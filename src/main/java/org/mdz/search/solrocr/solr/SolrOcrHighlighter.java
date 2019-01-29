@@ -1,7 +1,11 @@
 package org.mdz.search.solrocr.solr;
 
+import com.google.common.collect.Sets;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.solr.common.params.HighlightParams;
@@ -9,6 +13,7 @@ import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
+import org.apache.solr.schema.SchemaField;
 import org.apache.solr.search.DocList;
 import org.mdz.search.solrocr.lucene.OcrHighlighter;
 import org.mdz.search.solrocr.lucene.OcrSnippet;
@@ -28,8 +33,10 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     // - *snap* -
 
     // query-time parameters
-    String[] regularFieldNames = getHighlightFields(query, req, defaultFields);
     String[] ocrFieldNames = getOcrHighlightFields(query, req, defaultFields);
+    String[] regularFieldNames = Stream.of(getHighlightFields(query, req, defaultFields))
+        .filter(f -> Arrays.binarySearch(ocrFieldNames, f) < 0)
+        .toArray(String[]::new);
 
     int[] maxPassagesRegular = getMaxPassages(regularFieldNames, params);
     int[] maxPassagesOcr = getMaxPassages(ocrFieldNames, params);
@@ -61,9 +68,18 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     // TODO: Implement
   }
 
+  /**
+   * Obtain all fields among the requested fields that contain OCR data.
+   *
+   * By definition, a field contains OCR data if there is a corresponding field that contains its OCR path.
+   * Currently these have a hardcoded prefix of `ocrpath.`, but this will later be made configurable
+   */
   private String[] getOcrHighlightFields(Query query, SolrQueryRequest req, String[] defaultFields) {
-    // TODO: Determine which fields contain OCR data
-    // TODO: Determine which of these fields need to be highlighted
-    return new String[0];
+    HashSet<String> highlightFields = Sets.newHashSet(this.getHighlightFields(query, req, defaultFields));
+    return req.getSchema().getFields().values().stream()
+        .filter(f -> f.getName().startsWith("ocrpath."))
+        .map(SchemaField::getName)
+        .filter(highlightFields::contains)
+        .toArray(String[]::new);
   }
 }
