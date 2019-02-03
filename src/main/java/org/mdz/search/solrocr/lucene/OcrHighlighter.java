@@ -2,7 +2,6 @@ package org.mdz.search.solrocr.lucene;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.BreakIterator;
 import java.util.ArrayList;
@@ -18,6 +17,7 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
+import org.mdz.search.solrocr.util.FileCharIterable;
 
 public class OcrHighlighter extends UnifiedHighlighter {
   public OcrHighlighter(IndexSearcher indexSearcher,
@@ -30,14 +30,14 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return new HashMap<>();
   }
 
-  protected List<CharSequence[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
+  protected List<FileCharIterable[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
     // TODO: Read this prefix from the configuration and only use `ocrpath` as the default
     String ocrPathFieldPrefix = "ocrpath";
-    List<CharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
+    List<FileCharIterable[]> fieldValues = new ArrayList<>((int) docIter.cost());
     OcrPathStoredFieldVisitor visitor = new OcrPathStoredFieldVisitor(ocrPathFieldPrefix);
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-      CharSequence[] ocrVals = new CharSequence[fields.length];
+      FileCharIterable[] ocrVals = new FileCharIterable[fields.length];
       searcher.doc(docId, visitor);
       HashMap<String, String> paths = visitor.getOcrPaths();
       for (Entry<String, String> entry : paths.entrySet()) {
@@ -45,16 +45,12 @@ public class OcrHighlighter extends UnifiedHighlighter {
         if (fieldIdx < 0) {
           continue;
         }
-        ocrVals[fieldIdx] = this.loadOcrText(entry.getValue());
+        ocrVals[fieldIdx] = new FileCharIterable(Paths.get(entry.getValue()));
       }
       fieldValues.add(ocrVals);
       visitor.reset();
     }
     return fieldValues;
-  }
-
-  protected String loadOcrText(String ocrPath) throws IOException {
-    return new String(Files.readAllBytes(Paths.get(ocrPath)), StandardCharsets.UTF_8);
   }
 
   @Override
