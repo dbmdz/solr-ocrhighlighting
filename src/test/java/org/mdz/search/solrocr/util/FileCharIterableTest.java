@@ -1,7 +1,6 @@
 package org.mdz.search.solrocr.util;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -22,7 +21,7 @@ class FileCharIterableTest {
   void setUp() throws IOException {
     this.testText = RandomString.make(2^16);
     this.testFile = Files.createTempFile("solrocrtest", ".txt");
-    Files.write(this.testFile, this.testText.getBytes(StandardCharsets.UTF_16BE));
+    Files.write(this.testFile, this.testText.getBytes(StandardCharsets.UTF_16));
   }
 
   @AfterEach
@@ -31,18 +30,19 @@ class FileCharIterableTest {
   }
 
   @Test
-  void testReadSeek() throws IOException, URISyntaxException {
-    assertThat(testText.length()).isEqualTo(Files.size(testFile) / 2);
-    Random rand = new Random();
-    RandomAccessFile fp = new RandomAccessFile(testFile.toFile(), "r");
+  void testInit() throws IOException {
+    FileCharIterable it = new FileCharIterable(testFile);
+    assertThat(it.length()).isEqualTo(2^16);
+  }
 
+  @Test
+  void testSeek() throws IOException, URISyntaxException {
+    FileCharIterable it = new FileCharIterable(testFile);
+    Random rand = new Random();
     for (int i=0; i < 100000; i++) {
-      int idx = rand.nextInt(testText.length() - 8);
-      byte[] u16Bytes = new byte[2];
-      fp.seek(idx * 2);
-      fp.read(u16Bytes);
+      int idx = rand.nextInt(testText.length() - 6);
+      char decoded = it.charAt(idx);
       char fromString = testText.charAt(idx);
-      char decoded = new String(u16Bytes, StandardCharsets.UTF_16BE).charAt(0);
       assertThat(decoded).isEqualTo(fromString);
     }
   }
