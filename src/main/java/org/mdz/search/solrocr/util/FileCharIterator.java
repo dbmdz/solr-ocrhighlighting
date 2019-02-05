@@ -1,6 +1,7 @@
 package org.mdz.search.solrocr.util;
 
 import java.io.IOException;
+import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
@@ -29,15 +30,19 @@ public class FileCharIterator implements CharSequence, CharacterIterator {
     // or second byte is zero. This will fail if the file starts with higher-valued code points, but in this case we
     // just ask the user to add a BOM to the file.
     if (bomBuf[0] == (byte) 0xFE && bomBuf[1] == (byte) 0xFF) {
+      this.buf.order(ByteOrder.BIG_ENDIAN);
       this.charset = StandardCharsets.UTF_16BE;
       this.startOffset = 1;
     } else if (bomBuf[0] == (byte) 0xFF && bomBuf[1] == (byte) 0xFE) {
+      this.buf.order(ByteOrder.LITTLE_ENDIAN);
       this.charset = StandardCharsets.UTF_16LE;
       this.startOffset = 1;
     } else if (bomBuf[0] == (byte) 0x00) {
+      this.buf.order(ByteOrder.BIG_ENDIAN);
       this.charset = StandardCharsets.UTF_16BE;
       this.startOffset = 0;
     } else if (bomBuf[1] == (byte) 0x00) {
+      this.buf.order(ByteOrder.LITTLE_ENDIAN);
       this.charset = StandardCharsets.UTF_16LE;
       this.startOffset = 0;
     } else {
