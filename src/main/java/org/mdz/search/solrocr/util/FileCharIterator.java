@@ -1,51 +1,54 @@
 package org.mdz.search.solrocr.util;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.CharacterIterator;
 
-public class FileCharIterable implements CharSequence, CharacterIterator {
-
+public class FileCharIterator implements CharSequence, CharacterIterator {
   private final Path filePath;  // For copy-constructor
-  private final RandomAccessFile file;
-  private final long numChars;
+  private final MappedByteBuffer buf;
   private final Charset charset;
-  private final boolean hasBom;
+  private final int startOffset;  // 0 if no BOM, otherwise 1
+  private final long numChars;
   private int position;
 
-  public FileCharIterable(Path path) throws IOException {
+  public FileCharIterator(Path path) throws IOException {
     this.filePath = path;
-    this.file = new RandomAccessFile(path.toFile(), "r");
+    FileChannel channel = (FileChannel) Files.newByteChannel(path, StandardOpenOption.READ);
+    this.buf = channel.map(MapMode.READ_ONLY, 0, channel.size());
     byte[] bomBuf = new byte[2];
-    this.file.read(bomBuf);
+    this.buf.get(bomBuf);
     // Heuristic for determining the byte order: First check the BOM, and if that is not present check if the first
     // or second byte is zero. This will fail if the file starts with higher-valued code points, but in this case we
     // just ask the user to add a BOM to the file.
     if (bomBuf[0] == (byte) 0xFE && bomBuf[1] == (byte) 0xFF) {
       this.charset = StandardCharsets.UTF_16BE;
-      this.hasBom = true;
+      this.startOffset = 1;
     } else if (bomBuf[0] == (byte) 0xFF && bomBuf[1] == (byte) 0xFE) {
       this.charset = StandardCharsets.UTF_16LE;
-      this.hasBom = true;
+      this.startOffset = 1;
     } else if (bomBuf[0] == (byte) 0x00) {
       this.charset = StandardCharsets.UTF_16BE;
-      this.hasBom = false;
+      this.startOffset = 0;
     } else if (bomBuf[1] == (byte) 0x00) {
       this.charset = StandardCharsets.UTF_16LE;
-      this.hasBom = false;
+      this.startOffset = 0;
     } else {
       throw new IOException(String.format(
           "Could not determine UTF-16 byte order for %s, please add a BOM.", path));
     }
-    this.numChars = (Files.size(path) - (hasBom ? 2 : 0)) / 2;
+    this.numChars = channel.size() / 2 - this.startOffset;
     this.position = 0;
   }
 
-  private FileCharIterable(FileCharIterable other) throws IOException {
+  private FileCharIterator(FileCharIterator other) throws IOException {
     this(other.filePath);
     this.position = other.position;
   }
@@ -60,52 +63,39 @@ public class FileCharIterable implements CharSequence, CharacterIterator {
     if (offset < 0 || offset >= this.numChars) {
       throw new IndexOutOfBoundsException();
     }
-    try {
-      if (hasBom) {
-        offset += 1;
-      }
-      this.file.seek(offset * 2);
-      byte[] buf = new byte[2];
-      this.file.read(buf);
-      return new String(buf, charset).charAt(0);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return this.buf.getChar((this.startOffset + offset) * 2);
   }
 
   @Override
   public CharSequence subSequence(int start, int end) {
-    if (start < 0 || end < 0 || end >= this.numChars || end < start) {
+    if (start < 0 || end < 0 || end > this.numChars || end < start) {
       throw new IndexOutOfBoundsException();
     }
-    try {
-      if (hasBom) {
-        start += 1;
-        end += 1;
-      }
-      byte[] buf = new byte[(end - start) * 2];
-      this.file.seek(start * 2);
-      this.file.read(buf);
-      this.file.seek(position);
-      return new String(buf, charset);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    byte[] buf = new byte[(end - start) * 2];
+    this.buf.position((this.startOffset + start) * 2);
+    this.buf.get(buf);
+    return new String(buf, charset);
   }
 
   @Override
   public char first() {
-    return this.charAt(0);
+    this.position = getBeginIndex();
+    return this.current();
   }
 
   @Override
   public char last() {
-    return this.charAt((int) (this.numChars - 1));
+    this.position = Math.max(0, getEndIndex() - 1);
+    return this.current();
   }
 
   @Override
   public char current() {
-    return this.charAt(this.position);
+    if (this.position == this.numChars) {
+      return DONE;
+    } else {
+      return this.charAt(this.position);
+    }
   }
 
   @Override
@@ -129,7 +119,11 @@ public class FileCharIterable implements CharSequence, CharacterIterator {
   @Override
   public char setIndex(int offset) {
     this.position = offset;
-    return this.current();
+    try {
+      return this.current();
+    } catch (IndexOutOfBoundsException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
   @Override
@@ -144,13 +138,13 @@ public class FileCharIterable implements CharSequence, CharacterIterator {
 
   @Override
   public int getIndex() {
-    return 0;
+    return this.position;
   }
 
   @Override
   public Object clone() {
     try {
-      return new FileCharIterable(this);
+      return new FileCharIterator(this);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
