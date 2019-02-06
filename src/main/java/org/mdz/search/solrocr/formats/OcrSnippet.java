@@ -1,26 +1,26 @@
-package org.mdz.search.solrocr.lucene;
+package org.mdz.search.solrocr.formats;
 
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.mdz.search.solrocr.util.OcrBox;
 
-public class OcrSnippet {
+public class OcrSnippet<T extends Number> {
   private final String text;
   private final String pageId;
-  private final Rectangle2D snippetRegion;
-  private final List<Rectangle2D> highlightRegions;
+  private final OcrBox<T> snippetRegion;
+  private final List<OcrBox<T>> highlightRegions;
   private float score;
 
-  public OcrSnippet(String text, String pageId, Rectangle2D snippetRegion) {
+  public OcrSnippet(String text, String pageId, OcrBox<T> snippetRegion) {
     this.text = text;
     this.pageId = pageId;
     this.snippetRegion = snippetRegion;
     this.highlightRegions = new ArrayList<>();
   }
 
-  public void addHighlightRegion(Rectangle2D region) {
+  public void addHighlightRegion(OcrBox<T> region) {
     this.highlightRegions.add(region);
   }
 
@@ -28,11 +28,11 @@ public class OcrSnippet {
     return text;
   }
 
-  public Rectangle2D getSnippetRegion() {
+  public OcrBox<T> getSnippetRegion() {
     return snippetRegion;
   }
 
-  public List<Rectangle2D> getHighlightRegions() {
+  public List<OcrBox<T>> getHighlightRegions() {
     return highlightRegions;
   }
 
@@ -49,20 +49,20 @@ public class OcrSnippet {
     m.add("score", this.getScore());
     SimpleOrderedMap snipRegion = new SimpleOrderedMap();
     if (this.getSnippetRegion() != null) {
-      snipRegion.add("x", this.getSnippetRegion().getX());
-      snipRegion.add("y", this.getSnippetRegion().getY());
-      snipRegion.add("w", this.getSnippetRegion().getWidth());
-      snipRegion.add("h", this.getSnippetRegion().getHeight());
+      snipRegion.add("x", this.getSnippetRegion().x);
+      snipRegion.add("y", this.getSnippetRegion().y);
+      snipRegion.add("w", this.getSnippetRegion().width);
+      snipRegion.add("h", this.getSnippetRegion().height);
     }
     m.add("region", snipRegion);
     if (this.getHighlightRegions() != null) {
       SimpleOrderedMap[] highlights = this.getHighlightRegions().stream()
           .map(r -> {
             SimpleOrderedMap hlMap = new SimpleOrderedMap();
-            hlMap.add("x", r.getX());
-            hlMap.add("y", r.getY());
-            hlMap.add("w", r.getWidth());
-            hlMap.add("h", r.getHeight());
+            hlMap.add("x", r.x);
+            hlMap.add("y", r.y);
+            hlMap.add("w", r.width);
+            hlMap.add("h", r.height);
             return hlMap;
           }).toArray(SimpleOrderedMap[]::new);
       m.add("highlights", highlights);

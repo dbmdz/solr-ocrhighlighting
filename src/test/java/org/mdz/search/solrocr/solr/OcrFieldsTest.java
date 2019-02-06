@@ -30,7 +30,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
             + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
             + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
             + "deserunt mollit anim id est laborum.", "id", "1337"));
-    Path ocrPath = dataPath.resolve("ocr.xml");
+    Path ocrPath = dataPath.resolve("31337_ocr.xml");
     assertU(adoc(
         "ocr_text", new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_16),
         "ocrpath.ocr_text", ocrPath.toString(),

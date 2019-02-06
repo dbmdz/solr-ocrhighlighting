@@ -10,9 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.text.CharacterIterator;
 
-public class FileCharIterator implements CharSequence, CharacterIterator {
+public class FileCharIterator implements IterableCharSequence {
   private final Path filePath;  // For copy-constructor
   private final MappedByteBuffer buf;
   private final Charset charset;

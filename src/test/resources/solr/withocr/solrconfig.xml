@@ -9,6 +9,13 @@
   <requestHandler name="/select" class="solr.SearchHandler"/>
 
   <searchComponent class="solr.HighlightComponent" name="highlight">
-    <highlighting class="org.mdz.search.solrocr.solr.SolrOcrHighlighter" />
+    <highlighting class="org.mdz.search.solrocr.solr.SolrOcrHighlighter"
+                  ocrFormat="org.mdz.search.solrocr.formats.mini.MiniOcrFormat">
+      <fieldResolver name="externalFieldResolver" class="org.mdz.search.solrocr.lucene.PatternFieldResolver">
+        <lst name="externalFields">
+          <str name="ocr_text">src/test/resources/data/{docId}_ocr.xml</str>
+        </lst>
+      </fieldResolver>
+    </highlighting>
   </searchComponent>
 </config>
