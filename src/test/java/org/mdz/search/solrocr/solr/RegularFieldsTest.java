@@ -7,7 +7,7 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SolrOcrHighlighterTest extends SolrTestCaseJ4 {
+public class RegularFieldsTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "minimal");

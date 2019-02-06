@@ -1,7 +1,6 @@
 package org.mdz.search.solrocr.lucene;
 
 import java.io.IOException;
-import java.text.BreakIterator;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.search.uhighlight.AnalysisOffsetStrategy;
 import org.apache.lucene.search.uhighlight.FieldHighlighter;
@@ -9,13 +8,15 @@ import org.apache.lucene.search.uhighlight.FieldOffsetStrategy;
 import org.apache.lucene.search.uhighlight.OffsetsEnum;
 import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageScorer;
-import org.mdz.search.solrocr.util.FileCharIterable;
+import org.mdz.search.solrocr.util.ContextBreakIterator;
+import org.mdz.search.solrocr.util.FileCharIterator;
+import org.mdz.search.solrocr.util.TagBreakIterator;
 
 public class OcrFieldHighlighter extends FieldHighlighter {
-  public OcrFieldHighlighter(String field, FieldOffsetStrategy fieldOffsetStrategy, BreakIterator breakIterator,
-                             PassageScorer passageScorer, int maxPassages, int maxNoHighlightPassages) {
-    super(field, fieldOffsetStrategy, breakIterator, passageScorer, maxPassages, maxNoHighlightPassages,
-          new OcrPassageFormatter());
+  public OcrFieldHighlighter(String field, FieldOffsetStrategy fieldOffsetStrategy, PassageScorer passageScorer,
+                             int maxPassages, int maxNoHighlightPassages, String contextTag, int contextSize) {
+    super(field, fieldOffsetStrategy, new ContextBreakIterator(new TagBreakIterator(contextTag), contextSize),
+          passageScorer, maxPassages, maxNoHighlightPassages, new OcrPassageFormatter(contextTag));
     if (fieldOffsetStrategy instanceof AnalysisOffsetStrategy) {
       throw new RuntimeException("AnalysisOffsetStrategy is not supported for OCR fields.");
     }
@@ -24,7 +25,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
   /**
    * The primary method -- highlight this doc, assuming a specific field and given this content.
    */
-  public Object highlightFieldForDoc(LeafReader reader, int docId, FileCharIterable content) throws IOException {
+  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, FileCharIterator content) throws IOException {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
     if (content.length() == 0) {
       return null; // nothing to do

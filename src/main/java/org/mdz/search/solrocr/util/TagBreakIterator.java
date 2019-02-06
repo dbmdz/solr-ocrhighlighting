@@ -6,10 +6,21 @@ import java.text.CharacterIterator;
 public class TagBreakIterator extends BreakIterator {
   private final String breakTag;
   private CharacterIterator text;
+  private final boolean breakAfter;
   private int current;
 
   public TagBreakIterator(String tagName) {
-    this.breakTag = "<" + tagName;
+    this(tagName, false);
+  }
+
+  public TagBreakIterator(String tagName, boolean closing) {
+    if (closing) {
+      this.breakTag = "</" + tagName + ">";
+      this.breakAfter = true;
+    } else {
+      this.breakTag = "<" + tagName;
+      this.breakAfter = false;
+    }
   }
 
   @Override
