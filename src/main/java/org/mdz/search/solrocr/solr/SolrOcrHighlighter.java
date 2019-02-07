@@ -11,9 +11,9 @@ import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
+import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.schema.SchemaField;
 import org.apache.solr.search.DocList;
 import org.mdz.search.solrocr.lucene.OcrHighlighter;
 import org.mdz.search.solrocr.lucene.OcrSnippet;
@@ -42,17 +42,30 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     int[] maxPassagesOcr = getMaxPassages(ocrFieldNames, params);
 
     // Highlight non-OCR fields
-    UnifiedHighlighter regularHighlighter = getHighlighter(req);
-    Map<String, String[]> regularSnippets = regularHighlighter.highlightFields(regularFieldNames, query, docIDs, maxPassagesRegular);
+    Map<String, String[]> regularSnippets = null;
+    if (regularFieldNames.length > 0) {
+      UnifiedHighlighter regularHighlighter = getHighlighter(req);
+      regularSnippets = regularHighlighter.highlightFields(regularFieldNames, query, docIDs, maxPassagesRegular);
+    }
 
+    Map<String, OcrSnippet[][]> ocrSnippets = null;
     // Highlight OCR fields
-    OcrHighlighter ocrHighlighter = new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer());
-    Map<String, OcrSnippet[]> ocrSnippets = ocrHighlighter.highlightOcrFields(ocrFieldNames, query, docIDs, maxPassagesOcr);
+    if (ocrFieldNames.length > 0) {
+      String breakTag = params.get("hl.ctxTag", "w");
+      int contextSize = params.getInt("hl.ctxSize", 5);
+      OcrHighlighter ocrHighlighter = new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer());
+      ocrSnippets = ocrHighlighter.highlightOcrFields(
+          ocrFieldNames, query, docIDs, maxPassagesOcr, breakTag, contextSize);
+    }
 
     // Assemble output data
-    NamedList<Object> out = this.encodeSnippets(keys, regularFieldNames, regularSnippets);
-    this.addOcrSnippets(out, keys, ocrFieldNames, ocrSnippets);
-
+    NamedList<Object> out = new NamedList<>();
+    if (regularSnippets != null) {
+      out.addAll(this.encodeSnippets(keys, regularFieldNames, regularSnippets));
+    }
+    if (ocrSnippets != null) {
+      this.addOcrSnippets(out, keys, ocrFieldNames, ocrSnippets);
+    }
     return out;
   }
 
@@ -64,8 +77,24 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     return maxPassages;
   }
 
-  private void addOcrSnippets(NamedList<Object> out, String[] keys, String[] ocrFieldNames, Map<String, OcrSnippet[]> ocrSnippets) {
-    // TODO: Implement
+  private void addOcrSnippets(NamedList<Object> out, String[] keys, String[] ocrFieldNames, Map<String, OcrSnippet[][]> ocrSnippets) {
+    for (int k=0; k < keys.length; k++) {
+      String docId = keys[k];
+      SimpleOrderedMap docMap = (SimpleOrderedMap) out.get(docId);
+      if (docMap == null) {
+        docMap = new SimpleOrderedMap();
+        out.add(docId, docMap);
+      }
+      for (String fieldName : ocrFieldNames) {
+        OcrSnippet[] snips = ocrSnippets.get(fieldName)[k];
+        NamedList[] outSnips = new SimpleOrderedMap[snips.length];
+        for (int s = 0; s < snips.length; s++) {
+          OcrSnippet snip = snips[s];
+          outSnips[s] = snip.toNamedList();
+        }
+        docMap.add(fieldName, outSnips);
+      }
+    }
   }
 
   /**
@@ -78,7 +107,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     HashSet<String> highlightFields = Sets.newHashSet(this.getHighlightFields(query, req, defaultFields));
     return req.getSchema().getFields().values().stream()
         .filter(f -> f.getName().startsWith("ocrpath."))
-        .map(SchemaField::getName)
+        .map(f -> f.getName().replace("ocrpath.", ""))
         .filter(highlightFields::contains)
         .toArray(String[]::new);
   }
