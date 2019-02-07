@@ -75,10 +75,34 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testBooleanQuery2() throws Exception {
+  public void testBooleanQueryNoMatch() throws Exception {
     SolrQueryRequest req = xmlQ(
-        "q", "((München AND Bayern) OR Hamburg)", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+        "q", "((München AND Rotterdam) OR Mexico)", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='ocr_text']/lst)=0");
+  }
+
+  @Test
+  public void testWildcardQuery() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "(Mün* OR Magde*)", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=10");
+  }
+
+  @Test
+  public void testWildcardQueryWithWildcardOnly() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "*", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=10");
+  }
+
+  @Test
+  public void testWildcardQueryWithNoResults() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "Zzz*", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=0");
   }
 }
