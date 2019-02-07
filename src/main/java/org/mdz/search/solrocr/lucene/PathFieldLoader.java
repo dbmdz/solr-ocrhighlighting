@@ -10,6 +10,28 @@ import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.mdz.search.solrocr.util.FileCharIterator;
 import org.mdz.search.solrocr.util.IterableCharSequence;
 
+/** Load field values from filesystem paths.
+ *
+ * Must be configured with a mapping of field names to path patterns. In the pattern, <pre>{docId}</pre> is replaced
+ * with the <pre>"id"</pre> field of the document that the field content is to be retrieved for.
+ *
+ * The files the resolver loads from <strong>must be encoded in UTF-16, all other encodings are not supported.</strong>
+ * It is recommended to include a Byte-Order marker in the files, although the loader contains some heuristics to
+ * detect the endianness without its presence.
+ *
+ * Example:
+ *
+ * <pre>
+ * {@code
+ *  <fieldLoader class="org.mdz.search.solrocr.lucene.PathFieldLoader">
+ *    <lst name="externalFields">
+ *      <str name="ocr_text">src/test/resources/data/{docId}_ocr.xml</str>
+ *    </lst>
+ *  </fieldLoader>
+ *  }
+ * </pre>
+ *
+ * */
 public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitialized {
   private Map<String, String> fieldPatterns;
 

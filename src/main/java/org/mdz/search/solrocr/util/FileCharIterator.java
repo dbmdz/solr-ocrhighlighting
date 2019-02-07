@@ -11,6 +11,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+/** A lazy {@link java.lang.CharSequence} and {@link java.text.CharacterIterator} implementation for memory-mapped files.
+ *
+ * Allows fast random access to arbitrary character offsets in the file without having to load the whole content onto
+ * the Heap.
+ *
+ * <strong>The files must be encoded in UTF-16, all other encodings are not supported.</strong>
+ */
 public class FileCharIterator implements IterableCharSequence {
   private final Path filePath;  // For copy-constructor
   private final MappedByteBuffer buf;

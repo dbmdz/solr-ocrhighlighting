@@ -4,6 +4,11 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.stream.IntStream;
 
+/** A combination interface of {@link java.lang.CharSequence} and {@link java.text.CharacterIterator}.
+ *
+ * This is needed because in various parts of the {@link org.apache.lucene.search.uhighlight.UnifiedHighlighter} that
+ * this plugin wraps the content is accessed via both interfaces.
+ */
 public interface IterableCharSequence extends CharSequence, CharacterIterator {
   static IterableCharSequence fromString(String string) {
     return new IterableStringCharSequence(string);

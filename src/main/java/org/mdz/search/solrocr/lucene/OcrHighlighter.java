@@ -174,7 +174,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       searcher.doc(docId, docIdVisitor);
       for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {
         String fieldName = fields[fieldIdx];
-        if (fieldLoader == null) {
+        if (fieldLoader == null || !fieldLoader.isExternalField(fieldName)) {
           ocrVals[fieldIdx] = IterableCharSequence.fromString(docIdVisitor.getDocument().get(fieldName));
         } else {
           ocrVals[fieldIdx] = fieldLoader.loadField(docIdVisitor.getDocument().get("id"), fieldName);
