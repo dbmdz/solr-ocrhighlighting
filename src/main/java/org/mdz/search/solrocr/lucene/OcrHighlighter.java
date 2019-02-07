@@ -1,27 +1,24 @@
 package org.mdz.search.solrocr.lucene;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.index.BaseCompositeReader;
-import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.FilterLeafReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.ReaderUtil;
-import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
@@ -32,20 +29,26 @@ import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.InPlaceMergeSorter;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
+import org.mdz.search.solrocr.formats.OcrPassageFormatter;
+import org.mdz.search.solrocr.formats.OcrSnippet;
 import org.mdz.search.solrocr.util.FileCharIterator;
+import org.mdz.search.solrocr.util.IterableCharSequence;
 
 public class OcrHighlighter extends UnifiedHighlighter {
-  public OcrHighlighter(IndexSearcher indexSearcher,
-                        Analyzer indexAnalyzer) {
+
+  private final ExternalFieldLoader fieldLoader;
+
+  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, ExternalFieldLoader fieldLoader) {
     super(indexSearcher, indexAnalyzer);
+    this.fieldLoader = fieldLoader;
   }
 
   // FIXME: This is largely (>80%) copied straight from
   //        {@link UnifiedHighlighter#highlightFieldsAsObjects(String[], Query, int[], int[])}
   //        Would be nice if the architecture allowed for easier overriding of some things...
   public Map<String, OcrSnippet[][]> highlightOcrFields(
-      String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr, String breakTag,
-      int contextSize) throws IOException {
+      String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr, BreakIterator breakIter,
+      OcrPassageFormatter formatter) throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
     }
@@ -75,7 +78,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     int numPostings = 0;
     for (int f = 0; f < fields.length; f++) {
       OcrFieldHighlighter fieldHighlighter = getOcrFieldHighlighter(
-          fields[f], query, queryTerms, maxPassages[f], breakTag, contextSize);
+          fields[f], query, queryTerms, maxPassages[f], breakIter, formatter);
       fieldHighlighters[f] = fieldHighlighter;
 
       switch (fieldHighlighter.getOffsetSource()) {
@@ -107,7 +110,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     DocIdSetIterator docIdIter = asDocIdSetIterator(docIds);
     for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
       // Load the field values of the first batch of document(s) (note: commonly all docs are in this batch)
-      List<FileCharIterator[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
+      List<IterableCharSequence[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
       //List<CharSequence[]> fieldValsByDoc = loadFieldValues(fields, docIdIter, -1);
       //    the size of the above list is the size of the batch (num of docs in the batch)
 
@@ -117,7 +120,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
         OcrFieldHighlighter fieldHighlighter = fieldHighlighters[fieldIdx];
         for (int docIdx = batchDocIdx; docIdx - batchDocIdx < fieldValsByDoc.size(); docIdx++) {
           int docId = docIds[docIdx];//sorted order
-          FileCharIterator content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
+          IterableCharSequence content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
           //CharSequence content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
           if (content == null) {
             continue;
@@ -157,53 +160,42 @@ public class OcrHighlighter extends UnifiedHighlighter {
   @Override
   protected List<CharSequence[]> loadFieldValues(String[] fields, DocIdSetIterator docIter, int cacheCharsThreshold)
       throws IOException {
-    String ocrPathFieldPrefix = "ocrpath";
-    List<CharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
-    OcrPathStoredFieldVisitor visitor = new OcrPathStoredFieldVisitor(ocrPathFieldPrefix);
-    int docId;
-    while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-      CharSequence[] ocrVals = new CharSequence[fields.length];
-      searcher.doc(docId, visitor);
-      HashMap<String, String> paths = visitor.getOcrPaths();
-      for (Entry<String, String> entry : paths.entrySet()) {
-        int fieldIdx = Arrays.binarySearch(fields, entry.getKey());
-        if (fieldIdx < 0) {
-          continue;
-        }
-        ocrVals[fieldIdx] = new String(Files.readAllBytes(Paths.get(entry.getValue())), StandardCharsets.UTF_16);
-      }
-      fieldValues.add(ocrVals);
-      visitor.reset();
-    }
-    return fieldValues;
-
+    return loadOcrFieldValues(fields, docIter).stream()
+        .map(seqs -> Arrays.stream(seqs).map(IterableCharSequence::toString).toArray(CharSequence[]::new))
+        .collect(Collectors.toList());
   }
 
-  protected List<FileCharIterator[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
-    // TODO: Read this prefix from the configuration and only use `ocrpath` as the default
-    String ocrPathFieldPrefix = "ocrpath";
-    List<FileCharIterator[]> fieldValues = new ArrayList<>((int) docIter.cost());
-    OcrPathStoredFieldVisitor visitor = new OcrPathStoredFieldVisitor(ocrPathFieldPrefix);
+  protected List<IterableCharSequence[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
+    List<IterableCharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
+    DocumentStoredFieldVisitor docIdVisitor = getStoredFieldVisitor(fields);
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-      FileCharIterator[] ocrVals = new FileCharIterator[fields.length];
-      searcher.doc(docId, visitor);
-      HashMap<String, String> paths = visitor.getOcrPaths();
-      for (Entry<String, String> entry : paths.entrySet()) {
-        int fieldIdx = Arrays.binarySearch(fields, entry.getKey());
-        if (fieldIdx < 0) {
-          continue;
+      IterableCharSequence[] ocrVals = new FileCharIterator[fields.length];
+      searcher.doc(docId, docIdVisitor);
+      for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {
+        String fieldName = fields[fieldIdx];
+        if (fieldLoader == null || !fieldLoader.isExternalField(fieldName)) {
+          ocrVals[fieldIdx] = IterableCharSequence.fromString(docIdVisitor.getDocument().get(fieldName));
+        } else {
+          ocrVals[fieldIdx] = fieldLoader.loadField(docIdVisitor.getDocument().get("id"), fieldName);
         }
-        ocrVals[fieldIdx] = new FileCharIterator(Paths.get(entry.getValue()));
       }
       fieldValues.add(ocrVals);
-      visitor.reset();
     }
     return fieldValues;
+  }
+
+  protected DocumentStoredFieldVisitor getStoredFieldVisitor(String[] fields) {
+    if (fieldLoader == null) {
+      return new DocumentStoredFieldVisitor(fields);
+    } else {
+      return new DocumentStoredFieldVisitor("id");
+    }
   }
 
   private OcrFieldHighlighter getOcrFieldHighlighter(
-      String field, Query query, Set<Term> allTerms, int maxPassages, String breakTag, int contextSize) {
+      String field, Query query, Set<Term> allTerms, int maxPassages, BreakIterator breakIter,
+      OcrPassageFormatter formatter) {
     Predicate<String> fieldMatcher = getFieldMatcher(field);
     BytesRef[] terms = filterExtractedTerms(fieldMatcher, allTerms);
     Set<HighlightFlag> highlightFlags = getFlags(field);
@@ -211,9 +203,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
     CharacterRunAutomaton[] automata = getAutomata(field, query, highlightFlags);
     OffsetSource offsetSource = getOptimizedOffsetSource(field, terms, phraseHelper, automata);
     UHComponents components = new UHComponents(field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
-    return new OcrFieldHighlighter(field, getOffsetStrategy(offsetSource, components),
-                                   getScorer(field), maxPassages,
-                                   getMaxNoHighlightPassages(field), breakTag, contextSize);
+    return new OcrFieldHighlighter(field, getOffsetStrategy(offsetSource, components), getScorer(field), breakIter,
+                                   formatter, maxPassages, getMaxNoHighlightPassages(field));
   }
 
   // FIXME: This is copied straight from UnifiedHighlighter because it has private access there. Maybe open an issue to
@@ -295,46 +286,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
         return Math.max(0, sortedDocIds.length - (idx + 1)); // remaining docs
       }
     };
-  }
-
-  /**
-   * Visits stored field values and for every field with a name that has the configured prefix, stores the value
-   * in the values map.
-   */
-  protected class OcrPathStoredFieldVisitor extends StoredFieldVisitor {
-
-    private final String ocrPathFieldPrefix;
-    private HashMap<String, String> values;
-
-    public OcrPathStoredFieldVisitor(String ocrPathFieldPrefix) {
-      this.ocrPathFieldPrefix = ocrPathFieldPrefix;
-      this.values = new HashMap<>();
-    }
-
-    public void reset() {
-      this.values = new HashMap<>();
-    }
-
-    public HashMap<String, String> getOcrPaths() {
-      HashMap<String, String> paths = new HashMap<>();
-      // Strip the field prefix from the field name
-      for (Entry<String, String> entry : this.values.entrySet()) {
-        paths.put(entry.getKey().replaceFirst(ocrPathFieldPrefix + ".", ""),
-                  entry.getValue());
-      }
-      return paths;
-    }
-
-    @Override
-    public void stringField(FieldInfo fieldInfo, byte[] byteValue) throws IOException {
-      String value = new String(byteValue, StandardCharsets.UTF_8);
-      this.values.put(fieldInfo.name, value);
-    }
-
-    @Override
-    public Status needsField(FieldInfo fieldInfo) throws IOException {
-      return fieldInfo.name.startsWith(this.ocrPathFieldPrefix) ? Status.YES : Status.NO;
-    }
   }
 
   /**

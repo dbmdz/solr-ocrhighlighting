@@ -1,24 +1,77 @@
 package org.mdz.search.solrocr.solr;
 
-import com.google.common.collect.Sets;
 import java.io.IOException;
+import java.text.BreakIterator;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
+import org.apache.solr.common.SolrException;
+import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.solr.core.PluginInfo;
+import org.apache.solr.core.SolrCore;
+import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.DocList;
+import org.apache.solr.util.plugin.PluginInfoInitialized;
+import org.mdz.search.solrocr.formats.OcrBlock;
+import org.mdz.search.solrocr.formats.OcrFormat;
+import org.mdz.search.solrocr.formats.OcrPassageFormatter;
+import org.mdz.search.solrocr.formats.OcrSnippet;
+import org.mdz.search.solrocr.lucene.ExternalFieldLoader;
 import org.mdz.search.solrocr.lucene.OcrHighlighter;
-import org.mdz.search.solrocr.lucene.OcrSnippet;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
+  private final ResourceLoader resourceLoader;
+
+  private ExternalFieldLoader fieldLoader;
+  private OcrFormat ocrFormat;
+  private List<String> ocrFieldNames;
+
+  public SolrOcrHighlighter() {
+    this.resourceLoader = new SolrResourceLoader();
+  }
+
+  @Override
+  public void init(PluginInfo info) {
+    super.init(info);
+    String formatClsName = info.attributes.get("ocrFormat");
+    if (formatClsName == null) {
+      throw new SolrException(
+          ErrorCode.FORBIDDEN,
+          "Please configure your OCR format with the `ocrFormat` attribute on <highlighting>. "
+        + "Refer to the org.mdz.search.solrocr.formats package for available formats.");
+    }
+    this.ocrFormat = SolrCore.createInstance(formatClsName, OcrFormat.class, null, null, resourceLoader);
+
+    NamedList<String> ocrFieldInfo = (NamedList) info.initArgs.get("ocrFields");
+    if (ocrFieldInfo == null) {
+      throw new SolrException(
+          ErrorCode.FORBIDDEN,
+          "Please define the fields that OCR highlighting should apply to in a ocrFields list in your solrconfig.xml. "
+        + "Example: <lst name\"ocrFields\"><str>ocr_text</str></lst>");
+    }
+    this.ocrFieldNames = new ArrayList<>();
+    ocrFieldInfo.forEach((k, fieldName) -> ocrFieldNames.add(fieldName));
+
+    PluginInfo fieldLoaderInfo = info.getChild("fieldLoader");
+    if (fieldLoaderInfo != null) {
+      fieldLoader = SolrCore.createInstance(
+          fieldLoaderInfo.className, ExternalFieldLoader.class,null, null, resourceLoader);
+      if (fieldLoader instanceof PluginInfoInitialized) {
+        ((PluginInfoInitialized) fieldLoader).init(fieldLoaderInfo);
+      }
+    }
+  }
 
   @Override
   public NamedList<Object> doHighlighting(DocList docs, Query query, SolrQueryRequest req, String[] defaultFields)
@@ -51,11 +104,17 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     Map<String, OcrSnippet[][]> ocrSnippets = null;
     // Highlight OCR fields
     if (ocrFieldNames.length > 0) {
-      String breakTag = params.get("hl.ctxTag", "w");
-      int contextSize = params.getInt("hl.ctxSize", 5);
-      OcrHighlighter ocrHighlighter = new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer());
+      OcrHighlighter ocrHighlighter = new OcrHighlighter(
+          req.getSearcher(), req.getSchema().getIndexAnalyzer(), fieldLoader);
+      ocrFormat.setBreakParameters(
+          OcrBlock.valueOf(params.get("hl.ocr.contextBlock", "line").toUpperCase()),
+          params.getInt("hl.ocr.contextSize", 2));
+      BreakIterator ocrBreakIterator = ocrFormat.getBreakIterator();
+      OcrPassageFormatter ocrFormatter = ocrFormat.getPassageFormatter(
+          OcrBlock.valueOf(params.get("hl.ocr.limitBlock", "block").toUpperCase()),
+          params.get("hl.tag.pre", "<em>"), params.get("hl.tag.post", "</em>"));
       ocrSnippets = ocrHighlighter.highlightOcrFields(
-          ocrFieldNames, query, docIDs, maxPassagesOcr, breakTag, contextSize);
+          ocrFieldNames, query, docIDs, maxPassagesOcr, ocrBreakIterator, ocrFormatter);
     }
 
     // Assemble output data
@@ -77,7 +136,8 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     return maxPassages;
   }
 
-  private void addOcrSnippets(NamedList<Object> out, String[] keys, String[] ocrFieldNames, Map<String, OcrSnippet[][]> ocrSnippets) {
+  private void addOcrSnippets(NamedList<Object> out, String[] keys, String[] ocrFieldNames,
+                              Map<String, OcrSnippet[][]> ocrSnippets) {
     for (int k=0; k < keys.length; k++) {
       String docId = keys[k];
       SimpleOrderedMap docMap = (SimpleOrderedMap) out.get(docId);
@@ -97,18 +157,11 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     }
   }
 
-  /**
-   * Obtain all fields among the requested fields that contain OCR data.
-   *
-   * By definition, a field contains OCR data if there is a corresponding field that contains its OCR path.
-   * Currently these have a hardcoded prefix of `ocrpath.`, but this will later be made configurable
-   */
+  /** Obtain all fields among the requested fields that contain OCR data. */
   private String[] getOcrHighlightFields(Query query, SolrQueryRequest req, String[] defaultFields) {
-    HashSet<String> highlightFields = Sets.newHashSet(this.getHighlightFields(query, req, defaultFields));
-    return req.getSchema().getFields().values().stream()
-        .filter(f -> f.getName().startsWith("ocrpath."))
-        .map(f -> f.getName().replace("ocrpath.", ""))
-        .filter(highlightFields::contains)
+    return Arrays.stream(getHighlightFields(query, req, defaultFields))
+        .distinct()
+        .filter(ocrFieldNames::contains)
         .toArray(String[]::new);
   }
 }

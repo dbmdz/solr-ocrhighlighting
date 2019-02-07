@@ -3,6 +3,7 @@ package org.mdz.search.solrocr.util;
 import java.text.BreakIterator;
 import java.text.CharacterIterator;
 
+/** A {@link java.text.BreakIterator} that splits an XML-like document on a specific opening or closing tag. */
 public class TagBreakIterator extends BreakIterator {
   private final String breakTag;
   private CharacterIterator text;

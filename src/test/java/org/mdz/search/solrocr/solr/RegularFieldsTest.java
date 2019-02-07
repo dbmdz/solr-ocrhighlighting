@@ -10,7 +10,7 @@ import org.junit.Test;
 public class RegularFieldsTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "minimal");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr");
 
     HighlightComponent hlComp = (HighlightComponent) h.getCore().getSearchComponent("highlight");
     assertTrue("wrong highlighter: " + hlComp.getHighlighter().getClass(),
