@@ -14,7 +14,7 @@ import org.junit.Test;
 public class OcrFieldsTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "withocr");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr");
 
     HighlightComponent hlComp = (HighlightComponent) h.getCore().getSearchComponent("highlight");
     assertTrue("wrong highlighter: " + hlComp.getHighlighter().getClass(),
