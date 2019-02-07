@@ -18,7 +18,7 @@ class TagBreakIteratorTest {
 
   @BeforeEach
   void setUp() throws IOException {
-    text = new FileCharIterator(Paths.get("src/test/resources/data/31337_ocr.xml"));
+    text = new FileCharIterator(Paths.get("src/test/resources/data/miniocr.xml"));
     it = new TagBreakIterator("w");
     it.setText(this.text);
   }

@@ -26,8 +26,8 @@
   <fields>
     <field name="id" type="int" indexed="true" stored="true" multiValued="false" required="false"/>
     <field name="some_text" type="text" indexed="true" stored="true" />
-    <field name="ocr_text" type="text_ocr" indexed="true" stored="false" />
-    <field name="ocrpath.ocr_text" type="text" indexed="false" stored="true" />
+    <field name="external_ocr_text" type="text_ocr" indexed="true" stored="false" />
+    <field name="stored_ocr_text" type="text_ocr" indexed="true" stored="true" />
     <dynamicField name="*_ocr" type="text_ocr" indexed="true" stored="false" />
   </fields>
   <uniqueKey>id</uniqueKey>

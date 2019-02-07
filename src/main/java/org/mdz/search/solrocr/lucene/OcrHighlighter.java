@@ -31,7 +31,6 @@ import org.apache.lucene.util.InPlaceMergeSorter;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
-import org.mdz.search.solrocr.util.FileCharIterator;
 import org.mdz.search.solrocr.util.IterableCharSequence;
 
 public class OcrHighlighter extends UnifiedHighlighter {
@@ -167,10 +166,15 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
   protected List<IterableCharSequence[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
     List<IterableCharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
-    DocumentStoredFieldVisitor docIdVisitor = getStoredFieldVisitor(fields);
+    List<String> storedFields = Arrays.stream(fields)
+        .filter(f -> fieldLoader == null || !fieldLoader.isExternalField(f))
+        .collect(Collectors.toList());
+    storedFields.add(0, "id");
+
+    DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor(storedFields.stream().toArray(String[]::new));
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-      IterableCharSequence[] ocrVals = new FileCharIterator[fields.length];
+      IterableCharSequence[] ocrVals = new IterableCharSequence[fields.length];
       searcher.doc(docId, docIdVisitor);
       for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {
         String fieldName = fields[fieldIdx];
@@ -183,14 +187,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
       fieldValues.add(ocrVals);
     }
     return fieldValues;
-  }
-
-  protected DocumentStoredFieldVisitor getStoredFieldVisitor(String[] fields) {
-    if (fieldLoader == null) {
-      return new DocumentStoredFieldVisitor(fields);
-    } else {
-      return new DocumentStoredFieldVisitor("id");
-    }
   }
 
   private OcrFieldHighlighter getOcrFieldHighlighter(
