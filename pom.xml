@@ -92,6 +92,15 @@
         <artifactId>junit-platform-maven-plugin</artifactId>
         <version>${version.junit-platform-maven}</version>
         <extensions>true</extensions>
+        <configuration>
+          <executor>JAVA</executor>
+          <javaOptions>
+            <inheritIO>true</inheritIO>
+            <additionalOptions>
+              <additionalOption>-Dtest.solr.allowed.securerandom=NativePRNG</additionalOption>
+            </additionalOptions>
+          </javaOptions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
