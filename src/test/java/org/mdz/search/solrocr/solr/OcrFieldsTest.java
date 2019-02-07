@@ -53,4 +53,20 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='ocr_text']/lst)=3");
   }
+
+  @Test
+  public void testBooleanQuery() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "((München AND Italien) OR Landsherr)", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='ocr_text']/lst)=10");
+  }
+
+  @Test
+  public void testBooleanQuery2() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "((München AND Bayern) OR Hamburg)", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='ocr_text']/lst)=3");
+  }
 }
