@@ -10,6 +10,7 @@ import org.apache.solr.handler.component.HighlightComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 
 public class OcrFieldsTest extends SolrTestCaseJ4 {
   @BeforeClass
@@ -88,6 +89,17 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
         "q", "(Mün* OR Magde*)", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=10");
+  }
+
+  @Test
+  @Disabled("fix xpath evaluation")
+  public void testWildcardQueryAtTheEnd() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "*deburg", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=10");
+    assertQ(req,
+        "contains(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='ocr_text']/lst/str[@name='text'],'<em>Magdebur</em>g')");
   }
 
   @Test
