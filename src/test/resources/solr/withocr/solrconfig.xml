@@ -11,11 +11,14 @@
   <searchComponent class="solr.HighlightComponent" name="highlight">
     <highlighting class="org.mdz.search.solrocr.solr.SolrOcrHighlighter"
                   ocrFormat="org.mdz.search.solrocr.formats.mini.MiniOcrFormat">
-      <fieldResolver name="externalFieldResolver" class="org.mdz.search.solrocr.lucene.PatternFieldResolver">
+      <lst name="ocrFields">
+        <str>ocr_text</str>
+      </lst>
+      <fieldLoader class="org.mdz.search.solrocr.lucene.PathFieldLoader">
         <lst name="externalFields">
           <str name="ocr_text">src/test/resources/data/{docId}_ocr.xml</str>
         </lst>
-      </fieldResolver>
+      </fieldLoader>
     </highlighting>
   </searchComponent>
 </config>

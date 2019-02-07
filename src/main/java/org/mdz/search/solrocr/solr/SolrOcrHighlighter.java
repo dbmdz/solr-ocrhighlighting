@@ -1,10 +1,10 @@
 package org.mdz.search.solrocr.solr;
 
-import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.text.BreakIterator;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.lucene.analysis.util.ResourceLoader;
@@ -19,27 +19,23 @@ import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.SolrResourceLoader;
-import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.schema.SchemaField;
 import org.apache.solr.search.DocList;
-import org.apache.solr.util.plugin.NamedListInitializedPlugin;
 import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.mdz.search.solrocr.formats.OcrBlock;
 import org.mdz.search.solrocr.formats.OcrFormat;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
-import org.mdz.search.solrocr.lucene.ExternalFieldResolver;
+import org.mdz.search.solrocr.lucene.ExternalFieldLoader;
 import org.mdz.search.solrocr.lucene.OcrHighlighter;
-import org.mdz.search.solrocr.lucene.PatternFieldResolver;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private final ResourceLoader resourceLoader;
 
-  private PluginInfo info;
-  private ExternalFieldResolver externalFieldResolver;
+  private ExternalFieldLoader fieldLoader;
   private OcrFormat ocrFormat;
+  private List<String> ocrFieldNames;
 
   public SolrOcrHighlighter() {
     this.resourceLoader = new SolrResourceLoader();
@@ -48,7 +44,6 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   @Override
   public void init(PluginInfo info) {
     super.init(info);
-    PluginInfo fieldResolverInfo = info.getChild("fieldResolver");
     String formatClsName = info.attributes.get("ocrFormat");
     if (formatClsName == null) {
       throw new SolrException(
@@ -57,16 +52,24 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
         + "Refer to the org.mdz.search.solrocr.formats package for available formats.");
     }
     this.ocrFormat = SolrCore.createInstance(formatClsName, OcrFormat.class, null, null, resourceLoader);
-    if (fieldResolverInfo != null) {
-      externalFieldResolver = createInitInstance(
-          fieldResolverInfo, ExternalFieldResolver.class, null, PatternFieldResolver.class.getName());
-    } else {
-      // TODO: We should be able to work with stored fields as well!
+
+    NamedList<String> ocrFieldInfo = (NamedList) info.initArgs.get("ocrFields");
+    if (ocrFieldInfo == null) {
       throw new SolrException(
           ErrorCode.FORBIDDEN,
-          "Currently the OCR highlighter only supports external fields from disk, please provide a "
-        + "ExternalFieldResolver implementation with the <fieldResolver> tag in the <highlighting> section of your Solr "
-        + "config.");
+          "Please define the fields that OCR highlighting should apply to in a ocrFields list in your solrconfig.xml. "
+        + "Example: <lst name\"ocrFields\"><str>ocr_text</str></lst>");
+    }
+    this.ocrFieldNames = new ArrayList<>();
+    ocrFieldInfo.forEach((k, fieldName) -> ocrFieldNames.add(fieldName));
+
+    PluginInfo fieldLoaderInfo = info.getChild("fieldLoader");
+    if (fieldLoaderInfo != null) {
+      fieldLoader = SolrCore.createInstance(
+          fieldLoaderInfo.className, ExternalFieldLoader.class,null, null, resourceLoader);
+      if (fieldLoader instanceof PluginInfoInitialized) {
+        ((PluginInfoInitialized) fieldLoader).init(fieldLoaderInfo);
+      }
     }
   }
 
@@ -102,7 +105,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     // Highlight OCR fields
     if (ocrFieldNames.length > 0) {
       OcrHighlighter ocrHighlighter = new OcrHighlighter(
-          req.getSearcher(), req.getSchema().getIndexAnalyzer(), externalFieldResolver);
+          req.getSearcher(), req.getSchema().getIndexAnalyzer(), fieldLoader);
       ocrFormat.setBreakParameters(
           OcrBlock.valueOf(params.get("hl.ocr.contextBlock", "line").toUpperCase()),
           params.getInt("hl.ocr.contextSize", 2));
@@ -154,33 +157,11 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     }
   }
 
-  /**
-   * Obtain all fields among the requested fields that contain OCR data.
-   *
-   * By definition, a field contains OCR data if there is a corresponding field that contains its OCR path.
-   * Currently these have a hardcoded prefix of `ocrpath.`, but this will later be made configurable
-   */
+  /** Obtain all fields among the requested fields that contain OCR data. */
   private String[] getOcrHighlightFields(Query query, SolrQueryRequest req, String[] defaultFields) {
-    HashSet<String> highlightFields = Sets.newHashSet(this.getHighlightFields(query, req, defaultFields));
-    return req.getSchema().getFields().values().stream()
-        .map(SchemaField::getName)
-        .filter(f -> externalFieldResolver.isExternalField(f))
-        .filter(highlightFields::contains)
+    return Arrays.stream(getHighlightFields(query, req, defaultFields))
+        .distinct()
+        .filter(ocrFieldNames::contains)
         .toArray(String[]::new);
-  }
-
-  private <T extends Object> T createInitInstance(PluginInfo info,Class<T> cast, String msg, String defClassName){
-    if(info == null) return null;
-    T o = SolrCore.createInstance(info.className == null ? defClassName : info.className ,cast, msg,null,
-                                  resourceLoader);
-    if (o instanceof PluginInfoInitialized) {
-      ((PluginInfoInitialized) o).init(info);
-    } else if (o instanceof NamedListInitializedPlugin) {
-      ((NamedListInitializedPlugin) o).init(info.initArgs);
-    }
-    if(o instanceof SearchComponent) {
-      ((SearchComponent) o).setName(info.name);
-    }
-    return o;
   }
 }

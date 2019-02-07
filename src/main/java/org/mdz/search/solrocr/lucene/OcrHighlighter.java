@@ -1,16 +1,15 @@
 package org.mdz.search.solrocr.lucene;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.index.BaseCompositeReader;
@@ -33,16 +32,15 @@ import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
 import org.mdz.search.solrocr.util.FileCharIterator;
+import org.mdz.search.solrocr.util.IterableCharSequence;
 
 public class OcrHighlighter extends UnifiedHighlighter {
 
-  private final ExternalFieldResolver externalFieldResolver;
+  private final ExternalFieldLoader fieldLoader;
 
-  public OcrHighlighter(IndexSearcher indexSearcher,
-                        Analyzer indexAnalyzer,
-                        ExternalFieldResolver externalFieldResolver) {
+  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, ExternalFieldLoader fieldLoader) {
     super(indexSearcher, indexAnalyzer);
-    this.externalFieldResolver = externalFieldResolver;
+    this.fieldLoader = fieldLoader;
   }
 
   // FIXME: This is largely (>80%) copied straight from
@@ -112,7 +110,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     DocIdSetIterator docIdIter = asDocIdSetIterator(docIds);
     for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
       // Load the field values of the first batch of document(s) (note: commonly all docs are in this batch)
-      List<FileCharIterator[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
+      List<IterableCharSequence[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
       //List<CharSequence[]> fieldValsByDoc = loadFieldValues(fields, docIdIter, -1);
       //    the size of the above list is the size of the batch (num of docs in the batch)
 
@@ -122,7 +120,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
         OcrFieldHighlighter fieldHighlighter = fieldHighlighters[fieldIdx];
         for (int docIdx = batchDocIdx; docIdx - batchDocIdx < fieldValsByDoc.size(); docIdx++) {
           int docId = docIds[docIdx];//sorted order
-          FileCharIterator content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
+          IterableCharSequence content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
           //CharSequence content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
           if (content == null) {
             continue;
@@ -162,39 +160,37 @@ public class OcrHighlighter extends UnifiedHighlighter {
   @Override
   protected List<CharSequence[]> loadFieldValues(String[] fields, DocIdSetIterator docIter, int cacheCharsThreshold)
       throws IOException {
-    DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor("id");
-    List<CharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
-    int docId;
-    while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-      searcher.doc(docId, docIdVisitor);
-      CharSequence[] ocrVals = new CharSequence[fields.length];
-      for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {
-        String fieldName = fields[fieldIdx];
-        ocrVals[fieldIdx] = new String(
-            Files.readAllBytes(externalFieldResolver.resolve(docIdVisitor.getDocument().get("id"), fieldName)),
-            StandardCharsets.UTF_16);
-      }
-      fieldValues.add(ocrVals);
-    }
-    return fieldValues;
-
+    return loadOcrFieldValues(fields, docIter).stream()
+        .map(seqs -> Arrays.stream(seqs).map(IterableCharSequence::toString).toArray(CharSequence[]::new))
+        .collect(Collectors.toList());
   }
 
-  protected List<FileCharIterator[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
-    List<FileCharIterator[]> fieldValues = new ArrayList<>((int) docIter.cost());
-    DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor("id");
+  protected List<IterableCharSequence[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
+    List<IterableCharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
+    DocumentStoredFieldVisitor docIdVisitor = getStoredFieldVisitor(fields);
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-      FileCharIterator[] ocrVals = new FileCharIterator[fields.length];
+      IterableCharSequence[] ocrVals = new FileCharIterator[fields.length];
       searcher.doc(docId, docIdVisitor);
       for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {
         String fieldName = fields[fieldIdx];
-        Path fieldPath = externalFieldResolver.resolve(docIdVisitor.getDocument().get("id"), fieldName);
-        ocrVals[fieldIdx] = new FileCharIterator(fieldPath);
+        if (fieldLoader == null) {
+          ocrVals[fieldIdx] = IterableCharSequence.fromString(docIdVisitor.getDocument().get(fieldName));
+        } else {
+          ocrVals[fieldIdx] = fieldLoader.loadField(docIdVisitor.getDocument().get("id"), fieldName);
+        }
       }
       fieldValues.add(ocrVals);
     }
     return fieldValues;
+  }
+
+  protected DocumentStoredFieldVisitor getStoredFieldVisitor(String[] fields) {
+    if (fieldLoader == null) {
+      return new DocumentStoredFieldVisitor(fields);
+    } else {
+      return new DocumentStoredFieldVisitor("id");
+    }
   }
 
   private OcrFieldHighlighter getOcrFieldHighlighter(

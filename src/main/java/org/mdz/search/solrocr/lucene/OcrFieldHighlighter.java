@@ -12,7 +12,7 @@ import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.apache.lucene.search.uhighlight.PassageScorer;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
-import org.mdz.search.solrocr.util.FileCharIterator;
+import org.mdz.search.solrocr.util.IterableCharSequence;
 
 public class OcrFieldHighlighter extends FieldHighlighter {
   public OcrFieldHighlighter(String field, FieldOffsetStrategy fieldOffsetStrategy, PassageScorer passageScorer,
@@ -28,7 +28,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
   /**
    * The primary method -- highlight this doc, assuming a specific field and given this content.
    */
-  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, FileCharIterator content) throws IOException {
+  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, IterableCharSequence content) throws IOException {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
     if (content.length() == 0) {
       return null; // nothing to do
