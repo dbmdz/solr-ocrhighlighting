@@ -171,9 +171,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
         .collect(Collectors.toList());
     storedFields.add(0, "id");
 
-    DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor(storedFields.stream().toArray(String[]::new));
+    String[] visitorArgs = storedFields.stream().toArray(String[]::new);
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
+      DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor(visitorArgs);
       IterableCharSequence[] ocrVals = new IterableCharSequence[fields.length];
       searcher.doc(docId, docIdVisitor);
       for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {

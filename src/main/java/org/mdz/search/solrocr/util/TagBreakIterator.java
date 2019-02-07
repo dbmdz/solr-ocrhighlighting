@@ -27,13 +27,15 @@ public class TagBreakIterator extends BreakIterator {
   @Override
   public int first() {
     this.text.first();
-    return this.next();
+    this.current = this.text.getIndex();
+    return this.current();
   }
 
   @Override
   public int last() {
     this.text.last();
-    return this.previous();
+    this.current = this.text.getIndex();
+    return this.current();
   }
 
   @Override

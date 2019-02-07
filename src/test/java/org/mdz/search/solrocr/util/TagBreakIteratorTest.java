@@ -18,7 +18,7 @@ class TagBreakIteratorTest {
 
   @BeforeEach
   void setUp() throws IOException {
-    text = new FileCharIterator(Paths.get("src/test/resources/data/miniocr.xml"));
+    text = new FileCharIterator(Paths.get("src/test/resources/data/31337_ocr.xml"));
     it = new TagBreakIterator("w");
     it.setText(this.text);
   }
@@ -31,7 +31,7 @@ class TagBreakIteratorTest {
 
   @Test
   void firstNext() {
-    int start = it.first();
+    int start = it.next();
     int end = it.next();
     String tag = text.subSequence(start, end).toString();
     assertThat(tag).startsWith("<w");

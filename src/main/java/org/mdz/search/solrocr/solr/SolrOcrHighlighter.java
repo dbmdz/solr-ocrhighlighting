@@ -147,6 +147,9 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
       }
       for (String fieldName : ocrFieldNames) {
         OcrSnippet[] snips = ocrSnippets.get(fieldName)[k];
+        if (snips == null) {
+          continue;
+        }
         NamedList[] outSnips = new SimpleOrderedMap[snips.length];
         for (int s = 0; s < snips.length; s++) {
           OcrSnippet snip = snips[s];

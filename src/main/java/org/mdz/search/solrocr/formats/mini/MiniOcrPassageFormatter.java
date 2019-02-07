@@ -103,7 +103,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
     int lastWord = endContextIter.last();
     int contextEndTagSize = this.contextTag.length() - 3;
     if (lastWord < snippet.length() - contextEndTagSize) {
-      snippet = snippet.substring(0, lastWord - contextEndTagSize);
+      snippet = snippet.substring(0, lastWord - contextEndTagSize - 1);
     }
     return snippet;
   }

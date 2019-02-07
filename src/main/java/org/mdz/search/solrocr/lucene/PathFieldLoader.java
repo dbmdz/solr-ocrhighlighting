@@ -1,6 +1,7 @@
 package org.mdz.search.solrocr.lucene;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,10 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
 
   @Override
   public IterableCharSequence loadField(String docId, String fieldName) throws IOException {
-    return new FileCharIterator(Paths.get(fieldPatterns.get(fieldName).replaceAll("\\{docId}", docId)));
+    try {
+      return new FileCharIterator(Paths.get(fieldPatterns.get(fieldName).replaceAll("\\{docId}", docId)));
+    } catch (NoSuchFileException e) {
+      return null;
+    }
   }
 }

@@ -7,7 +7,7 @@ import java.text.CharacterIterator;
  * A meta break iterator that wraps another {@link BreakIterator} and aggregates its breaks to form larger contexts.
  *
  * NOTE: This class is **only** intended to be used with Solr/Lucene highlighters.
- * It only implements `getText`, `preceding` and `following`.
+ * It only implements `getText`, `first`, `last`, `preceding` and `following`.
  */
 public class ContextBreakIterator extends BreakIterator {
   private final BreakIterator baseIter;
@@ -21,12 +21,12 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int first() {
-    throw new UnsupportedOperationException();
+    return this.baseIter.first();
   }
 
   @Override
   public int last() {
-    throw new UnsupportedOperationException();
+    return this.baseIter.last();
   }
 
   @Override
@@ -36,12 +36,18 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int next() {
-    throw new UnsupportedOperationException();
+    for (int i=0; i < context * 2 + 1; i++) {
+      this.baseIter.next();
+    }
+    return this.baseIter.current();
   }
 
   @Override
   public int previous() {
-    throw new UnsupportedOperationException();
+    for (int i=0; i < context * 2 + 1; i++) {
+      this.baseIter.previous();
+    }
+    return this.baseIter.current();
   }
 
   @Override

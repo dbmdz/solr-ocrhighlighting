@@ -15,7 +15,7 @@ class ContextBreakIteratorTest {
 
   @BeforeEach
   void setUp() throws IOException {
-    text = new FileCharIterator(Paths.get("src/test/resources/data/miniocr.xml"));
+    text = new FileCharIterator(Paths.get("src/test/resources/data/31337_ocr.xml"));
     BreakIterator baseIter = new TagBreakIterator("w");
     it = new ContextBreakIterator(baseIter, 5);
     it.setText(this.text);

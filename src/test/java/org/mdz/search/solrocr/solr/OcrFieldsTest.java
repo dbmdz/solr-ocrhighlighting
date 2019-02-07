@@ -1,16 +1,19 @@
 package org.mdz.search.solrocr.solr;
 
+import com.google.common.collect.ImmutableMap;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.handler.component.HighlightComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 
 public class OcrFieldsTest extends SolrTestCaseJ4 {
   @BeforeClass
@@ -31,7 +34,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
             + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
             + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
             + "deserunt mollit anim id est laborum.", "id", "1337"));
-    Path ocrPath = dataPath.resolve("miniocr.xml");
+    Path ocrPath = dataPath.resolve("31337_ocr.xml");
     assertU(adoc(
         "external_ocr_text", new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_16),
         "id", "31337"));
@@ -41,8 +44,24 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     assertU(commit());
   }
 
-  private static SolrQueryRequest xmlQ(String... args) throws Exception {
-    SolrQueryRequest q = req(args);
+  private static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
+    Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
+        .put("hl", "true")
+        .put("hl.fields", "external_ocr_text")
+        .put("hl.usePhraseHighlighter", "true")
+        .put("df", "external_ocr_text")
+        .put("hl.ctxTag", "l")
+        .put("hl.ctxSize", "2")
+        .put("hl.snippets", "10")
+        .put("fl", "id")
+        .build());
+    for (int i=0; i < extraArgs.length; i+=2) {
+      String key = extraArgs[i];
+      String val = extraArgs[i+1];
+      args.put(key, val);
+    }
+
+    SolrQueryRequest q = req(args.entrySet().stream().flatMap(e -> Stream.of(e.getKey(), e.getValue())).toArray(String[]::new));
     ModifiableSolrParams params = new ModifiableSolrParams(q.getParams());
     params.set("indent", "true");
     q.setParams(params);
@@ -92,18 +111,17 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled("fix xpath evaluation")
   public void testWildcardQueryAtTheEnd() throws Exception {
     SolrQueryRequest req = xmlQ(
         "q", "*deburg", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='ocr_text']/lst/str[@name='text' and contains(text(),'Magdebur')])=10");
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'Magdebur')])=10");
   }
 
   @Test
   public void testWildcardQueryWithWildcardOnly() throws Exception {
     SolrQueryRequest req = xmlQ(
-        "q", "*", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+        "q", "*", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10", "hl.highlightMultiTerm", "true");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=10");
   }
