@@ -173,7 +173,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ(
         "q", "\"Bayerische Staatsbibliothek\"", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=1");
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(), '<em>Bayerisch</em>e <em>Staatsbibliothe</em>k')])=1");
   }
 
   @Test
@@ -182,14 +182,6 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
         "q", "\"Münchener Stadtbibliothek\"", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=0");
-  }
-
-  @Test
-  public void testMultiPhraseQuery() throws Exception {
-    SolrQueryRequest req = xmlQ(
-        "q", "\"Bayerische Staatsbib*\"", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
-    assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=1");
   }
 
   @Test
@@ -215,7 +207,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'Magedbur')])>1");
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'Magdebur')])>1");
   }
 
   @Test
