@@ -1,14 +1,13 @@
 package org.mdz.search.solrocr.util;
 
-/** A region/box that is generic over the numerical type of its coordinates */
-public class OcrBox<T extends Number> {
-  public final T x;
-  public final T y;
-  public final T width;
-  public final T height;
+public class OcrBox {
+  public final float x;
+  public final float y;
+  public final float width;
+  public final float height;
 
 
-  public OcrBox(T x, T y, T width, T height) {
+  public OcrBox(float x, float y, float width, float height) {
     this.x = x;
     this.y = y;
     this.width = width;

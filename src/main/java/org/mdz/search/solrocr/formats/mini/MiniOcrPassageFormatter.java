@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.search.uhighlight.Passage;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
@@ -18,9 +19,8 @@ import org.mdz.search.solrocr.util.OcrBox;
 import org.mdz.search.solrocr.util.TagBreakIterator;
 
 public class MiniOcrPassageFormatter extends OcrPassageFormatter {
-  private final static Pattern absoluteCoordPat = Pattern.compile("x=\"\\d+\"");
   private final static Pattern wordPat = Pattern.compile(
-      "<w x=\"(?<x>.+?)\" y=\"(?<y>.+?)\" w=\"(?<w>.+?)\" h=\"(?<h>.+?)\">(?<text>.+?)</w>");
+      "<w x=\"(?<x>\\.?\\d+?) (?<y>\\.?\\d+?) (?<w>\\.?\\d+?) (?<h>\\.?\\d+?)\">(?<text>.+?)</w>");
   private final static Pattern pagePat = Pattern.compile("<p xml:id=\"(?<pageId>.+?)\">");
   private TagBreakIterator pageIter = new TagBreakIterator("p");
   private TagBreakIterator startContextIter;
@@ -40,7 +40,6 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   }
 
   public OcrSnippet[] format(Passage[] passages, IterableCharSequence content) {
-    // FIXME: Make <em/> configurable!
     OcrSnippet[] snippets = new OcrSnippet[passages.length];
     for (int i=0; i < passages.length; i++) {
       Passage passage = passages[i];
@@ -56,12 +55,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       }
       String xmlFragment = truncateSnippet(sb.toString());
       String pageId = determinePage(xmlFragment, passage.getStartOffset(), content);
-      Matcher m = absoluteCoordPat.matcher(xmlFragment);
-      if (m.find()) {
-        snippets[i] = parseAbsoluteSnippet(xmlFragment, pageId);
-      } else {
-        snippets[i] = parseRelativeSnippet(xmlFragment, pageId);
-      }
+      snippets[i] = parseSnippet(xmlFragment, pageId);
       snippets[i].setScore(passage.getScore());
     }
     return snippets;
@@ -84,8 +78,6 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   }
 
   private String truncateSnippet(String snippet) {
-    // FIXME: Make <b/> and its width configurable!
-    // FIXME: Make <em/> and its width configurable!
     int startBlock = snippet.indexOf("<" + limitTag + ">");
     if (startBlock > -1 && startBlock < snippet.indexOf(startHlTag)) {
       snippet = snippet.substring(startBlock + limitTag.length() + 2);
@@ -119,43 +111,8 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
     }
   }
 
-  private OcrSnippet<Integer> parseAbsoluteSnippet(String xmlFragment, String pageId) {
-   List<OcrBox<Integer>> hlCoords = new ArrayList<>();
-    int ulx = Integer.MAX_VALUE;
-    int uly = Integer.MAX_VALUE;
-    int lrx = -1;
-    int lry = -1;
-    Matcher m = wordPat.matcher(xmlFragment);
-    while (m.find()) {
-      int x = Integer.valueOf(m.group("x"));
-      int y = Integer.valueOf(m.group("y"));
-      int width = Integer.valueOf(m.group("w"));
-      int height = Integer.valueOf(m.group("h"));
-      if (x < ulx) {
-        ulx = x;
-      }
-      if (y < uly) {
-        uly = y;
-      }
-      if ((x + width) > lrx) {
-        lrx = x + width;
-      }
-      if ((y + height) > lry) {
-        lry = y + height;
-      }
-      String text = m.group("text");
-      if (text.startsWith("<em>")) {
-        hlCoords.add(new OcrBox<>(x, y, width, height));
-      }
-    }
-    OcrBox<Integer> snippetRegion = new OcrBox<>(ulx, uly, lrx -ulx, lry - uly);
-    OcrSnippet<Integer> snip = new OcrSnippet<>(getText(xmlFragment), pageId, snippetRegion);
-    hlCoords.forEach(snip::addHighlightRegion);
-    return snip;
-  }
-
-  private OcrSnippet<Float> parseRelativeSnippet(String xmlFragment, String pageId) {
-    List<OcrBox<Float>> hlCoords = new ArrayList<>();
+  private OcrSnippet parseSnippet(String xmlFragment, String pageId) {
+    List<OcrBox> hlCoords = new ArrayList<>();
     float ulx = Float.MAX_VALUE;
     float uly = Float.MAX_VALUE;
     float lrx = -1;
@@ -179,18 +136,39 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
         lry = y + height;
       }
       String text = m.group("text");
-      if (text.startsWith("<em>")) {
-        hlCoords.add(new OcrBox<>(x, y, width, height));
+      if (text.startsWith(startHlTag)) {
+        hlCoords.add(new OcrBox(x, y, width, height));
       }
     }
-    OcrBox<Float> snippetRegion = new OcrBox<>(
-        ulx, uly,
-        // Truncate float precision so we get a more compact output
-        (float) Math.floor((lrx - ulx) * 10000) / 10000,
-        (float) Math.floor((lry - uly) * 10000) / 10000);
-    OcrSnippet<Float> snip = new OcrSnippet<>(getText(xmlFragment), pageId, snippetRegion);
+    OcrBox snippetRegion;
+    final float snipX = ulx;
+    final float snipY = uly;
+    final float snipWidth = lrx - ulx;
+    final float snipHeight = lry - uly;
+    if (lrx < 1) {
+      // Relative snippets
+      snippetRegion = new OcrBox(ulx, uly, truncateFloat(snipWidth), truncateFloat(snipHeight));
+      hlCoords = hlCoords.stream()
+          .map(box -> {
+            float hlWidth = box.width / snipWidth;
+            float hlHeight = box.height / snipHeight;
+            float hlX = (box.x - snipX) / snipWidth;
+            float hlY = (box.y - snipY) / snipHeight;
+            return new OcrBox(truncateFloat(hlX), truncateFloat(hlY), truncateFloat(hlWidth), truncateFloat(hlHeight));
+          }).collect(Collectors.toList());
+    } else {
+      snippetRegion = new OcrBox(ulx, uly, (lrx - ulx), (lry - uly));
+      hlCoords = hlCoords.stream()
+          .map(box -> new OcrBox(box.x - snipX, box.y - snipY, box.width, box.height))
+          .collect(Collectors.toList());
+    }
+    OcrSnippet snip = new OcrSnippet(getText(xmlFragment), pageId, snippetRegion);
     hlCoords.forEach(snip::addHighlightRegion);
     return snip;
+  }
+
+  private float truncateFloat(float num) {
+    return (float) Math.floor(num * 10000) / 10000;
   }
 
   @Override

@@ -23,7 +23,7 @@ class ContextBreakIteratorTest {
 
   @Test
   void testContext() {
-    int center = 1062;
+    int center = 16126;
     int start = it.preceding(center);
     int end = it.following(center);
     assertThat(start).isLessThan(end);

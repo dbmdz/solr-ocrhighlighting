@@ -48,6 +48,6 @@ class TagBreakIteratorTest {
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
     assertThat(StringUtils.countMatches(tag, "</w>")).isEqualTo(1);
-    assertThat(stripTags(tag)).isEqualTo("den ");
+    assertThat(stripTags(tag)).isEqualTo("der ");
   }
 }

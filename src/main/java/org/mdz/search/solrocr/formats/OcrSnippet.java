@@ -6,16 +6,12 @@ import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.mdz.search.solrocr.util.OcrBox;
 
-/**
- * A structured representation of a highlighted OCR snippet.
- *
- * @param <T> the {@link Number} implementation that is used for the positions
- */
-public class OcrSnippet<T extends Number> {
+/** A structured representation of a highlighted OCR snippet. */
+public class OcrSnippet {
   private final String text;
   private final String pageId;
-  private final OcrBox<T> snippetRegion;
-  private final List<OcrBox<T>> highlightRegions;
+  private final OcrBox snippetRegion;
+  private final List<OcrBox> highlightRegions;
   private float score;
 
   /**
@@ -24,7 +20,7 @@ public class OcrSnippet<T extends Number> {
    * @param pageId identifier for the page the snippet is located on
    * @param snippetRegion region of the page the snippet is located in
    */
-  public OcrSnippet(String text, String pageId, OcrBox<T> snippetRegion) {
+  public OcrSnippet(String text, String pageId, OcrBox snippetRegion) {
     this.text = text;
     this.pageId = pageId;
     this.snippetRegion = snippetRegion;
@@ -37,7 +33,7 @@ public class OcrSnippet<T extends Number> {
    *
    * @param region Location of the highlighted region <strong>relative to the snippet region</strong>.
    */
-  public void addHighlightRegion(OcrBox<T> region) {
+  public void addHighlightRegion(OcrBox region) {
     this.highlightRegions.add(region);
   }
 
@@ -47,7 +43,7 @@ public class OcrSnippet<T extends Number> {
   }
 
   /** Get the region of the page that the snippes is located in */
-  public OcrBox<T> getSnippetRegion() {
+  public OcrBox getSnippetRegion() {
     return snippetRegion;
   }
 
@@ -56,7 +52,7 @@ public class OcrSnippet<T extends Number> {
    *
    * <strong>The highlighted regions are relative to the snippet region, not to the page.</strong>
    */
-  public List<OcrBox<T>> getHighlightRegions() {
+  public List<OcrBox> getHighlightRegions() {
     return highlightRegions;
   }
 
