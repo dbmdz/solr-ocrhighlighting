@@ -185,10 +185,60 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void multiPhraseQuery() throws Exception {
+  public void testMultiPhraseQuery() throws Exception {
     SolrQueryRequest req = xmlQ(
         "q", "\"Bayerische Staatsbib*\"", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=1");
+  }
+
+  @Test
+  public void testFuzzyQueryWithSingleTerm() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "bayrisch~", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
+  }
+
+  @Test
+  public void testFuzzyQueryWithSingleTermAndGreaterProximity() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "baurisch~3", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
+  }
+
+  @Test
+  public void testCombinedFuzzyQuery() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "Magdepurg~ OR baurisch~3", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'Magedbur')])>1");
+  }
+
+  @Test
+  public void testFuzzyQueryWithNoResults() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "Makdepurg~ OR baurysk~2", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=0");
+  }
+
+  @Test
+  public void testProximityQueryWithOneHighlighting() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "\"Bayerische München\"~3", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'<em>Bayerisch</em>e Staatsbibliothek <em>Münche</em>n')])=1");
+  }
+
+  @Test
+  public void testProximityQueryWithTwoHighlightings() throws Exception {
+    SolrQueryRequest req = xmlQ(
+        "q", "\"Bayerische Ausgabe\"~10", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+    assertQ(req,
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=2");
   }
 }
