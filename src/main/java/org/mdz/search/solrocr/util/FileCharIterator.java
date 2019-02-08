@@ -102,7 +102,7 @@ public class FileCharIterator implements IterableCharSequence {
 
   @Override
   public char current() {
-    if (this.position == this.numChars) {
+    if (this.position < 0 || this.position >= this.numChars) {
       return DONE;
     } else {
       return this.charAt(this.position);
@@ -120,11 +120,12 @@ public class FileCharIterator implements IterableCharSequence {
 
   @Override
   public char previous() {
-    this.position = Math.max(0, this.position - 1);
-    if (this.position == 0) {
+    if (this.position > 0) {
+      this.position = position - 1;
+      return this.current();
+    } else {
       return DONE;
     }
-    return this.current();
   }
 
   @Override
