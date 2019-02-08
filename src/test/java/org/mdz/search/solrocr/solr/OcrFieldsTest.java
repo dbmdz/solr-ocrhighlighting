@@ -221,7 +221,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   @Test
   public void testFuzzyQueryWithNoResults() throws Exception {
     SolrQueryRequest req = xmlQ(
-        "q", "Makdepurg~ OR baurysk~2", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
+        "q", "Makdepurk~ OR baurysk~2", "hl", "true", "hl.fields", "ocr_text", "hl.usePhraseHighlighter", "true", "df", "external_ocr_text", "hl.ctxTag", "l", "hl.ctxSize", "2", "hl.snippets", "10");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=0");
   }
