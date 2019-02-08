@@ -44,7 +44,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     assertU(commit());
   }
 
-  private static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
+  protected static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
         .put("hl", "true")
         .put("hl.fields", "external_ocr_text")
