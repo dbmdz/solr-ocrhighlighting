@@ -31,7 +31,7 @@ It works by extending Solr's standard `UnifiedHighlighter` with support for load
 
 ## Known Issues
 
-- UTF-16 requirement sucks balls, no way around it
+- File size is limited to 2GiB
 
 
 ## Contributing
