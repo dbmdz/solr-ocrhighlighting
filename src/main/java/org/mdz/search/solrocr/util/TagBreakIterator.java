@@ -84,7 +84,9 @@ public class TagBreakIterator extends BreakIterator {
           sb = null;
         }
       }
-      this.text.previous();
+      if (this.text.previous() == CharacterIterator.DONE) {
+        break;
+      };
     }
     this.current = this.text.getIndex()+ 1;
     return this.current;

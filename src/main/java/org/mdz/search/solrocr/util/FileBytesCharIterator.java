@@ -205,4 +205,9 @@ public class FileBytesCharIterator implements IterableCharSequence {
       throw new RuntimeException(e);
     }
   }
+
+  @Override
+  public OffsetType getOffsetType() {
+    return OffsetType.BYTES;
+  }
 }

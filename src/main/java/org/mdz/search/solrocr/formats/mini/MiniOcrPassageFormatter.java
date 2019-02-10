@@ -46,11 +46,11 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       StringBuilder sb = new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
       int extraChars = 0;
       for (int j=0; j < passage.getNumMatches(); j++) {
-        int matchStart = passage.getMatchStarts()[j] - passage.getStartOffset();
+        int matchStart = content.subSequence(passage.getStartOffset(), passage.getMatchStarts()[j]).toString().length();
         sb.insert(extraChars + matchStart, startHlTag);
         extraChars += startHlTag.length();
-        int matchEnd = passage.getMatchEnds()[j] - passage.getStartOffset();
-        sb.insert(extraChars + matchEnd - 1, endHlTag);
+        int matchEnd = content.subSequence(passage.getStartOffset(), passage.getMatchEnds()[j]).toString().length();
+        sb.insert(extraChars + matchEnd, endHlTag);
         extraChars += endHlTag.length();
       }
       String xmlFragment = truncateSnippet(sb.toString());

@@ -21,7 +21,7 @@ class MiniOcrByteOffsetsParserTest {
 
   @Test
   void testParse() throws IOException {
-    Path hocrPath = Paths.get("src/test/resources/data/miniocr_utf8.xml");
+    Path hocrPath = Paths.get("src/test/resources/data/31337_utf8ocr.xml");
     FileChannel chan = FileChannel.open(hocrPath, StandardOpenOption.READ);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     MiniOcrByteOffsetsParser.parse(Files.readAllBytes(hocrPath), bos);

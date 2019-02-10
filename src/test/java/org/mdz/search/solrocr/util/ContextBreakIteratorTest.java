@@ -17,7 +17,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class ContextBreakIteratorTest {
   private static final Path utf16Path = Paths.get("src/test/resources/data/31337_ocr.xml");
-  private static final Path utf8Path = Paths.get("src/test/resources/data/miniocr_utf8.xml");
+  private static final Path utf8Path = Paths.get("src/test/resources/data/31337_utf8ocr.xml");
 
   static Stream<IterableCharSequence> charSeq() throws IOException {
     return Stream.of(new FileCharIterator(utf16Path), new FileBytesCharIterator(utf8Path));

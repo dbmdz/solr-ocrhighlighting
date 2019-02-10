@@ -12,12 +12,11 @@
     <highlighting class="org.mdz.search.solrocr.solr.SolrOcrHighlighter"
                   ocrFormat="org.mdz.search.solrocr.formats.mini.MiniOcrFormat">
       <lst name="ocrFields">
-        <str>stored_ocr_text</str>
-        <str>external_ocr_text</str>
+        <str>ocr_text</str>
       </lst>
-      <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader">
+      <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="utf-8">
         <lst name="externalFields">
-          <str name="external_ocr_text">src/test/resources/data/{docId}_ocr.xml</str>
+          <str name="ocr_text">src/test/resources/data/{docId}_utf8ocr.xml</str>
         </lst>
       </fieldLoader>
     </highlighting>

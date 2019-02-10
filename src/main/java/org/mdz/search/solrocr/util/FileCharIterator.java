@@ -161,4 +161,9 @@ public class FileCharIterator implements IterableCharSequence {
       throw new RuntimeException(e);
     }
   }
+
+  @Override
+  public OffsetType getOffsetType() {
+    return OffsetType.CHARS;
+  }
 }

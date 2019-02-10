@@ -1,4 +1,4 @@
-package org.mdz.search.solrocr.lucene;
+package org.mdz.search.solrocr.lucene.fieldloader;
 
 import java.io.IOException;
 import org.mdz.search.solrocr.util.IterableCharSequence;

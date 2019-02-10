@@ -1,10 +1,15 @@
 package org.mdz.search.solrocr.solr;
 
+import com.google.common.collect.ImmutableMap;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.apache.solr.BaseDistributedSearchTestCase;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.handler.component.HighlightComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
@@ -39,11 +44,37 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
     assertU(BaseDistributedSearchTestCase.commit());
   }
 
+
+  protected static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
+    Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
+                                                 .put("hl", "true")
+                                                 .put("hl.fields", "external_ocr_text")
+                                                 .put("hl.usePhraseHighlighter", "true")
+                                                 .put("df", "external_ocr_text")
+                                                 .put("hl.ctxTag", "l")
+                                                 .put("hl.ctxSize", "2")
+                                                 .put("hl.snippets", "10")
+                                                 .put("fl", "id")
+                                                 .build());
+    for (int i = 0; i < extraArgs.length; i += 2) {
+      String key = extraArgs[i];
+      String val = extraArgs[i + 1];
+      args.put(key, val);
+    }
+
+    SolrQueryRequest q = req(args.entrySet().stream().flatMap(e -> Stream
+        .of(e.getKey(), e.getValue())).toArray(String[]::new));
+    ModifiableSolrParams params = new ModifiableSolrParams(q.getParams());
+    params.set("indent", "true");
+    q.setParams(params);
+    return q;
+  }
+
   @Test
   @ShardsRepeat(max=5)
   public void testPhraseQuery() throws Exception {
-    SolrQueryRequest req = OcrFieldsTest.xmlQ("q", "\"Bayerische Staatsbibliothek\"");
+    SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek\"");
     assertQ(req,
-            "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(), '<em>Bayerisch</em>e <em>Staatsbibliothe</em>k')])=1");
+            "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(), '<em>Bayerische</em> <em>Staatsbibliothek</em>')])=1");
   }
 }

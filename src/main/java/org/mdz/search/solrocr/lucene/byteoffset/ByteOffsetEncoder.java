@@ -1,4 +1,4 @@
-package org.mdz.search.solrocr.lucene;
+package org.mdz.search.solrocr.lucene.byteoffset;
 
 import com.google.common.math.IntMath;
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class ByteOffsetEncoder extends AbstractEncoder {
   }
 
   public static int decode(BytesRef payload) {
-    return new ByteArrayDataInput(payload.bytes).readVInt();
+    return new ByteArrayDataInput(payload.bytes, payload.offset, payload.length).readVInt();
   }
 
   @Override
