@@ -16,6 +16,7 @@ import org.apache.lucene.index.BaseCompositeReader;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.FilterLeafReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.MultiReader;
@@ -191,7 +192,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
     List<String> storedFields = Arrays.stream(fields)
         .filter(f -> fieldLoader == null || !fieldLoader.isExternalField(f))
         .collect(Collectors.toList());
-    storedFields.add(0, "id");
+    if (fieldLoader != null) {
+      storedFields.addAll(fieldLoader.getRequiredFields());
+    }
 
     String[] visitorArgs = storedFields.stream().toArray(String[]::new);
     int docId;
@@ -204,7 +207,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
         if (fieldLoader == null || !fieldLoader.isExternalField(fieldName)) {
           ocrVals[fieldIdx] = IterableCharSequence.fromString(docIdVisitor.getDocument().get(fieldName));
         } else {
-          ocrVals[fieldIdx] = fieldLoader.loadField(docIdVisitor.getDocument().get("id"), fieldName);
+          Map<String, String> fvals = docIdVisitor.getDocument().getFields().stream()
+              .filter(f -> f.stringValue() != null)
+              .collect(Collectors.toMap(IndexableField::name, IndexableField::stringValue));
+          ocrVals[fieldIdx] = fieldLoader.loadField(fvals, fieldName);
         }
       }
       fieldValues.add(ocrVals);
