@@ -28,7 +28,36 @@ public class HocrByteOffsetsParser {
   private static final Searcher<SequenceMatcher> END_SPAN_SEARCHER =
       new SequenceMatcherSearcher(new ByteSequenceMatcher("</span>"));
 
+  private static int getPageOffset(byte[] ocrBytes, String pageId) {
+    final Searcher<SequenceMatcher> pageSearcher;
+    try {
+      pageSearcher = new SequenceMatcherSearcher(SequenceMatcherCompiler.compileFrom(
+          "'<div class=' . 'ocr_page' . ' id=' . '" + pageId + "'"));
+    } catch (CompileException e) {
+      throw new RuntimeException(e);
+    }
+    ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<>(pageSearcher, ocrBytes);
+    if (!it.hasNext()) {
+      throw new IllegalArgumentException("Could not find page with id '" + pageId + "'");
+    }
+    return (int) it.next().get(0).getMatchPosition();
+  }
+
   public static void parse(byte[] ocrBytes, OutputStream os) throws IOException {
+    parse(ocrBytes, os, null, null);
+  }
+
+  /** Convert the hOCR document, starting from startPage and ending at, <strong>not including</strong> endPage. */
+  public static void parse(byte[] ocrBytes, OutputStream os, String startPage, String endPage) throws IOException {
+    int startOffset = 0;
+    if (startPage != null) {
+      startOffset = getPageOffset(ocrBytes, startPage);
+    }
+    int endOffset = ocrBytes.length - 1;
+    if (endPage != null) {
+      endOffset = getPageOffset(ocrBytes, endPage);
+    }
+
     Searcher<SequenceMatcher> termSearcher;
     try {
       termSearcher = new SequenceMatcherSearcher(SequenceMatcherCompiler.compileFrom("'>' ^'<'"));
@@ -36,8 +65,10 @@ public class HocrByteOffsetsParser {
       throw new RuntimeException();
     }
 
-    ForwardSearchIterator<SequenceMatcher> beginIt = new ForwardSearchIterator<>(BEGIN_SPAN_SEARCHER, ocrBytes);
-    ForwardSearchIterator<SequenceMatcher> endIt = new ForwardSearchIterator<>(END_SPAN_SEARCHER, ocrBytes);
+    ForwardSearchIterator<SequenceMatcher> beginIt = new ForwardSearchIterator<>(
+        BEGIN_SPAN_SEARCHER, startOffset, endOffset, ocrBytes);
+    ForwardSearchIterator<SequenceMatcher> endIt = new ForwardSearchIterator<>(
+        END_SPAN_SEARCHER,startOffset, endOffset, ocrBytes);
 
     List<ImmutablePair<Long, Long>> wordOffsets =
         Streams.zip(Streams.stream(beginIt).flatMap(Collection::stream).map(SearchResult::getMatchPosition),
@@ -65,9 +96,9 @@ public class HocrByteOffsetsParser {
   public static void main(String[] args) throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     long start = System.nanoTime();
-    parse(Files.readAllBytes(Paths.get("src/test/resources/data/hocr_test.html")), bos);
+    parse(Files.readAllBytes(Paths.get("src/test/resources/data/hocr_test.html")), bos, "page_118", "page_120");
     System.out.println(String.format("Parsing took %.2fms", (System.nanoTime() - start) / 1e6));
-    //String text = bos.toString(StandardCharsets.UTF_8.toString());
-    //System.out.println(text);
+    String text = bos.toString(StandardCharsets.UTF_8.toString());
+    System.out.println(text);
   }
 }
