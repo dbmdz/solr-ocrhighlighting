@@ -7,7 +7,11 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.solr.common.util.NamedList;
@@ -40,7 +44,12 @@ import org.mdz.search.solrocr.util.IterableCharSequence;
  *
  * */
 public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitialized {
+  // `{fieldName}`, `{fieldName[:-3]`
+  private static final Pattern variablePat = Pattern.compile(
+      "\\{(?<fieldName>.+?)(?:\\[(?<startIdx>-?\\d+)?(?:(?<rangeChar>:)(?<endIdx>-?\\d+)?)?])?}");
+
   private Map<String, String> fieldPatterns;
+  private Set<String> requiredFieldValues;
   private Charset charset;
 
   @Override
@@ -56,9 +65,14 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
           ErrorCode.FORBIDDEN,
           String.format("Invalid encoding '%s', must be one of 'utf-8', 'utf-16', 'utf-16le' or 'utf-16be'", cset));
     }
+    this.requiredFieldValues = new HashSet<>();
     this.fieldPatterns = new HashMap<>();
     NamedList<String> args = (NamedList<String>) info.initArgs.get("externalFields");
     args.forEach((fieldName, pattern) -> {
+      Matcher m = variablePat.matcher(pattern);
+      while (m.find()) {
+        requiredFieldValues.add(m.group("fieldName"));
+      }
       fieldPatterns.put(fieldName, pattern);
     });
   }
@@ -69,8 +83,48 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
   }
 
   @Override
-  public IterableCharSequence loadField(String docId, String fieldName) throws IOException {
-    Path p = Paths.get(fieldPatterns.get(fieldName).replaceAll("\\{docId}", docId));
+  public Set<String> getRequiredFields() {
+    return requiredFieldValues;
+  }
+
+  private String interpolateVariables(String pattern, Map<String, String> fieldValues) {
+    StringBuilder interpolated = new StringBuilder(pattern);
+    Matcher m = variablePat.matcher(pattern);
+    while (m.find()) {
+      String fieldName = m.group("fieldName");
+      String fieldValue = fieldValues.get(fieldName);
+      Integer startIdx = m.group("startIdx") != null ? Integer.parseInt(m.group("startIdx")) : null;
+      if (startIdx != null && startIdx < 0) {
+        startIdx = fieldValue.length() - startIdx;
+      }
+      Integer endIdx = m.group("endIdx") != null ? Integer.parseInt(m.group("endIdx")) : null;
+      if (endIdx != null && endIdx < 0) {
+        endIdx = fieldValue.length() - endIdx;
+      }
+      if (startIdx != null && endIdx != null && startIdx >= endIdx) {
+        throw new IllegalArgumentException(String.format("Invalid range '%s' specified in pattern '%s'",
+                                                         m.group(0), pattern));
+      }
+      boolean isRange = m.group("rangeChar") != null;
+
+      if (startIdx != null && !isRange) {
+        fieldValue = String.valueOf(fieldValue.charAt(startIdx));
+      } else if (startIdx != null && endIdx == null) {
+        fieldValue = fieldValue.substring(startIdx);
+      } else if (startIdx == null && endIdx != null) {
+        fieldValue = fieldValue.substring(0, endIdx);
+      } else if (startIdx != null) {
+        fieldValue = fieldValue.substring(startIdx, endIdx);
+      }
+      interpolated.replace(m.start(), m.end(), fieldValue);
+    }
+    return interpolated.toString();
+  }
+
+  @Override
+  public IterableCharSequence loadField(Map<String, String> fields, String fieldName) throws IOException {
+    String fieldPattern = fieldPatterns.get(fieldName);
+    Path p = Paths.get(interpolateVariables(fieldPattern, fields));
     try {
       if (this.charset == StandardCharsets.UTF_8) {
         return new FileBytesCharIterator(p);

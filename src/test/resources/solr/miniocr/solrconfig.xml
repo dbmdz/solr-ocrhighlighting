@@ -17,7 +17,7 @@
       </lst>
       <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader">
         <lst name="externalFields">
-          <str name="external_ocr_text">src/test/resources/data/{docId}_ocr.xml</str>
+          <str name="external_ocr_text">src/test/resources/data/{id}_ocr.xml</str>
         </lst>
       </fieldLoader>
     </highlighting>
