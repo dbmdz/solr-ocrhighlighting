@@ -15,7 +15,7 @@
         <str>stored_ocr_text</str>
         <str>external_ocr_text</str>
       </lst>
-      <fieldLoader class="org.mdz.search.solrocr.lucene.PathFieldLoader">
+      <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader">
         <lst name="externalFields">
           <str name="external_ocr_text">src/test/resources/data/{docId}_ocr.xml</str>
         </lst>

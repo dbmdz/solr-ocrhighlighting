@@ -27,7 +27,7 @@ import org.mdz.search.solrocr.formats.OcrBlock;
 import org.mdz.search.solrocr.formats.OcrFormat;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
-import org.mdz.search.solrocr.lucene.ExternalFieldLoader;
+import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
 import org.mdz.search.solrocr.lucene.OcrHighlighter;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {

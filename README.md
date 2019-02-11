@@ -1,6 +1,6 @@
 # solr-ocr-plugin
 
-This Solr plugin let's you put OCR text into one or more of you documents' fields and then allows you to obtain structured highlighting data with the text and its position on the page at query time. All this without having to store the OCR data in the index itself, but at arbitrary external locations instead.
+This Solr plugin lets you put OCR text into one or more of you documents' fields and then allows you to obtain structured highlighting data with the text and its position on the page at query time. All this without having to store the OCR data in the index itself, but at arbitrary external locations instead.
 
 It works by extending Solr's standard `UnifiedHighlighter` with support for loading external field values and determining OCR positions from those field values. This means that (almost) all options and query types supported by the `UnifiedHighlighter` are also supported for OCR highlighting. The plugin also works transparently with non-OCR fields and just lets the default implementation handle those.
 
@@ -17,7 +17,7 @@ It works by extending Solr's standard `UnifiedHighlighter` with support for load
 
 ## Usage
 
-- Requirement: UTF16-encoded MiniOCR format
+- Converting OCR format to indexing format (terms + byte offsets)
 - Ingesting a document with an OCR field
 - Querying with highlighting, example result
 
@@ -31,7 +31,7 @@ It works by extending Solr's standard `UnifiedHighlighter` with support for load
 
 ## Known Issues
 
-- UTF-16 requirement sucks balls, no way around it
+- File size is limited to 2GiB
 
 
 ## Contributing

@@ -73,7 +73,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "München");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=3",
-            "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>Münche</em>n Morgen-Ausgabe. Preſſe.'",
+            "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>München</em> Morgen-Ausgabe. Preſſe.'",
             "//lst[@name='region'][1]/float[@name='x']/text()='0.3714'",
             "//lst[@name='region'][1]/float[@name='y']/text()='0.0071'",
             "//lst[@name='region'][1]/float[@name='w']/text()='0.4384'",
@@ -103,7 +103,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   public void testBooleanQueryNoMatch() throws Exception {
     SolrQueryRequest req = xmlQ("q", "((München AND Rotterdam) OR Mexico)");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='ocr_text']/lst)=0");
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=4");
   }
 
   @Test
@@ -168,7 +168,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   public void testPhraseQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek\"");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(), '<em>Bayerisch</em>e <em>Staatsbibliothe</em>k')])=1");
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(), '<em>Bayerische</em> <em>Staatsbibliothek</em>')])=1");
   }
 
   @Test
@@ -212,7 +212,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   public void testProximityQueryWithOneHighlighting() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische München\"~3");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'<em>Bayerisch</em>e Staatsbibliothek <em>Münche</em>n')])=1");
+        "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(),'<em>Bayerische</em> Staatsbibliothek <em>München</em>')])=1");
   }
 
   @Test
