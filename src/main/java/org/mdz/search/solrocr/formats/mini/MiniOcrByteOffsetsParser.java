@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import net.byteseek.compiler.CompileException;
+import net.byteseek.compiler.matcher.SequenceMatcherCompiler;
 import net.byteseek.matcher.sequence.ByteSequenceMatcher;
 import net.byteseek.matcher.sequence.SequenceMatcher;
 import net.byteseek.searcher.ForwardSearchIterator;
@@ -26,12 +28,28 @@ public class MiniOcrByteOffsetsParser {
   private static final Searcher<SequenceMatcher> END_WORD_SEARCHER =
       new SequenceMatcherSearcher(new ByteSequenceMatcher("</w>"));
 
-  private static int getPageOffset(byte[] ocrBytes, String pageId) {
-    final Searcher<SequenceMatcher> pageSearcher =
-        new SequenceMatcherSearcher(new ByteSequenceMatcher("<p xml:id=\"" + pageId));
-    ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<>(pageSearcher, ocrBytes);
+  private static int getClosingOffsetFrom(byte[] ocrBytes, char tag, int fromOffset) {
+    final Searcher<SequenceMatcher> searcher = new SequenceMatcherSearcher(new ByteSequenceMatcher(
+        "</" + tag + ">"));
+    final ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<SequenceMatcher>(
+        searcher, ocrBytes, fromOffset);
     if (!it.hasNext()) {
-      throw new IllegalArgumentException("Could not find page with id '" + pageId + "'");
+      throw new IllegalArgumentException("Invalid MiniOCR, could not find closing tag for '" + tag + "'");
+    }
+    return (int) it.next().get(0).getMatchPosition();
+  }
+
+  private static int getIdOffset(byte[] ocrBytes, String id) {
+    final Searcher<SequenceMatcher> idSearcher;
+    try {
+      idSearcher = new SequenceMatcherSearcher(SequenceMatcherCompiler.compileFrom(
+          "'<' ['sp'] ' xml:id=\"" + id + "'"));
+    } catch (CompileException e) {
+      throw new RuntimeException(e);
+    }
+    ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<>(idSearcher, ocrBytes);
+    if (!it.hasNext()) {
+      throw new IllegalArgumentException("Could not find element with id '" + id + "'");
     }
     return (int) it.next().get(0).getMatchPosition();
   }
@@ -40,15 +58,21 @@ public class MiniOcrByteOffsetsParser {
     parse(ocrBytes, os, null, null);
   }
 
-  /** Convert the hOCR document, starting from startPage and ending at, <strong>not including</strong> endPage. */
-  public static void parse(byte[] ocrBytes, OutputStream os, String startPage, String endPage) throws IOException {
+  public static void parse(byte[] ocrBytes, OutputStream os, String onlyId) throws IOException {
+    parse(ocrBytes, os, onlyId, "\uFFFF");
+  }
+
+  public static void parse(byte[] ocrBytes, OutputStream os, String startId, String endId) throws IOException {
     int startOffset = 0;
-    if (startPage != null) {
-      startOffset = getPageOffset(ocrBytes, startPage);
+    if (startId != null) {
+      startOffset = getIdOffset(ocrBytes, startId);
     }
     int endOffset = ocrBytes.length - 1;
-    if (endPage != null) {
-      endOffset = getPageOffset(ocrBytes, endPage);
+    if (endId != null && endId.equals("\uFFFF")) {
+      char tag = new String(ocrBytes, startOffset, 6, StandardCharsets.UTF_8).charAt(1);
+      endOffset = getClosingOffsetFrom(ocrBytes, tag, startOffset);
+    } else if (endId != null) {
+      endOffset = getIdOffset(ocrBytes, endId);
     }
     ForwardSearchIterator<SequenceMatcher> beginIt = new ForwardSearchIterator<>(
         BEGIN_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
@@ -74,7 +98,7 @@ public class MiniOcrByteOffsetsParser {
   public static void main(String[] args) throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     long start = System.nanoTime();
-    parse(Files.readAllBytes(Paths.get("src/test/resources/data/31337_utf8ocr.xml")), bos, "28", "30");
+    parse(Files.readAllBytes(Paths.get("src/test/resources/data/31337_utf8ocr.xml")), bos, "28");
     System.out.println(String.format("Parsing took %.2fms", (System.nanoTime() - start) / 1e6));
     String text = bos.toString(StandardCharsets.UTF_8.toString());
     System.out.println(text);
