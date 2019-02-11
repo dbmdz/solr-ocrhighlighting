@@ -132,10 +132,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     // Highlight in doc batches determined by loadFieldValues (consumes from docIdIter)
     DocIdSetIterator docIdIter = asDocIdSetIterator(docIds);
     for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
-      // Load the field values of the first batch of document(s) (note: commonly all docs are in this batch)
       List<IterableCharSequence[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
-      //List<CharSequence[]> fieldValsByDoc = loadFieldValues(fields, docIdIter, -1);
-      //    the size of the above list is the size of the batch (num of docs in the batch)
 
       // Highlight in per-field order first, then by doc (better I/O pattern)
       for (int fieldIdx = 0; fieldIdx < fields.length; fieldIdx++) {
