@@ -12,6 +12,7 @@ import org.mdz.search.solrocr.util.TagBreakIterator;
 public class MiniOcrFormat implements OcrFormat {
   private static final Map<OcrBlock, String> blockTagMapping = ImmutableMap.of(
       OcrBlock.PAGE, "p",
+      OcrBlock.SECTION, "s",
       OcrBlock.BLOCK, "b",
       OcrBlock.LINE, "l",
       OcrBlock.WORD, "w");
