@@ -71,6 +71,14 @@ public class OcrSnippet {
     this.score = score;
   }
 
+  private void addDimension(SimpleOrderedMap map, String name, float val) {
+    if (val >= 1 || val == 0) {
+      map.add(name, (int) val);
+    } else {
+      map.add(name, val);
+    }
+  }
+
   /** Convert the snippet to a {@link NamedList} that is used by Solr to populate the response. */
   public NamedList toNamedList() {
     SimpleOrderedMap m = new SimpleOrderedMap();
@@ -81,20 +89,20 @@ public class OcrSnippet {
     m.add("score", this.getScore());
     SimpleOrderedMap snipRegion = new SimpleOrderedMap();
     if (this.getSnippetRegion() != null) {
-      snipRegion.add("x", this.getSnippetRegion().x);
-      snipRegion.add("y", this.getSnippetRegion().y);
-      snipRegion.add("w", this.getSnippetRegion().width);
-      snipRegion.add("h", this.getSnippetRegion().height);
+      addDimension(snipRegion, "x", this.getSnippetRegion().x);
+      addDimension(snipRegion, "y", this.getSnippetRegion().y);
+      addDimension(snipRegion, "w", this.getSnippetRegion().width);
+      addDimension(snipRegion, "h", this.getSnippetRegion().height);
     }
     m.add("region", snipRegion);
     if (this.getHighlightRegions() != null) {
       SimpleOrderedMap[] highlights = this.getHighlightRegions().stream()
           .map(r -> {
             SimpleOrderedMap hlMap = new SimpleOrderedMap();
-            hlMap.add("x", r.x);
-            hlMap.add("y", r.y);
-            hlMap.add("w", r.width);
-            hlMap.add("h", r.height);
+            addDimension(hlMap, "x", r.x);
+            addDimension(hlMap, "y", r.y);
+            addDimension(hlMap, "w", r.width);
+            addDimension(hlMap, "h", r.height);
             return hlMap;
           }).toArray(SimpleOrderedMap[]::new);
       m.add("highlights", highlights);

@@ -20,7 +20,7 @@ class HocrByteOffsetsParserTest {
 
   @Test
   void testParse() throws IOException {
-    Path hocrPath = Paths.get("src/test/resources/data/hocr_test.html");
+    Path hocrPath = Paths.get("src/test/resources/data/hocr_utf8.html");
     FileChannel chan = FileChannel.open(hocrPath, StandardOpenOption.READ);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     HocrByteOffsetsParser.parse(Files.readAllBytes(hocrPath), bos);

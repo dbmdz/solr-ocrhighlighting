@@ -7,7 +7,6 @@ import java.text.CharacterIterator;
 public class TagBreakIterator extends BreakIterator {
   private final String breakTag;
   private CharacterIterator text;
-  private final boolean breakAfter;
   private int current;
 
   public TagBreakIterator(String tagName) {
@@ -17,10 +16,8 @@ public class TagBreakIterator extends BreakIterator {
   public TagBreakIterator(String tagName, boolean closing) {
     if (closing) {
       this.breakTag = "</" + tagName + ">";
-      this.breakAfter = true;
     } else {
       this.breakTag = "<" + tagName;
-      this.breakAfter = false;
     }
   }
 
@@ -64,6 +61,7 @@ public class TagBreakIterator extends BreakIterator {
       }
       this.text.next();
     }
+    // FIXME: This will break with ByteCharIterators if the tag has a multi-byte codepoint.
     this.current = this.text.getIndex() - tag.length();
     return this.current;
   }
@@ -88,6 +86,7 @@ public class TagBreakIterator extends BreakIterator {
         break;
       };
     }
+    // FIXME: This will break with ByteCharIterators if the tag has a multi-byte codepoint.
     this.current = this.text.getIndex()+ 1;
     return this.current;
   }
