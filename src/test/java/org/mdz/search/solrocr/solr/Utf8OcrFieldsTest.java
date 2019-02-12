@@ -15,7 +15,6 @@ import org.apache.solr.handler.component.HighlightComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.mdz.search.solrocr.formats.mini.MiniOcrByteOffsetsParser;
 
 public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
@@ -102,7 +101,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testWildcardQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "(Mün* OR Magdebur?)");
     assertQ(req,
@@ -110,7 +108,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testWildcardQueryAtTheBeginning() throws Exception {
     SolrQueryRequest req = xmlQ("q", "*deburg");
     assertQ(req,
@@ -118,7 +115,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testWildcardQueryIntheMiddle() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Mü*hen");
     assertQ(req,
@@ -126,7 +122,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testWildcardQueryAtTheEnd() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Münch*");
     assertQ(req,
@@ -134,7 +129,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testWildcardQueryWithWildcardOnly() throws Exception {
     SolrQueryRequest req = xmlQ("q", "*");
     assertQ(req,
@@ -142,7 +136,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testWildcardQueryWithAsteriskAndNoResults() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Zzz*");
     assertQ(req,
@@ -150,7 +143,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testWildcardQueryWithNoResults() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Z?z");
     assertQ(req,
@@ -158,7 +150,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testWildcardQueryWithWildcardForUmlautInTheMiddle() throws Exception {
     SolrQueryRequest req = xmlQ("q", "M?nchen");
     assertQ(req,
@@ -168,7 +159,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testPhraseQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek\"");
     assertQ(req,
@@ -176,7 +166,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testPhraseQueryWithNoResults() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Münchener Stadtbibliothek\"");
     assertQ(req,
@@ -184,7 +173,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testFuzzyQueryWithSingleTerm() throws Exception {
     SolrQueryRequest req = xmlQ("q", "bayrisch~");
     assertQ(req,
@@ -192,7 +180,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testFuzzyQueryWithSingleTermAndGreaterProximity() throws Exception {
     SolrQueryRequest req = xmlQ("q", "baurisch~3");
     assertQ(req,
@@ -200,7 +187,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testCombinedFuzzyQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Magdepurg~ OR baurisch~3");
     assertQ(req,
@@ -210,7 +196,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testFuzzyQueryWithNoResults() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Makdepurk~ OR baurysk~2");
     assertQ(req,
@@ -218,7 +203,6 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testProximityQueryWithOneHighlighting() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische München\"~3");
     assertQ(req,
