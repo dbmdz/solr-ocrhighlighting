@@ -9,7 +9,6 @@ import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.highlight.TermVectorLeafReader;
 import org.apache.lucene.search.uhighlight.OverlaySingleDocTermsLeafReader;
-import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter.OffsetSource;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.CharsRefBuilder;
@@ -45,35 +44,28 @@ public abstract class FieldByteOffsetStrategy {
 
     final List<ByteOffsetsEnum> byteOffsetsEnums = new ArrayList<>();
 
-    // Handle Weight.matches approach
-    if (components.getHighlightFlags().contains(UnifiedHighlighter.HighlightFlag.WEIGHT_MATCHES)) {
-      // TODO: Document this!!
-      throw new RuntimeException("Not supported!");
-    } else { // classic approach
+    // Handle position insensitive terms (a subset of this.terms field):
+    final BytesRef[] insensitiveTerms;
+    final ByteOffsetPhraseHelper phraseHelper = components.getByteOffsetPhraseHelper();
+    final BytesRef[] terms = components.getTerms();
+    if (phraseHelper.hasPositionSensitivity()) {
+      insensitiveTerms = phraseHelper.getAllPositionInsensitiveTerms();
+      assert insensitiveTerms.length <= terms.length : "insensitive terms should be smaller set of all terms";
+    } else {
+      insensitiveTerms = terms;
+    }
+    if (insensitiveTerms.length > 0) {
+      createByteOffsetsEnumsForTerms(insensitiveTerms, termsIndex, doc, byteOffsetsEnums);
+    }
 
-      // Handle position insensitive terms (a subset of this.terms field):
-      final BytesRef[] insensitiveTerms;
-      final ByteOffsetPhraseHelper phraseHelper = components.getByteOffsetPhraseHelper();
-      final BytesRef[] terms = components.getTerms();
-      if (phraseHelper.hasPositionSensitivity()) {
-        insensitiveTerms = phraseHelper.getAllPositionInsensitiveTerms();
-        assert insensitiveTerms.length <= terms.length : "insensitive terms should be smaller set of all terms";
-      } else {
-        insensitiveTerms = terms;
-      }
-      if (insensitiveTerms.length > 0) {
-        createByteOffsetsEnumsForTerms(insensitiveTerms, termsIndex, doc, byteOffsetsEnums);
-      }
+    // Handle spans
+    if (phraseHelper.hasPositionSensitivity()) {
+      phraseHelper.createByteOffsetsEnumsForSpans(leafReader, doc, byteOffsetsEnums);
+    }
 
-      // Handle spans
-      if (phraseHelper.hasPositionSensitivity()) {
-        phraseHelper.createByteOffsetsEnumsForSpans(leafReader, doc, byteOffsetsEnums);
-      }
-
-      // Handle automata
-      if (components.getAutomata().length > 0) {
-        createByteOffsetsEnumsForAutomata(termsIndex, doc, byteOffsetsEnums);
-      }
+    // Handle automata
+    if (components.getAutomata().length > 0) {
+      createByteOffsetsEnumsForAutomata(termsIndex, doc, byteOffsetsEnums);
     }
 
     switch (byteOffsetsEnums.size()) {

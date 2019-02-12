@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -27,10 +28,14 @@ import org.mdz.search.solrocr.formats.OcrBlock;
 import org.mdz.search.solrocr.formats.OcrFormat;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
-import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
 import org.mdz.search.solrocr.lucene.OcrHighlighter;
+import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
+
+  public static final String NO_WEIGHT_MATCHES_SUPPORT_MSG =
+      "OCR highlighting does not support hl.weightMatches, classic highlighting approach will be used instead.";
+
   private final ResourceLoader resourceLoader;
 
   private ExternalFieldLoader fieldLoader;
@@ -101,11 +106,17 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
       regularSnippets = regularHighlighter.highlightFields(regularFieldNames, query, docIDs, maxPassagesRegular);
     }
 
+    Map<String, String> highlightFieldWarnings = new HashMap<>();
     Map<String, OcrSnippet[][]> ocrSnippets = null;
     // Highlight OCR fields
     if (ocrFieldNames.length > 0) {
       OcrHighlighter ocrHighlighter = new OcrHighlighter(
           req.getSearcher(), req.getSchema().getIndexAnalyzer(), fieldLoader);
+      Arrays.stream(ocrFieldNames)
+          .filter(field -> (params.getFieldBool(field, HighlightParams.WEIGHT_MATCHES, false)
+                            && params.getFieldBool(field, HighlightParams.HIGHLIGHT_MULTI_TERM, true)
+                            && params.getFieldBool(field, HighlightParams.USE_PHRASE_HIGHLIGHTER, true)))
+          .forEach(field -> highlightFieldWarnings.put(field, NO_WEIGHT_MATCHES_SUPPORT_MSG));
       ocrFormat.setBreakParameters(
           OcrBlock.valueOf(params.get("hl.ocr.contextBlock", "line").toUpperCase()),
           params.getInt("hl.ocr.contextSize", 2));
@@ -124,6 +135,11 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     }
     if (ocrSnippets != null) {
       this.addOcrSnippets(out, keys, ocrFieldNames, ocrSnippets);
+    }
+    if (!highlightFieldWarnings.isEmpty()) {
+      SimpleOrderedMap<String> hlWarnings = new SimpleOrderedMap<>();
+      highlightFieldWarnings.forEach(hlWarnings::add);
+      out.add("warnings", hlWarnings);
     }
     return out;
   }

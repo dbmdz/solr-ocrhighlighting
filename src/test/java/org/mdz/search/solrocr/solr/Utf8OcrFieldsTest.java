@@ -226,10 +226,15 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  @Disabled
   public void testProximityQueryWithTwoHighlightings() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Ausgabe\"~10");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='ocr_text']/lst)=2");
+  }
+
+  @Test
+  public void testWeightMatchesWarning() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek\"", "hl.weightMatches", "true");
+    assertQ(req, "count(//lst[@name='warnings']/str[@name='ocr_text'])=1");
   }
 }
