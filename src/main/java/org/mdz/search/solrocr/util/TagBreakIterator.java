@@ -59,7 +59,9 @@ public class TagBreakIterator extends BreakIterator {
           sb = null;
         }
       }
-      this.text.next();
+      if (this.text.next() == CharacterIterator.DONE) {
+        break;
+      }
     }
     // FIXME: This will break with ByteCharIterators if the tag has a multi-byte codepoint.
     this.current = this.text.getIndex() - tag.length();
@@ -84,10 +86,10 @@ public class TagBreakIterator extends BreakIterator {
       }
       if (this.text.previous() == CharacterIterator.DONE) {
         break;
-      };
+      }
     }
     // FIXME: This will break with ByteCharIterators if the tag has a multi-byte codepoint.
-    this.current = this.text.getIndex()+ 1;
+    this.current = this.text.getIndex() + 1;
     return this.current;
   }
 
