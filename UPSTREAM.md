@@ -19,7 +19,7 @@ new APIs/implementations.
 - [`PhraseHelper`](https://github.com/apache/lucene-solr/commits/master/lucene/highlighter/src/java/org/apache/lucene/search/uhighlight/PhraseHelper.java)
 - [`OffsetsEnum`](https://github.com/apache/lucene-solr/commits/master/lucene/highlighter/src/java/org/apache/lucene/search/uhighlight/OffsetsEnum.java)
 - [`FieldOffsetStrategy`](https://github.com/apache/lucene-solr/commits/master/lucene/highlighter/src/java/org/apache/lucene/search/uhighlight/FieldOffsetStrategy.java)
-  * `NoOpOffsetStrategy`
-  * `TermVectorOffsetStrategy`
-  * `PostingsOffsetStrategy`
-  * `PostingsWithTermVectorsOffsetStrategy`
+- [`PostingsOffsetStrategy`](https://github.com/apache/lucene-solr/commits/master/lucene/highlighter/src/java/org/apache/lucene/search/uhighlight/PostingsOffsetStrategy.java)
+- [`TermVectorOffsetStrategy`](https://github.com/apache/lucene-solr/commits/master/lucene/highlighter/src/java/org/apache/lucene/search/uhighlight/TermVectorOffsetStrategy.java)
+- [`PostingsWithTermVectorsOffsetStrategy`](https://github.com/apache/lucene-solr/commits/master/lucene/highlighter/src/java/org/apache/lucene/search/uhighlight/PostingsWithTermVectorsOffsetStrategy.java)
+- [`NoOpOffsetStrategy`](https://github.com/apache/lucene-solr/commits/master/lucene/highlighter/src/java/org/apache/lucene/search/uhighlight/NoOpOffsetStrategy.java)
