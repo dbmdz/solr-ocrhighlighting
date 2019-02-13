@@ -43,7 +43,7 @@ public class MiniOcrByteOffsetsParser {
     final Searcher<SequenceMatcher> idSearcher;
     try {
       idSearcher = new SequenceMatcherSearcher(SequenceMatcherCompiler.compileFrom(
-          "'<' ['sp'] ' xml:id=\"" + id + "'"));
+          "'<' . ' xml:id=\"" + id + "'"));
     } catch (CompileException e) {
       throw new RuntimeException(e);
     }
