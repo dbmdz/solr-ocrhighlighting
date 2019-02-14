@@ -62,17 +62,19 @@ public class MiniOcrByteOffsetsParser {
     parse(ocrBytes, os, onlyId, "\uFFFF");
   }
 
-  public static void parse(byte[] ocrBytes, OutputStream os, String startId, String endId) throws IOException {
+  public static void parse(byte[] ocrBytes, OutputStream os, String firstId, String lastId) throws IOException {
     int startOffset = 0;
-    if (startId != null) {
-      startOffset = getIdOffset(ocrBytes, startId);
+    if (firstId != null) {
+      startOffset = getIdOffset(ocrBytes, firstId);
     }
     int endOffset = ocrBytes.length - 1;
-    if (endId != null && endId.equals("\uFFFF")) {
+    if (lastId != null && lastId.equals("\uFFFF")) {
       char tag = new String(ocrBytes, startOffset, 6, StandardCharsets.UTF_8).charAt(1);
       endOffset = getClosingOffsetFrom(ocrBytes, tag, startOffset);
-    } else if (endId != null) {
-      endOffset = getIdOffset(ocrBytes, endId);
+    } else if (lastId != null) {
+      int lastOffset = getIdOffset(ocrBytes, lastId);
+      char tag = new String(ocrBytes, lastOffset, 6, StandardCharsets.UTF_8).charAt(1);
+      endOffset = getClosingOffsetFrom(ocrBytes, tag, lastOffset);
     }
     ForwardSearchIterator<SequenceMatcher> beginIt = new ForwardSearchIterator<>(
         BEGIN_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
