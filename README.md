@@ -4,6 +4,18 @@ This Solr plugin lets you put OCR text into one or more of you documents' fields
 
 It works by extending Solr's standard `UnifiedHighlighter` with support for loading external field values and determining OCR positions from those field values. This means that (almost) all options and query types supported by the `UnifiedHighlighter` are also supported for OCR highlighting. The plugin also works transparently with non-OCR fields and just lets the default implementation handle those.
 
+The plugin implements a number of usage scenarios:
+
+1. Index raw OCR documents (hOCR, ALTO or MiniOCR) into Solr and stored them in stored field<br>
+   **😊** Very simple to use, can use all regular features of the `UnifiedHighlighter`<br>
+   **😒** Large index size, very memory-intensive with large documents
+2. Index raw OCR documents into Solr and store them in UTF-16 encoded files in an external location.<br>
+   **😊** Simple to index (just raw documents), small index size, memory-efficient, can use all regular features of the `UnifiedHighlighter`<br>
+   **😒** Need to keep UTF-16 encoded OCR documents around on external storage (space-inefficient, probably need to be converted from UTF-8 first)
+3. Store the OCR documents in UTF-8 encoded files on disk, index parsed OCR documents that contain the byte offsets of each word in the file into Solr<br>
+   **😊** Small index size, memory-efficient, can use existing UTF-8 encoded files on external storage<br>
+   **😒** Indexing is more complicated: Need to determine the byte offsets for each word in the OCR document (**but:** Java implementation provided for all supported OCR formats), cannot use modern `hl.weightMatches` highlighting Method
+
 
 **TODO**: Badges
 
@@ -32,6 +44,7 @@ It works by extending Solr's standard `UnifiedHighlighter` with support for load
 ## Known Issues
 
 - File size is limited to 2GiB
+- The `hl.weightMatches` parameter is not supported when using external UTF-8 files, i.e. it will be ignored and the classical highlighting approach will be used instead.
 
 
 ## Contributing
