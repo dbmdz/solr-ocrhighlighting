@@ -36,7 +36,7 @@ import org.mdz.search.solrocr.util.IterableCharSequence;
  * {@code
  *  <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader">
  *    <lst name="externalFields">
- *      <str name="ocr_text">src/test/resources/data/{docId}_ocr.xml</str>
+ *      <str name="ocr_text">/opt/miniocr/content/bsb_content{docId[7-10]}/{docId[0-10]}/xml/standard/2.2/{docId[0-10]}_miniocr.xml</str>
  *    </lst>
  *  </fieldLoader>
  *  }

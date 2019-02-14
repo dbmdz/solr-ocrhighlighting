@@ -17,6 +17,8 @@
 
     <version.assertj>3.11.1</version.assertj>
     <version.assertj-json>1.2.0</version.assertj-json>
+    <version.byteseek>2.0.3</version.byteseek>
+    <version.commons-text>1.6</version.commons-text>
     <version.junit>5.3.2</version.junit>
     <version.log4j>2.11.1</version.log4j>
     <version.slf4j>1.7.25</version.slf4j>
@@ -26,6 +28,7 @@
     <version.maven-compiler-plugin>3.8.0</version.maven-compiler-plugin>
     <version.maven-jar-plugin>3.1.0</version.maven-jar-plugin>
     <version.maven-javadoc-plugin>3.0.1</version.maven-javadoc-plugin>
+    <version.maven-shade-plugin>3.2.0</version.maven-shade-plugin>
     <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
     <version.junit-platform-maven>1.0.0-M5</version.junit-platform-maven>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
@@ -33,14 +36,19 @@
 
   <dependencies>
     <dependency>
+      <groupId>net.byteseek</groupId>
+      <artifactId>byteseek</artifactId>
+      <version>${version.byteseek}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+      <version>${version.commons-text}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <version>${version.solr}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.byteseek</groupId>
-      <artifactId>byteseek</artifactId>
-      <version>2.0.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -88,11 +96,6 @@
       <version>${version.slf4j}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-text</artifactId>
-      <version>1.6</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -111,6 +114,32 @@
             </additionalOptions>
           </javaOptions>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${version.maven-shade-plugin}</version>
+        <configuration>
+          <minimizeJar>true</minimizeJar>
+          <artifactSet>
+            <includes>
+              <include>org.mdz.search:solr-ocr-plugin</include>
+              <include>net.byteseek:byteseek</include>
+              <include>net.sf.trove4j:trove4j</include>
+              <include>org.apache.commons:commons-text</include>
+              <include>org.apache.commons:commons-lang3</include>
+              <include>com.google.guava:guava</include>
+            </includes>
+          </artifactSet>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
