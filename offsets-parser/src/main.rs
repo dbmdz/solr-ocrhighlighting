@@ -48,12 +48,6 @@ fn get_regex(ocr: &str) -> &Regex {
 }
 
 fn main() {
-    /* TODO:
-     * - Read file path from arguments
-     * - Read file into buffer
-     * - Determine OCR format from buffer
-     * - Call out to format implementations to get the converted format
-     */
     let matches = App::new("Byte Offset converter for hOCR/ALTO/MiniOCR")
         .version("0.1.0")
         .author("Johannes Baiter <johannes.baiter@bsb-muenchen.de>")
@@ -80,6 +74,8 @@ fn main() {
     };
     let word_re = get_regex(&ocr_text);
     for cap in word_re.captures_iter(&ocr_text) {
-        write!(out_writer, "{}{}{} ", decode_html_entities(&cap["text"]).unwrap_or(format!("BROKEN<{}>", &cap["text"])), delimiter, cap.get(0).unwrap().start()).unwrap();
+        let text = decode_html_entities(&cap["text"]).unwrap();
+        let start_offset = cap.get(0).unwrap().start();
+        write!(out_writer, "{}{}{} ", text, delimiter, start_offset).unwrap();
     }
 }

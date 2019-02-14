@@ -19,11 +19,12 @@ documents are stored:
 |-----------------------|-----------------------------|-----------------------|------------------|-----------------------------|---------------------------------|-----------------------------|
 | hOCR/MiniOCR          | Solr (stored field)         | ❌ Raw docs in index  | ❌ High [1]      |  ✅ raw OCR                 | ✅                              | ❌                          |
 | hOCR/MiniOCR          | External (UTF-16 file)      | ✅ Just offsets       | ✅ Low           |  ✅ raw OCR                 | ✅                              | ❌                          |
-| hOCR/ALTO/MiniOCR     | External (UTF-8 file)       | ✅ Just payloads      | ✅ Low           | ❓ words w/ byte offsets[2] | ❌ Only "classic" highlighting  | ✅                          |
+| hOCR/ALTO/MiniOCR     | External (UTF-8 file)       | ✅ Just payloads      | ✅ Low           | ✅ words w/ byte offsets[2] | ❌ Only "classic" highlighting  | ✅                          |
 
 [1] The whole document needs to be kept in memory during highlighting
 
-[2] Java implementations for all supported OCR formats is provided, native library/CLI tool planned
+[2] Java implementations and a cross-platform CLI tool to generate the required format for all supported OCR formats are
+    provided
 
 **TODO**: Badges
 
