@@ -4,18 +4,15 @@ This Solr plugin lets you put OCR text into one or more of you documents' fields
 
 It works by extending Solr's standard `UnifiedHighlighter` with support for loading external field values and determining OCR positions from those field values. This means that (almost) all options and query types supported by the `UnifiedHighlighter` are also supported for OCR highlighting. The plugin also works transparently with non-OCR fields and just lets the default implementation handle those.
 
-The plugin implements a number of usage scenarios:
+The plugin implements a number of usage scenarios, based on where the OCR documents are stored:
 
-1. Index raw OCR documents (hOCR, ALTO or MiniOCR) into Solr and stored them in stored field<br>
-   **😊** Very simple to use, can use all regular features of the `UnifiedHighlighter`<br>
-   **😒** Large index size, very memory-intensive with large documents
-2. Index raw OCR documents into Solr and store them in UTF-16 encoded files in an external location.<br>
-   **😊** Simple to index (just raw documents), small index size, memory-efficient, can use all regular features of the `UnifiedHighlighter`<br>
-   **😒** Need to keep UTF-16 encoded OCR documents around on external storage (space-inefficient, probably need to be converted from UTF-8 first)
-3. Store the OCR documents in UTF-8 encoded files on disk, index parsed OCR documents that contain the byte offsets of each word in the file into Solr<br>
-   **😊** Small index size, memory-efficient, can use existing UTF-8 encoded files on external storage<br>
-   **😒** Indexing is more complicated: Need to determine the byte offsets for each word in the OCR document (**but:** Java implementation provided for all supported OCR formats), cannot use modern `hl.weightMatches` highlighting Method
+| **Location of OCR content** | **Index Size**                    | **Memory Usage**                                 | **Easy to index**                                                       | **Supports `hl.weightMatches`**     | **Uses existing UTF-8 files on disk** |
+|-----------------------------|-----------------------------------|--------------------------------------------------|---------------------------------------------------------------------|-----------------------------------------|-----------------------------------------|
+| Solr (stored field)         | ❌ Large, raw docs in index        | ❌ High, need to keep complete document in memory |  ✅ raw hOCR/ALTO/MiniOCR                                            | ✅                                       | ❌                                       |
+| External (UTF-16 file)      | ✅ just offsets                    | ✅ low, only highlighted content is read          |  ✅ raw hOCR/ALTO/MiniOCR                                            | ✅                                       | ❌                                       |
+| External (UTF-8 file)       | ✅ no stored fields, just payloads | ✅ low, only highlighted content is read          | ❓ Complicated for non-Java, need to determine byte offsets of words | ❌ Only "classic" highlighting supported | ✅                                       |
 
+[1] Java implementations for all supported OCR formats is provided, native library/CLI tool planned
 
 **TODO**: Badges
 
