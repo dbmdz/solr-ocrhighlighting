@@ -4,7 +4,7 @@ extern crate html_entities;
 extern crate regex;
 
 use std::fs;
-use std::io::{stdout,Write};
+use std::io::{stdin,stdout,Write,BufRead,BufReader};
 use std::path::Path;
 
 use clap::App;
@@ -59,13 +59,20 @@ fn main() {
         .author("Johannes Baiter <johannes.baiter@bsb-muenchen.de>")
         .about("Converts OCR documents into a whitespace-separated sequence of <word><delimiter><byte_offset> tokens.")
         .args_from_usage(
-            "-d, --delimiter=[⚑] 'the delimiter to be used, defaults to ⚑'
-            -o, --output=[]      'path to write the converted output to, defaults to stdout'
+            "-d, --delimiter     'the delimiter to be used, defaults to ⚑'
+            -o, --output         'path to write the converted output to, defaults to stdout'
             [OCR_DOCUMENT]       'the OCR document to be converted, defaults to stdin'")
         .get_matches();
 
     let delimiter = matches.value_of("delimiter").unwrap_or("⚑");
-    let ocr_text = fs::read_to_string(matches.value_of("OCR_DOCUMENT").unwrap()).unwrap();
+    let input = matches.value_of("OCR_DOCUMENT");
+
+    let mut reader: Box<BufRead> = match input {
+        Some(fname) => Box::new(BufReader::new(fs::File::open(fname).unwrap())),
+        None => Box::new(BufReader::new(stdin())),
+    };
+    let mut ocr_text = String::new();
+    reader.read_to_string(&mut ocr_text).unwrap();
 
     let mut out_writer = match matches.value_of("output") {
         Some(p) => Box::new(fs::File::create(&Path::new(p)).unwrap()) as Box<Write>,
