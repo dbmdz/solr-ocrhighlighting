@@ -3,6 +3,7 @@ extern crate html_entities;
 #[macro_use] extern crate lazy_static;
 extern crate regex;
 
+use std::error::Error;
 use std::fs;
 use std::io::{stdin,stdout,Write,BufRead,BufReader};
 use std::path::Path;
@@ -10,6 +11,8 @@ use std::path::Path;
 use clap::App;
 use html_entities::decode_html_entities;
 use regex::Regex;
+
+type Result<T> = std::result::Result<T, Box<Error>>;
 
 enum OcrFormat {
     Hocr,
@@ -47,7 +50,7 @@ fn get_regex(ocr: &str) -> &Regex {
     }
 }
 
-fn main() {
+fn main() -> Result<()> {
     let matches = App::new("Byte Offset converter for hOCR/ALTO/MiniOCR")
         .version("0.1.0")
         .author("Johannes Baiter <johannes.baiter@bsb-muenchen.de>")
@@ -62,20 +65,23 @@ fn main() {
     let input = matches.value_of("OCR_DOCUMENT");
 
     let mut reader: Box<BufRead> = match input {
-        Some(fname) => Box::new(BufReader::new(fs::File::open(fname).unwrap())),
+        Some(fname) => Box::new(BufReader::new(fs::File::open(fname)?)),
         None => Box::new(BufReader::new(stdin())),
     };
     let mut ocr_text = String::new();
-    reader.read_to_string(&mut ocr_text).unwrap();
+    reader.read_to_string(&mut ocr_text)?;
 
     let mut out_writer = match matches.value_of("output") {
-        Some(p) => Box::new(fs::File::create(&Path::new(p)).unwrap()) as Box<Write>,
+        Some(p) => Box::new(fs::File::create(&Path::new(p))?) as Box<Write>,
         None    => Box::new(stdout()) as Box<Write>,
     };
     let word_re = get_regex(&ocr_text);
     for cap in word_re.captures_iter(&ocr_text) {
         let text = decode_html_entities(&cap["text"]).unwrap();
-        let start_offset = cap.get(0).unwrap().start();
-        write!(out_writer, "{}{}{} ", text, delimiter, start_offset).unwrap();
+        match cap.get(0) {
+            Some(mat) => write!(out_writer, "{}{}{} ", text, delimiter, mat.start())?,
+            None => ()
+        }
     }
+    Ok(())
 }
