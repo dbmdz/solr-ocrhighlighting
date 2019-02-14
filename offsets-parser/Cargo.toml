@@ -7,3 +7,5 @@ edition = "2018"
 [dependencies]
 regex = "1"
 clap = "2.32"
+lazy_static = "1"
+html-entities = "0.1.0"
