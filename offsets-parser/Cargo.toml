@@ -1,0 +1,9 @@
+[package]
+name = "offsets-parser"
+version = "0.1.0"
+authors = ["Johannes Baiter <johannes.baiter@bsb-muenchen.de>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+clap = "2.32"
