@@ -11,7 +11,7 @@ public class OcrSnippet {
   private final String text;
   private final String pageId;
   private final OcrBox snippetRegion;
-  private final List<OcrBox> highlightRegions;
+  private final List<OcrBox[]> highlightRegions;
   private float score;
 
   /**
@@ -33,8 +33,8 @@ public class OcrSnippet {
    *
    * @param region Location of the highlighted region <strong>relative to the snippet region</strong>.
    */
-  public void addHighlightRegion(OcrBox region) {
-    this.highlightRegions.add(region);
+  public void addHighlightRegion(List<OcrBox> region) {
+    this.highlightRegions.add(region.toArray(new OcrBox[0]));
   }
 
   /** Get the plaintext version of the highlighted page text with highlighting tags */
@@ -52,7 +52,7 @@ public class OcrSnippet {
    *
    * <strong>The highlighted regions are relative to the snippet region, not to the page.</strong>
    */
-  public List<OcrBox> getHighlightRegions() {
+  public List<OcrBox[]> getHighlightRegions() {
     return highlightRegions;
   }
 
@@ -89,24 +89,37 @@ public class OcrSnippet {
     m.add("score", this.getScore());
     SimpleOrderedMap snipRegion = new SimpleOrderedMap();
     if (this.getSnippetRegion() != null) {
-      addDimension(snipRegion, "x", this.getSnippetRegion().x);
-      addDimension(snipRegion, "y", this.getSnippetRegion().y);
-      addDimension(snipRegion, "w", this.getSnippetRegion().width);
-      addDimension(snipRegion, "h", this.getSnippetRegion().height);
+      addDimension(snipRegion, "ulx", this.getSnippetRegion().ulx);
+      addDimension(snipRegion, "uly", this.getSnippetRegion().uly);
+      addDimension(snipRegion, "lrx", this.getSnippetRegion().lrx);
+      addDimension(snipRegion, "lry", this.getSnippetRegion().lry);
     }
     m.add("region", snipRegion);
     if (this.getHighlightRegions() != null) {
-      SimpleOrderedMap[] highlights = this.getHighlightRegions().stream()
-          .map(r -> {
-            SimpleOrderedMap hlMap = new SimpleOrderedMap();
-            addDimension(hlMap, "x", r.x);
-            addDimension(hlMap, "y", r.y);
-            addDimension(hlMap, "w", r.width);
-            addDimension(hlMap, "h", r.height);
-            return hlMap;
-          }).toArray(SimpleOrderedMap[]::new);
+      List<SimpleOrderedMap[]> highlights = new ArrayList<>();
+      for (OcrBox[] region : this.getHighlightRegions()) {
+        SimpleOrderedMap[] regionBoxes = new SimpleOrderedMap[region.length];
+        for (int i=0; i < region.length; i++) {
+          OcrBox ocrBox = region[i];
+          SimpleOrderedMap box = new SimpleOrderedMap();
+          addCoord( "ulx", ocrBox.ulx, box);
+          addCoord( "uly", ocrBox.uly, box);
+          addCoord( "lrx", ocrBox.lrx, box);
+          addCoord( "lry", ocrBox.lry, box);
+          regionBoxes[i] = box;
+        }
+        highlights.add(regionBoxes);
+      }
       m.add("highlights", highlights);
     }
     return m;
+  }
+
+  private void addCoord(String key, float val, SimpleOrderedMap map) {
+    if (val == 0 || val >= 1) {
+      map.add(key, (int) val);
+    } else {
+      map.add(key, val);
+    }
   }
 }

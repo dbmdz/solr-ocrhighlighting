@@ -75,12 +75,13 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
 
   @Override
   protected OcrSnippet parseFragment(String xmlFragment, String pageId) {
-    List<OcrBox> hlCoords = new ArrayList<>();
+    List<List<OcrBox>> hlBoxes = new ArrayList<>();
     float ulx = Float.MAX_VALUE;
     float uly = Float.MAX_VALUE;
     float lrx = -1;
     float lry = -1;
     Matcher m = wordPat.matcher(xmlFragment);
+    List<OcrBox> currentHl = null;
     while (m.find()) {
       float x = Float.valueOf(m.group("x"));
       float y = Float.valueOf(m.group("y"));
@@ -99,8 +100,15 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
         lry = y + height;
       }
       String text = m.group("text");
-      if (text.startsWith(startHlTag)) {
-        hlCoords.add(new OcrBox(x, y, width, height));
+      if (text.contains(startHlTag)) {
+        currentHl = new ArrayList<>();
+      }
+      if (currentHl != null) {
+        currentHl.add(new OcrBox(x, y, x + width, y + height));
+      }
+      if (text.contains(endHlTag)) {
+        hlBoxes.add(currentHl);
+        currentHl = null;
       }
     }
     OcrBox snippetRegion;
@@ -110,23 +118,26 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
     final float snipHeight = lry - uly;
     if (lrx < 1) {
       // Relative snippets
-      snippetRegion = new OcrBox(ulx, uly, truncateFloat(snipWidth), truncateFloat(snipHeight));
-      hlCoords = hlCoords.stream()
-          .map(box -> {
-            float hlWidth = box.width / snipWidth;
-            float hlHeight = box.height / snipHeight;
-            float hlX = (box.x - snipX) / snipWidth;
-            float hlY = (box.y - snipY) / snipHeight;
-            return new OcrBox(truncateFloat(hlX), truncateFloat(hlY), truncateFloat(hlWidth), truncateFloat(hlHeight));
-          }).collect(Collectors.toList());
+      snippetRegion = new OcrBox(ulx, uly, lrx, lry);
+      hlBoxes = hlBoxes.stream()
+        .map(cs -> cs.stream()
+            .map(b -> new OcrBox(truncateFloat((b.ulx - snipX) / snipWidth),
+                                 truncateFloat((float) ((b.uly - snipY) / snipHeight)),
+                                 truncateFloat((b.lrx - snipX) / snipWidth),
+                                 truncateFloat((b.lry - snipY) / snipHeight)))
+           .collect(Collectors.toList()))
+        .collect(Collectors.toList());
     } else {
-      snippetRegion = new OcrBox(ulx, uly, (lrx - ulx), (lry - uly));
-      hlCoords = hlCoords.stream()
-          .map(box -> new OcrBox(box.x - snipX, box.y - snipY, box.width, box.height))
-          .collect(Collectors.toList());
-    }
-    OcrSnippet snip = new OcrSnippet(getTextFromXml(xmlFragment), pageId, snippetRegion);
-    hlCoords.forEach(snip::addHighlightRegion);
+      snippetRegion = new OcrBox(ulx, uly, lrx, lry);
+      hlBoxes = hlBoxes.stream()
+        .map(cs -> cs.stream()
+            .map(b -> new OcrBox((b.ulx - snipX), (b.uly - snipY),
+                                 (b.lrx - snipX), (b.lry - snipY)))
+            .collect(Collectors.toList()))
+        .collect(Collectors.toList());
+      }
+      OcrSnippet snip = new OcrSnippet(getTextFromXml(xmlFragment), pageId, snippetRegion);
+    hlBoxes.forEach(snip::addHighlightRegion);
     return snip;
   }
 

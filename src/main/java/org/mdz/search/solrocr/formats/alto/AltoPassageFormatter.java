@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.commons.text.StringEscapeUtils;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
@@ -80,7 +81,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
 
   @Override
   protected OcrSnippet parseFragment(String ocrFragment, String pageId) {
-    List<OcrBox> hlCoords = new ArrayList<>();
+    List<List<OcrBox>> hlBoxes = new ArrayList<>();
     int ulx = Integer.MAX_VALUE;
     int uly = Integer.MAX_VALUE;
     int lrx = -1;
@@ -88,6 +89,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     ocrFragment = ocrFragment.replaceAll(startHlTag, "@@STARTHLTAG@@")
                              .replaceAll(endHlTag, "@@ENDHLTAG@@");
     Matcher m = wordPat.matcher(ocrFragment);
+    List<OcrBox> currentHl = null;
     while (m.find()) {
       Map<String, String> attribs = parseAttribs(m.group("attribs"));
       int x = Integer.parseInt(attribs.get("HPOS"));
@@ -107,21 +109,29 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         lry = y + h;
       }
       String text = attribs.get("CONTENT");
-      if (text.startsWith("@@STARTHLTAG@@")) {
-        hlCoords.add(new OcrBox(x, y, w, h));
+      if (text.contains("@@STARTHLTAG@@")) {
+        currentHl = new ArrayList<>();
+      }
+      if (currentHl != null) {
+        currentHl.add(new OcrBox(x, y, x + w, y + h));
+      }
+      if (text.contains("@@ENDHLTAG@@")) {
+        hlBoxes.add(currentHl);
+        currentHl = null;
       }
     }
     final int snipX = ulx;
     final int snipY = uly;
-    final int snipWidth = lrx - snipX;
-    final int snipHeight = lry - snipY;
-    OcrBox snippetRegion = new OcrBox(snipX, snipY, snipWidth, snipHeight);
+    OcrBox snippetRegion = new OcrBox(ulx, uly, lrx, lry);
     String text = StringEscapeUtils.unescapeXml(
         extractText(ocrFragment).replaceAll("@@STARTHLTAG@@", startHlTag)
                                 .replaceAll("@@ENDHLTAG@@", endHlTag)).trim();
     OcrSnippet snip = new OcrSnippet(text,  pageId, snippetRegion);
-    hlCoords.stream()
-        .map(box -> new OcrBox(box.x - snipX, box.y - snipY, box.width, box.height))
+    hlBoxes.stream()
+        .map(bs -> bs.stream()
+            .map(b -> new OcrBox(b.ulx - snipX, b.uly - snipY,
+                                 b.lrx - snipX, b.lry - snipY))
+            .collect(Collectors.toList()))
         .forEach(snip::addHighlightRegion);
     return snip;
   }

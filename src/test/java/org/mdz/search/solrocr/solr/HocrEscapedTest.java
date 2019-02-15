@@ -63,20 +63,20 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
         "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
             + "Jlluſtrationen zu Lermontoffs „Dämon“: die Verführung <em>Tamaras</em> durch den Dämon, ihre "
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",
-        "//lst[@name='region'][1]/int[@name='x']/text()=146",
-        "//arr[@name='highlights']/lst[1]/int[@name='x']/text()=361"
+        "//lst[@name='region'][1]/int[@name='ulx']/text()=146",
+        "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=361"
     );
   }
 
   @Test
-  public void testWeightMatchesWarning() throws Exception {
+  public void testWeightMatches() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Verführung Tamaras\"", "hl.weightMatches", "true");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='42']/arr[@name='ocr_text']/lst)=1",
         "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
             + "Jlluſtrationen zu Lermontoffs „Dämon“: die <em>Verführung Tamaras</em> durch den Dämon, ihre "
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",
-        "//lst[@name='region'][1]/int[@name='x']/text()=146",
-        "//arr[@name='highlights']/lst[1]/int[@name='x']/text()=361");
+        "//lst[@name='region'][1]/int[@name='ulx']/text()=146",
+        "//arr[@name='highlights']/arr/lst[2]/int[@name='ulx']/text()=361");
   }
 }

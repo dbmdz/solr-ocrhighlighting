@@ -74,15 +74,15 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=3",
             "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>München</em> Morgen-Ausgabe. Preſſe.'",
-            "//lst[@name='region'][1]/float[@name='x']/text()='0.3714'",
-            "//lst[@name='region'][1]/float[@name='y']/text()='0.0071'",
-            "//lst[@name='region'][1]/float[@name='w']/text()='0.4384'",
-            "//lst[@name='region'][1]/float[@name='h']/text()='0.1033'",
+            "//lst[@name='region'][1]/float[@name='ulx']/text()='0.3714'",
+            "//lst[@name='region'][1]/float[@name='uly']/text()='0.0071'",
+            "//lst[@name='region'][1]/float[@name='lrx']/text()='0.8098'",
+            "//lst[@name='region'][1]/float[@name='lry']/text()='0.1104'",
             "count(//arr[@name='highlights'])=3",
-            "//arr[@name='highlights'][1]/lst/float[@name='x']/text()='0.3223'",
-            "//arr[@name='highlights'][1]/lst/float[@name='y']/text()='0.1481'",
-            "//arr[@name='highlights'][1]/lst/float[@name='w']/text()='0.0948'",
-            "//arr[@name='highlights'][1]/lst/float[@name='h']/text()='0.059'");
+            "//arr[@name='highlights'][1]/arr/lst/float[@name='ulx']/text()='0.3223'",
+            "//arr[@name='highlights'][1]/arr/lst/float[@name='uly']/text()='0.1481'",
+            "//arr[@name='highlights'][1]/arr/lst/float[@name='lrx']/text()='0.4171'",
+            "//arr[@name='highlights'][1]/arr/lst/float[@name='lry']/text()='0.2071'");
   }
 
   @Test
@@ -220,5 +220,15 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Ausgabe\"~10");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=2");
+  }
+
+  @Test
+  public void testWeightMatches() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek München\"", "hl.weightMatches", "true");
+    assertQ(req,
+            "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst)=1",
+            "//str[@name='text']/text()='Herausgeber und <em>Bayerische Staatsbibliothek München</em>'",
+            "//arr[@name='highlights']/arr/lst[1]/float[@name='ulx']/text()='0.7853'",
+            "//arr[@name='highlights']/arr/lst[1]/int[@name='uly']/text()='0'");
   }
 }
