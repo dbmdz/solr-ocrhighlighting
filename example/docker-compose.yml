@@ -1,0 +1,25 @@
+version: '2'
+services:
+  solr:
+    command: solr-foreground -a "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+    build: solr
+    ports:
+      - "8983:8983"
+      - "18983:18983"
+      - "8849:8849"
+      - "1044:1044"
+    volumes:
+      - data-solr:/opt/solr/server/solr/ocrtest
+      - ./google1000:/google1000
+  iiif:
+    command: /bin/iiif-server -host 0.0.0.0 -config /data/go-iiif-conf.json
+    build:
+      context: 'https://github.com/go-iiif/go-iiif.git'
+      dockerfile: Dockerfile.server
+    volumes:
+      - .:/data
+    ports:
+      - "8080:8080"
+
+volumes:
+  data-solr:

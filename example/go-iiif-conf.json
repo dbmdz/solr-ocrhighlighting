@@ -1,0 +1,15 @@
+{
+  "level": {
+    "compliance": "2"
+  },
+  "graphics": {
+    "source": { "name": "VIPS" }
+  },
+  "images": {
+    "source": { "name": "Disk", "path": "/data/google1000/" },
+    "cache": { "name": "Null" }
+  },
+  "derivatives": {
+    "cache": { "name": "Null" }
+  }
+}
