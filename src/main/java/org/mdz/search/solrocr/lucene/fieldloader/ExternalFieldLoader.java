@@ -1,6 +1,7 @@
 package org.mdz.search.solrocr.lucene.fieldloader;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
 import org.mdz.search.solrocr.util.IterableCharSequence;
@@ -16,4 +17,7 @@ public interface ExternalFieldLoader {
 
   /** Load the field content from an external source */
   IterableCharSequence loadField(Map<String, String> fields, String fieldName) throws IOException;
+
+  /** Get the charset that field values will be encoded in */
+  Charset getCharset();
 }

@@ -1,6 +1,7 @@
 package org.mdz.search.solrocr.solr;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.text.BreakIterator;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.stream.Stream;
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
+import org.apache.lucene.search.uhighlight.UnifiedHighlighter.HighlightFlag;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.solr.common.params.HighlightParams;
@@ -39,7 +41,8 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrOcrHighlighter.class);
 
   public static final String NO_WEIGHT_MATCHES_SUPPORT_MSG =
-      "OCR highlighting does not support hl.weightMatches, classic highlighting approach will be used instead.";
+      "OCR highlighting in external UTF-8 files does not support hl.weightMatches, classic highlighting approach will "
+    + "be used instead. Switch to escaped ASCII or UTF-16 to avoid this.";
 
   private final ResourceLoader resourceLoader;
 
@@ -133,12 +136,12 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     // Highlight OCR fields
     if (ocrFieldNames.length > 0) {
       OcrHighlighter ocrHighlighter = new OcrHighlighter(
-          req.getSearcher(), req.getSchema().getIndexAnalyzer(), fieldLoader);
-      Arrays.stream(ocrFieldNames)
-          .filter(field -> (params.getFieldBool(field, HighlightParams.WEIGHT_MATCHES, false)
-                            && params.getFieldBool(field, HighlightParams.HIGHLIGHT_MULTI_TERM, true)
-                            && params.getFieldBool(field, HighlightParams.USE_PHRASE_HIGHLIGHTER, true)))
-          .forEach(field -> highlightFieldWarnings.put(field, NO_WEIGHT_MATCHES_SUPPORT_MSG));
+          req.getSearcher(), req.getSchema().getIndexAnalyzer(), fieldLoader, req.getParams());
+      if (fieldLoader.getCharset() == StandardCharsets.UTF_8) {
+        Arrays.stream(ocrFieldNames)
+            .filter(f -> ocrHighlighter.getFlags(f).contains(HighlightFlag.WEIGHT_MATCHES))
+            .forEach(field -> highlightFieldWarnings.put(field, NO_WEIGHT_MATCHES_SUPPORT_MSG));
+      }
       ocrFormat.setBreakParameters(
           OcrBlock.valueOf(params.get("hl.ocr.contextBlock", "line").toUpperCase()),
           params.getInt("hl.ocr.contextSize", 2));

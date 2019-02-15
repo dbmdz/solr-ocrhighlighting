@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +26,14 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.uhighlight.PassageScorer;
 import org.apache.lucene.search.uhighlight.PhraseHelper;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.InPlaceMergeSorter;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
+import org.apache.solr.common.params.HighlightParams;
+import org.apache.solr.common.params.SolrParams;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
 import org.mdz.search.solrocr.lucene.byteoffset.ByteOffsetPhraseHelper;
@@ -47,8 +51,6 @@ import org.mdz.search.solrocr.util.IterableCharSequence;
  */
 public class OcrHighlighter extends UnifiedHighlighter {
 
-  private final ExternalFieldLoader fieldLoader;
-
   static final IndexSearcher EMPTY_INDEXSEARCHER;
 
   static {
@@ -61,9 +63,41 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }
   }
 
-  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, ExternalFieldLoader fieldLoader) {
+  private final ExternalFieldLoader fieldLoader;
+  private final SolrParams params;
+
+
+  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, ExternalFieldLoader fieldLoader,
+      SolrParams params) {
     super(indexSearcher, indexAnalyzer);
     this.fieldLoader = fieldLoader;
+    this.params = params;
+  }
+
+  @Override
+  protected PassageScorer getScorer(String fieldName) {
+    float k1 = params.getFieldFloat(fieldName, HighlightParams.SCORE_K1, 1.2f);
+    float b = params.getFieldFloat(fieldName, HighlightParams.SCORE_B, 0.75f);
+    float pivot = params.getFieldFloat(fieldName, HighlightParams.SCORE_PIVOT, 87f);
+    return new PassageScorer(k1, b, pivot);
+  }
+
+  @Override
+  public Set<HighlightFlag> getFlags(String field) {
+    Set<HighlightFlag> flags = EnumSet.noneOf(HighlightFlag.class);
+    if (params.getFieldBool(field, HighlightParams.HIGHLIGHT_MULTI_TERM, true)) {
+      flags.add(HighlightFlag.MULTI_TERM_QUERY);
+    }
+    if (params.getFieldBool(field, HighlightParams.USE_PHRASE_HIGHLIGHTER, true)) {
+      flags.add(HighlightFlag.PHRASES);
+    }
+    flags.add(HighlightFlag.PASSAGE_RELEVANCY_OVER_SPEED);
+
+    if (params.getFieldBool(field, HighlightParams.WEIGHT_MATCHES, false) // true in 8.0
+        && flags.contains(HighlightFlag.PHRASES) && flags.contains(HighlightFlag.MULTI_TERM_QUERY)) {
+      flags.add(HighlightFlag.WEIGHT_MATCHES);
+    }
+    return flags;
   }
 
   // FIXME: This is largely (>80%) copied straight from

@@ -142,4 +142,9 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
       return null;
     }
   }
+
+  @Override
+  public Charset getCharset() {
+    return charset;
+  }
 }
