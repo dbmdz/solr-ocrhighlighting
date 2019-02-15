@@ -5,6 +5,7 @@ import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageFormatter;
@@ -57,7 +58,8 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         new StringReader(xmlFragment),
         ImmutableSet.of(startHlTag.substring(1, startHlTag.length() - 1)));
     try {
-      return CharStreams.toString(filter)
+      String text = CharStreams.toString(filter);
+      return StringEscapeUtils.unescapeXml(text)
           .replaceAll("\n", "")
           .replaceAll("\\s+", " ")
           .trim();

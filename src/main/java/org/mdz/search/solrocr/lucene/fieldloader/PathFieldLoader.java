@@ -1,5 +1,6 @@
 package org.mdz.search.solrocr.lucene.fieldloader;
 
+import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +48,12 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
   // `{fieldName}`, `{fieldName[:-3]`
   private static final Pattern variablePat = Pattern.compile(
       "\\{(?<fieldName>.+?)(?:\\[(?<startIdx>-?\\d+)?(?:(?<rangeChar>:)(?<endIdx>-?\\d+)?)?])?}");
+  private static final Set<Charset> supportedCharsets = ImmutableSet.of(
+      StandardCharsets.US_ASCII,
+      StandardCharsets.UTF_8,
+      StandardCharsets.UTF_16,
+      StandardCharsets.UTF_16LE,
+      StandardCharsets.UTF_16BE);
 
   private Map<String, String> fieldPatterns;
   private Set<String> requiredFieldValues;
@@ -59,11 +66,11 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
       cset = "utf-16";
     }
     this.charset = Charset.forName(cset);
-    if (this.charset != StandardCharsets.UTF_8 && this.charset != StandardCharsets.UTF_16
-        && this.charset != StandardCharsets.UTF_16LE && this.charset != StandardCharsets.UTF_16BE) {
+    if (!supportedCharsets.contains(this.charset)) {
       throw new SolrException(
           ErrorCode.FORBIDDEN,
-          String.format("Invalid encoding '%s', must be one of 'utf-8', 'utf-16', 'utf-16le' or 'utf-16be'", cset));
+          String.format("Invalid encoding '%s', must be one of 'ascii', 'utf-8', 'utf-16', 'utf-16le' or 'utf-16be'",
+                        cset));
     }
     this.requiredFieldValues = new HashSet<>();
     this.fieldPatterns = new HashMap<>();
@@ -126,8 +133,8 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
     String fieldPattern = fieldPatterns.get(fieldName);
     Path p = Paths.get(interpolateVariables(fieldPattern, fields));
     try {
-      if (this.charset == StandardCharsets.UTF_8) {
-        return new FileBytesCharIterator(p);
+      if (this.charset == StandardCharsets.UTF_8 || this.charset == StandardCharsets.US_ASCII) {
+        return new FileBytesCharIterator(p, this.charset);
       } else {
         return new FileCharIterator(p);
       }

@@ -1,5 +1,7 @@
 package org.mdz.search.solrocr.util;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.stream.IntStream;
@@ -15,6 +17,8 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
   }
 
   OffsetType getOffsetType();
+
+  Charset getCharset();
 
   static IterableCharSequence fromString(String string) {
     return new IterableStringCharSequence(string);
@@ -118,6 +122,11 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
     @Override
     public OffsetType getOffsetType() {
       return OffsetType.CHARS;
+    }
+
+    @Override
+    public Charset getCharset() {
+      return StandardCharsets.UTF_16;
     }
   }
 }

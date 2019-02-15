@@ -40,6 +40,28 @@ class FileBytesCharIteratorTest {
   }
 
   @Test
+  public void testAscii() throws IOException {
+    Path asciiPath = Paths.get("src/test/resources/data/hocr_escaped.html");
+    FileBytesCharIterator asciiIt = new FileBytesCharIterator(asciiPath);
+    StringBuilder sb = new StringBuilder();
+    String text = new String(Files.readAllBytes(asciiPath), StandardCharsets.US_ASCII);
+    int start = 0;
+    int charIdx = 0;
+    char c = asciiIt.first();
+    sb.append(c);
+    charIdx++;
+    while ((c = asciiIt.next()) != CharacterIterator.DONE) {
+      sb.append(c);
+      charIdx++;
+      if (sb.length() == 100) {
+        assertThat(sb.toString()).isEqualTo(text.substring(start, charIdx));
+        start = charIdx;
+        sb = new StringBuilder();
+      }
+    }
+  }
+
+  @Test
   public void testLength() throws IOException {
     assertThat(it.length()).isEqualTo(Files.size(ocrPath));
   }

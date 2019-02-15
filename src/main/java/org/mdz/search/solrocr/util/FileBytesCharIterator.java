@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -23,38 +24,51 @@ public class FileBytesCharIterator implements IterableCharSequence {
   private final int startOffset;
   private final int numBytes;
   private final CharsetDecoder decoder;
+  private final Charset charset;
 
   private int current;
 
   public FileBytesCharIterator(Path path) throws IOException {
+    this(path, StandardCharsets.UTF_8);
+  }
+
+  public FileBytesCharIterator(Path path, Charset charset) throws IOException {
+    this.charset = charset;
     this.filePath = path;
     FileChannel channel = (FileChannel) Files.newByteChannel(path, StandardOpenOption.READ);
     this.numBytes = (int) channel.size();
     this.buf = channel.map(MapMode.READ_ONLY, 0, channel.size());
-    byte[] b = new byte[4];
-    buf.get(b);
-    int[]  validationBuf = new int[4];
-    for (int i=0; i < b.length; i++) {
-      validationBuf[i] = b[i] & 0xFF;
-    }
-    // TODO: This is a pretty spotty heuristic, maybe there's something in the stdlib?
-    if (!(validationBuf[0] == 0xEF && validationBuf[1] == 0xBB && validationBuf[2] == 0xBF)
-        && ((validationBuf[0] >> 3) != 0b11110 )
-        && ((validationBuf[0] >> 4) != 0b1110 )
-        && ((validationBuf[0] >> 5) != 0b110)
-        && ((validationBuf[0] >> 7) != 0)) {
-      throw new IllegalArgumentException("File is not UTF-8 encoded");
-    }
-    this.decoder = StandardCharsets.UTF_8.newDecoder();
-    if (validationBuf[0] == 0xEF) {
-      this.startOffset = 3;
-    } else {
+    if (this.charset == StandardCharsets.UTF_8) {
+      byte[] b = new byte[4];
+      buf.get(b);
+      int[] validationBuf = new int[4];
+      for (int i = 0; i < b.length; i++) {
+        validationBuf[i] = b[i] & 0xFF;
+      }
+      // TODO: This is a pretty spotty heuristic, maybe there's something in the stdlib?
+      if (!(validationBuf[0] == 0xEF && validationBuf[1] == 0xBB && validationBuf[2] == 0xBF)
+          && ((validationBuf[0] >> 3) != 0b11110)
+          && ((validationBuf[0] >> 4) != 0b1110)
+          && ((validationBuf[0] >> 5) != 0b110)
+          && ((validationBuf[0] >> 7) != 0)) {
+        throw new IllegalArgumentException("File is not UTF-8 encoded");
+      }
+      this.decoder = StandardCharsets.UTF_8.newDecoder();
+      if (validationBuf[0] == 0xEF) {
+        this.startOffset = 3;
+      } else {
+        this.startOffset = 0;
+      }
+    } else if (this.charset == StandardCharsets.US_ASCII) {
+      this.decoder = StandardCharsets.US_ASCII.newDecoder();
       this.startOffset = 0;
+    } else {
+      throw new IllegalArgumentException("Invalid charset: %s, only ASCII or UTF-8 are  supported");
     }
   }
 
   public FileBytesCharIterator(FileBytesCharIterator other) throws IOException {
-    this(other.filePath);
+    this(other.filePath, other.charset);
     this.current = other.current;
   }
 
@@ -209,5 +223,10 @@ public class FileBytesCharIterator implements IterableCharSequence {
   @Override
   public OffsetType getOffsetType() {
     return OffsetType.BYTES;
+  }
+
+  @Override
+  public Charset getCharset() {
+    return this.charset;
   }
 }

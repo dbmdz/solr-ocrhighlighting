@@ -49,7 +49,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     breakIterator.setText(content);
 
     Passage[] passages;
-    if (content.getOffsetType() == OffsetType.BYTES) {
+    if (content.getOffsetType() == OffsetType.BYTES && content.getCharset() == StandardCharsets.UTF_8) {
       try (ByteOffsetsEnum byteOffsetsEnums = fieldByteOffsetStrategy.getByteOffsetsEnum(reader, docId)) {
         passages = highlightByteOffsetsEnums(byteOffsetsEnums);
       }

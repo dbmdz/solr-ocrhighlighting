@@ -60,7 +60,7 @@ public class HocrUtf8Test extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testTHocr() throws Exception {
+  public void testHocr() throws Exception {
     SolrQueryRequest req = xmlQ("q", "tamara");
     assertQ(req,
         "count(//lst[@name='highlighting']/lst[@name='42']/arr[@name='ocr_text']/lst)=2",
