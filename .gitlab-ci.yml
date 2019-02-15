@@ -1,10 +1,5 @@
 include: "http://bsb0mdz-ci.bsb.lrz.de/build/gitlab-ci-base.yml"
 
-stages:
-  - build
-  - test
-
-cache:
-  key: "$CI_COMMIT_SHA"
-  paths:
-    - target/
+# We don't want to publish to a Maven repo, for now
+variables:
+  - NO_PUBLISH: yes
