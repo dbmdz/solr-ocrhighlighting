@@ -21,6 +21,8 @@ import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.mdz.search.solrocr.util.FileBytesCharIterator;
 import org.mdz.search.solrocr.util.FileCharIterator;
 import org.mdz.search.solrocr.util.IterableCharSequence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Load field values from filesystem paths.
  *
@@ -54,6 +56,7 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
       StandardCharsets.UTF_16,
       StandardCharsets.UTF_16LE,
       StandardCharsets.UTF_16BE);
+  private static final Logger logger = LoggerFactory.getLogger(PathFieldLoader.class);
 
   private Map<String, String> fieldPatterns;
   private Set<String> requiredFieldValues;
@@ -139,6 +142,7 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
         return new FileCharIterator(p);
       }
     } catch (NoSuchFileException e) {
+      logger.error("Could not resolve path for highlighting: " + p, e);
       return null;
     }
   }

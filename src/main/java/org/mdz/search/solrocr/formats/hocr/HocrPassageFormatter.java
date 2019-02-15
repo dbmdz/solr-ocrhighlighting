@@ -95,7 +95,8 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
         currentHl.add(new OcrBox(x0, y0, x1, y1));
       }
       if (text.contains(endHlTag)
-          || ocrFragment.substring(m.end(), m.end() + endHlTag.length()).equals(endHlTag)) {
+          || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(),
+                                                     ocrFragment.length())).equals(endHlTag)) {
         hlBoxes.add(currentHl);
         currentHl = null;
       }

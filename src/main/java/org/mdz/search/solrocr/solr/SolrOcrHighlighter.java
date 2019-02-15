@@ -21,7 +21,6 @@ import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.core.PluginInfo;
-import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
@@ -66,21 +65,13 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
           "Please configure your OCR format with the `ocrFormat` attribute on <highlighting>. "
         + "Refer to the org.mdz.search.solrocr.formats package for available formats.");
     }
-
-    LOGGER.warn("FormatClassName=" + formatClsName);
-
     try {
-      LOGGER.warn("Looking in " + ((SolrResourceLoader)resourceLoader).getInstancePath());
-
-      Class clazz = resourceLoader.findClass(formatClsName, OcrFormat.class);
-      LOGGER.warn("Class=" + clazz);
-
-      this.ocrFormat = SolrCore.createInstance(formatClsName, OcrFormat.class, null, null, resourceLoader);
-      LOGGER.warn("ocrFormat=" + ocrFormat);
+      Class<?> clz = Class.forName(formatClsName);
+      this.ocrFormat = (OcrFormat) clz.getConstructors()[0].newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new SolrException(ErrorCode.FORBIDDEN, "Unknown OCR format: " + formatClsName);
     } catch (Exception e) {
-      LOGGER.error("Eek: " + e, e);
-      LOGGER.error("resourceLoader=" + resourceLoader);
-      throw new SolrException(ErrorCode.SERVER_ERROR, "Cannot instanciate ocrFormat: " + e, e);
+      throw new SolrException(ErrorCode.FORBIDDEN, "Error loading OCR format: " + e);
     }
 
     NamedList<String> ocrFieldInfo = (NamedList) info.initArgs.get("ocrFields");
@@ -95,8 +86,14 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
     PluginInfo fieldLoaderInfo = info.getChild("fieldLoader");
     if (fieldLoaderInfo != null) {
-      fieldLoader = SolrCore.createInstance(
-          fieldLoaderInfo.className, ExternalFieldLoader.class,null, null, resourceLoader);
+      try {
+        Class<?> clz = Class.forName(fieldLoaderInfo.className);
+        this.fieldLoader = (ExternalFieldLoader) clz.getConstructors()[0].newInstance();
+      } catch (ClassNotFoundException e) {
+        throw new SolrException(ErrorCode.FORBIDDEN, "Unknown OCR format: " + formatClsName);
+      } catch (Exception e) {
+        throw new SolrException(ErrorCode.FORBIDDEN, "Error loading OCR format: " + e);
+      }
       if (fieldLoader instanceof PluginInfoInitialized) {
         ((PluginInfoInitialized) fieldLoader).init(fieldLoaderInfo);
       }
