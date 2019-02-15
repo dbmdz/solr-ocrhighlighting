@@ -1,6 +1,7 @@
 package org.mdz.search.solrocr.solr;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,8 +31,12 @@ import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
 import org.mdz.search.solrocr.lucene.OcrHighlighter;
 import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SolrOcrHighlighter.class);
 
   public static final String NO_WEIGHT_MATCHES_SUPPORT_MSG =
       "OCR highlighting does not support hl.weightMatches, classic highlighting approach will be used instead.";
@@ -43,7 +48,9 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private List<String> ocrFieldNames;
 
   public SolrOcrHighlighter() {
-    this.resourceLoader = new SolrResourceLoader();
+    Path libPath = SolrResourceLoader.locateSolrHome().resolve("lib");
+
+    this.resourceLoader = new SolrResourceLoader(libPath);
   }
 
   @Override
@@ -56,7 +63,22 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
           "Please configure your OCR format with the `ocrFormat` attribute on <highlighting>. "
         + "Refer to the org.mdz.search.solrocr.formats package for available formats.");
     }
-    this.ocrFormat = SolrCore.createInstance(formatClsName, OcrFormat.class, null, null, resourceLoader);
+
+    LOGGER.warn("FormatClassName=" + formatClsName);
+
+    try {
+      LOGGER.warn("Looking in " + ((SolrResourceLoader)resourceLoader).getInstancePath());
+
+      Class clazz = resourceLoader.findClass(formatClsName, OcrFormat.class);
+      LOGGER.warn("Class=" + clazz);
+
+      this.ocrFormat = SolrCore.createInstance(formatClsName, OcrFormat.class, null, null, resourceLoader);
+      LOGGER.warn("ocrFormat=" + ocrFormat);
+    } catch (Exception e) {
+      LOGGER.error("Eek: " + e, e);
+      LOGGER.error("resourceLoader=" + resourceLoader);
+      throw new SolrException(ErrorCode.SERVER_ERROR, "Cannot instanciate ocrFormat: " + e, e);
+    }
 
     NamedList<String> ocrFieldInfo = (NamedList) info.initArgs.get("ocrFields");
     if (ocrFieldInfo == null) {
