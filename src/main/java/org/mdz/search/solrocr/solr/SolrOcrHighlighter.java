@@ -151,7 +151,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     }
 
     // Assemble output data
-    NamedList<Object> out = new NamedList<>();
+    SimpleOrderedMap out = new SimpleOrderedMap();
     if (regularSnippets != null) {
       out.addAll(this.encodeSnippets(keys, regularFieldNames, regularSnippets));
     }
