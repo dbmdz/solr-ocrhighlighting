@@ -41,7 +41,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
-        pageOffset, pageOffset + Math.min(128, content.length())).toString();
+        pageOffset, Math.min(pageOffset + 128, content.length())).toString();
     m = pagePat.matcher(pageFragment);
     if (m.find()) {
       return m.group("pageId");
@@ -106,7 +106,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       if (currentHl != null) {
         currentHl.add(new OcrBox(x, y, x + width, y + height));
       }
-      if (text.contains(endHlTag)) {
+      if (text.contains(endHlTag) && currentHl != null) {
         hlBoxes.add(currentHl);
         currentHl = null;
       }

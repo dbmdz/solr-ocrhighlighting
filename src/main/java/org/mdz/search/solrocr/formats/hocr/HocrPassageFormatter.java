@@ -17,20 +17,14 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern pagePat = Pattern.compile(
       "<div.+?class=['\"]ocr_page['\"].+?id=['\"](?<pageId>.+?)['\"]");
 
-  private final String contextClass;
-  private final HocrClassBreakIterator startContextIter;
   private final HocrClassBreakIterator pageIter;
   private final HocrClassBreakIterator limitIter;
-  private final String limitClass;
   private final String startHlTag;
   private final String endHlTag;
 
   public HocrPassageFormatter(String contextClass, String limitClass, String startHlTag, String endHlTag) {
     super(startHlTag, endHlTag);
-    this.contextClass = contextClass;
-    this.startContextIter = new HocrClassBreakIterator(contextClass);
     this.pageIter = new HocrClassBreakIterator("ocr_page");
-    this.limitClass = limitClass;
     this.limitIter = new HocrClassBreakIterator(limitClass);
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;
@@ -45,7 +39,7 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
-        pageOffset, pageOffset + Math.min(256, content.length())).toString();
+        pageOffset, Math.min(pageOffset + 256, content.length())).toString();
     m = pagePat.matcher(pageFragment);
     if (m.find()) {
       return m.group("pageId");
@@ -94,9 +88,10 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
       if (currentHl != null) {
         currentHl.add(new OcrBox(x0, y0, x1, y1));
       }
-      if (text.contains(endHlTag)
-          || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(),
-                                                     ocrFragment.length())).equals(endHlTag)) {
+      if (currentHl != null
+          && (text.contains(endHlTag)
+              || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(),ocrFragment.length()))
+                            .equals(endHlTag))) {
         hlBoxes.add(currentHl);
         currentHl = null;
       }

@@ -55,6 +55,9 @@ public class ContextBreakIterator extends BreakIterator {
     this.baseIter.following(offset);
     for (int i=0; i < context; i++) {
       this.baseIter.next();
+      if (this.baseIter.current() == this.baseIter.getText().getEndIndex()) {
+        break;
+      }
     }
     return this.baseIter.current();
   }

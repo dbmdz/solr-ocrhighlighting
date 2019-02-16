@@ -45,7 +45,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
-        pageOffset, pageOffset + Math.min(512, content.length())).toString();
+        pageOffset, Math.min(pageOffset + 512, content.length())).toString();
     m = pagePat.matcher(pageFragment);
     if (m.find()) {
       return parseAttribs(m.group("attribs")).get("ID");
@@ -115,7 +115,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       if (currentHl != null) {
         currentHl.add(new OcrBox(x, y, x + w, y + h));
       }
-      if (text.contains("@@ENDHLTAG@@")) {
+      if (text.contains("@@ENDHLTAG@@") && currentHl != null) {
         hlBoxes.add(currentHl);
         currentHl = null;
       }

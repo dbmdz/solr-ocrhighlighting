@@ -57,11 +57,12 @@ public class HocrClassBreakIterator extends BreakIterator {
         }
       }
       if (this.text.next() == CharacterIterator.DONE) {
-        break;
+        this.current = this.text.getIndex();;
+        return this.current;
       }
     }
     // FIXME: This will break with ByteCharIterators if the tag has a multi-byte codepoint.
-    this.current = this.text.getIndex() - fullTag.length();
+    this.current = this.text.getIndex() - fullTag.length() + 1;
     return this.current;
   }
 
@@ -93,11 +94,12 @@ public class HocrClassBreakIterator extends BreakIterator {
         }
       }
       if (this.text.previous() == CharacterIterator.DONE) {
-        break;
+        this.current = this.text.getIndex();
+        return this.current;
       }
     }
     // FIXME: This will break with ByteCharIterators if the tag has a multi-byte codepoint.
-    this.current = this.text.getIndex();
+    this.current = this.text.getIndex() + 1;
     return this.current;
   }
 

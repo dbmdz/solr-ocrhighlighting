@@ -129,7 +129,7 @@ public class FileBytesCharIterator implements IterableCharSequence {
       throw new IndexOutOfBoundsException();
     }
     start = adjustOffset(start);
-    end = adjustOffset(end);
+    end = adjustOffset(end - 1);
     byte[] buf = new byte[end - start];
     this.buf.position(start);
     this.buf.get(buf);
@@ -150,6 +150,9 @@ public class FileBytesCharIterator implements IterableCharSequence {
 
   @Override
   public char current() {
+    if (this.current == this.numBytes) {
+      return DONE;
+    }
     return this.charAt(current);
   }
 
