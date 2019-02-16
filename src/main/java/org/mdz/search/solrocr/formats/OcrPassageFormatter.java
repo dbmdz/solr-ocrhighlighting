@@ -38,10 +38,10 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       int extraChars = 0;
       for (int j=0; j < passage.getNumMatches(); j++) {
         int matchStart = content.subSequence(passage.getStartOffset(), passage.getMatchStarts()[j]).toString().length();
-        sb.insert(extraChars + matchStart + 1, startHlTag);
+        sb.insert(extraChars + matchStart, startHlTag);
         extraChars += startHlTag.length();
         int matchEnd = content.subSequence(passage.getStartOffset(), passage.getMatchEnds()[j]).toString().length();
-        sb.insert(extraChars + matchEnd + 1, endHlTag);
+        sb.insert(extraChars + matchEnd, endHlTag);
         extraChars += endHlTag.length();
       }
       String xmlFragment = truncateFragment(sb.toString());

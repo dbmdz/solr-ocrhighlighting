@@ -62,7 +62,7 @@ public class HocrClassBreakIterator extends BreakIterator {
       }
     }
     // FIXME: This will break with ByteCharIterators if the tag has a multi-byte codepoint.
-    this.current = this.text.getIndex() - fullTag.length() + 1;
+    this.current = this.text.getIndex() - fullTag.length();
     return this.current;
   }
 

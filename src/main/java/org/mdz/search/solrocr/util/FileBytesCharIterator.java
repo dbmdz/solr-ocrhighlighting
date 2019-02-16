@@ -97,6 +97,9 @@ public class FileBytesCharIterator implements IterableCharSequence {
     if (offset < 0 || offset >= this.numBytes) {
       throw new IndexOutOfBoundsException();
     }
+    if (this.charset == StandardCharsets.US_ASCII) {
+      return (char) buf.get(offset);
+    }
     int originalOffset = offset;
     offset = adjustOffset(offset);
     int b = buf.get(offset) & 0xFF;  // bytes are signed in Java....
@@ -128,8 +131,10 @@ public class FileBytesCharIterator implements IterableCharSequence {
     if (start < 0 || end < 0 || end > this.numBytes || end < start) {
       throw new IndexOutOfBoundsException();
     }
-    start = adjustOffset(start);
-    end = adjustOffset(end - 1);
+    if (charset == StandardCharsets.UTF_8) {
+      start = adjustOffset(start);
+      end = adjustOffset(end);
+    }
     byte[] buf = new byte[end - start];
     this.buf.position(start);
     this.buf.get(buf);
