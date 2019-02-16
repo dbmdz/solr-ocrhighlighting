@@ -22,7 +22,7 @@
     <version.junit>5.3.2</version.junit>
     <version.log4j>2.11.1</version.log4j>
     <version.slf4j>1.7.25</version.slf4j>
-    <version.solr>7.7.0</version.solr>
+    <version.solr>7.6.0</version.solr>
 
     <version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
     <version.maven-compiler-plugin>3.8.0</version.maven-compiler-plugin>
