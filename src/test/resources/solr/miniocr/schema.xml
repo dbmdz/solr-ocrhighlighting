@@ -1,11 +1,10 @@
 <schema name="coordinateHighlight" version="1.0">
   <types>
-    <fieldType name="int" class="solr.TrieIntField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
 
     <fieldType name="text" class="solr.TextField">
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StandardFilterFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>
         <filter class="solr.PorterStemFilterFactory"/>
@@ -15,7 +14,6 @@
       <analyzer>
         <charFilter class="solr.HTMLStripCharFilterFactory" />
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StandardFilterFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>
         <filter class="solr.PorterStemFilterFactory"/>
@@ -24,7 +22,7 @@
   </types>
 
   <fields>
-    <field name="id" type="int" indexed="true" stored="true" multiValued="false" required="false"/>
+    <field name="id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
     <field name="some_text" type="text" indexed="true" stored="true" />
     <field name="external_ocr_text" type="text_ocr" indexed="true" stored="false" />
     <field name="stored_ocr_text" type="text_ocr" indexed="true" stored="true" />
