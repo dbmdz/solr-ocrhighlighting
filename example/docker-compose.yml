@@ -9,15 +9,15 @@ services:
       - "8849:8849"
       - "1044:1044"
     volumes:
+      - ..:/data
       - data-solr:/opt/solr/server/solr/ocrtest
       - ./google1000:/google1000
   iiif:
     command: /bin/iiif-server -host 0.0.0.0 -config /data/go-iiif-conf.json
-    build:
-      context: 'https://github.com/go-iiif/go-iiif.git'
-      dockerfile: Dockerfile.server
+    build: iiif
     volumes:
-      - .:/data
+      - ./iiif:/data
+      - ./google1000:/google1000
     ports:
       - "8080:8080"
 

@@ -6,7 +6,7 @@
     "source": { "name": "VIPS" }
   },
   "images": {
-    "source": { "name": "Disk", "path": "/data/google1000/" },
+    "source": { "name": "Disk", "path": "/google1000/" },
     "cache": { "name": "Null" }
   },
   "derivatives": {

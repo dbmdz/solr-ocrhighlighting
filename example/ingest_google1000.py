@@ -39,6 +39,8 @@ def load_ocrtext(base_dir):
 if __name__ == '__main__':
     ocr_iter = load_ocrtext(GOOGLE1000_PATH)
     batch = []
-    for ident, ocr in ocr_iter:
-        doc = dict(id=ident.split("_")[-1], vol_name=ident, ocr_text=ocr)
+    for idx, (ident, ocr) in enumerate(ocr_iter):
+        doc = dict(id=ident, ocr_text=ocr)
         index_documents([doc])
+        sys.stdout.write(f'{idx}/1000\r')
+        sys.stdout.flush()

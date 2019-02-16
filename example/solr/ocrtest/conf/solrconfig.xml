@@ -16,7 +16,7 @@
       </lst>
       <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
         <lst name="externalFields">
-          <str name="ocr_text">/google1000/{vol_name}/hOCR.html</str>
+          <str name="ocr_text">/google1000/{id}/hOCR.html</str>
         </lst>
       </fieldLoader>
     </highlighting>

@@ -1,4 +1,4 @@
-FROM solr:7.7-alpine
+FROM solr:7.6-alpine
 
 COPY ocrtest /opt/solr/server/solr/ocrtest
 

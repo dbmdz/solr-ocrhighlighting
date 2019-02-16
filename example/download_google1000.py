@@ -1,6 +1,7 @@
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from io import BytesIO
+from multiprocessing import cpu_count
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -24,6 +25,9 @@ def download_volume(vol_num: int, out_dir: Path):
 
 def fix_hocr(hocr_path: Path):
     tree = etree.parse(str(hocr_path), parser=parser)
+    title = tree.find('.//title')
+    if title is not None:
+        title.getparent().remove(title))
     for idx, page_elem in enumerate(tree.findall('.//div[@class="ocr_page"]'),
                                     start=1):
         page_elem.attrib['id'] = f'page_{idx}'
@@ -36,11 +40,12 @@ def fix_hocr(hocr_path: Path):
 def main():
     out_dir = Path('./google1000')
     out_dir.mkdir(exist_ok=True)
-    with ProcessPoolExecutor(max_workers=8) as pool:
+    with ProcessPoolExecutor(max_workers=cpu_count()) as pool:
         futs = []
         for vol_num in range(1000):
             futs.append(pool.submit(download_volume, vol_num, out_dir))
         for idx, fut in enumerate(as_completed(futs)):
+            fut.result()
             sys.stdout.write(f'{idx + 1}/1000\r')
             sys.stdout.flush()
 
