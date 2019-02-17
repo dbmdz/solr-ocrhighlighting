@@ -2,7 +2,6 @@ package org.mdz.search.solrocr.solr;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter.HighlightFlag;
@@ -21,7 +19,6 @@ import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.core.PluginInfo;
-import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.DocList;
@@ -43,17 +40,9 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
       "OCR highlighting in external UTF-8 files does not support hl.weightMatches, classic highlighting approach will "
     + "be used instead. Switch to escaped ASCII or UTF-16 to avoid this.";
 
-  private final ResourceLoader resourceLoader;
-
   private ExternalFieldLoader fieldLoader;
   private OcrFormat ocrFormat;
   private List<String> ocrFieldNames;
-
-  public SolrOcrHighlighter() {
-    Path libPath = SolrResourceLoader.locateSolrHome().resolve("lib");
-
-    this.resourceLoader = new SolrResourceLoader(libPath);
-  }
 
   @Override
   public void init(PluginInfo info) {
