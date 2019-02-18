@@ -63,7 +63,7 @@ public class AltoTest extends SolrTestCaseJ4 {
   public void testAlto() throws Exception {
     SolrQueryRequest req = xmlQ("q", "svadag");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='42']/arr[@name='ocr_text']/lst)=1",
+        "count(//lst[@name='highlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
         "//str[@name='text'][1]/text()='H.ieifics Menighed Kl. eg for Nicolai Mcniohed Kl. > > Slet. <) Sftensan« om-exler««««« boggeMenighederzNicvlaiMe- Mighed h«r »stenfang paa <em>Svadag</em> ferrkkvm»,cnde. ->) Sknf- «ewaal til Ssndagen holdes i H.geNesKirte sorNicolaiMemghch L?verda.en Kl.«, oz f»r H-geist-S Menighed Kk72. e) Bor-'",
         "//lst[@name='region'][1]/int[@name='ulx']/text()=436",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=1504"

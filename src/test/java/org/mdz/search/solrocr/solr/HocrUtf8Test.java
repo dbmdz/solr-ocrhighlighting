@@ -63,7 +63,7 @@ public class HocrUtf8Test extends SolrTestCaseJ4 {
   public void testHocr() throws Exception {
     SolrQueryRequest req = xmlQ("q", "tamara");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='42']/arr[@name='ocr_text']/lst)=2",
+        "count(//lst[@name='highlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=2",
         "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
             + "Jlluſtrationen zu Lermontoffs „Dämon“: die Verführung <em>Tamaras</em> durch den Dämon, ihre "
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",

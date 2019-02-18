@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.search.uhighlight.FieldHighlighter;
@@ -25,6 +27,7 @@ import org.mdz.search.solrocr.util.IterableCharSequence.OffsetType;
  */
 public class OcrFieldHighlighter extends FieldHighlighter {
   protected FieldByteOffsetStrategy fieldByteOffsetStrategy;
+  private Map<Integer, Integer> numMatches;
 
   public OcrFieldHighlighter(String field, FieldOffsetStrategy fieldOffsetStrategy,
                              FieldByteOffsetStrategy fieldByteOffsetStrategy, PassageScorer passageScorer,
@@ -32,6 +35,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
                              int maxNoHighlightPassages) {
     super(field, fieldOffsetStrategy, breakIter, passageScorer, maxPassages, maxNoHighlightPassages, formatter);
     this.fieldByteOffsetStrategy = fieldByteOffsetStrategy;
+    this.numMatches = new HashMap<>();
   }
 
   /**
@@ -51,11 +55,13 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     Passage[] passages;
     if (content.getOffsetType() == OffsetType.BYTES && content.getCharset() == StandardCharsets.UTF_8) {
       try (ByteOffsetsEnum byteOffsetsEnums = fieldByteOffsetStrategy.getByteOffsetsEnum(reader, docId)) {
-        passages = highlightByteOffsetsEnums(byteOffsetsEnums);
+        this.numMatches.put(docId, byteOffsetsEnums.freq());
+        passages = highlightByteOffsetsEnums(byteOffsetsEnums, pageId);
       }
     } else {
       try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
-        passages = highlightOffsetsEnums(offsetsEnums);// and breakIterator & scorer
+        this.numMatches.put(docId, offsetsEnums.freq());
+        passages = highlightOffsetsEnums(offsetsEnums, pageId);// and breakIterator & scorer
       }
     }
 
@@ -70,6 +76,61 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     } else {
       return null;
     }
+  }
+  @Override
+  protected Passage[] highlightOffsetsEnums(OffsetsEnum off) throws IOException {
+    final int contentLength = this.breakIterator.getText().getEndIndex();
+    if (!off.nextPosition()) {
+      return new Passage[0];
+    }
+    int queueSize = maxPassages;
+    if (queueSize  <= 0) {
+      queueSize = 512;
+    }
+    queueSize = Math.min(512, queueSize);
+
+    PriorityQueue<Passage> passageQueue = new PriorityQueue<>(queueSize, (left, right) -> {
+      if (left.getScore() < right.getScore()) {
+        return -1;
+      } else if (left.getScore() > right.getScore()) {
+        return 1;
+      } else {
+        return left.getStartOffset() - right.getStartOffset();
+      }
+    });
+    Passage passage = new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
+
+    do {
+      int start = off.startOffset();
+      if (start == -1) {
+        throw new IllegalArgumentException("field '" + field + "' was indexed without offsets, cannot highlight");
+      }
+      int end = off.endOffset();
+      if (start < contentLength && end > contentLength) {
+        continue;
+      }
+      // See if this term should be part of a new passage.
+      if (start >= passage.getEndOffset()) {
+        passage = maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
+        // if we exceed limit, we are done
+        if (start >= contentLength) {
+          break;
+        }
+        // advance breakIterator
+        passage.setStartOffset(Math.max(this.breakIterator.preceding(start + 1), 0));
+        passage.setEndOffset(Math.min(this.breakIterator.following(start), contentLength));
+      }
+      // Add this term to the passage.
+      BytesRef term = off.getTerm();// a reference; safe to refer to
+      assert term != null;
+      passage.addMatch(start, end, term, off.freq());
+    } while (off.nextPosition());
+    maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
+
+    Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
+    // sort in ascending order
+    Arrays.sort(passages, Comparator.comparingInt(Passage::getStartOffset));
+    return passages;
   }
 
   /**
@@ -152,5 +213,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
     }
     return passage;
+  }
+
+  public int getNumMatches(int  docId) {
+    return numMatches.get(docId);
   }
 }

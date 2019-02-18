@@ -75,6 +75,7 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
   public void testPhraseQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek\"");
     assertQ(req,
-            "count(//lst[@name='highlighting']/lst[@name='31337']/arr[@name='external_ocr_text']/lst/str[@name='text' and contains(text(), '<em>Bayerische</em> <em>Staatsbibliothek</em>')])=1");
+            "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/"
+          + "str[@name='text' and contains(text(), '<em>Bayerische</em> <em>Staatsbibliothek</em>')])=1");
   }
 }

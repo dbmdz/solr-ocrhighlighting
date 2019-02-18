@@ -26,9 +26,9 @@ import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.mdz.search.solrocr.formats.OcrBlock;
 import org.mdz.search.solrocr.formats.OcrFormat;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
-import org.mdz.search.solrocr.formats.OcrSnippet;
 import org.mdz.search.solrocr.lucene.OcrHighlighter;
 import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
+import org.mdz.search.solrocr.util.OcrHighlightResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +118,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     }
 
     Map<String, String> highlightFieldWarnings = new HashMap<>();
-    Map<String, OcrSnippet[][]> ocrSnippets = null;
+    OcrHighlightResult[] ocrSnippets = null;
     // Highlight OCR fields
     if (ocrFieldNames.length > 0) {
       OcrHighlighter ocrHighlighter = new OcrHighlighter(
@@ -164,7 +164,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   }
 
   private void addOcrSnippets(NamedList<Object> out, String[] keys, String[] ocrFieldNames,
-                              Map<String, OcrSnippet[][]> ocrSnippets) {
+                              OcrHighlightResult[] ocrSnippets) {
     for (int k=0; k < keys.length; k++) {
       String docId = keys[k];
       SimpleOrderedMap docMap = (SimpleOrderedMap) out.get(docId);
@@ -172,18 +172,10 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
         docMap = new SimpleOrderedMap();
         out.add(docId, docMap);
       }
-      for (String fieldName : ocrFieldNames) {
-        OcrSnippet[] snips = ocrSnippets.get(fieldName)[k];
-        if (snips == null) {
-          continue;
-        }
-        NamedList[] outSnips = new SimpleOrderedMap[snips.length];
-        for (int s = 0; s < snips.length; s++) {
-          OcrSnippet snip = snips[s];
-          outSnips[s] = snip.toNamedList();
-        }
-        docMap.add(fieldName, outSnips);
+      if (ocrSnippets[k] == null) {
+        continue;
       }
+      docMap.addAll(ocrSnippets[k].toNamedList());
     }
   }
 

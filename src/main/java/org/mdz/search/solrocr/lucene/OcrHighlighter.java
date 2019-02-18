@@ -5,7 +5,6 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +43,7 @@ import org.mdz.search.solrocr.lucene.byteoffset.FieldByteOffsetStrategy.TermVect
 import org.mdz.search.solrocr.lucene.byteoffset.NoOpByteOffsetStrategy;
 import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
 import org.mdz.search.solrocr.util.IterableCharSequence;
+import org.mdz.search.solrocr.util.OcrHighlightResult;
 
 /**
  * A {@link UnifiedHighlighter} variant to support lazy-loading field values from arbitrary storage and using byte
@@ -100,10 +100,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return flags;
   }
 
-  // FIXME: This is largely (>80%) copied straight from
-  //        {@link UnifiedHighlighter#highlightFieldsAsObjects(String[], Query, int[], int[])}
-  //        Would be nice if the architecture allowed for easier overriding of some things...
-  public Map<String, OcrSnippet[][]> highlightOcrFields(
+  public OcrHighlightResult[] highlightOcrFields(
       String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr, BreakIterator breakIter,
       OcrPassageFormatter formatter) throws IOException {
     if (ocrFieldNames.length < 1) {
@@ -163,6 +160,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
     // [fieldIdx][docIdInIndex] of highlightDoc result
     OcrSnippet[][][] highlightDocsInByField = new OcrSnippet[fields.length][docIds.length][];
+    int[][] snippetCountsByField = new int[fields.length][docIds.length];
     // Highlight in doc batches determined by loadFieldValues (consumes from docIdIter)
     DocIdSetIterator docIdIter = asDocIdSetIterator(docIds);
     for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
@@ -195,6 +193,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
           int docInIndex = docInIndexes[docIdx];//original input order
           assert resultByDocIn[docInIndex] == null;
           resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(leafReader, docId, content);
+          snippetCountsByField[fieldIdx][docIdx] = fieldHighlighter.getNumMatches(docId);
         }
       }
       batchDocIdx += fieldValsByDoc.size();
@@ -202,12 +201,19 @@ public class OcrHighlighter extends UnifiedHighlighter {
     assert docIdIter.docID() == DocIdSetIterator.NO_MORE_DOCS
         || docIdIter.nextDoc() == DocIdSetIterator.NO_MORE_DOCS;
 
-    // field -> object highlights parallel to docIdsIn
-    Map<String, OcrSnippet[][]> resultMap = new HashMap<>(fields.length);
-    for (int f = 0; f < fields.length; f++) {
-      resultMap.put(fields[f], highlightDocsInByField[f]);
+    OcrHighlightResult[] out = new OcrHighlightResult[docIds.length];
+    for (int d=0; d < docIds.length; d++) {
+      OcrHighlightResult hl = new OcrHighlightResult();
+      for (int f = 0; f < fields.length; f++) {
+        hl.addSnippetsForField(fields[f], highlightDocsInByField[f][d]);
+        hl.addSnippetCountForField(fields[f], snippetCountsByField[f][d]);
+      }
+      if (Arrays.stream(fields).allMatch(f -> hl.getFieldSnippets(f) == null)) {
+        continue;
+      }
+      out[d] = hl;
     }
-    return resultMap;
+    return out;
   }
 
   @Override

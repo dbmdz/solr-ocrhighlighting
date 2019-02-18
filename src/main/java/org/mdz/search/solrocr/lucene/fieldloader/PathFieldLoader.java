@@ -142,7 +142,8 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
         return new FileCharIterator(p);
       }
     } catch (NoSuchFileException e) {
-      logger.error("Could not resolve path for highlighting: " + p, e);
+      // NOTE: We don't log these cases, since this is currently also called for documents that weren't indexed with
+      //       any value in this field
       return null;
     }
   }
