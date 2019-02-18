@@ -231,4 +231,13 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
             "//arr[@name='highlights']/arr/lst[1]/float[@name='ulx']/text()='0.7853'",
             "//arr[@name='highlights']/arr/lst[1]/int[@name='uly']/text()='0'");
   }
+
+  @Test
+  public void testFilterByPage() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "München", "hl.pageId", "26", "fq", "id:31337");
+    assertQ(req,
+        "count(//str[@name='page' and text() != '26'])=0",
+          "count(//str[@name='page' and text() = '26'])=1");
+
+  }
 }

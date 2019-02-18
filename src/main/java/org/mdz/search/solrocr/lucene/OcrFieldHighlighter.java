@@ -44,7 +44,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    * Largely copied from {@link FieldHighlighter#highlightFieldForDoc(LeafReader, int, String)}, modified to support
    * an {@link IterableCharSequence} as content.
    */
-  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, IterableCharSequence content) throws IOException {
+  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, IterableCharSequence content, String pageId)
+      throws IOException {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
     if (content.length() == 0) {
       return null; // nothing to do
@@ -66,7 +67,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
 
     // Format the resulting Passages.
-    if (passages.length == 0) {
+    if (passages.length == 0 && pageId == null) {
       // no passages were returned, so ask for a default summary
       passages = getSummaryPassagesNoHighlight(maxNoHighlightPassages == -1 ? maxPassages : maxNoHighlightPassages);
     }
@@ -79,11 +80,16 @@ public class OcrFieldHighlighter extends FieldHighlighter {
   }
   @Override
   protected Passage[] highlightOffsetsEnums(OffsetsEnum off) throws IOException {
-    final int contentLength = this.breakIterator.getText().getEndIndex();
+    return this.highlightOffsetsEnums(off, null);
+  }
+
+  protected Passage[] highlightOffsetsEnums(OffsetsEnum off, String pageId) throws IOException {
+        final int contentLength = this.breakIterator.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
     }
-    int queueSize = maxPassages;
+    // If we're filtering by a page identifier, we want *all* hits on that page
+    int queueSize = pageId != null ? 4096 : maxPassages;
     if (queueSize  <= 0) {
       queueSize = 512;
     }
@@ -104,6 +110,13 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       int start = off.startOffset();
       if (start == -1) {
         throw new IllegalArgumentException("field '" + field + "' was indexed without offsets, cannot highlight");
+      }
+      if (pageId != null) {
+        String passagePageId = ((OcrPassageFormatter) passageFormatter).determinePage(
+            null, start, (IterableCharSequence) breakIterator.getText());
+        if (!passagePageId.equals(pageId)) {
+          continue;
+        }
       }
       int end = off.endOffset();
       if (start < contentLength && end > contentLength) {
@@ -139,12 +152,19 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    * Largely copied from {@link FieldHighlighter#highlightOffsetsEnums(OffsetsEnum)}, modified to load the byte offsets
    * from the term payloads.
    */
-  protected Passage[] highlightByteOffsetsEnums(ByteOffsetsEnum off) throws IOException {
+  protected Passage[] highlightByteOffsetsEnums(ByteOffsetsEnum off, String pageId) throws IOException {
     final int contentLength = this.breakIterator.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
     }
-    PriorityQueue<Passage> passageQueue = new PriorityQueue<>(Math.min(64, maxPassages + 1), (left, right) -> {
+    // If we're filtering by a page identifier, we want *all* hits on that page
+    int queueSize = pageId != null ? 4096 : maxPassages;
+    if (queueSize  <= 0) {
+      queueSize = 512;
+    }
+    queueSize = Math.min(512, queueSize);
+
+    PriorityQueue<Passage> passageQueue = new PriorityQueue<>(queueSize, (left, right) -> {
       if (left.getScore() < right.getScore()) {
         return -1;
       } else if (left.getScore() > right.getScore()) {
@@ -167,6 +187,13 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
       if (offset < contentLength && end > contentLength) {
         continue;
+      }
+      if (pageId != null) {
+        String passagePageId = ((OcrPassageFormatter) passageFormatter).determinePage(
+            null, offset, (IterableCharSequence) breakIterator.getText());
+        if (!passagePageId.equals(pageId)) {
+          continue;
+        }
       }
       // See if this term should be part of a new passage.
       if (offset >= passage.getEndOffset()) {

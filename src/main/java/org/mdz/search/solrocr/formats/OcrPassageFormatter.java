@@ -69,7 +69,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
   }
 
   /** Determine the id of the page an OCR fragment resides on. */
-  protected abstract String determinePage(String ocrFragment, int startOffset, IterableCharSequence content);
+  public abstract String determinePage(String ocrFragment, int startOffset, IterableCharSequence content);
 
   /** Truncate an OCR fragment to remove undesired parts, most often from the front or end. */
   protected String truncateFragment(String ocrFragment) {

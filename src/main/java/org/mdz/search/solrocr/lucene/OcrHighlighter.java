@@ -102,7 +102,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
   public OcrHighlightResult[] highlightOcrFields(
       String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr, BreakIterator breakIter,
-      OcrPassageFormatter formatter) throws IOException {
+      OcrPassageFormatter formatter, String pageId) throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
     }
@@ -192,7 +192,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
           }
           int docInIndex = docInIndexes[docIdx];//original input order
           assert resultByDocIn[docInIndex] == null;
-          resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(leafReader, docId, content);
+          resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(leafReader, docId, content, pageId);
           snippetCountsByField[fieldIdx][docIdx] = fieldHighlighter.getNumMatches(docId);
         }
       }

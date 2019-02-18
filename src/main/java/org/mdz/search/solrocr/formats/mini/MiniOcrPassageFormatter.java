@@ -33,16 +33,18 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   }
 
   @Override
-  protected String determinePage(String xmlFragment, int startOffset, IterableCharSequence content) {
-    Matcher m = pagePat.matcher(xmlFragment);
-    if (m.find()) {
-      return m.group("pageId");
+  public String determinePage(String xmlFragment, int startOffset, IterableCharSequence content) {
+    if (xmlFragment != null) {
+      Matcher m = pagePat.matcher(xmlFragment);
+      if (m.find()) {
+        return m.group("pageId");
+      }
     }
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
         pageOffset, Math.min(pageOffset + 128, content.length())).toString();
-    m = pagePat.matcher(pageFragment);
+    Matcher m = pagePat.matcher(pageFragment);
     if (m.find()) {
       return m.group("pageId");
     }

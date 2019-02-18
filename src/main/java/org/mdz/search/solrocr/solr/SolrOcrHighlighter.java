@@ -136,7 +136,8 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
           OcrBlock.valueOf(params.get("hl.ocr.limitBlock", "block").toUpperCase()),
           params.get("hl.tag.pre", "<em>"), params.get("hl.tag.post", "</em>"));
       ocrSnippets = ocrHighlighter.highlightOcrFields(
-          ocrFieldNames, query, docIDs, maxPassagesOcr, ocrBreakIterator, ocrFormatter);
+          ocrFieldNames, query, docIDs, maxPassagesOcr, ocrBreakIterator, ocrFormatter,
+          params.get("hl.pageId", null));
     }
 
     // Assemble output data
