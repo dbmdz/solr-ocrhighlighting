@@ -193,7 +193,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
           int docInIndex = docInIndexes[docIdx];//original input order
           assert resultByDocIn[docInIndex] == null;
           resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(leafReader, docId, content, pageId);
-          snippetCountsByField[fieldIdx][docIdx] = fieldHighlighter.getNumMatches(docId);
+          snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
         }
       }
       batchDocIdx += fieldValsByDoc.size();

@@ -56,13 +56,11 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     Passage[] passages;
     if (content.getOffsetType() == OffsetType.BYTES && content.getCharset() == StandardCharsets.UTF_8) {
       try (ByteOffsetsEnum byteOffsetsEnums = fieldByteOffsetStrategy.getByteOffsetsEnum(reader, docId)) {
-        this.numMatches.put(docId, byteOffsetsEnums.freq());
-        passages = highlightByteOffsetsEnums(byteOffsetsEnums, pageId);
+        passages = highlightByteOffsetsEnums(byteOffsetsEnums, docId,  pageId);
       }
     } else {
       try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
-        this.numMatches.put(docId, offsetsEnums.freq());
-        passages = highlightOffsetsEnums(offsetsEnums, pageId);// and breakIterator & scorer
+        passages = highlightOffsetsEnums(offsetsEnums, docId, pageId);// and breakIterator & scorer
       }
     }
 
@@ -80,10 +78,10 @@ public class OcrFieldHighlighter extends FieldHighlighter {
   }
   @Override
   protected Passage[] highlightOffsetsEnums(OffsetsEnum off) throws IOException {
-    return this.highlightOffsetsEnums(off, null);
+    return this.highlightOffsetsEnums(off, -1, null);
   }
 
-  protected Passage[] highlightOffsetsEnums(OffsetsEnum off, String pageId) throws IOException {
+  protected Passage[] highlightOffsetsEnums(OffsetsEnum off, int docId, String pageId) throws IOException {
         final int contentLength = this.breakIterator.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
@@ -106,6 +104,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     });
     Passage passage = new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
 
+    int numTotal = 0;
     do {
       int start = off.startOffset();
       if (start == -1) {
@@ -124,6 +123,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
       // See if this term should be part of a new passage.
       if (start >= passage.getEndOffset()) {
+        if (passage.getStartOffset() >= 0) {
+          numTotal++;
+        }
         passage = maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
         // if we exceed limit, we are done
         if (start >= contentLength) {
@@ -138,8 +140,12 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       assert term != null;
       passage.addMatch(start, end, term, off.freq());
     } while (off.nextPosition());
+    if (passage.getStartOffset() >= 0) {
+      numTotal++;
+    }
     maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
 
+    this.numMatches.put(docId, numTotal);
     Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
     // sort in ascending order
     Arrays.sort(passages, Comparator.comparingInt(Passage::getStartOffset));
@@ -152,7 +158,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    * Largely copied from {@link FieldHighlighter#highlightOffsetsEnums(OffsetsEnum)}, modified to load the byte offsets
    * from the term payloads.
    */
-  protected Passage[] highlightByteOffsetsEnums(ByteOffsetsEnum off, String pageId) throws IOException {
+  protected Passage[] highlightByteOffsetsEnums(ByteOffsetsEnum off, int docId, String pageId) throws IOException {
     final int contentLength = this.breakIterator.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
@@ -174,6 +180,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
     });
     Passage passage = new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
+    int numTotal = 0;
     do {
       int offset = off.byteOffset();
       this.breakIterator.getText().setIndex(offset);
@@ -197,6 +204,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
       // See if this term should be part of a new passage.
       if (offset >= passage.getEndOffset()) {
+        if (passage.getStartOffset() >= 0) {
+          numTotal++;
+        }
         passage = maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
         // if we exceed limit, we are done
         if (offset >= contentLength) {
@@ -211,7 +221,11 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       assert term != null;
       passage.addMatch(offset, end, term, off.freq());
     } while (off.nextPosition());
+    if (passage.getStartOffset() >= 0) {
+      numTotal++;
+    }
     maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
+    this.numMatches.put(docId, numTotal);
 
     Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
     // sort in ascending order
