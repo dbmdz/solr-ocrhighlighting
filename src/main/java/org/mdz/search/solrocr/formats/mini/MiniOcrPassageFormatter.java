@@ -53,6 +53,10 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
 
   @Override
   protected String truncateFragment(String snippet) {
+    pageIter.setText(snippet);
+    int start = pageIter.preceding(snippet.indexOf(startHlTag));
+    int end = pageIter.following(snippet.lastIndexOf(endHlTag));
+    snippet = snippet.substring(start, end);
     int startBlock = snippet.indexOf("<" + limitTag + ">");
     if (startBlock > -1 && startBlock < snippet.indexOf(startHlTag)) {
       snippet = snippet.substring(startBlock + limitTag.length() + 2);

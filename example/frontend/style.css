@@ -1,0 +1,91 @@
+html, body {
+	font: 14px/1.21 'Helvetica Neue', arial, sans-serif;
+	font-weight: 400;
+}
+
+h1 {
+	text-align: center;
+}
+
+section, form {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-gap: 10px;
+  grid-auto-rows: minmax(50px, auto);
+}
+
+.search-form .mdc-text-field {
+	grid-column: 1/7;
+	grid-row: 1;
+}
+
+.search-form .mdc-form-field {
+	grid-column: 1/7;
+	grid-row: 2;
+}
+
+.search-form .mdc-linear-progress {
+	grid-column: 1/7;
+	grid-row: 3;
+}
+
+.search-form .mdc-typography {
+	grid-column: 1/7;
+	grid-row: 2;
+}
+
+main p {
+	text-align: center;
+}
+
+.results .result-document {
+	grid-column: 1/7;
+}
+
+.result-document .mdc-elevation {
+	padding: 1em;
+	border-radius: 10px;
+}
+
+.result-document img {
+	max-width: 100%;
+}
+
+.snippet-display {
+	position: relative;
+}
+
+.snippet-display em {
+	background-color: hsla(50, 100%, 50%, 50%);
+	font-style: normal;
+	font-weight: 700;
+}
+
+.snippet-display .highlight-box {
+	padding: 0px 4px 4px 0px;
+	border-radius: 5px;
+	box-shadow: 3px 3px 3px;
+}
+
+@media only screen and (min-width: 720px) {
+	.search-form .mdc-text-field {
+		grid-column: 2/6;
+	}
+
+	.search-form .mdc-form-field {
+		grid-column: 2/6;
+	}
+
+	.search-form .mdc-linear-progress {
+		grid-column: 2/6;
+	}
+
+	.search-form .mdc-typography {
+		grid-column: 2/6;
+	}
+
+
+	.results .result-document {
+		grid-column: 2/6;
+	}
+}
