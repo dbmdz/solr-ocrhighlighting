@@ -140,7 +140,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
             .map(b -> new OcrBox(b.ulx - snipX, b.uly - snipY,
                                  b.lrx - snipX, b.lry - snipY))
             .collect(Collectors.toList()))
-        .forEach(snip::addHighlightRegion);
+        .forEach(bs -> snip.addHighlightRegion(this.mergeBoxes(bs)));
     return snip;
   }
 }

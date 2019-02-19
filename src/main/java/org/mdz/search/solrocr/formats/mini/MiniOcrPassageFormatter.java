@@ -134,6 +134,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
                                  truncateFloat((b.lrx - snipX) / snipWidth),
                                  truncateFloat((b.lry - snipY) / snipHeight)))
            .collect(Collectors.toList()))
+        .map(this::mergeBoxes)
         .collect(Collectors.toList());
     } else {
       snippetRegion = new OcrBox(ulx, uly, lrx, lry);
@@ -142,6 +143,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
             .map(b -> new OcrBox((b.ulx - snipX), (b.uly - snipY),
                                  (b.lrx - snipX), (b.lry - snipY)))
             .collect(Collectors.toList()))
+        .map(this::mergeBoxes)
         .collect(Collectors.toList());
       }
       OcrSnippet snip = new OcrSnippet(getTextFromXml(xmlFragment), pageId, snippetRegion);

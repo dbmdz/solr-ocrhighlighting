@@ -4,12 +4,16 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.mdz.search.solrocr.util.IterableCharSequence;
+import org.mdz.search.solrocr.util.OcrBox;
 
 /**
  * Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances.
@@ -79,6 +83,30 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
 
   /** Parse an {@link OcrSnippet} from an OCR fragment. */
   protected abstract OcrSnippet parseFragment(String ocrFragment, String pageId);
+
+  /** Merge adjacent OCR boxes into a single one, taking line breaks into account **/
+  protected List<OcrBox> mergeBoxes(List<OcrBox> boxes) {
+    List<OcrBox> out = new ArrayList<>();
+    Iterator<OcrBox> it = boxes.iterator();
+    OcrBox curBox = it.next();
+    while (it.hasNext()) {
+      OcrBox nextBox = it.next();
+      float yDiff = Math.abs(nextBox.lry - curBox.lry);
+      if (yDiff > (0.75 * (curBox.lry - curBox.uly))) {
+        out.add(curBox);
+        curBox = nextBox;
+        continue;
+      }
+      if (nextBox.lrx > curBox.lrx) {
+        curBox.lrx = nextBox.lrx;
+      }
+      if (nextBox.lry > curBox.lry) {
+        curBox.lry = nextBox.lry;
+      }
+    }
+    out.add(curBox);
+    return out;
+  }
 
   /**
    * Convenience implementation to format document text that is available as a {@link String}.
