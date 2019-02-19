@@ -13,29 +13,27 @@ works transparently with non-OCR fields and just lets the default
 implementation handle those.
 
 The plugin implements a number of usage scenarios, based on where and how the
-OCR documents are stored:
+OCR documents are stored.
+**If your environment allows for a slight modification of your OCR documents,
+the last scenario (ASCII + excaped Unicode codepoints) is highly recommended.**
+It offers the most flexibility with the lowest index, memory and storage
+requirements.
 
 | **Supported Formats** | **Location of OCR content** | **Index Size**        | **Memory Usage** | **Easy to index**           | **Supports `hl.weightMatches`** | **Use UTF-8 files on disk** |
 |-----------------------|-----------------------------|-----------------------|------------------|-----------------------------|---------------------------------|-----------------------------|
-| hOCR/MiniOCR          | Solr (stored field)         | ❌ Raw docs in index  | ❌ High [1]      |  ✅ raw OCR                 | ✅                              | ❌                          |
-| hOCR/MiniOCR          | External (UTF-16 file)      | ✅ Just offsets       | ✅ Low           |  ✅ raw OCR                 | ✅                              | ❌ [2]                      |
-| hOCR/ALTO/MiniOCR     | External (UTF-8 file)       | ✅ Just payloads      | ✅ Low           | ✅ words w/ byte offsets[3] | ❌ Only "classic" highlighting  | ✅                          |
-| hOCR/MiniOCR [4]      | External (ASCII+XML-Escapes)| ✅ Just offsets       | ✅ Low           |  ✅ raw OCR                 | ✅                              | ✅ [5]                      |
+| hOCR/MiniOCR [3]       | Solr (stored field)         | ❌ Raw docs in index  | ❌ High [1]      |  ✅ raw OCR                 | ✅                              | ❌                          |
+| hOCR/ALTO/MiniOCR     | External (UTF-8 file)       | ✅ Just payloads      | ✅ Low           | ✅ words w/ byte offsets[2] | ❌ Only "classic" highlighting  | ✅                          |
+| hOCR/MiniOCR [3]      | External (ASCII+XML-Escapes)| ✅ Just offsets       | ✅ Low           |  ✅ raw OCR                 | ✅                              | ✅ [4]                  |
 
-[1] The whole document needs to be kept in memory during highlighting
-
-[2] This option is really bad storage-wise, since the documents will be up to twice the size of their UTF-8 encoded
-    variants.
-
-[3] Java implementations and a cross-platform CLI tool to generate the required format for all supported OCR formats are
-    provided
-    
-[4] Support for ALTO should be possible with some trickery, but is not implemented yet.
-    
-[5] Only technically UTF-8, since all non-ASCII codepoints have to be XML-escaped (i.e. `&#x17F` instead of `ſ`.
-    However, all XML-processors should be able to work with these files just the same as if they were UTF-8 encoded, so
-    it's as practical (and almost as space-efficient) as the UTF8 + byte offsets scenario, with the advantage that a
-    more modern highlighting technique (`hl.weightMatches`) can be used.
+**[1]** The whole document needs to be kept in memory during highlighting<br>
+**[2]** Java implementations and a cross-platform CLI tool to generate the required format for all supported OCR formats are
+        provided<br>
+**[3]** Support for ALTO should be possible with some trickery, but is not implemented yet.<br>
+**[4]** Only technically UTF-8, since all non-ASCII codepoints have to be XML-escaped (i.e. `&#x17F` instead of `ſ`.
+        However, all XML-processors should be able to work with these files just the same as if they were UTF-8 encoded, so
+        it's as practical (and almost as space-efficient) as the UTF8 + byte offsets scenario, with the advantage that a
+        more modern highlighting technique (`hl.weightMatches`) can be used.<br>
+        
 
 **TODO**: Badges
 
