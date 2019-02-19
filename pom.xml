@@ -147,5 +147,23 @@
     </plugins>
   </build>
 
+  <distributionManagement>
+    <!-- credentials for server in settings.xml -->
+    <repository>
+      <id>mdzrepo-release</id>
+      <name>MDZ Release</name>
+      <url>http://bsbrepo.bsb.lrz.de/nexus/content/repositories/mdzrepo-release</url>
+    </repository>
+    <snapshotRepository>
+      <id>mdzrepo-snapshot</id>
+      <name>MDZ Snapshot</name>
+      <url>http://bsbrepo.bsb.lrz.de/nexus/content/repositories/mdzrepo-snapshot</url>
+    </snapshotRepository>
+    <site>
+      <id>website-projects</id>
+      <url>scp://bsb0mdz-reporting.bsb.lrz.de/local/projects/${project.groupId}/${project.artifactId}</url>
+    </site>
+  </distributionManagement>
+
 
 </project>
