@@ -121,7 +121,9 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         currentHl = new ArrayList<>();
       }
       if (currentHl != null) {
-        currentHl.add(new OcrBox(x, y, x + w, y + h));
+        currentHl.add(new OcrBox(text.replace("@@STARTHLTAG@@", "")
+                                     .replace("@@ENDHLTAG@@", ""),
+                                 x, y, x + w, y + h));
       }
       if (text.contains("@@ENDHLTAG@@") && currentHl != null) {
         hlBoxes.add(currentHl);
@@ -130,14 +132,14 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     }
     final int snipX = ulx;
     final int snipY = uly;
-    OcrBox snippetRegion = new OcrBox(ulx, uly, lrx, lry);
+    OcrBox snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
     String text = StringEscapeUtils.unescapeXml(
         extractText(ocrFragment).replaceAll("@@STARTHLTAG@@", startHlTag)
                                 .replaceAll("@@ENDHLTAG@@", endHlTag)).trim();
     OcrSnippet snip = new OcrSnippet(text,  pageId, snippetRegion);
     hlBoxes.stream()
         .map(bs -> bs.stream()
-            .map(b -> new OcrBox(b.ulx - snipX, b.uly - snipY,
+            .map(b -> new OcrBox(b.text, b.ulx - snipX, b.uly - snipY,
                                  b.lrx - snipX, b.lry - snipY))
             .collect(Collectors.toList()))
         .forEach(bs -> snip.addHighlightRegion(this.mergeBoxes(bs)));

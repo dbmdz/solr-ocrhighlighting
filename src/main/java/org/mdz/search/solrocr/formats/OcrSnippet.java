@@ -102,6 +102,9 @@ public class OcrSnippet {
         for (int i=0; i < region.length; i++) {
           OcrBox ocrBox = region[i];
           SimpleOrderedMap box = new SimpleOrderedMap();
+          if (ocrBox.text != null) {
+            box.add("text", ocrBox.text);
+          }
           addCoord( "ulx", ocrBox.ulx, box);
           addCoord( "uly", ocrBox.uly, box);
           addCoord( "lrx", ocrBox.lrx, box);

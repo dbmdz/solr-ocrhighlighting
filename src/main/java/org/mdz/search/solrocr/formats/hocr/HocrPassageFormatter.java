@@ -92,7 +92,8 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
         currentHl = new ArrayList<>();
       }
       if (currentHl != null) {
-        currentHl.add(new OcrBox(x0, y0, x1, y1));
+        currentHl.add(new OcrBox(text.replace(startHlTag, "").replace(endHlTag, ""),
+                                 x0, y0, x1, y1));
       }
       if (currentHl != null
           && (text.contains(endHlTag)
@@ -104,11 +105,11 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
     }
     int snipX = ulx;
     int snipY = uly;
-    OcrBox snippetRegion = new OcrBox(ulx, uly, lrx, lry);
+    OcrBox snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
     OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), pageId, snippetRegion);
     hlBoxes.stream()
         .map(cs -> cs.stream()
-            .map(b -> new OcrBox(b.ulx - snipX, b.uly - snipY,
+            .map(b -> new OcrBox(b.text, b.ulx - snipX, b.uly - snipY,
                                  b.lrx - snipX, b.lry - snipY))
             .collect(Collectors.toList()))
         .forEach(bs -> snip.addHighlightRegion(this.mergeBoxes(bs)));

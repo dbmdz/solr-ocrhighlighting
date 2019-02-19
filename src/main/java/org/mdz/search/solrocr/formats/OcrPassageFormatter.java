@@ -89,19 +89,27 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     List<OcrBox> out = new ArrayList<>();
     Iterator<OcrBox> it = boxes.iterator();
     OcrBox curBox = it.next();
+    StringBuilder curText = new StringBuilder(curBox.text);
     while (it.hasNext()) {
       OcrBox nextBox = it.next();
       float yDiff = Math.abs(nextBox.lry - curBox.lry);
       if (yDiff > (0.75 * (curBox.lry - curBox.uly))) {
+        curBox.text = curText.toString();
         out.add(curBox);
         curBox = nextBox;
+        curText = new StringBuilder(curBox.text);
         continue;
       }
+      curText.append(" ");
+      curText.append(nextBox.text);
       if (nextBox.lrx > curBox.lrx) {
         curBox.lrx = nextBox.lrx;
       }
       if (nextBox.lry > curBox.lry) {
         curBox.lry = nextBox.lry;
+      }
+      if (nextBox.uly < curBox.uly) {
+        curBox.uly = nextBox.uly;
       }
     }
     out.add(curBox);

@@ -112,7 +112,8 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
         currentHl = new ArrayList<>();
       }
       if (currentHl != null) {
-        currentHl.add(new OcrBox(x, y, x + width, y + height));
+        currentHl.add(new OcrBox(text.replace(startHlTag, "").replace(endHlTag, ""),
+                                 x, y, x + width, y + height));
       }
       if (text.contains(endHlTag) && currentHl != null) {
         hlBoxes.add(currentHl);
@@ -126,10 +127,11 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
     final float snipHeight = lry - uly;
     if (lrx < 1) {
       // Relative snippets
-      snippetRegion = new OcrBox(ulx, uly, lrx, lry);
+      snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
       hlBoxes = hlBoxes.stream()
         .map(cs -> cs.stream()
-            .map(b -> new OcrBox(truncateFloat((b.ulx - snipX) / snipWidth),
+            .map(b -> new OcrBox(b.text,
+                                 truncateFloat((b.ulx - snipX) / snipWidth),
                                  truncateFloat((float) ((b.uly - snipY) / snipHeight)),
                                  truncateFloat((b.lrx - snipX) / snipWidth),
                                  truncateFloat((b.lry - snipY) / snipHeight)))
@@ -137,10 +139,11 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
         .map(this::mergeBoxes)
         .collect(Collectors.toList());
     } else {
-      snippetRegion = new OcrBox(ulx, uly, lrx, lry);
+      snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
       hlBoxes = hlBoxes.stream()
         .map(cs -> cs.stream()
-            .map(b -> new OcrBox((b.ulx - snipX), (b.uly - snipY),
+            .map(b -> new OcrBox(b.text,
+                                 (b.ulx - snipX), (b.uly - snipY),
                                  (b.lrx - snipX), (b.lry - snipY)))
             .collect(Collectors.toList()))
         .map(this::mergeBoxes)
