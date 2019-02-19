@@ -257,6 +257,6 @@ public class OcrFieldHighlighter extends FieldHighlighter {
   }
 
   public int getNumMatches(int  docId) {
-    return numMatches.get(docId);
+    return numMatches.getOrDefault(docId, -1);
   }
 }

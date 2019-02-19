@@ -75,13 +75,15 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
 
   @Override
   protected String truncateFragment(String ocrFragment) {
-    pageIter.setText(ocrFragment);
-    int start = pageIter.preceding(ocrFragment.indexOf(startHlTag));
-    int end = pageIter.following(ocrFragment.lastIndexOf(endHlTag));
-    ocrFragment = ocrFragment.substring(start, end);
+    if (ocrFragment.contains(startHlTag)) {
+      pageIter.setText(ocrFragment);
+      int start = pageIter.preceding(ocrFragment.indexOf(startHlTag));
+      int end = pageIter.following(ocrFragment.lastIndexOf(endHlTag));
+      ocrFragment = ocrFragment.substring(start, end);
+    }
     limitIter.setText(ocrFragment);
-    start = limitIter.preceding(ocrFragment.indexOf(startHlTag));
-    end = limitIter.following(ocrFragment.lastIndexOf(endHlTag));
+    int start = limitIter.preceding(ocrFragment.indexOf(startHlTag));
+    int end = limitIter.following(ocrFragment.lastIndexOf(endHlTag));
     return ocrFragment.substring(start, end);
   }
 
