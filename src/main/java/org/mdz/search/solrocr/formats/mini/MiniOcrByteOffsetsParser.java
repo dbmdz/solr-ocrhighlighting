@@ -19,6 +19,7 @@ import net.byteseek.searcher.Searcher;
 import net.byteseek.searcher.sequence.SequenceMatcherSearcher;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.mdz.search.solrocr.util.Streams;
 
 public class MiniOcrByteOffsetsParser {
@@ -39,7 +40,7 @@ public class MiniOcrByteOffsetsParser {
     return (int) it.next().get(0).getMatchPosition();
   }
 
-  private static int getIdOffset(byte[] ocrBytes, String id) {
+  private static int getIdOffset(byte[] ocrBytes, int startOffset, String id) {
     final Searcher<SequenceMatcher> idSearcher;
     try {
       idSearcher = new SequenceMatcherSearcher(SequenceMatcherCompiler.compileFrom(
@@ -47,11 +48,47 @@ public class MiniOcrByteOffsetsParser {
     } catch (CompileException e) {
       throw new RuntimeException(e);
     }
-    ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<>(idSearcher, ocrBytes);
+    ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<>(idSearcher, ocrBytes, startOffset);
     if (!it.hasNext()) {
       throw new IllegalArgumentException("Could not find element with id '" + id + "'");
     }
     return (int) it.next().get(0).getMatchPosition();
+  }
+
+  public static List<Pair<String, Integer>> parse(byte[] ocrBytes, int startOffset, String firstId, String lastId) throws IOException {
+    if (firstId != null) {
+      startOffset = getIdOffset(ocrBytes, startOffset, firstId);
+    }
+    int endOffset = ocrBytes.length - 1;
+    if (lastId != null && lastId.equals("\uFFFF")) {
+      char tag = new String(ocrBytes, startOffset, 6, StandardCharsets.UTF_8).charAt(1);
+      endOffset = getClosingOffsetFrom(ocrBytes, tag, startOffset);
+    } else if (lastId != null) {
+      int lastOffset = getIdOffset(ocrBytes, startOffset, lastId);
+      char tag = new String(ocrBytes, lastOffset, 6, StandardCharsets.UTF_8).charAt(1);
+      endOffset = getClosingOffsetFrom(ocrBytes, tag, lastOffset);
+    }
+    ForwardSearchIterator<SequenceMatcher> beginIt = new ForwardSearchIterator<>(
+        BEGIN_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
+    ForwardSearchIterator<SequenceMatcher> endIt = new ForwardSearchIterator<>(
+        END_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
+
+    return
+        Streams.zip(
+            Streams.stream(beginIt).flatMap(Collection::stream).map(SearchResult::getMatchPosition),
+            Streams.stream(endIt).flatMap(Collection::stream).map(SearchResult::getMatchPosition),
+            ImmutablePair::new)
+        .map(offsets -> mapOffsetsToTerm(offsets, ocrBytes))
+        .collect(Collectors.toList());
+  }
+
+  private static Pair<String, Integer> mapOffsetsToTerm(Pair<Long, Long> offsets, byte[] ocrBytes) {
+    int start = offsets.getLeft().intValue();
+    int end = offsets.getRight().intValue();
+    int startTerm = ArrayUtils.indexOf(ocrBytes, (byte) '>', start) + 1;
+    assert startTerm < end;
+    int termWidth = (end - startTerm);
+    return ImmutablePair.of(new String(ocrBytes, startTerm, termWidth, StandardCharsets.UTF_8), startTerm);
   }
 
   public static void parse(byte[] ocrBytes, OutputStream os) throws IOException {
@@ -63,37 +100,9 @@ public class MiniOcrByteOffsetsParser {
   }
 
   public static void parse(byte[] ocrBytes, OutputStream os, String firstId, String lastId) throws IOException {
-    int startOffset = 0;
-    if (firstId != null) {
-      startOffset = getIdOffset(ocrBytes, firstId);
-    }
-    int endOffset = ocrBytes.length - 1;
-    if (lastId != null && lastId.equals("\uFFFF")) {
-      char tag = new String(ocrBytes, startOffset, 6, StandardCharsets.UTF_8).charAt(1);
-      endOffset = getClosingOffsetFrom(ocrBytes, tag, startOffset);
-    } else if (lastId != null) {
-      int lastOffset = getIdOffset(ocrBytes, lastId);
-      char tag = new String(ocrBytes, lastOffset, 6, StandardCharsets.UTF_8).charAt(1);
-      endOffset = getClosingOffsetFrom(ocrBytes, tag, lastOffset);
-    }
-    ForwardSearchIterator<SequenceMatcher> beginIt = new ForwardSearchIterator<>(
-        BEGIN_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
-    ForwardSearchIterator<SequenceMatcher> endIt = new ForwardSearchIterator<>(
-        END_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
-
-    List<ImmutablePair<Long, Long>> wordOffsets =
-        Streams.zip(Streams.stream(beginIt).flatMap(Collection::stream).map(SearchResult::getMatchPosition),
-            Streams.stream(endIt).flatMap(Collection::stream).map(SearchResult::getMatchPosition),
-            ImmutablePair::new).collect(Collectors.toList());
-
-    for (ImmutablePair<Long, Long> p : wordOffsets) {
-      int start = p.left.intValue();
-      int end = p.right.intValue();
-      int startTerm = ArrayUtils.indexOf(ocrBytes, (byte) '>', start) + 1;
-      assert startTerm < end;
-      int termWidth = (end - startTerm);
-      os.write(ocrBytes, startTerm, termWidth);
-      os.write(String.format("⚑%d ", startTerm).getBytes(StandardCharsets.UTF_8));
+    for (Pair<String, Integer> pair : parse(ocrBytes, 0, firstId, lastId)) {
+      os.write(pair.getLeft().getBytes(StandardCharsets.UTF_8));
+      os.write(String.format("⚑%d ", pair.getRight()).getBytes(StandardCharsets.UTF_8));
     }
   }
 
