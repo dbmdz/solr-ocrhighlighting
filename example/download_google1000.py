@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from io import BytesIO
@@ -27,7 +28,7 @@ def fix_hocr(hocr_path: Path):
     tree = etree.parse(str(hocr_path), parser=parser)
     title = tree.find('.//title')
     if title is not None:
-        title.getparent().remove(title))
+        title.getparent().remove(title)
     for idx, page_elem in enumerate(tree.findall('.//div[@class="ocr_page"]'),
                                     start=1):
         page_elem.attrib['id'] = f'page_{idx}'
