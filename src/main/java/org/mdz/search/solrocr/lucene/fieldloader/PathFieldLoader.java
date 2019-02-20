@@ -127,6 +127,7 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
         fieldValue = fieldValue.substring(startIdx, endIdx);
       }
       interpolated.replace(m.start(), m.end(), fieldValue);
+      m = variablePat.matcher(interpolated);
     }
     return interpolated.toString();
   }
