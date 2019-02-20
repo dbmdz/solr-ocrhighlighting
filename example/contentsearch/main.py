@@ -70,7 +70,7 @@ CANVAS_TEMPLATE = {
         "on": None}]}
 
 
-app = Sanic()
+app = Sanic(load_env="CFG_")
 
 
 async def query_solr(query: str, volume_id: str):
@@ -83,21 +83,26 @@ async def query_solr(query: str, volume_id: str):
         'hl.snippets': 4096,
         'hl.weightMatches': 'true',
     }
-    print(params)
+    solr_url = app.config.get('SOLR_HANDLER', "http://127.0.0.1:8983/solr/ocrtest/select")
     async with app.aiohttp_session.get(SOLR_URL, params=params) as resp:
         result_doc = await resp.json()
         return result_doc['highlighting'][volume_id]['ocr_text']
 
 
 def make_id(vol_id, resource_type="annotation"):
+    protocol = app.config.get('PROTOCOL', 'http')
+    address = app.config.get('SERVER_NAME', 'localhost:8008')
     ident = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', monsterurl.get_monster())
     ident = re.sub('([a-z0-9])([A-Z])', r'\1-\2', ident).replace('--', '-').lower()
-    return f'http://localhost:8008/{vol_id}/{resource_type}/{ident}'
+    return f'{protocol}://{address}/{vol_id}/{resource_type}/{ident}'
 
 
 def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
+    protocol = app.config.get('PROTOCOL', 'http')
+    address = app.config.get('SERVER_NAME', 'localhost:8008')
+    search_path = app.url_for('search', volume_id=vol_id, q=query)
     doc = copy.deepcopy(RESPONSE_TEMPLATE)
-    doc['@id'] = f'http://localhost:8008/{vol_id}/search?q={query}'
+    doc['@id'] = f'{protocol}://{address}{search_path}'
     doc['within']['total'] = hlresp['snippetCount']
     doc['within']['ignored'] = ignored_fields
     for snip in hlresp['snippets']:
@@ -125,7 +130,7 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
                         "@type": "cnt:ContentAsText",
                         "chars": hlbox['text'] 
                     },
-                    "on": f'http://localhost:8008/{vol_id}/canvas/{snip["page"]}#xywh={x},{y},{w},{h}'}
+                    "on": f'{protocol}://{address}/{vol_id}/canvas/{snip["page"]}#xywh={x},{y},{w},{h}'}
                 doc['resources'].append(anno)
             doc['hits'].append({
                 '@type': 'search:Hit',
@@ -138,9 +143,14 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
 
 
 async def make_manifest(vol_id, hocr_path):
+    protocol = app.config.get('PROTOCOL', 'http')
+    address = app.config.get('SERVER_NAME', 'localhost:8008')
+    manifest_path = app.url_for('get_manifest', volume_id=vol_id)
+    search_path = app.url_for('search', volume_id=vol_id)
+    image_api_base = app.config.get('IMAGE_API_BASE', 'http://localhost:8080')
     manifest = copy.deepcopy(MANIFEST_TEMPLATE)
-    manifest['@id'] = f'http://localhost:8008/{vol_id}/manifest'
-    manifest['service']['@id'] = f'http://localhost:8008/{vol_id}/search'
+    manifest['@id'] = f'{protocol}://{address}{manifest_path}'
+    manifest['service']['@id'] = f'{protocol}://{address}{search_path}'
     manifest['sequences'][0]['@id'] = make_id(vol_id, 'sequence')
     tree = etree.parse(str(hocr_path))
     metadata = {}
@@ -153,10 +163,9 @@ async def make_manifest(vol_id, hocr_path):
     for page_elem in tree.findall('.//div[@class="ocr_page"]'):
         canvas = copy.deepcopy(CANVAS_TEMPLATE)
         page_id = page_elem.attrib['id']
-        canvas['@id'] = f'http://localhost:8008/{vol_id}/canvas/{page_id}'
+        canvas['@id'] = f'{protocol}://{address}/{vol_id}/canvas/{page_id}'
         page_idx = int(page_id.split('_')[-1]) - 1
-        image_url = f'http://localhost:8080/{vol_id}/Image_{page_idx:04}.JPEG'
-        print(image_url)
+        image_url = f'{image_api_base}/{vol_id}/Image_{page_idx:04}.JPEG'
         async with app.aiohttp_session.get(image_url + '/info.json') as resp:
             info = await resp.json()
         canvas['width'] = info['width']
