@@ -105,10 +105,10 @@ public class OcrSnippet {
           if (ocrBox.text != null) {
             box.add("text", ocrBox.text);
           }
-          addCoord( "ulx", ocrBox.ulx, box);
-          addCoord( "uly", ocrBox.uly, box);
-          addCoord( "lrx", ocrBox.lrx, box);
-          addCoord( "lry", ocrBox.lry, box);
+          addDimension( box, "ulx", ocrBox.ulx);
+          addDimension( box, "uly", ocrBox.uly);
+          addDimension( box, "lrx", ocrBox.lrx);
+          addDimension( box, "lry", ocrBox.lry);
           regionBoxes[i] = box;
         }
         highlights.add(regionBoxes);
@@ -116,13 +116,5 @@ public class OcrSnippet {
       m.add("highlights", highlights);
     }
     return m;
-  }
-
-  private void addCoord(String key, float val, SimpleOrderedMap map) {
-    if (val == 0 || val >= 1) {
-      map.add(key, (int) val);
-    } else {
-      map.add(key, val);
-    }
   }
 }
