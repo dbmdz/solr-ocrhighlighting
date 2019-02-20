@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+ipython = "*"
+
+[packages]
+sanic = "*"
+aiohttp = "*"
+monsterurl = "*"
+aioify = "*"
+lxml = "*"
+sanic-cors = "*"
+
+[requires]
+python_version = "3.7"
