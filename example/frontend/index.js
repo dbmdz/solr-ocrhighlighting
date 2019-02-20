@@ -184,7 +184,7 @@ export default class App extends Component {
                 return {
                   key: idx,
                   docId: doc.id,
-                  hl: searchResults.highlighting[doc.id].ocr_text }
+                  hl: searchResults.ocrHighlighting[doc.id].ocr_text }
               })
               .map(({ key, docId, hl }) => <ResultDocument key={key} hl={hl} docId={docId} />)}
         </section>

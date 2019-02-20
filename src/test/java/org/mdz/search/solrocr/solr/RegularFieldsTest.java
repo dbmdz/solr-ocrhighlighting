@@ -2,7 +2,6 @@ package org.mdz.search.solrocr.solr;
 
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.apache.solr.handler.component.HighlightComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,10 +10,6 @@ public class RegularFieldsTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr");
-
-    HighlightComponent hlComp = (HighlightComponent) h.getCore().getSearchComponent("highlight");
-    assertTrue("wrong highlighter: " + hlComp.getHighlighter().getClass(),
-               hlComp.getHighlighter() instanceof SolrOcrHighlighter);
 
     assertU(adoc(
         "some_text",
@@ -41,6 +36,6 @@ public class RegularFieldsTest extends SolrTestCaseJ4 {
         "q", "exercitation", "hl", "true", "hl.fields", "some_text", "hl.usePhraseHighlighter", "true", "df", "some_text");
     assertQ(req,
         "//lst[@name='highlighting']/lst[@name='1337']/arr[@name='some_text']/str/text()="
-       + "'Ut enim ad minim veniam, quis nostrud <em>exercitation</em> ullamco laboris nisi ut aliquip ex ea commodo consequat. '");
+       + "' et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud <em>exercitation</em> ullamco laboris nisi ut'");
   }
 }

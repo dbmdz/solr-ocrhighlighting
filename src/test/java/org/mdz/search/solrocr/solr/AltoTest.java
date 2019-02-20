@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.apache.solr.handler.component.HighlightComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,10 +20,6 @@ public class AltoTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto");
-
-    HighlightComponent hlComp = (HighlightComponent) h.getCore().getSearchComponent("highlight");
-    assertTrue("wrong highlighter: " + hlComp.getHighlighter().getClass(),
-               hlComp.getHighlighter() instanceof SolrOcrHighlighter);
 
     Path ocrPath = Paths.get("src/test/resources/data/alto.xml");
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -63,7 +58,7 @@ public class AltoTest extends SolrTestCaseJ4 {
   public void testAlto() throws Exception {
     SolrQueryRequest req = xmlQ("q", "svadag");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
+        "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
         "//str[@name='text'][1]/text()='H.ieifics Menighed Kl. eg for Nicolai Mcniohed Kl. > > Slet. <) Sftensan« om-exler««««« boggeMenighederzNicvlaiMe- Mighed h«r »stenfang paa <em>Svadag</em> ferrkkvm»,cnde. ->) Sknf- «ewaal til Ssndagen holdes i H.geNesKirte sorNicolaiMemghch L?verda.en Kl.«, oz f»r H-geist-S Menighed Kk72. e) Bor-'",
         "//lst[@name='region'][1]/int[@name='ulx']/text()=436",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=1504"

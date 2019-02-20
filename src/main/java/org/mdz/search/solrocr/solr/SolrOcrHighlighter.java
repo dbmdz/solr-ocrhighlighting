@@ -3,26 +3,19 @@ package org.mdz.search.solrocr.solr;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter.HighlightFlag;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
-import org.apache.solr.core.PluginInfo;
 import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.DocList;
-import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.mdz.search.solrocr.formats.OcrBlock;
 import org.mdz.search.solrocr.formats.OcrFormat;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
@@ -44,49 +37,12 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private OcrFormat ocrFormat;
   private List<String> ocrFieldNames;
 
-  @Override
-  public void init(PluginInfo info) {
-    super.init(info);
-    String formatClsName = info.attributes.get("ocrFormat");
-    if (formatClsName == null) {
-      throw new SolrException(
-          ErrorCode.FORBIDDEN,
-          "Please configure your OCR format with the `ocrFormat` attribute on <highlighting>. "
-        + "Refer to the org.mdz.search.solrocr.formats package for available formats.");
-    }
-    try {
-      Class<?> clz = Class.forName(formatClsName);
-      this.ocrFormat = (OcrFormat) clz.getConstructors()[0].newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new SolrException(ErrorCode.FORBIDDEN, "Unknown OCR format: " + formatClsName);
-    } catch (Exception e) {
-      throw new SolrException(ErrorCode.FORBIDDEN, "Error loading OCR format: " + e);
-    }
 
-    NamedList<String> ocrFieldInfo = (NamedList) info.initArgs.get("ocrFields");
-    if (ocrFieldInfo == null) {
-      throw new SolrException(
-          ErrorCode.FORBIDDEN,
-          "Please define the fields that OCR highlighting should apply to in a ocrFields list in your solrconfig.xml. "
-        + "Example: <lst name\"ocrFields\"><str>ocr_text</str></lst>");
-    }
-    this.ocrFieldNames = new ArrayList<>();
-    ocrFieldInfo.forEach((k, fieldName) -> ocrFieldNames.add(fieldName));
-
-    PluginInfo fieldLoaderInfo = info.getChild("fieldLoader");
-    if (fieldLoaderInfo != null) {
-      try {
-        Class<?> clz = Class.forName(fieldLoaderInfo.className);
-        this.fieldLoader = (ExternalFieldLoader) clz.getConstructors()[0].newInstance();
-      } catch (ClassNotFoundException e) {
-        throw new SolrException(ErrorCode.FORBIDDEN, "Unknown OCR format: " + formatClsName);
-      } catch (Exception e) {
-        throw new SolrException(ErrorCode.FORBIDDEN, "Error loading OCR format: " + e);
-      }
-      if (fieldLoader instanceof PluginInfoInitialized) {
-        ((PluginInfoInitialized) fieldLoader).init(fieldLoaderInfo);
-      }
-    }
+  public SolrOcrHighlighter(ExternalFieldLoader fieldLoader, OcrFormat ocrFormat,
+                            List<String> ocrFieldNames) {
+    this.fieldLoader = fieldLoader;
+    this.ocrFormat = ocrFormat;
+    this.ocrFieldNames = ocrFieldNames;
   }
 
   @Override
@@ -103,19 +59,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
     // query-time parameters
     String[] ocrFieldNames = getOcrHighlightFields(query, req, defaultFields);
-    String[] regularFieldNames = Stream.of(getHighlightFields(query, req, defaultFields))
-        .filter(f -> Arrays.binarySearch(ocrFieldNames, f) < 0)
-        .toArray(String[]::new);
-
-    int[] maxPassagesRegular = getMaxPassages(regularFieldNames, params);
     int[] maxPassagesOcr = getMaxPassages(ocrFieldNames, params);
-
-    // Highlight non-OCR fields
-    Map<String, String[]> regularSnippets = null;
-    if (regularFieldNames.length > 0) {
-      UnifiedHighlighter regularHighlighter = getHighlighter(req);
-      regularSnippets = regularHighlighter.highlightFields(regularFieldNames, query, docIDs, maxPassagesRegular);
-    }
 
     Map<String, String> highlightFieldWarnings = new HashMap<>();
     OcrHighlightResult[] ocrSnippets = null;
@@ -142,9 +86,6 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
     // Assemble output data
     SimpleOrderedMap out = new SimpleOrderedMap();
-    if (regularSnippets != null) {
-      out.addAll(this.encodeSnippets(keys, regularFieldNames, regularSnippets));
-    }
     if (ocrSnippets != null) {
       this.addOcrSnippets(out, keys, ocrFieldNames, ocrSnippets);
     }

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.solr.BaseDistributedSearchTestCase;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.apache.solr.handler.component.HighlightComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,10 +18,6 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
   @BeforeClass
   public static void beforeClass() throws Exception {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr");
-
-    HighlightComponent hlComp = (HighlightComponent) h.getCore().getSearchComponent("highlight");
-    assertTrue("wrong highlighter: " + hlComp.getHighlighter().getClass(),
-               hlComp.getHighlighter() instanceof SolrOcrHighlighter);
 
     Path dataPath = Paths.get("src", "test", "resources", "data").toAbsolutePath();
 
@@ -75,7 +70,7 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
   public void testPhraseQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek\"");
     assertQ(req,
-            "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/"
+            "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/"
           + "str[@name='text' and contains(text(), '<em>Bayerische</em> <em>Staatsbibliothek</em>')])=1");
   }
 }

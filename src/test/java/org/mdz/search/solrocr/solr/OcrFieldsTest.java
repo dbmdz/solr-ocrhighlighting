@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.apache.solr.handler.component.HighlightComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,10 +18,6 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr");
-
-    HighlightComponent hlComp = (HighlightComponent) h.getCore().getSearchComponent("highlight");
-    assertTrue("wrong highlighter: " + hlComp.getHighlighter().getClass(),
-        hlComp.getHighlighter() instanceof SolrOcrHighlighter);
 
     Path dataPath = Paths.get("src", "test", "resources", "data").toAbsolutePath();
 
@@ -72,7 +67,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   public void testSingleTerm() throws Exception {
     SolrQueryRequest req = xmlQ("q", "München");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=3",
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=3",
             "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>München</em> Morgen-Ausgabe. Preſſe.'",
             "//lst[@name='region'][1]/float[@name='ulx']/text()='0.3714'",
             "//lst[@name='region'][1]/float[@name='uly']/text()='0.0071'",
@@ -89,144 +84,144 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   public void testStoredHighlighting() throws Exception {
     SolrQueryRequest req = xmlQ("q", "München", "hl.fields", "stored_ocr_text", "df", "stored_ocr_text");
     assertQ(req,
-            "count(//lst[@name='highlighting']/lst[@name='41337']/lst[@name='stored_ocr_text']/arr/lst)=3");
+            "count(//lst[@name='ocrHighlighting']/lst[@name='41337']/lst[@name='stored_ocr_text']/arr/lst)=3");
   }
 
   @Test
   public void testBooleanQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "((München AND Italien) OR Landsherr)");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=10");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=10");
   }
 
   @Test
   public void testBooleanQueryNoMatch() throws Exception {
     SolrQueryRequest req = xmlQ("q", "((München AND Rotterdam) OR Mexico)");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=4");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=4");
   }
 
   @Test
   public void testWildcardQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "(Mün* OR Magdebur?)");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=10");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=10");
   }
 
   @Test
   public void testWildcardQueryAtTheBeginning() throws Exception {
     SolrQueryRequest req = xmlQ("q", "*deburg");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Magdebur')])=10");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Magdebur')])=10");
   }
 
   @Test
   public void testWildcardQueryIntheMiddle() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Mü*hen");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])=3");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])=3");
   }
 
   @Test
   public void testWildcardQueryAtTheEnd() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Münch*");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])=3");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])=3");
   }
 
   @Test
   public void testWildcardQueryWithWildcardOnly() throws Exception {
     SolrQueryRequest req = xmlQ("q", "*");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=10");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=10");
   }
 
   @Test
   public void testWildcardQueryWithAsteriskAndNoResults() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Zzz*");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
   }
 
   @Test
   public void testWildcardQueryWithNoResults() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Z?z");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
   }
 
   @Test
   public void testWildcardQueryWithWildcardForUmlautInTheMiddle() throws Exception {
     SolrQueryRequest req = xmlQ("q", "M?nchen");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])>0");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])>0");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'manche')])>0");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'manche')])>0");
   }
 
   @Test
   public void testPhraseQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek\"");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(), '<em>Bayerische</em> <em>Staatsbibliothek</em>')])=1");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(), '<em>Bayerische</em> <em>Staatsbibliothek</em>')])=1");
   }
 
   @Test
   public void testPhraseQueryWithNoResults() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Münchener Stadtbibliothek\"");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
   }
 
   @Test
   public void testFuzzyQueryWithSingleTerm() throws Exception {
     SolrQueryRequest req = xmlQ("q", "bayrisch~");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
   }
 
   @Test
   public void testFuzzyQueryWithSingleTermAndGreaterProximity() throws Exception {
     SolrQueryRequest req = xmlQ("q", "baurisch~3");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
   }
 
   @Test
   public void testCombinedFuzzyQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Magdepurg~ OR baurisch~3");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Magdebur')])>1");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Magdebur')])>1");
   }
 
   @Test
   public void testFuzzyQueryWithNoResults() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Makdepurk~ OR baurysk~2");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
   }
 
   @Test
   public void testProximityQueryWithOneHighlighting() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische München\"~3");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'<em>Bayerische</em> Staatsbibliothek <em>München</em>')])=1");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'<em>Bayerische</em> Staatsbibliothek <em>München</em>')])=1");
   }
 
   @Test
   public void testProximityQueryWithTwoHighlightings() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Ausgabe\"~10");
     assertQ(req,
-        "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=2");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=2");
   }
 
   @Test
   public void testWeightMatches() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek München\"", "hl.weightMatches", "true");
     assertQ(req,
-            "count(//lst[@name='highlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=1",
+            "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=1",
             "//str[@name='text']/text()='Herausgeber und <em>Bayerische Staatsbibliothek München</em>'",
             "//arr[@name='highlights']/arr/lst[1]/float[@name='ulx']/text()='0.7853'",
             "//arr[@name='highlights']/arr/lst[1]/int[@name='uly']/text()='0'");

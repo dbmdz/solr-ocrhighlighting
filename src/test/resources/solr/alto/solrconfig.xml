@@ -6,17 +6,15 @@
 
   <requestHandler name="/select" class="solr.SearchHandler"/>
 
-  <searchComponent class="solr.HighlightComponent" name="highlight">
-    <highlighting class="org.mdz.search.solrocr.solr.SolrOcrHighlighter"
-                  ocrFormat="org.mdz.search.solrocr.formats.alto.AltoFormat">
-      <lst name="ocrFields">
-        <str>ocr_text</str>
+  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="highlight"
+                   ocrFormat="org.mdz.search.solrocr.formats.alto.AltoFormat">
+    <lst name="ocrFields">
+      <str>ocr_text</str>
+    </lst>
+    <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="utf-8">
+      <lst name="externalFields">
+        <str name="ocr_text">src/test/resources/data/alto.xml</str>
       </lst>
-      <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="utf-8">
-        <lst name="externalFields">
-          <str name="ocr_text">src/test/resources/data/alto.xml</str>
-        </lst>
-      </fieldLoader>
-    </highlighting>
+    </fieldLoader>
   </searchComponent>
 </config>
