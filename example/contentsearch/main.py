@@ -86,7 +86,7 @@ async def query_solr(query: str, volume_id: str):
     solr_url = app.config.get('SOLR_HANDLER', "http://127.0.0.1:8983/solr/ocrtest/select")
     async with app.aiohttp_session.get(SOLR_URL, params=params) as resp:
         result_doc = await resp.json()
-        return result_doc['highlighting'][volume_id]['ocr_text']
+        return result_doc['ocrHighlighting'][volume_id]['ocr_text']
 
 
 def make_id(vol_id, resource_type="annotation"):
