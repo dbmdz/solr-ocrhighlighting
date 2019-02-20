@@ -43,7 +43,7 @@ public class OcrHighlightResult {
           .map(OcrSnippet::toNamedList)
           .toArray(NamedList[]::new);
       fieldOut.add("snippets", outSnips);
-      fieldOut.add("snippetCount", snipCount);
+      fieldOut.add("numTotal", snipCount);
       out.add(fieldName, fieldOut);
     }
     return out;

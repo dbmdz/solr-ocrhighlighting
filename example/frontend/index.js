@@ -104,7 +104,7 @@ class ResultDocument extends Component {
         <Elevation z={4}>
           <Typography tag="div" headline4>{docId}</Typography>
           <Typography subtitle1>
-            {hl.snippetCount} matching passages found
+            {hl.numTotal} matching passages found
           </Typography>
           {hl.snippets.map(snip => <SnippetView snippet={snip} docId={docId} />)}
         </Elevation>
