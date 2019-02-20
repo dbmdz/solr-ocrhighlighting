@@ -13,7 +13,6 @@ import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.handler.component.ResponseBuilder;
-import org.apache.solr.highlight.SolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
 import org.mdz.search.solrocr.formats.OcrFormat;
 import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
@@ -67,7 +66,6 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
     if (rb.doHighlights) {
       SolrQueryRequest req = rb.req;
       SolrParams params = req.getParams();
-      SolrHighlighter regularHighlighter = getHighlighter(params);
       String[] defaultHighlightFields = rb.getQparser() != null ? rb.getQparser().getDefaultHighlightFields() : null;
       Query highlightQuery = rb.getHighlightQuery();
       if(highlightQuery==null) {
@@ -84,37 +82,29 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
         }
       }
 
-      ModifiableSolrParams regularParams = new ModifiableSolrParams(params);
       ModifiableSolrParams ocrParams = new ModifiableSolrParams(params);
       String[] hlFields = params.getParams(HighlightParams.FIELDS);
       if (hlFields != null) {
-        regularParams.set(
-            HighlightParams.FIELDS,
-            Arrays.stream(hlFields).filter(f -> !ocrFieldNames.contains(f)).toArray(String[]::new));
         ocrParams.set(
             HighlightParams.FIELDS,
             Arrays.stream(hlFields).filter(ocrFieldNames::contains).toArray(String[]::new));
       }
 
       if( highlightQuery != null ) {
-        req.setParams(regularParams);
-        NamedList regularHighlights = regularHighlighter.doHighlighting(
-                rb.getResults().docList,
-                highlightQuery,
-                req, defaultHighlightFields);
-
         req.setParams(ocrParams);
         NamedList ocrHighlights = ocrHighlighter.doHighlighting(
             rb.getResults().docList,
             highlightQuery,
             req, defaultHighlightFields);
-        if(regularHighlights != null) {
-          rb.rsp.add(highlightingResponseField(), convertHighlights(regularHighlights));
-        }
         if (ocrHighlights != null) {
-          rb.rsp.add("ocrHighlighting", ocrHighlights);
+          rb.rsp.add(highlightingResponseField(), ocrHighlights);
         }
       }
     }
+  }
+
+  @Override
+  protected String highlightingResponseField() {
+    return "ocrHighlighting";
   }
 }

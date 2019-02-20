@@ -4,9 +4,14 @@
   <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.RAMDirectoryFactory}"/>
   <schemaFactory class="ClassicIndexSchemaFactory"/>
 
-  <requestHandler name="/select" class="solr.SearchHandler"/>
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <arr name="components">
+      <str>query</str>
+      <str>ocr_highlight</str>
+    </arr>
+  </requestHandler>
 
-  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="highlight"
+  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocr_highlight"
                   ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
     <lst name="ocrFields">
       <str>ocr_text</str>
