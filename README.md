@@ -53,19 +53,27 @@ the schema):
 
 ```xml
 <config>
-  <searchComponent class="solr.HighlightComponent" name="highlight">
     <!-- Use this plugin's custom highlighter with hOCR.
     
     For ALTO, specify `org.mdz.search.solrocr.formats.alto.AltoFormat` int the `ocrFormat`
     attribute, for MiniOCR use `org.mdz.search.solrocr.formats.miniocr.MiniOcrFormat`. -->
-    <highlighting class="org.mdz.search.solrocr.solr.SolrOcrHighlighter"
-                  ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
-        <!-- Names of the fields in the schema that contain OCR text. -->
-        <lst name="ocrFields">
-          <str>ocr_text</str>
-        </lst>
-      </highlighting>
+  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocrHighlight"
+                   ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
+      <!-- Names of the fields in the schema that contain OCR text. -->
+      <lst name="ocrFields">
+        <str>ocr_text</str>
+      </lst>
   </searchComponent>
+  
+  <!-- Add the OCR highlighting component to the components on your request handler(s) -->
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <arr name="components">
+      <str>query</str>
+      <str>highlight</str>
+      <str>ocr_highlight</str>
+    </arr>
+  </requestHandler>
+
 </config>
 ```
 
