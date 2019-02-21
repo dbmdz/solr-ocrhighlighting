@@ -52,11 +52,17 @@ class SnippetView extends Component {
   }
 
   render() {
+    const { docId } = this.props;
     const { text, page, highlights } = this.props.snippet;
+    const { proto, host } = window.location;
+    const pageIdx = parseInt(page.split("_")[1]) - 1;
+    const viewerUrl = `/viewer/#?manifest=${proto}//${host}/${docId}/manifest&cv=${pageIdx}`;
     return (
       <div class="snippet-display">
         <hr />
-        <img ref={i => this.img = i} src={this.getImageUrl()} />
+        <a href={viewerUrl} target="_blank">
+          <img ref={i => this.img = i} src={this.getImageUrl()} />
+        </a>
         {this.state.renderedImage && highlights.flatMap(
           hls => hls.map(hl => <div class="highlight-box" style={this.getHighlightStyle(hl, 50)} />))}
         <p dangerouslySetInnerHTML={{ __html: text }} />
@@ -98,11 +104,15 @@ class ResultDocument extends Component {
   }
 
   render() {
-    const {docId, hl } = this.props;
+    const { docId, hl } = this.props;
+    const { proto, host } = window.location;
+    const viewerUrl = `/viewer/#?manifest=${proto}//${host}/${docId}/manifest`;
     return (
       <div class="result-document">
         <Elevation z={4}>
-          <Typography tag="div" headline4>{docId}</Typography>
+          <Typography tag="div" headline4>
+            <a href={viewerUrl} title="Open in viewer" target="_blank">{docId}</a>
+          </Typography>
           <Typography subtitle1>
             {hl.numTotal} matching passages found
           </Typography>

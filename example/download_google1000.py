@@ -6,6 +6,7 @@ from multiprocessing import cpu_count
 from pathlib import Path
 from zipfile import ZipFile
 
+from PIL import Image
 import lxml.etree as etree
 import requests
 
@@ -32,6 +33,12 @@ def fix_hocr(hocr_path: Path):
     for idx, page_elem in enumerate(tree.findall('.//div[@class="ocr_page"]'),
                                     start=1):
         page_elem.attrib['id'] = f'page_{idx}'
+        img_path = hocr_path.parent / f'Image_{idx-1:04}.JPEG'
+        if not img_path.exists():
+            print(f"Could not find image at {img_path}")
+        elif not page_elem.attrib.get('title', '').startswith('bbox'):
+            img = Image.open(str(img_path))
+            page_elem.attrib['title'] = f'bbox 0 0 {img.width} {img.height}'
         for word_elem in page_elem.findall('.//span[@class="ocr_cinfo"]'):
             word_elem.attrib['class'] = 'ocrx_word'
     with hocr_path.open('wb') as fp:

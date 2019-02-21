@@ -3,7 +3,6 @@ import re
 from functools import wraps
 from pathlib import Path
 
-import aioify
 import aiohttp
 import lxml.etree as etree
 import monsterurl
@@ -142,7 +141,7 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
     return doc
 
 
-async def make_manifest(vol_id, hocr_path):
+def make_manifest(vol_id, hocr_path):
     protocol = app.config.get('PROTOCOL', 'http')
     address = app.config.get('SERVER_NAME', 'localhost:8008')
     manifest_path = app.url_for('get_manifest', volume_id=vol_id)
@@ -166,13 +165,12 @@ async def make_manifest(vol_id, hocr_path):
         canvas['@id'] = f'{protocol}://{address}/{vol_id}/canvas/{page_id}'
         page_idx = int(page_id.split('_')[-1]) - 1
         image_url = f'{image_api_base}/{vol_id}/Image_{page_idx:04}.JPEG'
-        async with app.aiohttp_session.get(image_url + '/info.json') as resp:
-            info = await resp.json()
-        canvas['width'] = info['width']
-        canvas['height'] = info['height']
+        _, _, width, height = (int(x) for x in page_elem.attrib['title'].split(' ')[1:])
+        canvas['width'] = width
+        canvas['height'] = height
         canvas['images'][0]['on'] = canvas['@id']
-        canvas['images'][0]['resource']['width'] = info['width']
-        canvas['images'][0]['resource']['height'] = info['height']
+        canvas['images'][0]['resource']['width'] = width
+        canvas['images'][0]['resource']['height'] = height
         canvas['images'][0]['resource']['@id'] = f'{image_url}/full/full/0/default.jpg'
         canvas['images'][0]['resource']['service']['@id'] = image_url
         manifest['sequences'][0]['canvases'].append(canvas)
@@ -180,12 +178,12 @@ async def make_manifest(vol_id, hocr_path):
 
 
 @app.listener('before_server_start')
-def init(app, loop):
+async def init(app, loop):
     app.aiohttp_session = aiohttp.ClientSession(loop=loop)
 
 
 @app.listener('after_server_stop')
-def finish(app, loop):
+async def finish(app, loop):
     loop.run_until_complete(app.session.close())
     loop.close()
 
@@ -204,8 +202,7 @@ async def search(request: Request, volume_id) -> HTTPResponse:
 @cross_origin(app, automatic_options=True)
 async def get_manifest(request, volume_id):
     hocr_path = Path('../google1000') / volume_id / 'hOCR.html'
-    manifest = await make_manifest(volume_id, hocr_path)
-    return json(manifest)
+    return json(make_manifest(volume_id, hocr_path))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8008, debug=True)
