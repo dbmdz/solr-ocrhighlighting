@@ -2,7 +2,8 @@ FROM node:alpine as builder
 
 COPY . /build
 
-RUN cd /build &&\
+RUN apk add git &&\
+    cd /build &&\
     npm install &&\
     npm run build
 
