@@ -42,6 +42,7 @@ import org.mdz.search.solrocr.lucene.byteoffset.FieldByteOffsetStrategy.Postings
 import org.mdz.search.solrocr.lucene.byteoffset.FieldByteOffsetStrategy.TermVectorByteOffsetStrategy;
 import org.mdz.search.solrocr.lucene.byteoffset.NoOpByteOffsetStrategy;
 import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
+import org.mdz.search.solrocr.solr.OcrHighlightParams;
 import org.mdz.search.solrocr.util.IterableCharSequence;
 import org.mdz.search.solrocr.util.OcrHighlightResult;
 
@@ -79,7 +80,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
     float k1 = params.getFieldFloat(fieldName, HighlightParams.SCORE_K1, 1.2f);
     float b = params.getFieldFloat(fieldName, HighlightParams.SCORE_B, 0.75f);
     float pivot = params.getFieldFloat(fieldName, HighlightParams.SCORE_PIVOT, 87f);
-    return new PassageScorer(k1, b, pivot);
+    boolean boostEarly = params.getFieldBool(fieldName, OcrHighlightParams.SCORE_BOOST_EARLY, false);
+    return new OcrPassageScorer(k1, b, pivot, boostEarly);
   }
 
   @Override
