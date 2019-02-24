@@ -47,12 +47,15 @@ main p {
 	border-radius: 10px;
 }
 
-.result-document img {
-	max-width: 100%;
-}
-
 .snippet-display {
 	position: relative;
+	box-shadow: 1px 2px 8px;
+    border-radius: 8px;
+}
+
+.snippet-display img {
+	max-width: 100%;
+	border-radius: 8px;
 }
 
 .snippet-display em {
@@ -65,6 +68,12 @@ main p {
 	padding: 0px 4px 4px 0px;
 	border-radius: 5px;
 	box-shadow: 3px 3px 3px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+    text-shadow: 1px 1px 3px darkgrey;
 }
 
 @media only screen and (min-width: 720px) {

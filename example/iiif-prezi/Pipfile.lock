@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a83ea9d684b838d814758ac3b032f77e60a2aa63920af78ec11d0584b2617e42"
+            "sha256": "d672b30517984f5c66e1d859379ad69a72db802064cfa14b67417cb85329bc2f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -50,14 +50,6 @@
             ],
             "index": "pypi",
             "version": "==3.5.4"
-        },
-        "aioify": {
-            "hashes": [
-                "sha256:a48a62ab298dc18f70be3ec30a462230ce91a743b993c2d1613f793743ddcf45",
-                "sha256:eec2fec91c8eb01ad245ce70603ab3b8531b8ab4a133698a58060648a92e11cb"
-            ],
-            "index": "pypi",
-            "version": "==0.3.1"
         },
         "async-timeout": {
             "hashes": [
@@ -125,13 +117,6 @@
             "index": "pypi",
             "version": "==4.3.1"
         },
-        "module-wrapper": {
-            "hashes": [
-                "sha256:76449ff513af380674280b18b0b0019e187935594b8745683b080d82c09db7ee",
-                "sha256:da0f1557af1e92a7f384b1e90aacbf527fcf40944428f04e7eb75073969924a5"
-            ],
-            "version": "==0.2.3"
-        },
         "monsterurl": {
             "hashes": [
                 "sha256:3da4c5931f9de5b14568883f5b1c77b587960d0fefb8e9c07a3de1afb89eb944",
@@ -174,13 +159,6 @@
             ],
             "version": "==4.5.2"
         },
-        "poetry-version": {
-            "hashes": [
-                "sha256:746c16322b612e214036ec1a259bd221f52d8fc214787441e5ca7d0564187222",
-                "sha256:7d67345e3dd657f1364ad9cb187025a78439c012b2699370b5ad043c73ebf003"
-            ],
-            "version": "==0.1.2"
-        },
         "sanic": {
             "hashes": [
                 "sha256:4ce5ffd9588557caff844da0f4b478d263d0e836fa0204480a2a17958b333fe0",
@@ -188,28 +166,6 @@
             ],
             "index": "pypi",
             "version": "==18.12.0"
-        },
-        "sanic-cors": {
-            "hashes": [
-                "sha256:7547f9a029cbbffa38f64a890aae186719e78ce83beba8d015c9a6fd09b348ff",
-                "sha256:7cbb7ee1d0f3bad2820b8c49571b9968a9d579fcdba602d44427cec12cd23a5c"
-            ],
-            "index": "pypi",
-            "version": "==0.9.7"
-        },
-        "sanic-plugins-framework": {
-            "hashes": [
-                "sha256:0f0b7ce3689330decd9d9b26f2ad739f0dd42cfe978a2df613a555a32441ca7d",
-                "sha256:281578ec93eac798368abba17d3e88b5046e0bfe8fb02d4c1adf89979f9d143b"
-            ],
-            "version": "==0.6.5"
-        },
-        "tomlkit": {
-            "hashes": [
-                "sha256:d6506342615d051bc961f70bfcfa3d29b6616cc08a3ddfd4bc24196f16fd4ec2",
-                "sha256:f077456d35303e7908cc233b340f71e0bec96f63429997f38ca9272b7d64029e"
-            ],
-            "version": "==0.5.3"
         },
         "ujson": {
             "hashes": [

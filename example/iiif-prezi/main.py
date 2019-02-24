@@ -1,5 +1,6 @@
 import copy
 import re
+import sys
 from functools import wraps
 from pathlib import Path
 
@@ -9,10 +10,7 @@ import monsterurl
 from sanic import Sanic
 from sanic.request import Request
 from sanic.response import json, HTTPResponse
-from sanic_cors import cross_origin
 
-#SOLR_URL = "http://solr:8983/solr/ocrtest/select"
-SOLR_URL = "http://127.0.0.1:8983/solr/ocrtest/select"
 RESPONSE_TEMPLATE = {
   "@context":[
       "http://iiif.io/api/presentation/2/context.json",
@@ -74,7 +72,7 @@ app = Sanic(load_env="CFG_")
 
 async def query_solr(query: str, volume_id: str):
     params = {
-        'q': f'"{query}"',
+        'q': f'{query}',
         'df': 'ocr_text',
         'fq': 'id:' + volume_id,
         'hl': 'on',
@@ -83,26 +81,28 @@ async def query_solr(query: str, volume_id: str):
         'hl.weightMatches': 'true',
     }
     solr_url = app.config.get('SOLR_HANDLER', "http://127.0.0.1:8983/solr/ocrtest/select")
-    async with app.aiohttp_session.get(SOLR_URL, params=params) as resp:
+    async with app.aiohttp_session.get(solr_url, params=params) as resp:
         result_doc = await resp.json()
         return result_doc['ocrHighlighting'][volume_id]['ocr_text']
 
 
 def make_id(vol_id, resource_type="annotation"):
     protocol = app.config.get('PROTOCOL', 'http')
-    address = app.config.get('SERVER_NAME', 'localhost:8008')
+    location = app.config.get('SERVER_NAME', 'localhost:8008')
+    app_path = app.config.get('APP_PATH', '')
     ident = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', monsterurl.get_monster())
     ident = re.sub('([a-z0-9])([A-Z])', r'\1-\2', ident).replace('--', '-').lower()
-    return f'{protocol}://{address}/{vol_id}/{resource_type}/{ident}'
+    return f'{protocol}://{location}{app_path}/{vol_id}/{resource_type}/{ident}'
 
 
 def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
     protocol = app.config.get('PROTOCOL', 'http')
-    address = app.config.get('SERVER_NAME', 'localhost:8008')
+    location = app.config.get('SERVER_NAME', 'localhost:8008')
+    app_path = app.config.get('APP_PATH', '')
     search_path = app.url_for('search', volume_id=vol_id, q=query)
     doc = copy.deepcopy(RESPONSE_TEMPLATE)
-    doc['@id'] = f'{protocol}://{address}{search_path}'
-    doc['within']['total'] = hlresp['snippetCount']
+    doc['@id'] = f'{protocol}://{location}{app_path}/{search_path}'
+    doc['within']['total'] = hlresp['numTotal']
     doc['within']['ignored'] = ignored_fields
     for snip in hlresp['snippets']:
         text = snip['text'].replace('<em>', '').replace('</em>', '')
@@ -129,7 +129,7 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
                         "@type": "cnt:ContentAsText",
                         "chars": hlbox['text'] 
                     },
-                    "on": f'{protocol}://{address}/{vol_id}/canvas/{snip["page"]}#xywh={x},{y},{w},{h}'}
+                    "on": f'{protocol}://{location}{app_path}/{vol_id}/canvas/{snip["page"]}#xywh={x},{y},{w},{h}'}
                 doc['resources'].append(anno)
             doc['hits'].append({
                 '@type': 'search:Hit',
@@ -143,13 +143,14 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
 
 def make_manifest(vol_id, hocr_path):
     protocol = app.config.get('PROTOCOL', 'http')
-    address = app.config.get('SERVER_NAME', 'localhost:8008')
+    location = app.config.get('SERVER_NAME', 'localhost:8008')
+    app_path = app.config.get('APP_PATH', '')
     manifest_path = app.url_for('get_manifest', volume_id=vol_id)
     search_path = app.url_for('search', volume_id=vol_id)
     image_api_base = app.config.get('IMAGE_API_BASE', 'http://localhost:8080')
     manifest = copy.deepcopy(MANIFEST_TEMPLATE)
-    manifest['@id'] = f'{protocol}://{address}{manifest_path}'
-    manifest['service']['@id'] = f'{protocol}://{address}{search_path}'
+    manifest['@id'] = f'{protocol}://{location}{app_path}/{manifest_path}'
+    manifest['service']['@id'] = f'{protocol}://{location}{app_path}/{search_path}'
     manifest['sequences'][0]['@id'] = make_id(vol_id, 'sequence')
     tree = etree.parse(str(hocr_path))
     metadata = {}
@@ -162,7 +163,7 @@ def make_manifest(vol_id, hocr_path):
     for page_elem in tree.findall('.//div[@class="ocr_page"]'):
         canvas = copy.deepcopy(CANVAS_TEMPLATE)
         page_id = page_elem.attrib['id']
-        canvas['@id'] = f'{protocol}://{address}/{vol_id}/canvas/{page_id}'
+        canvas['@id'] = f'{protocol}://{location}{app_path}/{vol_id}/canvas/{page_id}'
         page_idx = int(page_id.split('_')[-1]) - 1
         image_url = f'{image_api_base}/{vol_id}/Image_{page_idx:04}.JPEG'
         _, _, width, height = (int(x) for x in page_elem.attrib['title'].split(' ')[1:])
@@ -184,12 +185,10 @@ async def init(app, loop):
 
 @app.listener('after_server_stop')
 async def finish(app, loop):
-    loop.run_until_complete(app.session.close())
-    loop.close()
+    await app.aiohttp_session.close()
 
 
 @app.route("/<volume_id>/search", methods=['GET', 'OPTIONS'])
-@cross_origin(app, automatic_options=True)
 async def search(request: Request, volume_id) -> HTTPResponse:
     query: str = request.args.get("q")
     resp = await query_solr(query, volume_id)
@@ -199,10 +198,16 @@ async def search(request: Request, volume_id) -> HTTPResponse:
 
 
 @app.route('/<volume_id>/manifest', methods=['GET', 'OPTIONS'])
-@cross_origin(app, automatic_options=True)
 async def get_manifest(request, volume_id):
-    hocr_path = Path('../google1000') / volume_id / 'hOCR.html'
+    hocr_path = Path(app.config.get('GOOGLE1000_PATH', '../google1000')) / volume_id / 'hOCR.html'
     return json(make_manifest(volume_id, hocr_path))
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8008, debug=True)
+    port = 8008
+    debug = False
+    if len(sys.argv) >= 2:
+        port = int(sys.argv[1])
+    if len(sys.argv) == 3:
+        debug = sys.argv[2] == 'debug'
+    app.run(host="0.0.0.0", port=port, debug=debug)

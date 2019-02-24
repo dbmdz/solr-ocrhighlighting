@@ -10,9 +10,11 @@ ipython = "*"
 sanic = "*"
 aiohttp = "*"
 monsterurl = "*"
-aioify = "*"
 lxml = "*"
-sanic-cors = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+dev = "python3 main.py 8008 debug"
+prod = "python3 main.py 8008"

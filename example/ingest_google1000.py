@@ -8,7 +8,7 @@ import requests
 
 
 GOOGLE1000_PATH = Path('./google1000')
-SOLR_HOST = 'localhost:8983'
+SOLR_HOST = 'localhost:8181'
 SOLR_CORE = 'ocrtest'
 
 
