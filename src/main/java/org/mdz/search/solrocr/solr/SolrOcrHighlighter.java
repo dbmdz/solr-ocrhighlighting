@@ -73,15 +73,16 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
             .forEach(field -> highlightFieldWarnings.put(field, NO_WEIGHT_MATCHES_SUPPORT_MSG));
       }
       ocrFormat.setBreakParameters(
-          OcrBlock.valueOf(params.get("hl.ocr.contextBlock", "line").toUpperCase()),
-          params.getInt("hl.ocr.contextSize", 2));
+          OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()),
+          params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
       BreakIterator ocrBreakIterator = ocrFormat.getBreakIterator();
       OcrPassageFormatter ocrFormatter = ocrFormat.getPassageFormatter(
-          OcrBlock.valueOf(params.get("hl.ocr.limitBlock", "block").toUpperCase()),
-          params.get("hl.tag.pre", "<em>"), params.get("hl.tag.post", "</em>"));
+          OcrBlock.valueOf(params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase()),
+          params.get(HighlightParams.TAG_PRE, "<em>"),
+          params.get(HighlightParams.TAG_POST, "</em>"));
       ocrSnippets = ocrHighlighter.highlightOcrFields(
           ocrFieldNames, query, docIDs, maxPassagesOcr, ocrBreakIterator, ocrFormatter,
-          params.get("hl.pageId", null));
+          params.get(OcrHighlightParams.PAGE_ID, null));
     }
 
     // Assemble output data

@@ -112,7 +112,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   public void testWildcardQueryAtTheBeginning() throws Exception {
     SolrQueryRequest req = xmlQ("q", "*deburg");
     assertQ(req,
-        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Magdebur')])=10");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'agdeburg')])=10");
   }
 
   @Test
@@ -189,7 +189,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
 
   @Test
   public void testCombinedFuzzyQuery() throws Exception {
-    SolrQueryRequest req = xmlQ("q", "Magdepurg~ OR baurisch~3");
+    SolrQueryRequest req = xmlQ("q", "Magdepurg~ OR baurisch~3", "hl.snippets", "100");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
     assertQ(req,
@@ -229,7 +229,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
 
   @Test
   public void testFilterByPage() throws Exception {
-    SolrQueryRequest req = xmlQ("q", "München", "hl.pageId", "26", "fq", "id:31337");
+    SolrQueryRequest req = xmlQ("q", "München", "hl.ocr.pageId", "26", "fq", "id:31337");
     assertQ(req,
         "count(//str[@name='page' and text() != '26'])=0",
           "count(//str[@name='page' and text() = '26'])=1");
