@@ -8,7 +8,7 @@ import requests
 
 
 GOOGLE1000_PATH = Path('./google1000')
-SOLR_HOST = 'localhost:8983'
+SOLR_HOST = 'localhost:8181'
 SOLR_CORE = 'ocrtest'
 
 
@@ -41,9 +41,6 @@ if __name__ == '__main__':
     batch = []
     for idx, (ident, ocr) in enumerate(ocr_iter):
         doc = dict(id=ident, ocr_text=ocr)
-        batch.append(doc)
-        if len(batch) == 5:
-            index_documents(batch)
-            batch = []
+        index_documents([doc])
         sys.stdout.write(f'\r{idx}/1000')
         sys.stdout.flush()

@@ -15,6 +15,13 @@ import 'preact-material-components/Slider/style.css';
 import 'preact-material-components/FormField/style.css';
 
 
+if (typeof window !== 'undefined') {
+  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
+} else {
+  var APP_BASE = 'http://localhost:8008';  // TODO: Read from environment?
+}
+
+
 class SnippetView extends Component {
   constructor(props) {
     super(props);
@@ -27,7 +34,7 @@ class SnippetView extends Component {
     const { docId } = this.props;
     const { page } = this.props.snippet;
     const pageId = String(parseInt(page.split("_")[1]) - 1).padStart(4, "0");
-    return `http://localhost:8080/${docId}/Image_${pageId}.JPEG`;
+    return `${APP_BASE}/iiif/image/${docId}/Image_${pageId}.JPEG`;
 
   }
 
@@ -52,13 +59,19 @@ class SnippetView extends Component {
   }
 
   render() {
+    const { docId, query } = this.props;
     const { text, page, highlights } = this.props.snippet;
+    const pageIdx = parseInt(page.split("_")[1]) - 1;
+    const manifestUri = `${APP_BASE}/iiif/presentation/${docId}/manifest`;
+    const viewerUrl = `/viewer/#?manifest=${manifestUri}&cv=${pageIdx}&q=${query}`;
     return (
       <div class="snippet-display">
-        <hr />
-        <img ref={i => this.img = i} src={this.getImageUrl()} />
+        <a href={viewerUrl} target="_blank" title="Open page in viewer">
+          <img ref={i => this.img = i} src={this.getImageUrl()} />
+        </a>
         {this.state.renderedImage && highlights.flatMap(
-          hls => hls.map(hl => <div class="highlight-box" style={this.getHighlightStyle(hl, 50)} />))}
+          hls => hls.map(hl =>
+            <div class="highlight-box" title={hl.text} style={this.getHighlightStyle(hl, 50)} />))}
         <p dangerouslySetInnerHTML={{ __html: text }} />
       </div>
     );
@@ -98,15 +111,19 @@ class ResultDocument extends Component {
   }
 
   render() {
-    const {docId, hl } = this.props;
+    const { docId, hl, query } = this.props;
+    const manifestUri = `${APP_BASE}/iiif/presentation/${docId}/manifest`;
+    const viewerUrl = `/viewer/#?manifest=${manifestUri}&q=${query}`;
     return (
       <div class="result-document">
         <Elevation z={4}>
-          <Typography tag="div" headline4>{docId}</Typography>
+          <Typography tag="div" headline4>
+            <a href={viewerUrl} title="Open in viewer" target="_blank">{docId}</a>
+          </Typography>
           <Typography subtitle1>
             {hl.numTotal} matching passages found
           </Typography>
-          {hl.snippets.map(snip => <SnippetView snippet={snip} docId={docId} />)}
+          {hl.snippets.map(snip => <SnippetView snippet={snip} docId={docId} query={query} />)}
         </Elevation>
       </div>);
   }
@@ -120,14 +137,16 @@ export default class App extends Component {
     }
     const query = document.querySelector(".search-form input").value;
     const params = { ...this.state.queryParams, q: query };
-    fetch(`http://localhost:8181/solr/ocrtest/select?${new URLSearchParams(params)}`)
+    fetch(`${APP_BASE}/solr/ocrtest/select?${new URLSearchParams(params)}`)
       .then(resp => resp.json())
       .then((data) => this.setState({ searchResults: data, isSearchPending: false }))
       .catch((err) => {
         console.error(err);
         this.setState({ isSearchPending: false });
       });
-    this.setState({ isSearchPending: true });
+    this.setState({
+      isSearchPending: true,
+      queryParams: params });
   }
 
   constructor(props) {
@@ -157,7 +176,7 @@ export default class App extends Component {
   }
 
   render() {
-    const { searchResults, isSearchPending } = this.state;
+    const { searchResults, isSearchPending, queryParams } = this.state;
     return (
       <main>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
@@ -186,7 +205,8 @@ export default class App extends Component {
                   docId: doc.id,
                   hl: searchResults.ocrHighlighting[doc.id].ocr_text }
               })
-              .map(({ key, docId, hl }) => <ResultDocument key={key} hl={hl} docId={docId} />)}
+              .map(({ key, docId, hl }) =>
+                <ResultDocument key={key} hl={hl} docId={docId} query={queryParams.q} />)}
         </section>
       </main>
     );

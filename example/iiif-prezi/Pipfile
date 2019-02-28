@@ -1,0 +1,20 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+ipython = "*"
+
+[packages]
+sanic = "*"
+aiohttp = "*"
+monsterurl = "*"
+lxml = "*"
+
+[requires]
+python_version = "3.7"
+
+[scripts]
+dev = "python3 main.py 8008 debug"
+prod = "python3 main.py 8008"

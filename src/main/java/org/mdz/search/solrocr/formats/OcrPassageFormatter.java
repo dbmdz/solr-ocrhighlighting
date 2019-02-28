@@ -45,7 +45,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         sb.insert(extraChars + matchStart, startHlTag);
         extraChars += startHlTag.length();
         int matchEnd = content.subSequence(passage.getStartOffset(), passage.getMatchEnds()[j]).toString().length();
-        sb.insert(extraChars + matchEnd, endHlTag);
+        sb.insert(Math.min(extraChars + matchEnd, sb.length()), endHlTag);
         extraChars += endHlTag.length();
       }
       String xmlFragment = truncateFragment(sb.toString());
