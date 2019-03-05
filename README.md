@@ -19,17 +19,16 @@ the last scenario (ASCII + excaped Unicode codepoints) is highly recommended.**
 It offers the most flexibility with the lowest index, memory and storage
 requirements.
 
-| **Supported Formats** | **Location of OCR content** | **Index Size**        | **Memory Usage** | **Easy to index**           | **Supports `hl.weightMatches`** | **Use UTF-8 files on disk** |
-|-----------------------|-----------------------------|-----------------------|------------------|-----------------------------|---------------------------------|-----------------------------|
-| hOCR/MiniOCR [3]       | Solr (stored field)         | ❌ Raw docs in index  | ❌ High [1]      |  ✅ raw OCR                 | ✅                              | ❌                          |
-| hOCR/ALTO/MiniOCR     | External (UTF-8 file)       | ✅ Just payloads      | ✅ Low           | ✅ words w/ byte offsets[2] | ❌ Only "classic" highlighting  | ✅                          |
-| hOCR/MiniOCR [3]      | External (ASCII+XML-Escapes)| ✅ Just offsets       | ✅ Low           |  ✅ raw OCR                 | ✅                              | ✅ [4]                  |
+| **Location of OCR content** | **Index Size**        | **Memory Usage** | **Easy to index**           | **Supports `hl.weightMatches`** | **Use UTF-8 files on disk** |
+|-----------------------------|-----------------------|------------------|-----------------------------|---------------------------------|-----------------------------|
+| Solr (stored field)         | ❌ Raw docs in index  | ❌ High [1]      |  ✅ raw OCR                 | ✅                              | ❌                          |
+| External (UTF-8 file)       | ✅ Just payloads      | ✅ Low           | ✅ words w/ byte offsets[2] | ❌ Only "classic" highlighting  | ✅                          |
+| External (ASCII+XML-Escapes)| ✅ Just offsets       | ✅ Low           |  ✅ raw OCR                 | ✅                              | ✅ [3]                  |
 
 **[1]** The whole document needs to be kept in memory during highlighting<br>
 **[2]** Java implementations and a cross-platform CLI tool to generate the required format for all supported OCR formats are
         provided<br>
-**[3]** Support for ALTO should be possible with some trickery, but is not implemented yet.<br>
-**[4]** Only technically UTF-8, since all non-ASCII codepoints have to be XML-escaped (i.e. `&#x17F` instead of `ſ`.
+**[3]** Only technically UTF-8, since all non-ASCII codepoints have to be XML-escaped (i.e. `&#x17F` instead of `ſ`.
         However, all XML-processors should be able to work with these files just the same as if they were UTF-8 encoded, so
         it's as practical (and almost as space-efficient) as the UTF8 + byte offsets scenario, with the advantage that a
         more modern highlighting technique (`hl.weightMatches`) can be used.<br>
@@ -115,6 +114,8 @@ the usage scenario.
      wildcard queries. -->
 <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
   <analyzer>
+    <!-- For ALTO, please add this as the first filter:
+    <charFilter class="org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory" /> -->
     <!-- Strip away the XML tags to arrive at a plaintext version of the OCR -->
     <charFilter class="solr.HTMLStripCharFilterFactory" />
     <!-- rest of your analyzer chain -->
@@ -160,6 +161,35 @@ the usage scenario.
 - The `hl.weightMatches` parameter is not supported when using external UTF-8
   files, i.e. it will be ignored and the classical highlighting approach will
   be used instead.
+
+
+## FAQ
+
+#### Can I have documents that point to a part of an OCR document on external storage?
+
+**Yes, with an ugly hack**. This use case appears e.g. when indexing digital newspapers,
+where you have a single large volume on disk (e.g. the OCR text for the bound volume containing all issues from the
+year 1878) but you want your Solr documents to be more fine-grained (e.g. on the issue or event article level).
+A problem in Solr is that the source of the offsets that are used for highlighting are always relative to the actual
+document that was used for indexing and cannot be easily customized. To work around this:<br/>
+**Replace all of the content preceding your sub-section with a single XML comment tag that is exactly as long as the
+old content and discard all content that follows after the sub-section** (We told you the solution was hacky, didn't
+we?). This will lead the analyzer chain to discard all of the undesired content, while still storing the correct offsets
+for the sub-section content in the index.
+
+Minimal example before masking:
+
+```
+<l>Some content that you don't want in your Solr document</l>
+<l>Here's the content that you're interested in and want in the index for this document</l>
+<l>And here's some extra content following it that you don't want</l>
+```
+
+Minimal example after masking:
+```
+<!---------------------------------------------------------->
+<l>Here's the content that you're interested in and want in the index for this document</l>
+```
 
 
 ## Contributing
