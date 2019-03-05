@@ -169,7 +169,7 @@ the usage scenario.
 
 **Yes, with an ugly hack**. This use case appears e.g. when indexing digital newspapers,
 where you have a single large volume on disk (e.g. the OCR text for the bound volume containing all issues from the
-year 1878) but you want your Solr documents to be more fine-grained (e.g. on the issue or event article level).
+year 1878) but you want your Solr documents to be more fine-grained (e.g. on the issue or even article level).
 A problem in Solr is that the source of the offsets that are used for highlighting are always relative to the actual
 document that was used for indexing and cannot be easily customized. To work around this:<br/>
 **Replace all of the content preceding your sub-section with a single XML comment tag that is exactly as long as the
