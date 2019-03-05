@@ -32,7 +32,6 @@ requirements.
         However, all XML-processors should be able to work with these files just the same as if they were UTF-8 encoded, so
         it's as practical (and almost as space-efficient) as the UTF8 + byte offsets scenario, with the advantage that a
         more modern highlighting technique (`hl.weightMatches`) can be used.<br>
-        
 
 **TODO**: Badges
 
@@ -40,8 +39,8 @@ requirements.
 
 ## Installation
 
-- Download plugin jar
-- Drop into `core/lib/` directory
+- Download the latest JAR from the [GitHub Releases Page](TODO)
+- Drop the JAR into the `core/lib/` directory for your Solr core
 
 # Solr Configuration
 
@@ -53,7 +52,7 @@ the schema):
 ```xml
 <config>
     <!-- Use this plugin's custom highlighter with hOCR.
-    
+
     For ALTO, specify `org.mdz.search.solrocr.formats.alto.AltoFormat` int the `ocrFormat`
     attribute, for MiniOCR use `org.mdz.search.solrocr.formats.miniocr.MiniOcrFormat`. -->
   <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocrHighlight"
@@ -63,13 +62,13 @@ the schema):
         <str>ocr_text</str>
       </lst>
   </searchComponent>
-  
+
   <!-- Add the OCR highlighting component to the components on your request handler(s) -->
   <requestHandler name="/select" class="solr.SearchHandler">
     <arr name="components">
       <str>query</str>
       <str>highlight</str>
-      <str>ocr_highlight</str>
+      <str>ocrHighlight</str>
     </arr>
   </requestHandler>
 
@@ -103,12 +102,16 @@ sources other than the file system, the plugin provides an `ExternalFieldLoader`
 implement and just pass in the `class` parameter.
 
 
-## Schema
+## Schema and indexing documents
 
-The OCR highlighter has some requirements for the fields it is supposed to highlight. The details vary depending on
-the usage scenario.
+The OCR highlighter has some requirements for the fields it is supposed to highlight and its contents. The details vary
+depending on the usage scenario.
 
-### Stored field and ASCII-encoded markup with escaped Unicode codepoints
+### Stored fields and ASCII-encoded markup with escaped Unicode codepoints
+For your schema, you will have to enable the storage of offsets (term vectors are also recommended for speeding up
+highlighting of wildcard queries) and add the `HTMLStripCharFilterFactory` to your analyzer chain.
+If you're using ALTO OCR documents, you will also have to add the `AltoCharFilterFactory` as the first component in
+your analyzer chain.
 ```xml
 <!-- Storing the offsets is mandatory with this approach. Term Vectors are optionally, but help speed up highlighting
      wildcard queries. -->
@@ -122,9 +125,36 @@ the usage scenario.
     <!-- ..... -->
   </analyzer>
 </fieldtype>
-```    
+```
+
+The documents that you want to ingest into your index **need to be ASCII-encoded, with Unicode codepoints being
+XML-escaped**. For example, the value `Wachſtube` needs to be encoded as `Wach&#383;tube`. The easiest way to convert
+your XML documents to this encoding is to use Python:
+
+```python
+with open('./mydocument.xml', 'rt') as fp:
+    ocr_text = fp.read()
+with open('./mydocument_escaped.xml', 'wb') as fp:
+    fp.write(ocr_text.encode('ascii', 'xmlcharrefreplace'))
+```
+
+That's basically all there is to it: Just read your file into a string and pass the contents as the field value
+during your `POST` to Solr.
 
 ### UTF-8 encoded markup
+
+If you can't or don't want to slightly modify the OCR documents on disk, you will have to take some more steps during
+indexing and also can't use the modern highlighting approach enabled by `hl.weightMatches` parameter (which will be the
+default in Solr 8).
+
+This approach differs from the above in that it completely bypasses Solr's approach to storing (character) offsets in
+the index and instead stores the **byte offsets** in the term payload. These byte offsets need to be passed to Solr by
+your application during indexing time, i.e. you cannot post OCR documents straight to Solr but need to convert them to
+a special format beforehand.
+
+First, for the schema configuration, you will have to enable term positions, term vectors and term payloads. To make
+Solr store the payloads, make it tokenize on whitespace and split the payload from the document terms:
+
 ```xml
 <!-- Positions, Term Vectors and Term Payloads are mandatory with this approach. -->
 <fieldtype name="text_ocr" class="solr.TextField" termPositions="true" termVectors="true" termPayloads="true">
@@ -141,26 +171,112 @@ the usage scenario.
 </fieldtype>
 ```
 
-## Usage
+For getting your OCR documents into Solr, you need to pass the content in a special format that includes the byte offset
+for each term:
 
-- Converting OCR format to indexing format (terms + byte offsets), if neccessary
-- Ingesting a document with an OCR field
-- Querying with highlighting, example result
+```
+Dieſe⚑5107923 leuchtenden⚑5108028 treuherzigen⚑5108138 blauen⚑5108250 Augen,⚑5108357
+```
+
+To convert from the supported formats (hOCR, ALTO and MiniOCR) to this format, we provide Java classes ([hOCR](TODO),
+[ALTO](TODO) and and a small portable command-line utility (available from the [GitHub Releases Page](TODO)).
+
+## Highlighting Output for queries
+
+At query time, no special parameters besides `hl=true` and an inclusion of your OCR fields in the `hl.fields` parameter
+are required. The result will look like this (with the XML output format):
+
+```xml
+<response>
+<result name="response" numFound="1" start="0">
+  <doc>
+    <str name="id">42</str></doc>
+</result>
+<lst name="ocrHighlighting">
+  <lst name="42">
+    <lst name="ocr_text">
+      <arr name="snippets">
+        <lst>
+          <str name="page">page_107</str>
+          <str name="text">und weder Liebe noch Zorn für fie übrig behalten, Jeden: falls prügelte er fie oft, wenn er kam, und niemals tönten ihr die &lt;em&gt;Volfslieder heller von den Lippen&lt;/em&gt;, als nach ſol&lt;h einem feſtlichen Wiederſehen. Viele früheſte Kindheitserinnerungen vorher und nach-</str>
+          <float name="score">1242847.8</float>
+          <lst name="region">
+            <int name="ulx">126</int>
+            <int name="uly">1572</int>
+            <int name="lrx">1439</int>
+            <int name="lry">1903</int>
+          </lst>
+          <arr name="highlights">
+            <arr>
+              <lst>
+                <str name="text">Volfslieder heller von den Lippen</str>
+                <int name="ulx">366</int>
+                <int name="uly">139</int>
+                <int name="lrx">1200</int>
+                <int name="lry">193</int>
+              </lst>
+            </arr>
+          </arr>
+        </lst>
+      </arr>
+      <int name="numTotal">1</int>
+    </lst>
+  </lst>
+</lst>
+</response>
+```
+
+As you can see, the `ocrHighlighting` component contains for every field in every document with a match a list of
+passages that match the query. The passage lists the page the match occurred on, the matching text, the score of the
+passage and the coordinates of the region on the page image containing the passage text. Additionally, it also includes
+the region and text for every hit (i.e. the actual terms that matched the query). Note that the region coordinates are
+**relative to the containing region, not the page!**
+
+You can customize the way the passages are formed. By default the passage will include two lines above and below the
+line with the match. Passages will also not cross block boundaries (what this means concretely depends on the format).
+These parameters can be changed at query time:
+
+- `hl.ocr.contextBlock`: Select which block type should be considered for determining the context. Valid values are
+  `word`, `line`, `paragraph`, `block` or `page` and defaults to `line`.
+- `hl.ocr.contextSize`: Set the number of blocks above and below the matching block to be included in the passage.
+  Defaults to `2`.
+- `hl.ocr.limitBlock`: Set the block type that passages may not exceed. Valid values are `word`, `line`, `paragraph`,
+  `block` or `page` and defaults to `page`.
+- `hl.ocr.pageId`: Only show passages from the page with this identifier. Useful if you want to implement a
+  "Search on this page" feature (e.g. for the [IIIF Content Search API](https://iiif.io/api/search/1.0/)).
+
 
 ## The MiniOCR format
 
-- Why????
-- Elements, Structure
-- floats or ints for coordinates
-- Hyphenation with `&shy;`
-- Encoding: Stripping all HTML tags should result in a readable plaintext document
+This plugin includes support for a custom OCR format that we dubbed *MiniOCR*. This format is intended for use cases
+where using the existing OCR files is not possible (e.g. because they're in an unsupported format or because you don't
+want to ASCII-encode them and still use the modern highlighting approach). In these cases, minimizing the storage
+requirements for the derived OCR files is important, which is why we defined this minimalistic format.
+
+A basic example looks like this:
+
+```xml
+<p id="page_identifier">
+  <b>
+    <l><w x="50 50 100 100">A</w> <w x="150 50 100 100">Line</w></l>
+  </b>
+</p>
+```
+
+The format uses the following elements for describing the page structure:
+
+- `<p>` for pages, can have a `id` attribute that contains the page identifier
+- `<b>` for "blocks", takes no attributes
+- `<l>` for lines, takes no attributes
+- `<w>` for words, takes a `box` attribute that contains the x and y offset and the width and height of the word in
+  pixels on the page image. The coordinates can be either integrals or floating point values between 0 and 1 (to denote
+  relative coordinates).
 
 ## Known Issues
 
-- File size is limited to 2GiB
-- The `hl.weightMatches` parameter is not supported when using external UTF-8
-  files, i.e. it will be ignored and the classical highlighting approach will
-  be used instead.
+- The supported file size is limited to 2GiB, since Lucene uses 32 bit integers throughout for storing offsets
+- The `hl.weightMatches` parameter is not supported when using external UTF-8 files, i.e. it will be ignored and the
+  classical highlighting approach will be used instead.
 
 
 ## FAQ
