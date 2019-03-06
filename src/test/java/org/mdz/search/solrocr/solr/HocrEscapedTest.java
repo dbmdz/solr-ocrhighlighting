@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -22,6 +23,12 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
     Path ocrPath = Paths.get("src/test/resources/data/hocr_escaped.html");
     String text = new String(Files.readAllBytes(ocrPath), StandardCharsets.US_ASCII);
     assertU(adoc("ocr_text", text, "id", "42"));
+    StringBuilder maskedText = new StringBuilder();
+    maskedText.insert(0, "<!");
+    maskedText.append(String.join("", Collections.nCopies(3064939, "-")));
+    maskedText.append('>');
+    maskedText.append(text.substring(3064942, 3098327));
+    assertU(adoc("ocr_text", maskedText.toString(), "id", "84"));
     assertU(commit());
   }
 
@@ -73,5 +80,23 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",
         "//lst[@name='region'][1]/int[@name='ulx']/text()=146",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=83");
+  }
+
+  @Test
+  public void testSubsectionHighlighting() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"brütenden Sonnenwärme\"", "hl.weightMatches", "true");
+    assertQ(req,
+        "count(//lst[@name='ocrHighlighting']/lst)=2",
+        "//lst[@name='ocrHighlighting']/lst[@name='84']//arr[@name='snippets']/lst/str[@name='text']/text()='"
+            + "glückſeligen Klang ihres gedämpften Lachens und mit dem Eindru> der: <em>brütenden Sonnenwärme</em> um "
+            + "uns. Wer will abwägen, wie unendlich zufällig, wie rein äußerlich bedingt es vielleicht iſt, wenn mir "
+            + "bei dieſer Erinnerung'",
+        "//lst[@name='ocrHighlighting']/lst[@name='42']//arr[@name='snippets']/lst/str[@name='text']/text()='"
+            + "glückſeligen Klang ihres gedämpften Lachens und mit dem Eindru> der: <em>brütenden Sonnenwärme</em> um "
+            + "uns. Wer will abwägen, wie unendlich zufällig, wie rein äußerlich bedingt es vielleicht iſt, wenn mir "
+            + "bei dieſer Erinnerung'");
+    req = xmlQ("q", "\"Volfslieder heller von den Lippen\"", "hl.weightMatches", "true");
+    assertQ(req,
+        "count(//lst[@name='ocrHighlighting']/lst)=1");
   }
 }
