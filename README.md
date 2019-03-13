@@ -15,7 +15,7 @@ implementation handle those.
 The plugin implements a number of usage scenarios, based on where and how the
 OCR documents are stored.
 **If your environment allows for a slight modification of your OCR documents,
-the last scenario (ASCII + excaped Unicode codepoints) is highly recommended.**
+the last scenario (ASCII + escaped Unicode codepoints) is highly recommended.**
 It offers the most flexibility with the lowest index, memory and storage
 requirements.
 
@@ -54,10 +54,11 @@ them. Refer to the `README` in the `example` directory for instructions on how t
 
 # Solr Configuration
 
-Using the plugin requires some configuration in your `solrconfig.xml`. For one, you have to tell Solr's
-highlighting component to use the OCR Highlighter for your OCR format (hOCR, ALTO or MiniOCR).
-Also, you will have to specify which of your fields contain OCR text (i.e. the `solrconfig` is tied to
-the schema):
+Using the plugin requires some configuration in your `solrconfig.xml`. For one, you have to define a
+search component to add the OCR highlighting information for your OCR format (hOCR, ALTO or MiniOCR)
+to the response.
+Also, you will have to specify which of your fields contain OCR text (i.e. the `solrconfig` is
+currently tied to the schema):
 
 ```xml
 <config>
@@ -170,9 +171,9 @@ Solr store the payloads, make it tokenize on whitespace and split the payload fr
 <fieldtype name="text_ocr" class="solr.TextField" termPositions="true" termVectors="true" termPayloads="true">
   <analyzer>
     <!-- Mandatory, the input is a whitespace-separated sequence of {term}{delimiter}{offset} units and has to be
-         split on the whitespace -->
+         split on whitespace -->
     <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-    <!-- The delimiter can be any UTF-16 codepoint, "⚑" is used by the provided Java implementation and CLI tool -->
+    <!-- The delimiter can be any UTF-16 codepoint, "⚑" is used by default in the provided Java implementation and CLI tool -->
     <filter class="solr.DelimitedPayloadTokenFilterFactory" delimiter="⚑"
             encoder="org.mdz.search.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
     <!-- rest of your analyzer chain -->
@@ -237,10 +238,10 @@ are required. The result will look like this (with the XML output format):
 </response>
 ```
 
-As you can see, the `ocrHighlighting` component contains for every field in every document with a match a list of
+As you can see, the `ocrHighlighting` component contains for every field in every matching document a list of
 passages that match the query. The passage lists the page the match occurred on, the matching text, the score of the
 passage and the coordinates of the region on the page image containing the passage text. Additionally, it also includes
-the region and text for every hit (i.e. the actual terms that matched the query). Note that the region coordinates are
+the region and text for every hit (i.e. the actual tokens that matched the query). Note that the region coordinates are
 **relative to the containing region, not the page!**
 
 You can customize the way the passages are formed. By default the passage will include two lines above and below the
