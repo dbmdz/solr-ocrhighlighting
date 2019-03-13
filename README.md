@@ -42,7 +42,7 @@ requirements.
 - Drop the JAR into the `core/lib/` directory for your Solr core
 
 
-# Running the example
+## Running the example
 
 The repository includes a full-fledged example setup based on the
 [Google Books 1000 Dataset](http://yaroslavvb.blogspot.com/2011/11/google1000-dataset_09.html).
@@ -52,7 +52,7 @@ OCRed texts and displays the matching passages as highlighted image and text sni
 Also included is a small IIIF-Viewer that allows viewing the complete volumes and searching for text within
 them. Refer to the `README` in the `example` directory for instructions on how to run the example.
 
-# Solr Configuration
+## Solr Configuration
 
 Using the plugin requires some configuration in your `solrconfig.xml`. For one, you have to define a
 search component to add the OCR highlighting information for your OCR format (hOCR, ALTO or MiniOCR)
@@ -293,7 +293,7 @@ The format uses the following elements for describing the page structure:
 
 ## FAQ
 
-#### Can I have documents that point to a part of an OCR document on external storage?
+### Can I have documents that point to a part of an OCR document on external storage?
 
 **Yes, with an ugly hack**. This use case appears e.g. when indexing digital newspapers,
 where you have a single large volume on disk (e.g. the OCR text for the bound volume containing all issues from the
@@ -339,4 +339,4 @@ the plugin :-)
 
 ## License
 
-[Apache License 2.0](https://github.com/dbmdz/solr-ocr-plugin/blob/master/LICENSE)
+[MIT License](https://github.com/dbmdz/solr-ocr-plugin/blob/master/LICENSE)
