@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.mdz.search</groupId>
-  <artifactId>solr-ocr-plugin</artifactId>
+  <artifactId>solr-ocrhighlighting</artifactId>
   <version>0.1-SNAPSHOT</version>
 
 

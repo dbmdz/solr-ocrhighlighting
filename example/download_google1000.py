@@ -16,7 +16,7 @@ parser = etree.HTMLParser()
 
 
 def download_volume(vol_num: int, out_dir: Path):
-    vol_dir = out_dir / f'Volume_{vol_num:04}'
+    vol_dir = out_dir / 'Volume_{:04}'.format(vol_num)
     if not vol_dir.exists():
         resp = requests.get(URL_TEMPLATE.format(vol_num))
         zf = ZipFile(BytesIO(resp.content))
@@ -32,13 +32,13 @@ def fix_hocr(hocr_path: Path):
         title.getparent().remove(title)
     for idx, page_elem in enumerate(tree.findall('.//div[@class="ocr_page"]'),
                                     start=1):
-        page_elem.attrib['id'] = f'page_{idx}'
-        img_path = hocr_path.parent / f'Image_{idx-1:04}.JPEG'
+        page_elem.attrib['id'] = 'page_{}'.format(idx)
+        img_path = hocr_path.parent / 'Image_{:04}.JPEG'.format(idx-1)
         if not img_path.exists():
-            print(f"Could not find image at {img_path}")
+            print("Could not find image at {}".format(img_path))
         elif not page_elem.attrib.get('title', '').startswith('bbox'):
             img = Image.open(str(img_path))
-            page_elem.attrib['title'] = f'bbox 0 0 {img.width} {img.height}'
+            page_elem.attrib['title'] = 'bbox 0 0 {} {}'.format(img.width,img.height)
         for word_elem in page_elem.findall('.//span[@class="ocr_cinfo"]'):
             word_elem.attrib['class'] = 'ocrx_word'
     with hocr_path.open('wb') as fp:
@@ -54,7 +54,7 @@ def main():
             futs.append(pool.submit(download_volume, vol_num, out_dir))
         for idx, fut in enumerate(as_completed(futs)):
             fut.result()
-            sys.stdout.write(f'{idx + 1}/1000\r')
+            sys.stdout.write('{}/1000\r'.format(idx + 1))
             sys.stdout.flush()
 
 

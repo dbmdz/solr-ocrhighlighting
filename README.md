@@ -1,4 +1,4 @@
-# solr-ocr-plugin
+# solr-ocrhighlighting
 
 This Solr plugin lets you put OCR text into one or more of you documents'
 fields and then allows you to obtain structured highlighting data with the text
@@ -35,12 +35,22 @@ requirements.
 
 **TODO**: Badges
 
-**TODO**: Graphic that shows the general principle
 
 ## Installation
 
-- Download the latest JAR from the [GitHub Releases Page](TODO)
+- Download the latest JAR from the [GitHub Releases Page](https://github.com/dbmdz/solr-ocrhighlighting/releases)
 - Drop the JAR into the `core/lib/` directory for your Solr core
+
+
+# Running the example
+
+The repository includes a full-fledged example setup based on the
+[Google Books 1000 Dataset](http://yaroslavvb.blogspot.com/2011/11/google1000-dataset_09.html).
+It consists of 1000 Volumes along with their OCRed text in the hOCR format and all book pages as
+full resolution JPEG images. The example ships with a search interface that allows querying the
+OCRed texts and displays the matching passages as highlighted image and text snippets.
+Also included is a small IIIF-Viewer that allows viewing the complete volumes and searching for text within
+them. Refer to the `README` in the `example` directory for instructions on how to run the example.
 
 # Solr Configuration
 
@@ -179,7 +189,8 @@ Dieſe⚑5107923 leuchtenden⚑5108028 treuherzigen⚑5108138 blauen⚑5108250 A
 ```
 
 To convert from the supported formats (hOCR, ALTO and MiniOCR) to this format, we provide Java classes ([hOCR](TODO),
-[ALTO](TODO) and and a small portable command-line utility (available from the [GitHub Releases Page](TODO)).
+[ALTO](TODO) and and a small portable command-line utility (available from the
+[GitHub Releases Page](https://github.com/dbmdz/solr-ocrhighlighting/releases)).
 
 ## Highlighting Output for queries
 
@@ -322,7 +333,7 @@ libraries. It helps us to focus our efforts on our open source offerings, so we
 can create even more useful stuff for the community.
 
 So don't hesitate to drop us a line at
-[TODO@bsb-muenchen.de](mailto:TODO@bsb-muenchen.de) if you could make use of
+[johannes.baiter@bsb-muenchen.de](mailto:johannes.baiter@bsb-muenchen.de) if you could make use of
 the plugin :-)
 
 ## License
