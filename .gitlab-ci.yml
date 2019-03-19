@@ -1,5 +1,1 @@
-include: "http://bsb0mdz-ci.bsb.lrz.de/build/gitlab-ci-base.yml"
-
-# We don't want to publish to a Maven repo, for now
-variables:
-  NO_PUBLISH: "yes"
+include: "https://raw.githubusercontent.com/dbmdz/development/generic-ci-config/ci/.gitlab-ci-base.yml"
