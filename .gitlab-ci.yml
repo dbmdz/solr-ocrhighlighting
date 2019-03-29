@@ -1,1 +1,1 @@
-include: "https://raw.githubusercontent.com/dbmdz/development/generic-ci-config/ci/.gitlab-ci-base.yml"
+include: "https://raw.githubusercontent.com/dbmdz/development/master/ci/.gitlab-ci-base.yml"
