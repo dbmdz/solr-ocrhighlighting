@@ -1,6 +1,8 @@
 package org.mdz.search.solrocr.lucene.byteoffset;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.Weight;
@@ -46,6 +49,7 @@ public class ByteOffsetPhraseHelper extends PhraseHelper {
   private final Predicate<String> fieldMatcher;
   private final String fieldName;
   private final Set<BytesRef> positionInsensitiveTerms; // (TermQuery terms)
+  private Method _createWeight;
 
   public ByteOffsetPhraseHelper(Query query, String field,
       Predicate<String> fieldMatcher,
@@ -58,6 +62,26 @@ public class ByteOffsetPhraseHelper extends PhraseHelper {
     this.fieldName = field;
     positionInsensitiveTerms = Arrays.stream(this.getAllPositionInsensitiveTerms()).collect(Collectors.toSet());
 
+  }
+
+  private Weight createWeight(IndexSearcher searcher, Query query) throws IOException {
+    // NOTE: We have to use reflection for this, since the createWeight API has changed between 7.x and 8.x
+    if (this._createWeight == null) {
+      this._createWeight = Arrays.stream(searcher.getClass().getDeclaredMethods())
+          .filter(m -> m.getName().equals("createWeight"))
+          .findFirst().orElseThrow(() -> new RuntimeException("Incompatible Lucene/Solr version, needs 7.x or 8.x."));
+    }
+    try {
+      if (_createWeight.getParameterTypes()[1] == boolean.class) {
+        return (Weight) _createWeight.invoke(
+            searcher, searcher.rewrite(query), false /* no scores */, 1f /* boost */);
+      } else {
+        return (Weight) _createWeight.invoke(
+            searcher, searcher.rewrite(query), ScoreMode.COMPLETE_NO_SCORES, 1f /* boost */);
+      }
+    } catch (IllegalAccessException|InvocationTargetException|IllegalArgumentException e) {
+      throw new RuntimeException("Incompatible Lucene/Solr version, needs 7.x or 8.x.");
+    }
   }
 
   public void createByteOffsetsEnumsForSpans(LeafReader leafReader, int docId, List<ByteOffsetsEnum> results) throws IOException {
@@ -74,7 +98,7 @@ public class ByteOffsetPhraseHelper extends PhraseHelper {
       }
     };
     for (Query query : getSpanQueries()) {
-      Weight weight = searcher.createWeight(searcher.rewrite(query), false, 1);
+      Weight weight = createWeight(searcher, query);
       Scorer scorer = weight.scorer(leafReader.getContext());
       if (scorer == null) {
         continue;
