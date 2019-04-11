@@ -48,8 +48,9 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         sb.insert(Math.min(extraChars + matchEnd, sb.length()), endHlTag);
         extraChars += endHlTag.length();
       }
-      String xmlFragment = truncateFragment(sb.toString());
+      String xmlFragment = sb.toString();
       String pageId = determinePage(xmlFragment, passage.getStartOffset(), content);
+      xmlFragment = truncateFragment(xmlFragment);
       snippets[i] = parseFragment(xmlFragment, pageId);
       snippets[i].setScore(passage.getScore());
     }

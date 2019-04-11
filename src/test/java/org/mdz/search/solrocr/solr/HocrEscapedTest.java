@@ -99,4 +99,11 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst)=1");
   }
+
+  @Test
+  public void testPageNumberAtBeginningOfPage() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"peramentvollere Glänzendere\"", "hl.weightMatches", "true");
+    assertQ(req, "//lst[@name='ocrHighlighting']//str[@name='page']/text()='page_109'");
+  }
+
 }
