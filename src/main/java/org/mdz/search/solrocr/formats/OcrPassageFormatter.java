@@ -119,8 +119,8 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     StringBuilder curText = new StringBuilder(curBox.text);
     while (it.hasNext()) {
       OcrBox nextBox = it.next();
-      float yDiff = Math.abs(nextBox.lry - curBox.lry);
-      if (yDiff > (0.75 * (curBox.lry - curBox.uly))) {
+      float xDiff = nextBox.lrx - curBox.lrx;
+      if (xDiff < 0) {  // New line?
         curBox.text = curText.toString();
         out.add(curBox);
         curBox = nextBox;
