@@ -117,10 +117,13 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     Iterator<OcrBox> it = boxes.iterator();
     OcrBox curBox = it.next();
     StringBuilder curText = new StringBuilder(curBox.text);
+    // Combine word boxes into a single new OCR box until we hit a linebreak
     while (it.hasNext()) {
       OcrBox nextBox = it.next();
-      float xDiff = nextBox.lrx - curBox.lrx;
-      if (xDiff < 0) {  // New line?
+      // We consider a box on a new line if its vertical distance from the current box is close to the line height
+      float lineHeight = curBox.lry - curBox.uly;
+      float yDiff = Math.abs(nextBox.uly - curBox.uly);
+      if (yDiff > (0.75 * lineHeight)) {
         curBox.text = curText.toString();
         out.add(curBox);
         curBox = nextBox;
