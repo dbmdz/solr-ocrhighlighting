@@ -15,4 +15,9 @@ public class OcrBox {
     this.lrx = lrx;
     this.lry = lry;
   }
+
+  @Override
+  public String toString() {
+    return String.format("OcrBox{text='%s', ulx=%s, uly=%s, lrx=%s, lry=%s}", text, ulx, uly, lrx, lry);
+  }
 }

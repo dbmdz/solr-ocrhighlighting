@@ -106,4 +106,14 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
     assertQ(req, "//lst[@name='ocrHighlighting']//str[@name='page']/text()='page_109'");
   }
 
+  @Test
+  public void testOverlappingMatches() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"pirate vessel\"~10", "hl.weightMatches", "true",
+                                "hl.ocr.contextSize", "0");
+    assertQ(
+        req,
+        "//lst[@name='ocrHighlighting']//str[@name='text']/text()='<em>pirates hove their vessel that the other pirates</em> had trashed'",
+        "//lst[@name='ocrHighlighting']//arr[@name='highlights']//str[@name='text']/text()='pirates hove their vessel that the other pirates'");
+  }
+
 }
