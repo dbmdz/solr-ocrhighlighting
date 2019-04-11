@@ -1,3 +1,5 @@
+![](https://i.imgur.com/5tt4mgZ.png)
+
 # solr-ocrhighlighting
 
 This Solr plugin lets you put OCR text into one or more of you documents'
@@ -12,8 +14,9 @@ values. This means that all options and query types supported by the
 works transparently with non-OCR fields and just lets the default
 implementation handle those.
 
-The plugin implements a number of usage scenarios, based on where and how the
-OCR documents are stored.
+The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0).
+It implements a number of usage scenarios,
+based on where and how the OCR documents are stored.
 **If your environment allows for a slight modification of your OCR documents,
 the last scenario (ASCII + escaped Unicode codepoints) is highly recommended.**
 It offers the most flexibility with the lowest index, memory and storage
@@ -309,14 +312,14 @@ Minimal example before masking:
 
 ```
 <l>Some content that you don't want in your Solr document</l>
-<l>Here's the content that you're interested in and want in the index for this document</l>
+<l>Here's the content you want in the index for this document</l>
 <l>And here's some extra content following it that you don't want</l>
 ```
 
 Minimal example after masking:
 ```
 <!---------------------------------------------------------->
-<l>Here's the content that you're interested in and want in the index for this document</l>
+<l>Here's the content you want in the index for this document</l>
 ```
 
 

@@ -7,7 +7,6 @@ import org.apache.lucene.analysis.CharFilter;
 import org.apache.lucene.analysis.pattern.PatternReplaceCharFilter;
 import org.apache.lucene.analysis.util.AbstractAnalysisFactory;
 import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.MultiTermAwareComponent;
 
 /**
  * CharFilter to prepare ALTO input for consumption by a
@@ -20,7 +19,7 @@ import org.apache.lucene.analysis.util.MultiTermAwareComponent;
  *   the {@link org.apache.lucene.analysis.charfilter.HTMLStripCharFilter}</li>
  * </ul>
  */
-public class AltoCharFilterFactory extends CharFilterFactory implements MultiTermAwareComponent {
+public class AltoCharFilterFactory extends CharFilterFactory {
   private static final Pattern DESC_PAT = Pattern.compile("<Description>.+</Description", Pattern.DOTALL);
   private static final Pattern CONTENT_PAT = Pattern.compile("CONTENT=['\"](.+?)['\"]");
 
@@ -32,10 +31,5 @@ public class AltoCharFilterFactory extends CharFilterFactory implements MultiTer
   public Reader create(Reader input) {
     CharFilter descFilter = new PatternReplaceCharFilter(DESC_PAT, "", input);
     return new PatternReplaceCharFilter(CONTENT_PAT, "        >$1<", descFilter);
-  }
-
-  @Override
-  public AbstractAnalysisFactory getMultiTermComponent() {
-    return this;
   }
 }

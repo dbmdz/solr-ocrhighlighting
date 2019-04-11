@@ -51,8 +51,12 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     // Copied from superclass
     // - *snip* -
     final SolrParams params = req.getParams();
-    if (!isHighlightingEnabled(params))
+    if (!isHighlightingEnabled(params)) {
       return null;
+    }
+    if (docs.size() == 0) {
+      return new SimpleOrderedMap<>();
+    }
     int[] docIDs = toDocIDs(docs);
     String[] keys = getUniqueKeys(req.getSearcher(), docIDs);
     // - *snap* -
