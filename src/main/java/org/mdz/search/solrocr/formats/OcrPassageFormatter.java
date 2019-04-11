@@ -139,6 +139,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         curBox.uly = nextBox.uly;
       }
     }
+    curBox.text = curText.toString();
     out.add(curBox);
     return out;
   }
