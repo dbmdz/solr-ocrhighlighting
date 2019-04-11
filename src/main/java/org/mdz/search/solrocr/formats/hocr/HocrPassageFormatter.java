@@ -32,12 +32,6 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
 
   @Override
   public String determinePage(String ocrFragment, int startOffset, IterableCharSequence content) {
-    if (ocrFragment != null) {
-      Matcher m = pagePat.matcher(ocrFragment);
-      if (m.find()) {
-        return m.group("pageId");
-      }
-    }
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
