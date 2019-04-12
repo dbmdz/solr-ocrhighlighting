@@ -1,5 +1,6 @@
 package org.mdz.search.solrocr.formats.alto;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,12 +39,6 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
 
   @Override
   public String determinePage(String ocrFragment, int startOffset, IterableCharSequence content) {
-    if (ocrFragment != null) {
-      Matcher m = pagePat.matcher(ocrFragment);
-      if (m.find()) {
-        return parseAttribs(m.group("attribs")).get("ID");
-      }
-    }
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
@@ -71,20 +66,6 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       sb.replace(m.start(), m.end(), content);
     }
     return sb.toString().replaceAll("</?[A-Z]?.*?>?", "");
-  }
-
-  @Override
-  protected String truncateFragment(String ocrFragment) {
-    if (ocrFragment.contains(startHlTag)) {
-      pageIter.setText(ocrFragment);
-      int start = pageIter.preceding(ocrFragment.indexOf(startHlTag));
-      int end = pageIter.following(ocrFragment.lastIndexOf(endHlTag));
-      ocrFragment = ocrFragment.substring(start, end);
-    }
-    limitIter.setText(ocrFragment);
-    int start = limitIter.preceding(ocrFragment.indexOf(startHlTag));
-    int end = limitIter.following(ocrFragment.lastIndexOf(endHlTag));
-    return ocrFragment.substring(start, end);
   }
 
   @Override
@@ -144,5 +125,15 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
             .collect(Collectors.toList()))
         .forEach(bs -> snip.addHighlightRegion(this.mergeBoxes(bs)));
     return snip;
+  }
+
+  @Override
+  protected BreakIterator getPageBreakIterator() {
+    return pageIter;
+  }
+
+  @Override
+  protected BreakIterator getLimitBreakIterator() {
+    return limitIter;
   }
 }

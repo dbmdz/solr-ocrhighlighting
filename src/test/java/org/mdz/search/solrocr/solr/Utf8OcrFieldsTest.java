@@ -68,17 +68,17 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
   public void testSingleTerm() throws Exception {
     SolrQueryRequest req = xmlQ("q", "München");
     assertQ(req,
-        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=3",
-        "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>München</em> Morgen-Ausgabe. Preſſe.'",
-        "//lst[@name='region'][1]/float[@name='ulx']/text()='0.3714'",
-        "//lst[@name='region'][1]/float[@name='uly']/text()='0.0071'",
-        "//lst[@name='region'][1]/float[@name='lrx']/text()='0.8098'",
-        "//lst[@name='region'][1]/float[@name='lry']/text()='0.1104'",
-        "count(//arr[@name='highlights'])=3",
-        "//arr[@name='highlights'][1]/arr/lst/float[@name='ulx']/text()='0.3223'",
-        "//arr[@name='highlights'][1]/arr/lst/float[@name='uly']/text()='0.1481'",
-        "//arr[@name='highlights'][1]/arr/lst/float[@name='lrx']/text()='0.4171'",
-        "//arr[@name='highlights'][1]/arr/lst/float[@name='lry']/text()='0.2071'");
+            "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=3",
+            "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>München</em>'",
+            "//lst[@name='region'][1]/float[@name='ulx']/text()='0.4949'",
+            "//lst[@name='region'][1]/float[@name='uly']/text()='0.0071'",
+            "//lst[@name='region'][1]/float[@name='lrx']/text()='0.571'",
+            "//lst[@name='region'][1]/float[@name='lry']/text()='0.028499998'",
+            "count(//arr[@name='highlights'])=3",
+            "//arr[@name='highlights'][1]/arr/lst/float[@name='ulx']/text()='0.2339'",
+            "//arr[@name='highlights'][1]/arr/lst/float[@name='uly']/text()='0.7149'",
+            "//arr[@name='highlights'][1]/arr/lst/float[@name='lrx']/text()='0.7805'",
+            "//arr[@name='highlights'][1]/arr/lst/int[@name='lry']/text()='1'");
   }
 
   @Test
