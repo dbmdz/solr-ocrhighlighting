@@ -1,5 +1,6 @@
 package org.mdz.search.solrocr.formats.hocr;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -41,18 +42,6 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
       return m.group("pageId");
     }
     return null;
-  }
-
-  @Override
-  protected String truncateFragment(String ocrFragment) {
-    pageIter.setText(ocrFragment);
-    int start = pageIter.preceding(ocrFragment.indexOf(startHlTag));
-    int end = pageIter.following(ocrFragment.lastIndexOf(endHlTag));
-    ocrFragment = ocrFragment.substring(start, end);
-    limitIter.setText(ocrFragment);
-    start = limitIter.preceding(ocrFragment.indexOf(startHlTag));
-    end = limitIter.following(ocrFragment.lastIndexOf(endHlTag));
-    return ocrFragment.substring(start, end);
   }
 
   @Override
@@ -108,5 +97,15 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
             .collect(Collectors.toList()))
         .forEach(bs -> snip.addHighlightRegion(this.mergeBoxes(bs)));
     return snip;
+  }
+
+  @Override
+  protected BreakIterator getPageBreakIterator() {
+    return pageIter;
+  }
+
+  @Override
+  protected BreakIterator getLimitBreakIterator() {
+    return limitIter;
   }
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.BreakIterator;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,7 +105,28 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
 
   /** Truncate an OCR fragment to remove undesired parts, most often from the front or end. */
   protected String truncateFragment(String ocrFragment) {
-    // Default: No-Op implementation
+    BreakIterator pageIter = getPageBreakIterator();
+    if (pageIter != null) {
+      ocrFragment = truncateFragment(ocrFragment, pageIter);
+    }
+    BreakIterator limitIter = getLimitBreakIterator();
+    if (limitIter != null) {
+      ocrFragment = truncateFragment(ocrFragment, limitIter);
+    }
+    return ocrFragment;
+  }
+
+  private String truncateFragment(String ocrFragment, BreakIterator breakIter) {
+    breakIter.setText(ocrFragment);
+    int start = ocrFragment.contains(startHlTag)
+                ? breakIter.preceding(ocrFragment.indexOf(startHlTag))
+                : 0;
+    int end = ocrFragment.contains(endHlTag)
+                ? breakIter.following(ocrFragment.lastIndexOf(endHlTag))
+                : ocrFragment.length();
+    if (start != 0 || end != ocrFragment.length()) {
+      ocrFragment = ocrFragment.substring(start, end);
+    }
     return ocrFragment;
   }
 
@@ -200,4 +222,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       return String.format("PassageMatch{start=%d, end=%d}", start, end);
     }
   }
+
+  protected abstract BreakIterator getPageBreakIterator();
+  protected abstract BreakIterator getLimitBreakIterator();
 }

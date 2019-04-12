@@ -1,6 +1,6 @@
 package org.mdz.search.solrocr.formats.mini;
 
-import java.text.StringCharacterIterator;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,27 +19,15 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern pagePat = Pattern.compile("<p xml:id=\"(?<pageId>.+?)\">");
 
   private final TagBreakIterator pageIter = new TagBreakIterator("p");
-  private final TagBreakIterator startContextIter;
-  private final TagBreakIterator endContextIter;
-  private final String contextTag;
-  private final String limitTag;
+  private final TagBreakIterator limitIter;
 
   public MiniOcrPassageFormatter(String contextTag, String limitTag, String startHlTag, String endHlTag) {
     super(startHlTag, endHlTag);
-    this.contextTag = contextTag;
-    this.startContextIter = new TagBreakIterator(contextTag);
-    this.endContextIter = new TagBreakIterator(contextTag, true);
-    this.limitTag = limitTag;
+    this.limitIter = new TagBreakIterator(limitTag);
   }
 
   @Override
   public String determinePage(String xmlFragment, int startOffset, IterableCharSequence content) {
-    if (xmlFragment != null) {
-      Matcher m = pagePat.matcher(xmlFragment);
-      if (m.find()) {
-        return m.group("pageId");
-      }
-    }
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
@@ -49,36 +37,6 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       return m.group("pageId");
     }
     return null;
-  }
-
-  @Override
-  protected String truncateFragment(String snippet) {
-    if (snippet.contains(startHlTag)) {
-      pageIter.setText(snippet);
-      int start = pageIter.preceding(snippet.indexOf(startHlTag));
-      int end = pageIter.following(snippet.lastIndexOf(endHlTag));
-      snippet = snippet.substring(start, end);
-    }
-    int startBlock = snippet.indexOf("<" + limitTag + ">");
-    if (startBlock > -1 && startBlock < snippet.indexOf(startHlTag)) {
-      snippet = snippet.substring(startBlock + limitTag.length() + 2);
-    }
-    int endBlock = snippet.lastIndexOf("</" + limitTag + ">");
-    if (endBlock > -1 && endBlock > snippet.lastIndexOf(endHlTag)) {
-      snippet = snippet.substring(0, endBlock);
-    }
-    startContextIter.setText(new StringCharacterIterator(snippet));
-    int firstWord = startContextIter.first();
-    if (firstWord > 0) {
-      snippet = snippet.substring(firstWord);
-    }
-    endContextIter.setText(new StringCharacterIterator(snippet));
-    int lastWord = endContextIter.last();
-    int contextEndTagSize = this.contextTag.length() - 3;
-    if (lastWord < snippet.length() - contextEndTagSize) {
-      snippet = snippet.substring(0, lastWord - contextEndTagSize - 1);
-    }
-    return snippet;
   }
 
   @Override
@@ -161,5 +119,15 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   @Override
   public Object format(Passage[] passages, String content) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected BreakIterator getPageBreakIterator() {
+    return pageIter;
+  }
+
+  @Override
+  protected BreakIterator getLimitBreakIterator() {
+    return limitIter;
   }
 }
