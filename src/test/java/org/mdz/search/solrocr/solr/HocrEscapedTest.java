@@ -116,4 +116,12 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
         "//lst[@name='ocrHighlighting']//arr[@name='highlights']//str[@name='text']/text()='pirates hove their vessel that the other pirates'");
   }
 
+  @Test
+  public void testAbsoluteHighlightRegions() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "Verführung", "hl.ocr.absoluteHighlights", "true");
+    assertQ(req,
+            "//lst[@name='region'][1]/int[@name='ulx']/text()=146",
+            "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=229");
+  }
+
 }

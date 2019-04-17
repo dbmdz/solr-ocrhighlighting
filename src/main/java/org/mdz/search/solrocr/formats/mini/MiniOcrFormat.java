@@ -32,7 +32,9 @@ public class MiniOcrFormat implements OcrFormat {
   }
 
   @Override
-  public OcrPassageFormatter getPassageFormatter(OcrBlock limitBlock, String prehHighlightTag, String postHighlightTag) {
-    return new MiniOcrPassageFormatter(breakTag, blockTagMapping.get(limitBlock), prehHighlightTag, postHighlightTag);
+  public OcrPassageFormatter getPassageFormatter(OcrBlock limitBlock, String prehHighlightTag, String postHighlightTag,
+                                                 boolean absoluteHighlights) {
+    return new MiniOcrPassageFormatter(breakTag, blockTagMapping.get(limitBlock), prehHighlightTag, postHighlightTag,
+                                       absoluteHighlights);
   }
 }

@@ -8,4 +8,5 @@ public interface OcrHighlightParams extends HighlightParams {
   String LIMIT_BLOCK = "hl.ocr.limitBlock";
   String PAGE_ID = "hl.ocr.pageId";
   String SCORE_BOOST_EARLY = "hl.score.boostEarly";
+  String ABSOLUTE_HIGHLIGHTS = "hl.ocr.absoluteHighlights";
 }

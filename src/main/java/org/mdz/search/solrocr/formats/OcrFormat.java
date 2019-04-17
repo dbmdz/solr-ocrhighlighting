@@ -30,5 +30,6 @@ public interface OcrFormat {
    * @param prehHighlightTag the tag to put in the snippet text before a highlighted region, e.g. &lt;em&gt;
    * @param postHighlightTag the tag to put in the snippet text after a highlighted region, e.g. &lt;/em&gt;
    */
-  OcrPassageFormatter getPassageFormatter(OcrBlock limitBlock, String prehHighlightTag, String postHighlightTag);
+  OcrPassageFormatter getPassageFormatter(OcrBlock limitBlock, String prehHighlightTag, String postHighlightTag,
+                                          boolean absoluteHighlights);
 }

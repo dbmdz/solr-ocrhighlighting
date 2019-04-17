@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
 import org.mdz.search.solrocr.util.IterableCharSequence;
@@ -23,8 +22,9 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   private final String startHlTag;
   private final String endHlTag;
 
-  public HocrPassageFormatter(String contextClass, String limitClass, String startHlTag, String endHlTag) {
-    super(startHlTag, endHlTag);
+  public HocrPassageFormatter(String contextClass, String limitClass, String startHlTag, String endHlTag,
+                              boolean absoluteHighlights) {
+    super(startHlTag, endHlTag, absoluteHighlights);
     this.pageIter = new HocrClassBreakIterator("ocr_page");
     this.limitIter = new HocrClassBreakIterator(limitClass);
     this.startHlTag = startHlTag;
@@ -90,12 +90,7 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
     int snipY = uly;
     OcrBox snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
     OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), pageId, snippetRegion);
-    hlBoxes.stream()
-        .map(cs -> cs.stream()
-            .map(b -> new OcrBox(b.text, b.ulx - snipX, b.uly - snipY,
-                                 b.lrx - snipX, b.lry - snipY))
-            .collect(Collectors.toList()))
-        .forEach(bs -> snip.addHighlightRegion(this.mergeBoxes(bs)));
+    this.addHighlightsToSnippet(hlBoxes, snip);
     return snip;
   }
 

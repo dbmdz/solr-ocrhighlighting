@@ -32,7 +32,8 @@ public class HocrFormat implements OcrFormat {
 
   @Override
   public OcrPassageFormatter getPassageFormatter(OcrBlock limitBlock, String prehHighlightTag,
-                                                 String postHighlightTag) {
-    return new HocrPassageFormatter(breakClass, blockClassMapping.get(limitBlock), prehHighlightTag, postHighlightTag);
+                                                 String postHighlightTag, boolean absoluteHighlights) {
+    return new HocrPassageFormatter(breakClass, blockClassMapping.get(limitBlock), prehHighlightTag, postHighlightTag,
+                                    absoluteHighlights);
   }
 }
