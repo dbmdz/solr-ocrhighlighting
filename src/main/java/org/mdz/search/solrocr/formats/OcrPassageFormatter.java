@@ -26,10 +26,12 @@ import org.mdz.search.solrocr.util.OcrBox;
 public abstract class OcrPassageFormatter extends PassageFormatter {
   protected final String startHlTag;
   protected final String endHlTag;
+  protected final boolean absoluteHighlights;
 
-  protected OcrPassageFormatter(String startHlTag, String endHlTag) {
+  protected OcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;
+    this.absoluteHighlights = absoluteHighlights;
   }
 
   /** Merge overlapping matches. **/
@@ -132,6 +134,18 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
 
   /** Parse an {@link OcrSnippet} from an OCR fragment. */
   protected abstract OcrSnippet parseFragment(String ocrFragment, String pageId);
+
+  protected void addHighlightsToSnippet(List<List<OcrBox>> hlBoxes, OcrSnippet snippet) {
+    final float xOffset = this.absoluteHighlights ? 0 : snippet.getSnippetRegion().ulx;
+    final float yOffset = this.absoluteHighlights ? 0 : snippet.getSnippetRegion().uly;
+    hlBoxes.stream()
+        .map(bs -> bs.stream()
+            .map(b -> new OcrBox(b.text, b.ulx - xOffset, b.uly - yOffset,
+                                 b.lrx - xOffset, b.lry - yOffset))
+            .collect(Collectors.toList()))
+        .forEach(bs -> snippet.addHighlightRegion(this.mergeBoxes(bs)));
+  }
+
 
   /** Merge adjacent OCR boxes into a single one, taking line breaks into account **/
   protected List<OcrBox> mergeBoxes(List<OcrBox> boxes) {

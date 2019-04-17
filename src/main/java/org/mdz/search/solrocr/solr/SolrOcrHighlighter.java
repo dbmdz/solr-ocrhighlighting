@@ -83,7 +83,8 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
       OcrPassageFormatter ocrFormatter = ocrFormat.getPassageFormatter(
           OcrBlock.valueOf(params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase()),
           params.get(HighlightParams.TAG_PRE, "<em>"),
-          params.get(HighlightParams.TAG_POST, "</em>"));
+          params.get(HighlightParams.TAG_POST, "</em>"),
+          params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false));
       ocrSnippets = ocrHighlighter.highlightOcrFields(
           ocrFieldNames, query, docIDs, maxPassagesOcr, ocrBreakIterator, ocrFormatter,
           params.get(OcrHighlightParams.PAGE_ID, null));

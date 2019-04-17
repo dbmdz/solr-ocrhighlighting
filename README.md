@@ -259,6 +259,8 @@ These parameters can be changed at query time:
   `block` or `page` and defaults to `page`.
 - `hl.ocr.pageId`: Only show passages from the page with this identifier. Useful if you want to implement a
   "Search on this page" feature (e.g. for the [IIIF Content Search API](https://iiif.io/api/search/1.0/)).
+- `hl.ocr.absoluteHighlights`: Return the coordinates of highlighted regions as absolute coordinates (i.e. relative to
+  the page, not the snippet region)
 
 
 ## The MiniOCR format

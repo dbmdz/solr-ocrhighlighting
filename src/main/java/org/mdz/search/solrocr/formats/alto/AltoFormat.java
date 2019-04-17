@@ -33,7 +33,8 @@ public class AltoFormat implements OcrFormat {
 
   @Override
   public OcrPassageFormatter getPassageFormatter(OcrBlock limitBlock, String prehHighlightTag,
-      String postHighlightTag) {
-    return new AltoPassageFormatter(breakTag, blockTagMapping.get(limitBlock), prehHighlightTag, postHighlightTag);
+                                                 String postHighlightTag, boolean absoluteHighlights) {
+    return new AltoPassageFormatter(breakTag, blockTagMapping.get(limitBlock), prehHighlightTag, postHighlightTag,
+                                    absoluteHighlights);
   }
 }

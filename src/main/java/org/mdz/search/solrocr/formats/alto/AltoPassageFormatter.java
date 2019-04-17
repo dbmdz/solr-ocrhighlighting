@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.text.StringEscapeUtils;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
 import org.mdz.search.solrocr.formats.OcrSnippet;
@@ -23,8 +22,9 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
   private final TagBreakIterator pageIter = new TagBreakIterator("Page");
   private final TagBreakIterator limitIter;
 
-  protected AltoPassageFormatter(String contextTag, String limitTag, String startHlTag, String endHlTag) {
-    super(startHlTag, endHlTag);
+  protected AltoPassageFormatter(String contextTag, String limitTag, String startHlTag, String endHlTag,
+                                 boolean absoluteHighlights) {
+    super(startHlTag, endHlTag, absoluteHighlights);
     this.limitIter = new TagBreakIterator(limitTag);
   }
 
@@ -118,12 +118,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         extractText(ocrFragment).replaceAll("@@STARTHLTAG@@", startHlTag)
                                 .replaceAll("@@ENDHLTAG@@", endHlTag)).trim();
     OcrSnippet snip = new OcrSnippet(text,  pageId, snippetRegion);
-    hlBoxes.stream()
-        .map(bs -> bs.stream()
-            .map(b -> new OcrBox(b.text, b.ulx - snipX, b.uly - snipY,
-                                 b.lrx - snipX, b.lry - snipY))
-            .collect(Collectors.toList()))
-        .forEach(bs -> snip.addHighlightRegion(this.mergeBoxes(bs)));
+    this.addHighlightsToSnippet(hlBoxes, snip);
     return snip;
   }
 

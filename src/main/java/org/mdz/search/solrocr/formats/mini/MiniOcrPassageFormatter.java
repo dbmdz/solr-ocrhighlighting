@@ -21,8 +21,9 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   private final TagBreakIterator pageIter = new TagBreakIterator("p");
   private final TagBreakIterator limitIter;
 
-  public MiniOcrPassageFormatter(String contextTag, String limitTag, String startHlTag, String endHlTag) {
-    super(startHlTag, endHlTag);
+  public MiniOcrPassageFormatter(String contextTag, String limitTag, String startHlTag, String endHlTag,
+                                 boolean absoluteHighlights) {
+    super(startHlTag, endHlTag, absoluteHighlights);
     this.limitIter = new TagBreakIterator(limitTag);
   }
 
@@ -79,8 +80,8 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       }
     }
     OcrBox snippetRegion;
-    final float snipX = ulx;
-    final float snipY = uly;
+    final float xOffset = this.absoluteHighlights ? 0 : ulx;
+    final float yOffset = this.absoluteHighlights ? 0 : uly;
     final float snipWidth = lrx - ulx;
     final float snipHeight = lry - uly;
     if (lrx < 1) {
@@ -89,10 +90,10 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       hlBoxes = hlBoxes.stream()
         .map(cs -> cs.stream()
             .map(b -> new OcrBox(b.text,
-                                 truncateFloat((b.ulx - snipX) / snipWidth),
-                                 truncateFloat((float) ((b.uly - snipY) / snipHeight)),
-                                 truncateFloat((b.lrx - snipX) / snipWidth),
-                                 truncateFloat((b.lry - snipY) / snipHeight)))
+                                 truncateFloat((b.ulx - xOffset) / snipWidth),
+                                 truncateFloat((float) ((b.uly - yOffset) / snipHeight)),
+                                 truncateFloat((b.lrx - xOffset) / snipWidth),
+                                 truncateFloat((b.lry - yOffset) / snipHeight)))
            .collect(Collectors.toList()))
         .map(this::mergeBoxes)
         .collect(Collectors.toList());
@@ -101,8 +102,8 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       hlBoxes = hlBoxes.stream()
         .map(cs -> cs.stream()
             .map(b -> new OcrBox(b.text,
-                                 (b.ulx - snipX), (b.uly - snipY),
-                                 (b.lrx - snipX), (b.lry - snipY)))
+                                 (b.ulx - xOffset), (b.uly - yOffset),
+                                 (b.lrx - xOffset), (b.lry - yOffset)))
             .collect(Collectors.toList()))
         .map(this::mergeBoxes)
         .collect(Collectors.toList());
