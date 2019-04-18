@@ -10,13 +10,6 @@ services:
       - data-solr:/opt/solr/server/solr/ocrtest
       - ./google1000:/google1000
 
-  iiif-image:
-    command: /bin/iiif-server -host 0.0.0.0 -config /data/go-iiif-conf.json
-    build: iiif-image
-    volumes:
-      - ./iiif-image:/data
-      - ./google1000:/google1000
-
   iiif-prezi:
     command: pipenv run prod
     build: iiif-prezi
@@ -25,7 +18,7 @@ services:
     environment:
       - CFG_SOLR_HANDLER=http://solr:8983/solr/ocrtest/select
       - CFG_SERVER_NAME=localhost:8181
-      - CFG_IMAGE_API_BASE=http://localhost:8181/iiif/image
+      - CFG_IMAGE_API_BASE=https://ocrhl.jbaiter.de/iiif/image
       - CFG_GOOGLE1000_PATH=/google1000
       - CFG_APP_PATH=/iiif/presentation
 

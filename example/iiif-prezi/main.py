@@ -206,7 +206,7 @@ async def search(request: Request, volume_id) -> HTTPResponse:
 
 @app.route('/<volume_id>/manifest', methods=['GET', 'OPTIONS'])
 async def get_manifest(request, volume_id):
-    hocr_path = Path(app.config.get('GOOGLE1000_PATH', '../google1000')) / volume_id / 'hOCR.html'
+    hocr_path = Path(app.config.get('GOOGLE1000_PATH', '../google1000')) / f'{volume_id}.hocr'
     return json(make_manifest(volume_id, hocr_path))
 
 
