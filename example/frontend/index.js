@@ -15,6 +15,7 @@ import 'preact-material-components/Slider/style.css';
 import 'preact-material-components/FormField/style.css';
 
 
+var IMAGE_API_BASE = 'https://ocrhl.jbaiter.de'
 if (typeof window !== 'undefined') {
   var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
 } else {
@@ -34,7 +35,7 @@ class SnippetView extends Component {
     const { docId } = this.props;
     const { page } = this.props.snippet;
     const pageId = String(parseInt(page.split("_")[1]) - 1).padStart(4, "0");
-    return `${APP_BASE}/iiif/image/${docId}/Image_${pageId}.JPEG`;
+    return `${IMAGE_API_BASE}/iiif/image/${docId}/Image_${pageId}.JPEG`;
 
   }
 
