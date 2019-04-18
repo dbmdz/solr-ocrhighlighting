@@ -86,8 +86,6 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
         currentHl = null;
       }
     }
-    int snipX = ulx;
-    int snipY = uly;
     OcrBox snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
     OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), pageId, snippetRegion);
     this.addHighlightsToSnippet(hlBoxes, snip);
