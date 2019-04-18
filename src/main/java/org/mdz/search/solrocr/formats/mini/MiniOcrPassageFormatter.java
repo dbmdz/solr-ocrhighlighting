@@ -91,7 +91,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
         .map(cs -> cs.stream()
             .map(b -> new OcrBox(b.text,
                                  truncateFloat((b.ulx - xOffset) / snipWidth),
-                                 truncateFloat((float) ((b.uly - yOffset) / snipHeight)),
+                                 truncateFloat((b.uly - yOffset) / snipHeight),
                                  truncateFloat((b.lrx - xOffset) / snipWidth),
                                  truncateFloat((b.lry - yOffset) / snipHeight)))
            .collect(Collectors.toList()))

@@ -111,8 +111,6 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         currentHl = null;
       }
     }
-    final int snipX = ulx;
-    final int snipY = uly;
     OcrBox snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
     String text = StringEscapeUtils.unescapeXml(
         extractText(ocrFragment).replaceAll("@@STARTHLTAG@@", startHlTag)
