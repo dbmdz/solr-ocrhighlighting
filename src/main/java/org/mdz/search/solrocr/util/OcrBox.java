@@ -6,14 +6,16 @@ public class OcrBox {
   public float uly;
   public float lrx;
   public float lry;
+  public boolean isHighlight;
 
 
-  public OcrBox(String text, float ulx, float uly, float lrx, float lry) {
+  public OcrBox(String text, float ulx, float uly, float lrx, float lry, boolean isHighlight) {
     this.text = text;
     this.ulx = ulx;
     this.uly = uly;
     this.lrx = lrx;
     this.lry = lry;
+    this.isHighlight = isHighlight;
   }
 
   @Override

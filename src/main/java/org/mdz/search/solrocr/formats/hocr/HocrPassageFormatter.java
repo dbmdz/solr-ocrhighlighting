@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
-import org.mdz.search.solrocr.formats.OcrSnippet;
 import org.mdz.search.solrocr.util.IterableCharSequence;
 import org.mdz.search.solrocr.util.OcrBox;
 
@@ -45,51 +44,30 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   }
 
   @Override
-  protected OcrSnippet parseFragment(String ocrFragment, String pageId) {
-    List<List<OcrBox>> hlBoxes = new ArrayList<>();
-    int ulx = Integer.MAX_VALUE;
-    int uly = Integer.MAX_VALUE;
-    int lrx = -1;
-    int lry = -1;
-    List<OcrBox> currentHl = null;
+  protected List<OcrBox> parseWords(String ocrFragment) {
+    List<OcrBox> wordBoxes = new ArrayList<>();
     Matcher m = wordPat.matcher(ocrFragment);
+    boolean inHighlight = false;
     while (m.find()) {
       int x0 = Integer.valueOf(m.group("ulx"));
       int y0 = Integer.valueOf(m.group("uly"));
       int x1 = Integer.valueOf(m.group("lrx"));
       int y1 = Integer.valueOf(m.group("lry"));
-      if (x0 < ulx) {
-        ulx = x0;
-      }
-      if (y0 < uly) {
-        uly = y0;
-      }
-      if (x1 > lrx) {
-        lrx = x1;
-      }
-      if (y1 > lry) {
-        lry = y1;
-      }
       String text = m.group("text");
       if (text.contains(startHlTag)) {
-        currentHl = new ArrayList<>();
+        inHighlight = true;
       }
-      if (currentHl != null) {
-        currentHl.add(new OcrBox(text.replace(startHlTag, "").replace(endHlTag, ""),
-                                 x0, y0, x1, y1));
-      }
-      if (currentHl != null
-          && (text.contains(endHlTag)
-              || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(),ocrFragment.length()))
-                            .equals(endHlTag))) {
-        hlBoxes.add(currentHl);
-        currentHl = null;
+      wordBoxes.add(new OcrBox(text.replace(startHlTag, "").replace(endHlTag, ""),
+                               x0, y0, x1, y1, inHighlight));
+      boolean endOfHl = (
+          text.contains(endHlTag)
+          || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(), ocrFragment.length()))
+              .equals(endHlTag));
+      if (endOfHl) {
+        inHighlight = false;
       }
     }
-    OcrBox snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
-    OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), pageId, snippetRegion);
-    this.addHighlightsToSnippet(hlBoxes, snip);
-    return snip;
+    return wordBoxes;
   }
 
   @Override
