@@ -133,7 +133,41 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
   }
 
   /** Parse an {@link OcrSnippet} from an OCR fragment. */
-  protected abstract OcrSnippet parseFragment(String ocrFragment, String pageId);
+  protected OcrSnippet parseFragment(String ocrFragment, String pageId) {
+    List<List<OcrBox>> hlBoxes = new ArrayList<>();
+    List<OcrBox> wordBoxes = this.parseWords(ocrFragment);
+
+    // Get highlighted spans
+    List<OcrBox> currentHl = null;
+    for (OcrBox wordBox : wordBoxes) {
+      if (wordBox.isHighlight) {
+        if (currentHl == null) {
+          currentHl = new ArrayList<>();
+        }
+        currentHl.add(wordBox);
+      } else if (currentHl != null) {
+        hlBoxes.add(currentHl);
+        currentHl = null;
+      }
+    }
+    if (currentHl != null) {
+      hlBoxes.add(currentHl);
+    }
+
+    // Determine the snippet size
+    float snipUlx = wordBoxes.stream().map(b -> b.ulx).min(Float::compareTo).get();
+    float snipUly = wordBoxes.stream().map(b -> b.uly).min(Float::compareTo).get();
+    float snipLrx = wordBoxes.stream().map(b -> b.lrx).max(Float::compareTo).get();
+    float snipLry = wordBoxes.stream().map(b -> b.lry).max(Float::compareTo).get();
+    OcrBox snippetRegion = new OcrBox(null, snipUlx, snipUly, snipLrx, snipLry, false);
+    OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), pageId, snippetRegion);
+    this.addHighlightsToSnippet(hlBoxes, snip);
+    return snip;
+  }
+
+
+  /** Parse word boxes from an OCR fragment. */
+  protected abstract List<OcrBox> parseWords(String ocrFragment);
 
   protected void addHighlightsToSnippet(List<List<OcrBox>> hlBoxes, OcrSnippet snippet) {
     final float xOffset = this.absoluteHighlights ? 0 : snippet.getSnippetRegion().ulx;
@@ -141,7 +175,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     hlBoxes.stream()
         .map(bs -> bs.stream()
             .map(b -> new OcrBox(b.text, b.ulx - xOffset, b.uly - yOffset,
-                                 b.lrx - xOffset, b.lry - yOffset))
+                                 b.lrx - xOffset, b.lry - yOffset, b.isHighlight))
             .collect(Collectors.toList()))
         .forEach(bs -> snippet.addHighlightRegion(this.mergeBoxes(bs)));
   }

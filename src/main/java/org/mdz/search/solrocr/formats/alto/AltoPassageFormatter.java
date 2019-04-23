@@ -9,12 +9,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.text.StringEscapeUtils;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
-import org.mdz.search.solrocr.formats.OcrSnippet;
 import org.mdz.search.solrocr.util.IterableCharSequence;
 import org.mdz.search.solrocr.util.OcrBox;
 import org.mdz.search.solrocr.util.TagBreakIterator;
 
 public class AltoPassageFormatter extends OcrPassageFormatter {
+
+  private final static String START_HL = "@@STARTHLTAG@@";
+  private final static String END_HL = "@@ENDHLTAG@@";
   private final static Pattern pagePat = Pattern.compile("<Page ?(?<attribs>.+?)/?>");
   private final static Pattern wordPat = Pattern.compile("<String ?(?<attribs>.+?)/?>");
   private final static Pattern attribPat = Pattern.compile("(?<key>[A-Z]+?)=\"(?<val>.+?)\"");
@@ -50,13 +52,18 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     return null;
   }
 
-  private String extractText(String altoFragment) {
+  @Override
+  protected String getTextFromXml(String altoFragment) {
+    // NOTE: We have to replace the original start/end highlight tags with non-XML placeholders so we don't break
+    //       our rudimentary XML "parsing" to get to the attributes
     StringBuilder sb = new StringBuilder(
         altoFragment
-        .replaceAll("<SP.*?>", " ")
-        .replaceAll("(</?)?TextLine.*?>", " ")
-        .replaceAll("\n", "")
-        .replaceAll("\\s+", " "));
+            .replaceAll(startHlTag, START_HL)
+            .replaceAll(endHlTag, END_HL)
+            .replaceAll("<SP.*?>", " ")
+            .replaceAll("(</?)?TextLine.*?>", " ")
+            .replaceAll("\n", "")
+            .replaceAll("\\s+", " "));
     while (true) {
       Matcher m = wordPat.matcher(sb);
       if (!m.find()) {
@@ -65,59 +72,43 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       String content = parseAttribs(m.group("attribs")).get("CONTENT");
       sb.replace(m.start(), m.end(), content);
     }
-    return sb.toString().replaceAll("</?[A-Z]?.*?>?", "");
+    return StringEscapeUtils.unescapeXml(sb.toString().replaceAll("</?[A-Z]?.*?>?", ""))
+        .trim()
+        .replaceAll(START_HL, startHlTag)
+        .replaceAll(END_HL, endHlTag);
   }
 
   @Override
-  protected OcrSnippet parseFragment(String ocrFragment, String pageId) {
-    List<List<OcrBox>> hlBoxes = new ArrayList<>();
-    int ulx = Integer.MAX_VALUE;
-    int uly = Integer.MAX_VALUE;
-    int lrx = -1;
-    int lry = -1;
-    ocrFragment = ocrFragment.replaceAll(startHlTag, "@@STARTHLTAG@@")
-                             .replaceAll(endHlTag, "@@ENDHLTAG@@");
+  protected List<OcrBox> parseWords(String ocrFragment) {
+    // NOTE: We have to replace the original start/end highlight tags with non-XML placeholders so we don't break
+    //       our rudimentary XML "parsing" to get to the attributes
+    ocrFragment = ocrFragment
+        .replaceAll(startHlTag, START_HL)
+        .replaceAll(endHlTag, END_HL);
+    List<OcrBox> wordBoxes = new ArrayList<>();
     Matcher m = wordPat.matcher(ocrFragment);
-    List<OcrBox> currentHl = null;
+    boolean inHighlight = false;
     while (m.find()) {
       Map<String, String> attribs = parseAttribs(m.group("attribs"));
       int x = Integer.parseInt(attribs.get("HPOS"));
       int y = Integer.parseInt(attribs.get("VPOS"));
       int w = Integer.parseInt(attribs.get("WIDTH"));
       int h = Integer.parseInt(attribs.get("HEIGHT"));
-      if (x < ulx) {
-        ulx = x;
-      }
-      if (y < uly) {
-        uly = y;
-      }
-      if ((x + w) > lrx) {
-        lrx = x + w;
-      }
-      if ((y + h) > lry) {
-        lry = y + h;
-      }
       String text = attribs.get("CONTENT");
-      if (text.contains("@@STARTHLTAG@@")) {
-        currentHl = new ArrayList<>();
+      if (text.contains(START_HL)) {
+        inHighlight = true;
       }
-      if (currentHl != null) {
-        currentHl.add(new OcrBox(text.replace("@@STARTHLTAG@@", "")
-                                     .replace("@@ENDHLTAG@@", ""),
-                                 x, y, x + w, y + h));
-      }
-      if (text.contains("@@ENDHLTAG@@") && currentHl != null) {
-        hlBoxes.add(currentHl);
-        currentHl = null;
+      wordBoxes.add(new OcrBox(text.replace(START_HL, "")
+                                   .replace(END_HL, ""),
+                               x, y, x + w, y + h, inHighlight));
+      boolean endOfHl = (
+          text.contains(END_HL)
+          || ocrFragment.substring(m.end(), Math.min(m.end() + END_HL.length(), ocrFragment.length())).equals(END_HL));
+      if (endOfHl) {
+        inHighlight = false;
       }
     }
-    OcrBox snippetRegion = new OcrBox(null, ulx, uly, lrx, lry);
-    String text = StringEscapeUtils.unescapeXml(
-        extractText(ocrFragment).replaceAll("@@STARTHLTAG@@", startHlTag)
-                                .replaceAll("@@ENDHLTAG@@", endHlTag)).trim();
-    OcrSnippet snip = new OcrSnippet(text,  pageId, snippetRegion);
-    this.addHighlightsToSnippet(hlBoxes, snip);
-    return snip;
+    return wordBoxes;
   }
 
   @Override
