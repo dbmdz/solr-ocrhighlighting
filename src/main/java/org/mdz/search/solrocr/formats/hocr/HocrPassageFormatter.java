@@ -49,10 +49,10 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
     Matcher m = wordPat.matcher(ocrFragment);
     boolean inHighlight = false;
     while (m.find()) {
-      int x0 = Integer.valueOf(m.group("ulx"));
-      int y0 = Integer.valueOf(m.group("uly"));
-      int x1 = Integer.valueOf(m.group("lrx"));
-      int y1 = Integer.valueOf(m.group("lry"));
+      int x0 = Integer.parseInt(m.group("ulx"));
+      int y0 = Integer.parseInt(m.group("uly"));
+      int x1 = Integer.parseInt(m.group("lrx"));
+      int y1 = Integer.parseInt(m.group("lry"));
       String text = m.group("text");
       if (text.contains(startHlTag)) {
         inHighlight = true;
