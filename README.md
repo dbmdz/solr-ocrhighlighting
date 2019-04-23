@@ -2,7 +2,7 @@
 
 # solr-ocrhighlighting
 
-This Solr plugin lets you put OCR text into one or more of you documents'
+This Solr plugin lets you put word-level OCR text into one or more of you documents'
 fields and then allows you to obtain structured highlighting data with the text
 and its position on the page at query time. All this without having to store
 the OCR data in the index itself, but at arbitrary external locations instead.
