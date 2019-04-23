@@ -3,6 +3,7 @@ package org.mdz.search.solrocr.formats.hocr;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
@@ -21,11 +22,11 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   private final String startHlTag;
   private final String endHlTag;
 
-  public HocrPassageFormatter(String contextClass, String limitClass, String startHlTag, String endHlTag,
+  public HocrPassageFormatter(Set<String> limitClasses, String startHlTag, String endHlTag,
                               boolean absoluteHighlights) {
     super(startHlTag, endHlTag, absoluteHighlights);
     this.pageIter = new HocrClassBreakIterator("ocr_page");
-    this.limitIter = new HocrClassBreakIterator(limitClass);
+    this.limitIter = new HocrClassBreakIterator(limitClasses);
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;
   }
