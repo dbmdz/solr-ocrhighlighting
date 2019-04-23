@@ -1,19 +1,25 @@
 package org.mdz.search.solrocr.formats.hocr;
 
+import com.google.common.collect.ImmutableSet;
 import java.text.BreakIterator;
 import java.text.CharacterIterator;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HocrClassBreakIterator extends BreakIterator {
   private final static Pattern CLASS_PAT = Pattern.compile("class=['\"](?<class>ocr.+?)['\"]");
-  private final String breakClass;
+  private final Set<String> breakClasses;
 
   private CharacterIterator text;
   private int current;
 
   public HocrClassBreakIterator(String breakClass) {
-    this.breakClass = breakClass;
+    this.breakClasses = ImmutableSet.of(breakClass);
+  }
+
+  public HocrClassBreakIterator(Set<String> breakClasses) {
+    this.breakClasses = breakClasses;
   }
 
   @Override
@@ -43,7 +49,7 @@ public class HocrClassBreakIterator extends BreakIterator {
     String fullTag = "";
     String hocrClass = "";
     StringBuilder sb = null;
-    while(!hocrClass.equals(breakClass)) {
+    while(!breakClasses.contains(hocrClass)) {
       char c = this.text.current();
       if (c == '<') {
         sb = new StringBuilder();
@@ -80,7 +86,7 @@ public class HocrClassBreakIterator extends BreakIterator {
     String fullTag = "";
     String hocrClass = "";
     StringBuilder sb = null;
-    while(!hocrClass.equals(breakClass)) {
+    while(!breakClasses.contains(hocrClass)) {
       char c = this.text.current();
       if (c == '>') {
         sb = new StringBuilder();
