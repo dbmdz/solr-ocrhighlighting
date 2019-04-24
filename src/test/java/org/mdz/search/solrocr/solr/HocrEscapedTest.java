@@ -124,4 +124,11 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
             "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=229");
   }
 
+  @Test
+  public void testLimitBlockHonored() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "Japan", "hl.ocr.absoluteHighlights", "true");
+    assertQ(req,
+            "(//arr[@name='snippets']/lst/str[@name='text']/text())[3]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of<em>Japan</em>'");
+  }
+
 }

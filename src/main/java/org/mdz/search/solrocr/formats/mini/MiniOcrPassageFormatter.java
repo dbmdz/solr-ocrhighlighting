@@ -1,6 +1,5 @@
 package org.mdz.search.solrocr.formats.mini;
 
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,12 +18,9 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern pagePat = Pattern.compile("<p xml:id=\"(?<pageId>.+?)\">");
 
   private final TagBreakIterator pageIter = new TagBreakIterator("p");
-  private final TagBreakIterator limitIter;
 
-  public MiniOcrPassageFormatter(String contextTag, String limitTag, String startHlTag, String endHlTag,
-                                 boolean absoluteHighlights) {
+  public MiniOcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
     super(startHlTag, endHlTag, absoluteHighlights);
-    this.limitIter = new TagBreakIterator(limitTag);
   }
 
   @Override
@@ -100,15 +96,5 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   @Override
   public Object format(Passage[] passages, String content) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected BreakIterator getPageBreakIterator() {
-    return pageIter;
-  }
-
-  @Override
-  protected BreakIterator getLimitBreakIterator() {
-    return limitIter;
   }
 }

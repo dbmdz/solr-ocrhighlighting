@@ -4,18 +4,20 @@ import java.text.BreakIterator;
 import java.text.CharacterIterator;
 
 /**
- * A meta break iterator that wraps another {@link BreakIterator} and aggregates its breaks to form larger contexts.
+ * A meta break iterator that wraps other {@link BreakIterator}s and aggregates their breaks to form larger contexts.
  *
  * NOTE: This class is **only** intended to be used with Solr/Lucene highlighters.
  * It only implements `getText`, `first`, `last`, `preceding` and `following`.
  */
 public class ContextBreakIterator extends BreakIterator {
   private final BreakIterator baseIter;
+  private final BreakIterator limitIter;
   private final int context;
 
   /** Wrap another BreakIterator and configure the output context size */
-  public ContextBreakIterator(BreakIterator baseIter, int contextSize) {
+  public ContextBreakIterator(BreakIterator baseIter, BreakIterator limitIter, int contextSize) {
     this.baseIter = baseIter;
+    this.limitIter = limitIter;
     this.context = contextSize;
   }
 
@@ -36,27 +38,33 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int next() {
+    int limit = this.limitIter.following(this.baseIter.current());
     for (int i=0; i < context * 2 + 1; i++) {
-      this.baseIter.next();
+      if (this.baseIter.next() >= limit) {
+        return limit;
+      };
     }
     return this.baseIter.current();
   }
 
   @Override
   public int previous() {
+    int limit = this.limitIter.preceding(this.baseIter.current());
     for (int i=0; i < context * 2 + 1; i++) {
-      this.baseIter.previous();
+      if (this.baseIter.previous() <= limit) {
+        return limit;
+      };
     }
     return this.baseIter.current();
   }
 
   @Override
   public int following(int offset) {
+    int limit = this.limitIter.following(offset);
     this.baseIter.following(offset);
     for (int i=0; i < context; i++) {
-      this.baseIter.next();
-      if (this.baseIter.current() == this.baseIter.getText().getEndIndex()) {
-        break;
+      if (this.baseIter.next() >= limit) {
+        return limit;
       }
     }
     return this.baseIter.current();
@@ -64,9 +72,12 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int preceding(int offset) {
+    int limit = this.limitIter.preceding(offset);
     this.baseIter.preceding(offset);
     for (int i=0; i < context; i++) {
-      this.baseIter.previous();
+      if (this.baseIter.previous() <= limit) {
+        return limit;
+      }
     }
     return this.baseIter.current();
   }
@@ -84,5 +95,6 @@ public class ContextBreakIterator extends BreakIterator {
   @Override
   public void setText(CharacterIterator newText) {
     baseIter.setText(newText);
+    limitIter.setText(newText);
   }
 }

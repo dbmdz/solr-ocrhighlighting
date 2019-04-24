@@ -76,12 +76,11 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
             .filter(f -> ocrHighlighter.getFlags(f).contains(HighlightFlag.WEIGHT_MATCHES))
             .forEach(field -> highlightFieldWarnings.put(field, NO_WEIGHT_MATCHES_SUPPORT_MSG));
       }
-      ocrFormat.setBreakParameters(
+      BreakIterator ocrBreakIterator = ocrFormat.getBreakIterator(
           OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()),
-          params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
-      BreakIterator ocrBreakIterator = ocrFormat.getBreakIterator();
-      OcrPassageFormatter ocrFormatter = ocrFormat.getPassageFormatter(
           OcrBlock.valueOf(params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase()),
+          params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
+      OcrPassageFormatter ocrFormatter = ocrFormat.getPassageFormatter(
           params.get(HighlightParams.TAG_PRE, "<em>"),
           params.get(HighlightParams.TAG_POST, "</em>"),
           params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false));

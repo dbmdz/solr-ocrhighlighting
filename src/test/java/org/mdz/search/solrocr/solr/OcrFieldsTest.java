@@ -133,7 +133,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
   public void testWildcardQueryWithWildcardOnly() throws Exception {
     SolrQueryRequest req = xmlQ("q", "*");
     assertQ(req,
-        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=10");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=0");
   }
 
   @Test

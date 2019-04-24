@@ -1,5 +1,11 @@
 package org.mdz.search.solrocr.formats;
 
 public enum OcrBlock {
-  WORD, LINE, BLOCK, PARAGRAPH, SECTION, PAGE
+  /* Order matters: From top of the page layout hierarchy to bottom */
+  PAGE,
+  BLOCK,
+  SECTION,
+  PARAGRAPH,
+  LINE,
+  WORD;
 }

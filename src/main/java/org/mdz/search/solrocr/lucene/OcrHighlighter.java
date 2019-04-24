@@ -207,6 +207,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
     for (int d=0; d < docIds.length; d++) {
       OcrHighlightResult hl = new OcrHighlightResult();
       for (int f = 0; f < fields.length; f++) {
+        if (snippetCountsByField[f][d] <= 0) {
+          continue;
+        }
         hl.addSnippetsForField(fields[f], highlightDocsInByField[f][d]);
         hl.addSnippetCountForField(fields[f], snippetCountsByField[f][d]);
       }
