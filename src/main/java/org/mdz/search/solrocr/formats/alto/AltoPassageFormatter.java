@@ -1,6 +1,5 @@
 package org.mdz.search.solrocr.formats.alto;
 
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,12 +21,9 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
   private final static Pattern attribPat = Pattern.compile("(?<key>[A-Z]+?)=\"(?<val>.+?)\"");
 
   private final TagBreakIterator pageIter = new TagBreakIterator("Page");
-  private final TagBreakIterator limitIter;
 
-  protected AltoPassageFormatter(String contextTag, String limitTag, String startHlTag, String endHlTag,
-                                 boolean absoluteHighlights) {
+  protected AltoPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
     super(startHlTag, endHlTag, absoluteHighlights);
-    this.limitIter = new TagBreakIterator(limitTag);
   }
 
   private Map<String, String> parseAttribs(String attribStr) {
@@ -109,15 +105,5 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       }
     }
     return wordBoxes;
-  }
-
-  @Override
-  protected BreakIterator getPageBreakIterator() {
-    return pageIter;
-  }
-
-  @Override
-  protected BreakIterator getLimitBreakIterator() {
-    return limitIter;
   }
 }

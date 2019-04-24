@@ -18,24 +18,17 @@ public class HocrFormat implements OcrFormat {
       OcrBlock.LINE, ImmutableSet.of("ocr_line", "ocrx_line"),
       OcrBlock.WORD, ImmutableSet.of("ocrx_word"));
 
-  private Set<String> breakClasses = blockClassMapping.get(OcrBlock.LINE);
-  private int contextSize = 2;
-
   @Override
-  public void setBreakParameters(OcrBlock breakBlock, int contextSize) {
-    this.contextSize = contextSize;
-    this.breakClasses = blockClassMapping.get(breakBlock);
+  public BreakIterator getBreakIterator(OcrBlock breakBlock, OcrBlock limitBlock, int contextSize) {
+    Set<String> breakClasses = blockClassMapping.get(breakBlock);
+    Set<String> limitClasses = blockClassMapping.get(limitBlock);
+    return new ContextBreakIterator(new HocrClassBreakIterator(breakClasses), new HocrClassBreakIterator(limitClasses),
+                                    contextSize);
   }
 
   @Override
-  public BreakIterator getBreakIterator() {
-    return new ContextBreakIterator(new HocrClassBreakIterator(breakClasses), contextSize);
-  }
-
-  @Override
-  public OcrPassageFormatter getPassageFormatter(OcrBlock limitBlock, String prehHighlightTag,
-                                                 String postHighlightTag, boolean absoluteHighlights) {
-    return new HocrPassageFormatter(
-        blockClassMapping.get(limitBlock), prehHighlightTag, postHighlightTag, absoluteHighlights);
+  public OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag,
+                                                 boolean absoluteHighlights) {
+    return new HocrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights);
   }
 }

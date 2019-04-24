@@ -1,9 +1,7 @@
 package org.mdz.search.solrocr.formats.hocr;
 
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.mdz.search.solrocr.formats.OcrPassageFormatter;
@@ -18,15 +16,12 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
       "<div.+?class=['\"]ocr_page['\"].+?id=['\"](?<pageId>.+?)['\"]");
 
   private final HocrClassBreakIterator pageIter;
-  private final HocrClassBreakIterator limitIter;
   private final String startHlTag;
   private final String endHlTag;
 
-  public HocrPassageFormatter(Set<String> limitClasses, String startHlTag, String endHlTag,
-                              boolean absoluteHighlights) {
+  public HocrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
     super(startHlTag, endHlTag, absoluteHighlights);
     this.pageIter = new HocrClassBreakIterator("ocr_page");
-    this.limitIter = new HocrClassBreakIterator(limitClasses);
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;
   }
@@ -69,15 +64,5 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
       }
     }
     return wordBoxes;
-  }
-
-  @Override
-  protected BreakIterator getPageBreakIterator() {
-    return pageIter;
-  }
-
-  @Override
-  protected BreakIterator getLimitBreakIterator() {
-    return limitIter;
   }
 }

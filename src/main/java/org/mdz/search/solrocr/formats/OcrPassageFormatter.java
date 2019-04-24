@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.BreakIterator;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,12 +75,13 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
           extraChars += endHlTag.length();
         }
       }
-      String fullFragment = sb.toString();
-      String xmlFragment = truncateFragment(fullFragment);
-      int adjustedStart = passage.getStartOffset() + fullFragment.indexOf(xmlFragment);
-      String pageId = determinePage(xmlFragment, adjustedStart, content);
-      snippets[i] = parseFragment(xmlFragment, pageId);
-      snippets[i].setScore(passage.getScore());
+      String xmlFragment = sb.toString();
+      String pageId = determinePage(xmlFragment, passage.getStartOffset(), content);
+      OcrSnippet snip = parseFragment(xmlFragment, pageId);
+      if (snip != null) {
+        snippets[i] = snip;
+        snippets[i].setScore(passage.getScore());
+      }
     }
     return snippets;
   }
@@ -105,37 +105,13 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
   /** Determine the id of the page an OCR fragment resides on. */
   public abstract String determinePage(String ocrFragment, int startOffset, IterableCharSequence content);
 
-  /** Truncate an OCR fragment to remove undesired parts, most often from the front or end. */
-  protected String truncateFragment(String ocrFragment) {
-    BreakIterator pageIter = getPageBreakIterator();
-    if (pageIter != null) {
-      ocrFragment = truncateFragment(ocrFragment, pageIter);
-    }
-    BreakIterator limitIter = getLimitBreakIterator();
-    if (limitIter != null) {
-      ocrFragment = truncateFragment(ocrFragment, limitIter);
-    }
-    return ocrFragment;
-  }
-
-  private String truncateFragment(String ocrFragment, BreakIterator breakIter) {
-    breakIter.setText(ocrFragment);
-    int start = ocrFragment.contains(startHlTag)
-                ? breakIter.preceding(ocrFragment.indexOf(startHlTag))
-                : 0;
-    int end = ocrFragment.contains(endHlTag)
-                ? breakIter.following(ocrFragment.lastIndexOf(endHlTag))
-                : ocrFragment.length();
-    if (start != 0 || end != ocrFragment.length()) {
-      ocrFragment = ocrFragment.substring(start, end);
-    }
-    return ocrFragment;
-  }
-
   /** Parse an {@link OcrSnippet} from an OCR fragment. */
   protected OcrSnippet parseFragment(String ocrFragment, String pageId) {
     List<List<OcrBox>> hlBoxes = new ArrayList<>();
     List<OcrBox> wordBoxes = this.parseWords(ocrFragment);
+    if (wordBoxes.isEmpty()) {
+      return null;
+    }
 
     // Get highlighted spans
     List<OcrBox> currentHl = null;
@@ -270,7 +246,4 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       return String.format("PassageMatch{start=%d, end=%d}", start, end);
     }
   }
-
-  protected abstract BreakIterator getPageBreakIterator();
-  protected abstract BreakIterator getLimitBreakIterator();
 }

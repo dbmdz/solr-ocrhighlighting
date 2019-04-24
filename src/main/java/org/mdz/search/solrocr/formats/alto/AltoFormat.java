@@ -17,24 +17,16 @@ public class AltoFormat implements OcrFormat {
       OcrBlock.LINE, "TextLine",
       OcrBlock.WORD, "String");
 
-  private String breakTag = blockTagMapping.get(OcrBlock.LINE);
-  private int contextSize = 2;
-
   @Override
-  public void setBreakParameters(OcrBlock breakBlock, int contextSize) {
-    this.breakTag = blockTagMapping.get(breakBlock);
-    this.contextSize = contextSize;
+  public BreakIterator getBreakIterator(OcrBlock breakBlock, OcrBlock limitBlock, int contextSize) {
+    String breakTag = blockTagMapping.get(breakBlock);
+    String limitTag = blockTagMapping.get(limitBlock);
+    return new ContextBreakIterator(new TagBreakIterator(breakTag), new TagBreakIterator(limitTag), contextSize);
   }
 
   @Override
-  public BreakIterator getBreakIterator() {
-    return new ContextBreakIterator(new TagBreakIterator(breakTag), contextSize);
-  }
-
-  @Override
-  public OcrPassageFormatter getPassageFormatter(OcrBlock limitBlock, String prehHighlightTag,
-                                                 String postHighlightTag, boolean absoluteHighlights) {
-    return new AltoPassageFormatter(breakTag, blockTagMapping.get(limitBlock), prehHighlightTag, postHighlightTag,
-                                    absoluteHighlights);
+  public OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag,
+                                                 boolean absoluteHighlights) {
+    return new AltoPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights);
   }
 }
