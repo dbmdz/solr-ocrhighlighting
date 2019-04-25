@@ -19,6 +19,8 @@ public interface OcrFormat {
    *
    * @param prehHighlightTag the tag to put in the snippet text before a highlighted region, e.g. &lt;em&gt;
    * @param postHighlightTag the tag to put in the snippet text after a highlighted region, e.g. &lt;/em&gt;
+   * @param absoluteHighlights whether the coordinates for highlights should be absolute, i.e. relative to the page
+   *                           and not the containing snippet
    */
   OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag, boolean absoluteHighlights);
 }
