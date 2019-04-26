@@ -131,4 +131,10 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
             "(//arr[@name='snippets']/lst/str[@name='text']/text())[3]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of<em>Japan</em>'");
   }
 
+  @Test
+  public void testAccidentalMerge() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "Robinson");
+    assertQ(req, "count(//arr[@name='highlights']/arr)=2");
+  }
+
 }

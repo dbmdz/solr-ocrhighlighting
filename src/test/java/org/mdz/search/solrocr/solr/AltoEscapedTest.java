@@ -60,4 +60,10 @@ public class AltoEscapedTest extends SolrTestCaseJ4 {
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=1504"
     );
   }
+
+  @Test
+  public void testAccidentalMerge() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "ligesom");
+    assertQ(req, "count(//arr[@name='highlights']/arr)=2");
+  }
 }

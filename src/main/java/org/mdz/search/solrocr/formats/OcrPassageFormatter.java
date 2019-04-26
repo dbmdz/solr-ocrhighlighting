@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.text.StringEscapeUtils;
@@ -23,9 +25,11 @@ import org.mdz.search.solrocr.util.OcrBox;
  * Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances.
  */
 public abstract class OcrPassageFormatter extends PassageFormatter {
+  private final static Pattern LAST_INNER_TAG_PAT = Pattern.compile("[a-zA-Z0-9]</");
   protected final String startHlTag;
   protected final String endHlTag;
   protected final boolean absoluteHighlights;
+
 
   protected OcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
     this.startHlTag = startHlTag;
@@ -71,6 +75,19 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
           sb.insert(extraChars + matchStart, startHlTag);
           extraChars += startHlTag.length();
           int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
+          String matchText = sb.substring(extraChars + matchStart, extraChars + matchEnd);
+          if (matchText.trim().endsWith(">")) {
+            // Set the end of the match to the position before the last inner closing tag inside of the match.
+            Matcher m = LAST_INNER_TAG_PAT.matcher(matchText);
+            int idx = -1;
+            while (m.find()) {
+              idx = m.start() + 1;
+            }
+            if (idx > -1) {
+              int matchLength = match.end - match.start;
+              matchEnd -= (matchLength - idx);
+            }
+          }
           sb.insert(Math.min(extraChars + matchEnd, sb.length()), endHlTag);
           extraChars += endHlTag.length();
         }
