@@ -256,6 +256,12 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     return passage;
   }
 
+  /** We don't provide summaries if there is no highlighting, i.e. no matches in the OCR text */
+  @Override
+  protected Passage[] getSummaryPassagesNoHighlight(int maxPassages) {
+    return new Passage[]{};
+  }
+
   public int getNumMatches(int  docId) {
     return numMatches.getOrDefault(docId, -1);
   }
