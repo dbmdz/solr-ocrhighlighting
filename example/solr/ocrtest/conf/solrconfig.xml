@@ -3,10 +3,8 @@
   <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
   <schemaFactory class="ClassicIndexSchemaFactory"/>
 
-  <requestHandler name="/select" class="solr.SearchHandler"/>
-
-  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="highlight"
-                  ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
+  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocrHighlight"
+                   ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
     <lst name="ocrFields">
       <str>ocr_text</str>
     </lst>
@@ -16,4 +14,12 @@
       </lst>
     </fieldLoader>
   </searchComponent>
+
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <arr name="components">
+      <str>query</str>
+      <str>highlight</str>
+      <str>ocrHighlight</str>
+    </arr>
+  </requestHandler>
 </config>

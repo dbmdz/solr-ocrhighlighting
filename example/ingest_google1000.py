@@ -9,8 +9,11 @@ from urllib import request
 
 GOOGLE1000_PATH = './google1000'
 GOOGLE1000_URL = 'https://ocrhl.jbaiter.de/data/gbooks1000_hocr.tar.xz'
-SOLR_HOST = 'localhost:8181'
+SOLR_HOST = 'localhost:8983'
 SOLR_CORE = 'ocrtest'
+
+METADATA_PAT = re.compile(
+    r'<meta name="DC\.(?P<key>.+?)" content="(?P<value>.+?)"\s*/>')
 
 
 class SolrException(Exception):
@@ -27,7 +30,15 @@ def are_volumes_missing(base_path):
     return False
 
 
-def load_ocrtext(base_path):
+def parse_metadata(hocr):
+    # I know, the <center> won't hold, but I think it's okay in this case,
+    # especially since we 100% know what data this script is going to work with
+    # and we don't want an external lxml dependency in here
+    return {key: int(value) if value.isdigit() else value
+            for key, value in METADATA_PAT.findall(hocr)}
+
+
+def load_documents(base_path):
     if are_volumes_missing(base_path):
         print("Downloading missing volumes to {}".format(base_path))
         base_path.mkdir(exist_ok=True)
@@ -42,10 +53,14 @@ def load_ocrtext(base_path):
                 if not doc_path.exists():
                     with doc_path.open('wb') as fp:
                         fp.write(ocr_text)
-                yield vol_id, ocr_text.decode('utf8')
+                hocr = ocr_text.decode('utf8')
+                yield {'id': vol_id, 'ocr_text': hocr,
+                       **parse_metadata(hocr)}
     else:
         for doc_path in base_path.glob('*.hocr'):
-            yield doc_path.stem, doc_path.read_text()
+            hocr = doc_path.read_text()
+            yield {'id': doc_path.stem, 'ocr_text': hocr,
+                   **parse_metadata(hocr)}
 
 
 def index_documents(docs):
@@ -59,10 +74,9 @@ def index_documents(docs):
 
 
 if __name__ == '__main__':
-    ocr_iter = load_ocrtext(Path(GOOGLE1000_PATH))
+    doc_iter = load_documents(Path(GOOGLE1000_PATH))
     batch = []
-    for idx, (ident, ocr) in enumerate(ocr_iter):
-        doc = dict(id=ident, ocr_text=ocr)
+    for idx, doc in enumerate(doc_iter):
         index_documents([doc])
         sys.stdout.write('\r{}/1000'.format(idx))
         sys.stdout.flush()

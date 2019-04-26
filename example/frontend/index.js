@@ -22,6 +22,22 @@ if (typeof window !== 'undefined') {
   var APP_BASE = 'http://localhost:8008';  // TODO: Read from environment?
 }
 
+function highlightDocument(doc, highlights) {
+  Object.keys(highlights).forEach(field => {
+    doc[field] = highlightFieldValue(doc[field], highlights[field]);
+  })
+  return doc;
+}
+
+function highlightFieldValue(val, highlights) {
+  let out = val;
+  highlights.forEach((hl => {
+    const rawText = hl.replace(/<\/?em>/g, '');
+    out = out.replace(new RegExp(rawText, 'g'), hl);
+  }))
+  return out;
+}
+
 
 class SnippetView extends Component {
   constructor(props) {
@@ -73,7 +89,7 @@ class SnippetView extends Component {
         {this.state.renderedImage && highlights.flatMap(
           hls => hls.map(hl =>
             <div class="highlight-box" title={hl.text} style={this.getHighlightStyle(hl, 50)} />))}
-        <p dangerouslySetInnerHTML={{ __html: text }} />
+        <p className="highlightable" dangerouslySetInnerHTML={{ __html: text }} />
       </div>
     );
   }
@@ -112,19 +128,25 @@ class ResultDocument extends Component {
   }
 
   render() {
-    const { docId, hl, query } = this.props;
-    const manifestUri = `${APP_BASE}/iiif/presentation/${docId}/manifest`;
+    const { hl, ocr_hl, query } = this.props;
+    const doc = highlightDocument(this.props.doc, hl);
+    const manifestUri = `${APP_BASE}/iiif/presentation/${doc.id}/manifest`;
     const viewerUrl = `/viewer/#?manifest=${manifestUri}&q=${query}`;
     return (
       <div class="result-document">
         <Elevation z={4}>
           <Typography tag="div" headline4>
-            <a href={viewerUrl} title="Open in viewer" target="_blank">{docId}</a>
+            <a className="highlightable" href={viewerUrl} title="Open in viewer" target="_blank" dangerouslySetInnerHTML={{ __html: doc.title }} />
           </Typography>
           <Typography subtitle1>
-            {hl.numTotal} matching passages found
+            { ocr_hl ? ocr_hl.numTotal : 'No' } matching passages in the text found
           </Typography>
-          {hl.snippets.map(snip => <SnippetView snippet={snip} docId={docId} query={query} />)}
+          <ul className="metadata">
+            <li><strong>Created by</strong> <span className="highlightable" dangerouslySetInnerHTML={{ __html: doc.creator }} /></li>
+            <li><strong>Published in</strong> {doc.date} <strong>by</strong> <span className="highlightable" dangerouslySetInnerHTML={{ __html: doc.publisher }} /></li>
+            <li><strong>Language:</strong> {doc.language}</li>
+          </ul>
+          {ocr_hl && ocr_hl.snippets.map(snip => <SnippetView snippet={snip} docId={doc.id} query={query} />)}
         </Elevation>
       </div>);
   }
@@ -155,8 +177,10 @@ export default class App extends Component {
     this.state = {
       isSearchPending: false,
       queryParams: {
-        'df': 'ocr_text',
-        'hl.fl': 'ocr_text',
+        'defType': 'edismax',
+        'fl': 'id,title,creator,publisher,date,language',
+        'qf': 'title^20.0 creator^10.0 publisher^5.0 ocr_text^0.3',
+        'hl.fl': 'title,creator,publisher,ocr_text',
         'hl.snippets': 10,
         'hl.weightMatches': true,
         'hl': 'on'
@@ -202,12 +226,13 @@ export default class App extends Component {
             searchResults.response.docs
               .map((doc, idx) => {
                 return {
+                  doc,
                   key: idx,
-                  docId: doc.id,
-                  hl: searchResults.ocrHighlighting[doc.id].ocr_text }
+                  ocrHl: searchResults.ocrHighlighting[doc.id].ocr_text,
+                  hl: searchResults.highlighting[doc.id] }
               })
-              .map(({ key, docId, hl }) =>
-                <ResultDocument key={key} hl={hl} docId={docId} query={queryParams.q} />)}
+              .map(({ key, doc, hl, ocrHl }) =>
+                <ResultDocument key={key} hl={hl} ocr_hl={ocrHl} doc={doc} query={queryParams.q} />)}
         </section>
       </main>
     );
