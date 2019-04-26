@@ -1,0 +1,8 @@
+site_name: Solr OCR Highlighting Plugin
+theme: readthedocs
+nav:
+    - Getting Started: getting_started.md
+    - OCR Formats: formats.md
+    - Usage Scenarios: usage.md
+    - Example Setup: example.md
+    - Frequently Asked Questions: faq.md
