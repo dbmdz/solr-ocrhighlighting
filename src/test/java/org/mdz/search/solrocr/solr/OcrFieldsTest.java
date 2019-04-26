@@ -41,6 +41,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
 
   protected static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
+        .put("defType", "edismax")
         .put("hl", "true")
         .put("hl.fields", "external_ocr_text")
         .put("hl.usePhraseHighlighter", "true")
@@ -61,6 +62,17 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     params.set("indent", "true");
     q.setParams(params);
     return q;
+  }
+
+  @Test
+  public void testMixedHighlighting() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "commodo münchen",
+                                "qf", "some_text external_ocr_text", "df", "some_text",
+                                "hl.fields", "some_text,ocr_text", "hl.weightMatches", "true");
+    assertQ(req,
+            "count(//lst[@name='highlighting']/lst[@name='1337']/arr[@name='some_text']/str)=1",
+            ".//arr[@name='some_text']/str/text()=' aliquip ex ea <em>commodo</em> consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum'",
+            "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=3");
   }
 
   @Test
