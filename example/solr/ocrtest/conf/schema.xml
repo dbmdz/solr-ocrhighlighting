@@ -2,7 +2,9 @@
   <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
 
-    <fieldType name="text" class="solr.TextField">
+    <fieldType name="int" class="solr.IntPointField" docValues="true" />
+
+    <fieldType name="text" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
@@ -10,6 +12,7 @@
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
     </fieldType>
+
     <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
       <analyzer>
         <charFilter class="solr.HTMLStripCharFilterFactory" />
@@ -23,10 +26,14 @@
 
   <fields>
     <field name="id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
-    <field name="vol_name" type="text" indexed="true" stored="true" />
-    <field name="some_text" type="text" indexed="true" stored="true" />
-    <field name="ocr_text" type="text_ocr" indexed="true" stored="false" />
-    <dynamicField name="*_ocr" type="text_ocr" indexed="true" stored="false" />
+    <field name="some_text" type="text" multiValued="false" indexed="true" stored="true" />
+    <field name="ocr_text" type="text_ocr" multiValued="false" indexed="true" stored="false" />
+    <field name="title" type="text" multiValued="false" indexed="true" stored="true" />
+    <field name="creator" type="text" multiValued="false" indexed="true" stored="true" />
+    <field name="publisher" type="text" multiValued="false" indexed="true" stored="true" />
+    <field name="language" type="string" multiValued="false" indexed="true" stored="true" />
+    <field name="date" type="int" multiValued="false" indexed="true" stored="true" />
+    <dynamicField name="*_ocr" type="text_ocr" multiValued="false" indexed="true" stored="false" />
   </fields>
   <uniqueKey>id</uniqueKey>
 </schema>

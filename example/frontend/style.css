@@ -58,10 +58,13 @@ main p {
 	border-radius: 8px;
 }
 
-.snippet-display em {
+.metadata {
+	text-align: left;
+}
+
+.highlightable em {
 	background-color: hsla(50, 100%, 50%, 50%);
 	font-style: normal;
-	font-weight: 700;
 }
 
 .snippet-display .highlight-box {

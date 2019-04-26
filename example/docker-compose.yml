@@ -5,6 +5,7 @@ services:
     build: solr
     ports:
       - "1044:1044"  # Debugging port
+      - "8983:8983"  # Solr admin interface
     volumes:
       - ..:/data
       - data-solr:/opt/solr/server/solr/ocrtest
