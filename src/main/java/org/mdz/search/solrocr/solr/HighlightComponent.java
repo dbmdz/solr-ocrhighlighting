@@ -18,7 +18,6 @@ import org.mdz.search.solrocr.formats.OcrFormat;
 import org.mdz.search.solrocr.lucene.fieldloader.ExternalFieldLoader;
 
 public class HighlightComponent extends org.apache.solr.handler.component.HighlightComponent {
-
   private PluginInfo info;
   private OcrFormat ocrFormat;
   private ArrayList<String> ocrFieldNames;
@@ -26,9 +25,16 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
   private SolrOcrHighlighter ocrHighlighter;
 
   @Override
+  public String getDescription() {
+    return "OCR Highlighting";
+  }
+
+  @Override
   public void init(PluginInfo info) {
     this.info = info;
   }
+
+
 
   @Override
   public void inform(SolrCore core) {
