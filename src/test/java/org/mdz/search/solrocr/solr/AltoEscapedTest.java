@@ -66,4 +66,10 @@ public class AltoEscapedTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "ligesom");
     assertQ(req, "count(//arr[@name='highlights']/arr)=2");
   }
+
+  @Test
+  public void testEntityRemoval() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "committee");
+    assertQ(req, "//str[@name='text'][1]/text()='Permanent <em>Committee</em>'");
+  }
 }
