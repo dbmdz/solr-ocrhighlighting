@@ -33,7 +33,7 @@ function highlightFieldValue(val, highlights) {
   let out = val;
   highlights.forEach((hl => {
     const rawText = hl.replace(/<\/?em>/g, '');
-    out = out.replace(new RegExp(rawText, 'g'), hl);
+    out = out.split(rawText).join(hl);
   }))
   return out;
 }
