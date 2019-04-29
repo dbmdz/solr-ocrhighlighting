@@ -68,7 +68,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       String content = parseAttribs(m.group("attribs")).get("CONTENT");
       sb.replace(m.start(), m.end(), content);
     }
-    return StringEscapeUtils.unescapeXml(sb.toString().replaceAll("</?[A-Z]?.*?>?", ""))
+    return StringEscapeUtils.unescapeXml(sb.toString().replaceAll("</?[A-Z]?.*?>", ""))
         .trim()
         .replaceAll(START_HL, startHlTag)
         .replaceAll(END_HL, endHlTag);
