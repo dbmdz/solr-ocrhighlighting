@@ -77,4 +77,4 @@ the plugin :-)
 
 ## License
 
-[MIT License](https://github.com/dbmdz/solr-ocr-plugin/blob/master/LICENSE)
+[MIT License](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/LICENSE)
