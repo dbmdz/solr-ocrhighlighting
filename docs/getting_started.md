@@ -95,7 +95,7 @@ $ curl -H "Content-Type: application/json" \
 ```
 
 **That's it!** Assuming Solr is correctly configured, you should now have a
-*document that can be highlighted in your index.
+document that can be highlighted in your index.
 
 ## Querying
 At query time, no extra parameters besides `hl=true` and an inclusion of your OCR fields in the
