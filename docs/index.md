@@ -35,9 +35,9 @@ The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0
 
 ## Features
 - Index various OCR formats without little to no preprocessing
-    * [hOCR](formats.md#hOCR)
-    * [ALTO](formats.md#ALTO)
-    * [MiniOCR](formats.md#MiniOCR)
+    * [hOCR](formats.md#hocr)
+    * [ALTO](formats.md#alto)
+    * [MiniOCR](formats.md#miniocr)
 - Retrieve all the information needed to render a highlighted snippet view directly from Solr, without postprocessing
 - Keeps your index size manageable by re-using OCR documents on disk for highlighting
 
