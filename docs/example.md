@@ -12,7 +12,7 @@ text within them.
 A public instance of this example is available at https://ocrhl.jbaiter.de.
 
 The Solr server can be queried at `https://ocrhl.jbaiter.de/solr`, e.g.
-[`q="mason dixon"~10"](https://ocrhl.jbaiter.de/solr/ocrtest/select?df=ocr_text&hl.fl=ocr_text&hl.snippets=10&hl.weightMatches=true&hl=on&q=%22mason+dixon%22%7E10)
+[`q="mason dixon"~10"`](https://ocrhl.jbaiter.de/solr/ocrtest/select?df=ocr_text&hl.fl=ocr_text&hl.snippets=10&hl.weightMatches=true&hl=on&q=%22mason+dixon%22%7E10)
 
 
 ## Prerequisites
