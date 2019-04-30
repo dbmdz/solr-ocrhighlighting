@@ -3,6 +3,12 @@ theme: readthedocs
 nav:
     - Getting Started: getting_started.md
     - OCR Formats: formats.md
-    - Usage Scenarios: usage.md
+    - External Storage: external_storage.md
     - Example Setup: example.md
+    - Query Parameters: queryparams.md
     - Frequently Asked Questions: faq.md
+markdown_extensions:
+    - attr_list
+    - fenced_code
+    - admonition
+    - smarty

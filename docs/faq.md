@@ -1,4 +1,4 @@
-## Can I have documents that point to a part of an OCR document on external storage?
+## Can I have documents that point to a part of an OCR document on external storage? {: #partial-docs}
 
 **Yes, with an ugly hack**. This use case appears e.g. when indexing digital newspapers,
 where you have a single large volume on disk (e.g. the OCR text for the bound volume containing all issues from the
@@ -10,16 +10,20 @@ old content and discard all content that follows after the sub-section** (We tol
 we?). This will lead the analyzer chain to discard all of the undesired content, while still storing the correct offsets
 for the sub-section content in the index.
 
+!!! note
+    Since the plugin doesn't do any actual XML parsing, the masked documents don't have to be valid XML.
+
 Minimal example before masking:
 
-```
+```xml
 <l>Some content that you don't want in your Solr document</l>
 <l>Here's the content you want in the index for this document</l>
 <l>And here's some extra content following it that you don't want</l>
 ```
 
 Minimal example after masking:
-```
+
+```xml
 <!---------------------------------------------------------->
 <l>Here's the content you want in the index for this document</l>
 ```
