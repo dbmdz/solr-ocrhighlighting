@@ -14,6 +14,7 @@ public class HocrFormat implements OcrFormat {
   private static final Map<OcrBlock, Set<String>> blockClassMapping = ImmutableMap.of(
       OcrBlock.PAGE, ImmutableSet.of("ocr_page"),
       OcrBlock.BLOCK, ImmutableSet.of("ocr_carea", "ocrx_block"),
+      OcrBlock.SECTION, ImmutableSet.of("ocr_chapter", "ocr_section", "ocr_subsection", "ocr_subsubsection"),
       OcrBlock.PARAGRAPH, ImmutableSet.of("ocr_par"),
       OcrBlock.LINE, ImmutableSet.of("ocr_line", "ocrx_line"),
       OcrBlock.WORD, ImmutableSet.of("ocrx_word"));

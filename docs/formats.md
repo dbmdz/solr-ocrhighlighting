@@ -1,13 +1,69 @@
+In general the plugin assumes that all OCR formats encode their documents
+in a hierarchy of **blocks**. For all supported formats, we map their
+corresponding block types to these general types (blocks in italics are
+entirely optional):
+
+- **Page**: optional if there is only a single page in a document)
+- **Block**: optional if `hl.ocr.limitBlock` is set to a different value at
+  query time
+- **Section**: optional
+- **Paragraph**: optional
+- **Line**: (optional if `hl.ocr.contextBlock` is set to a different value
+  at query time)
+- **Word**: *required*
+
+These block types can be used in the `hl.ocr.limitBlock` and `hl.ocr.contextBlock`
+[query parameters](queryparams.md) to control the formation of snippets.
+
 ## hOCR
+
+In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
+`org.mdz.search.solrocr.formats.hocr.HocrFormat`.
+
+In the **Schema**, make sure that `solr.HTMLStripCharFilterFactory` is the first filter
+in your indexing analyzer chain for OCR fields.
+
+**Block type mapping:**
+
+| Block     | hOCR class                  | notes                            |
+| --------- | --------------------------- | -------------------------------- |
+| Word      | `ocrx_word`                 | needs to have a `bbox` attribute with the coordinates on the page |
+| Page      | `ocr_page`                  | needs to have a `ppageno` attribute with a page identifier |
+| Block     | `ocr_carea`/`ocrx_block`    |                                  |
+| Section   | `ocr_chapter`/`ocr_section`/<br>`ocr_subsection`/`ocr_subsubsection` | |
+| Paragraph | `ocr_par`                   |                                  |
+| Line      | `ocr_line` or `ocrx_line`   |                                  |
 
 ## ALTO
 
+In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
+`org.mdz.search.solrocr.formats.alto.AltoFormat`.
+
+In the **Schema**, make sure that `org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory`
+and `solr.HTMLStripCharFilterFactory` are the first two filters in your indexing analyzer
+chain for OCR fields.
+
+**Block type mapping:**
+
+| Block     | ALTO tag                    | notes                            |
+| --------- | --------------------------- | -------------------------------- |
+| Word      | `<String />`                | needs to have `CONTENT`, `HPOS`, `VPOS`, `WIDTH` and `HEIGHT` attributes |
+| Line      | `<TextLine />`              |                                  |
+| Block     | `<TextBlock />`             |                                  |
+| Page      | `<Page />`                  | needs to have an `ID` attribute with a page identifier |
+| Section   | *not mapped*                |                                  |
+| Paragraph | *not mapped*                |                                  |
+
+
 ## MiniOCR
 
-This plugin includes support for a custom OCR format that we dubbed *MiniOCR*. This format is intended for use cases
-where using the existing OCR files is not possible (e.g. because they're in an unsupported format or because you don't
-want to ASCII-encode them and still use the modern highlighting approach). In these cases, minimizing the storage
-requirements for the derived OCR files is important, which is why we defined this minimalistic format.
+This plugin also includes support for a custom non-standard OCR format that
+we dubbed *MiniOCR*. This format is intended for use cases where reusing the
+existing OCR files is not possible (e.g. because they're in an unsupported
+format or because you don't want to ASCII-encode them and still use the
+modern highlighting approach). In these cases, minimizing the storage
+requirements for the derived OCR files is important, which is why we defined
+this minimalistic format.
 
 A basic example looks like this:
 
@@ -19,11 +75,13 @@ A basic example looks like this:
 </p>
 ```
 
-The format uses the following elements for describing the page structure:
+**Block type mapping:**
 
-- `<p>` for pages, can have a `id` attribute that contains the page identifier
-- `<b>` for "blocks", takes no attributes
-- `<l>` for lines, takes no attributes
-- `<w>` for words, takes a `box` attribute that contains the x and y offset and the width and height of the word in
-  pixels on the page image. The coordinates can be either integrals or floating point values between 0 and 1 (to denote
-  relative coordinates).
+| Block     | MiniOCR tag  | notes                            |
+| --------- | ------------ | -------------------------------- |
+| Word      | `<w/>`       | needs to have `box` attribute with `{x} {y} {width} {height}`. <br>Values can be integers or floats between 0 and 1 |
+| Line      | `<l/>`       |                                  |
+| Block     | `<b/>`       |                                  |
+| Page      | `<p/>`       | needs to have an `id` attribute with a page identifier |
+| Section   | *not mapped* |                                  |
+| Paragraph | *not mapped* |                                  |
