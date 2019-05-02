@@ -4,6 +4,10 @@
 - OCR documents need to be in [hOCR](formats.md#hocr), [ALTO](formats.md#alto)
   or [MiniOCR](formats.md#miniocr) formats, with at least page-, and word-level
   segmentation
+- One OCR file needs to correspond to one document in the search index<br>
+  There is a [hack to support multiple index documents per file](faq.md#partial-docs),
+  but the reverse (multiple files per index document) is not possible,
+  you will have to merge the files.
 
 ## Installation
 Download the JAR for the latest release from the [GitHub Releases
@@ -17,16 +21,17 @@ into your core's `lib` directory.
 
 Using the plugin requires some configuration in your `solrconfig.xml`. For one,
 you have to define a search component to add the OCR highlighting information
-for your OCR format to the response. Also, you will have to specify which of
-your fields contain OCR text (i.e. the `solrconfig` is currently tiedto the schema):
+for your format to the response. Also, you will have to specify which of
+your fields contain OCR text (i.e. the `solrconfig` is currently tied to the schema):
 
 ```xml
 <config>
   <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocrHighlight"
                    ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
-      <lst name="ocrFields">
-        <str>ocr_text</str>
-      </lst>
+    <lst name="ocrFields">
+      <!-- Requires a field named `ocr_text` in the schema -->
+      <str>ocr_text</str>
+    </lst>
   </searchComponent>
 
   <!-- Add the OCR highlighting component to the components on your request handler(s) -->
@@ -75,8 +80,8 @@ You can then use this new field type in your schema:
 ```
 
 After you've saved your configuration and schema and restarted Solr, you can
-verify that the plugin is activated by checking the "Plugin" section in the
-Solr admin interface for your core, there should now be a Highlighting plugin
+verify that the plugin is activated by checking the *Plugins / Stats* section in the
+Solr admin interface for your core. There should now be a Highlighting plugin
 with the `name` you chose:
 
 ![](img/config-plugin-enabled.png)
@@ -84,7 +89,7 @@ with the `name` you chose:
 ## Indexing
 
 Indexing for most usage scenarios (except for [externally stored UTF8
-files](external_storage.md#utf8) is simple: Just POST the document with
+files](external_storage.md#utf8)) is simple: Just POST the document with
 appropriately  escaped OCR in the corresponding field.
 
 A simple example using curl and [jq](https://stedolan.github.io/jq/) for escaping:
@@ -106,7 +111,7 @@ At query time, no extra parameters besides `hl=true` and an inclusion of your OC
 
 Given an index with the fields `id`, `title` and `ocr_text`, and a query like the following:
 ```http
-GET http://localhost:8983/solr/ocrtest/select?hl=on&hl.fl=ocr_text&df=ocr_text&q=pirate
+GET http://localhost:8983/solr/ocrtest/select?fl=id,title&hl=on&hl.fl=ocr_text&df=ocr_text&q=pirate
 ```
 
 should yield a response like this:
@@ -135,7 +140,10 @@ should yield a response like this:
         "snippets": [
           {
             "page": "page_44",
-            "text": "Easy to have, impregnable to hold, An Island to be rul'd, and I to rule ![Enter a Gladiator, shouting towards <em>Pirates</em>' quarter.]GLAD. Ho, there ! what ho ! the troops are on the move, My Chief! my Chief! the <em>Pirates</em> steal away !",
+            "text": "Easy to have, impregnable to hold, An Island to be rul'd, and "
+                    "I to rule ![Enter a Gladiator, shouting towards <em>Pirates</em>' "
+                    "quarter.]GLAD. Ho, there ! what ho ! the troops are on the move, "
+                    "My Chief! my Chief! the <em>Pirates</em> steal away !",
             "score": 881062.75,
             "region": {
               "ulx": 194,
@@ -180,7 +188,7 @@ passage text.
 
 Additionally, it also includes the region and text for every highlighting hit
 (i.e. the actual tokens that matched the query). Every hit in the document
-is an array of hit regions: If a given hit spans multiple lines, the hit is
+is an array of hit regions: If a given hit spans multiple lines, it is
 split into multiple regions, one for every line.
 
 Note that the hit region coordinates are by default **relative to the containing

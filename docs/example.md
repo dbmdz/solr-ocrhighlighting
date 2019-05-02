@@ -9,7 +9,7 @@ text within them.
 
 ## Online version
 
-A public instance of this example is available at https://ocrhl.jbaiter.de.
+A public instance of this example is available at [https://ocrhl.jbaiter.de](https://ocrhl.jbaiter.de).
 
 The Solr server can be queried at `https://ocrhl.jbaiter.de/solr`, e.g.
 [`q="mason dixon"~10"`](https://ocrhl.jbaiter.de/solr/ocrtest/select?df=ocr_text&hl.fl=ocr_text&hl.snippets=10&hl.weightMatches=true&hl=on&q=%22mason+dixon%22%7E10)
@@ -25,9 +25,10 @@ To run the example setup yourself, you will need:
 
 ## Running the example
 
-1. `docker-compose up -d`
-2. `./ingest_google100.py`
-3. Access `http://localhost:8181` in your browser
+1. `cd example`
+2. `docker-compose up -d`
+3. `./ingest_google100.py`
+4. Access `http://localhost:8181` in your browser
 
 ## Search Frontend
 

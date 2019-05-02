@@ -2,41 +2,42 @@ In the setup described in the [Getting Started guide](getting_started.md), the O
 directly stored in Solr. This does not require any special configuration besides setting `stored=true`
 on the fields in the schema.
 
-This approach has several drawbacks, that might not make it practical for your use case:
+However, this approach has several drawbacks, that might not make it practical for your use case:
 
-- **Index size:** Requires raw OCR documents to be stored in the Solr index, depending on the format these
-  can be >100MiB, which adds up really quickly
-- **Memory Usage:** During highlighting, Solr will load the full contents of the document into memory.
-  Here again, the document size can make this problematic.
+- **Index size:** Raw OCR documents need to be stored in the Solr index, depending on the format
+  these regularly reach sizes  above 100MiB, which adds up really quickly with thousands of documents
+- **Memory Usage:** During highlighting, Solr will load the full contents of the stored field into memory.
+  Here again, the document sizes involved can make this problematic.
 
 
 ## Storing OCR outside of Solr
 
-For the reasons listed above, the plugin can also access OCR documents stored outside of Solr
+To work around the above issues, the plugin can also access OCR documents stored outside of Solr
 for highlighting. This works by lazily loading only the parts of the documents that actually
 need to be highlighted at query time from an external source like the file system.
 
-This works since with an appropriately configured index, Solr stores the *offsets* of the
-indexed terms in the input document in the index. Given these offsets, we can seek into
+This works, since with an appropriately configured index, Solr stores the *character offsets* of
+the indexed terms in the input document in the index. Given these offsets, we can seek into
 the input document and retrieve just the parts that are needed.
 
 There is, however, one complication: Internally, Solr works with UTF-16 strings, where every
-character takes up exactly 2 bytes, which is also what the stored offsets are based on. If 
-the input document is encoded with UTF-16, this means, that given a character offset of `32`,
-you can obtain the character by seeking into the input document at position `64`
-(two bytes per character) and read two bytes to get the character.
+character takes up exactly 2 bytes, which is also what the stored character offsets are based on.
+In a UTF-16 encoded document, given a character offset of `32`, you can obtain the character at this
+position by simply seeking into the input document at position `64` (two bytes per character) and
+reading the two bytes that make up the character
 
-The complication is now that almost nobody stores documents in UTF-16, since it is very space-inefficient.
-Most real-world documents will be stored in UTF-8, which is *variable length encoding*, which means
-that the number of bytes a character takes up is dependant on the character. This makes it
-impossible to calculate the byte offset of a given character, given only the character offset.
+This would easy, but almost nobody stores documents in UTF-16, since it is very space-inefficient.
+Most real-world documents will be stored in UTF-8, which is a *variable length encoding*, meaning
+that the number of bytes a character takes up depends on the character itself (e.g. `a` is one byte,
+while `ä` is two bytes). This makes it impossible to calculate the byte offset of a given character,
+given only the character offset.
 
 To get around this limitation, you have two options:
 
-1. Encode the input documents in [ASCII](#ascii) (= always one byte per character) and
+1. [Encode the input documents in ASCII](#ascii) (= always one byte per character) and
    format non-ASCII codepoints as XML character entities
    (i.e. `ſ` becomes `&#383;`)
-2. Leave the input documents in [UTF-8](#utf8) and store the byte offset for
+2. [Leave the input documents in UTF-8](#utf8) and store the byte offset for
    every term in the Solr index
 
 **Option #1 is the recommended way**: It only requires a slight modification to
@@ -49,18 +50,6 @@ To enable accessing external documents during highlighting, you will have to con
 a `FieldLoader` in the `<searchComponent>` section of your `solrconfig.xml`.
 For documents on the local filesystem, the loader to use is
 `org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader`.
-
-To tell the loader where to find the file for a given document, you have to provide it
-with the encoding of the files ([`ascii`](#ascii) or [`utf8`](#utf8)) and a mapping from the
-field name to a **path pattern**.
-
-The path pattern can include arbitrary field values enclosed in curly braces. For example,
-given a document where the `id` field is set to `1337`, the pattern `/data/ocr/{id}_ocr.xml` would
-load the OCR document from `/data/ocr/1337_ocr.xml`. You can use any field that is defined in your
-schema inside of the pattern. You can also use a Python-like slicing syntax to only refer to
-parts of the field values (e.g. `{id[:10]}`, `{id[2:4]}`, `{id[:-5]}`).
-
-Here is a complete example configuration:
 
 ```xml
 <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="highlight"
@@ -76,10 +65,22 @@ Here is a complete example configuration:
 </searchComponent>
 ```
 
+To tell the loader where to find the file for a given document, you have to provide it
+with the encoding of the files ([`ascii`](#ascii) or [`utf8`](#utf8)) and a mapping from the
+field name to a **path pattern**.
+
+The path pattern can include arbitrary field names enclosed in curly braces. During resolving,
+these will be replaced with the contents of the field for the current document. The OCR document
+will then be loaded from the path described by the resulting string. For example,
+given a document where the `id` field is set to `1337`, the pattern `/data/ocr/{id}_ocr.xml` would
+load the OCR document from `/data/ocr/1337_ocr.xml`. You can use any field that is defined in your
+schema inside of the pattern. You can also use a Python-like slicing syntax to only refer to
+parts of the field values (e.g. `{id[:10]}`, `{id[2:4]}`, `{id[:-5]}`).
+
 !!! caution
     When using external documents for highlighting, the performance depends almost exclusively on
     how fast the underlying storage is able to perform random I/O. This is why **using flash storage
-    for the documents** is highly recommended.
+    for the documents is highly recommended**.
 
 !!! note
     If your use case requires more sophisticated resolving, or you want to load the document contents from
@@ -95,10 +96,16 @@ of your `fieldLoader` and make sure that they **do not contain any unescaped UTF
 This can be done very effectively with this little Python snippet:
 
 ```python
-with open('./mydocument.xml', 'rt') as fp:
-    ocr_text = fp.read()
-with open('./mydocument_escaped.xml', 'wb') as fp:
-    fp.write(ocr_text.encode('ascii', 'xmlcharrefreplace'))
+utftext.encode('ascii', 'xmlcharrefreplace')
+```
+
+The repository also includes a [script that you can use to do the conversion:](https://github.com/dbmdz/solr-ocrhighlighting/raw/master/ascii_escape)
+
+```sh
+$ cat input.xml | ./ascii_escape > output.xml
+
+#or:
+$ ./ascii_escape input.xml output.xml
 ```
 
 ## Encoding: UTF-8 {: #utf8}
@@ -126,7 +133,12 @@ You don't have to do this by yourself, we provide a Java implementation for ever
 [ALTO](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/org/mdz/search/solrocr/formats/alto/AltoByteOffsetsParser.java)
 and [MiniOCR](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/org/mdz/search/solrocr/formats/mini/MiniOcrByteOffsetsParser.java))
 as well as a cross-platform command-line tool (available on the
-[GitHub releases page](https://github.com/dbmdz/solr-ocrhighlighting/releases)).
+[GitHub releases page](https://github.com/dbmdz/solr-ocrhighlighting/releases)):
+
+```sh
+# The tool works transparently with all supported formats
+./offsets-parser ../example/google1000/Volume_0000.hocr > out.txt
+```
 
 In your schema, you will have to enable term positions, term vectors and term payloads.
 In your indexing analyzer chain, you need to remove the `HTMLStripCharFilterFactory`
