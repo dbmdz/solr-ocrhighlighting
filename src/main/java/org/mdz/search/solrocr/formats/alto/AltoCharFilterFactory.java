@@ -16,11 +16,11 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
  *   <li>Strip out the <code>&lt;Description&gt;...&lt;/Description&gt;</code> element</li>
  *   <li>Extract the OCRed text out of the <code>CONTENT</code> attribute into a text node so it's not removed by
  *   the {@link org.apache.lucene.analysis.charfilter.HTMLStripCharFilter}</li>
- *   <li>Strip out all XML-Tags, leaving only text nodes/li>
+ *   <li>Strip out all XML-Tags, leaving only text nodes</li>
  * </ul>
  */
 public class AltoCharFilterFactory extends CharFilterFactory {
-  private static final Pattern DESC_PAT = Pattern.compile("<Description>.+</Description", Pattern.DOTALL);
+  private static final Pattern DESC_PAT = Pattern.compile("<Description>.+</Description>", Pattern.DOTALL);
   private static final Pattern CONTENT_PAT = Pattern.compile("CONTENT=['\"](.+?)['\"]");
   private static final Pattern SUFFIX_PAT = Pattern.compile("<(\\s*)/>");
 
