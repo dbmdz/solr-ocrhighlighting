@@ -1,19 +1,18 @@
 In general the plugin assumes that all OCR formats encode their documents
 in a hierarchy of **blocks**. For all supported formats, we map their
-corresponding block types to these general types (blocks in italics are
-entirely optional):
+block types to these general types:
 
-- **Page**: optional if there is only a single page in a document)
-- **Block**: optional if `hl.ocr.limitBlock` is set to a different value at
+- **Page**: optional if there is only a single page in a document
+- **Block**: optional if [`hl.ocr.limitBlock`](queryparams.md) is set to a different value at
   query time
 - **Section**: optional
 - **Paragraph**: optional
-- **Line**: (optional if `hl.ocr.contextBlock` is set to a different value
+- **Line**: (optional if [`hl.ocr.contextBlock`](queryparams.md) is set to a different value
   at query time)
 - **Word**: *required*
 
-These block types can be used in the `hl.ocr.limitBlock` and `hl.ocr.contextBlock`
-[query parameters](queryparams.md) to control the formation of snippets.
+These block types can be used in the [`hl.ocr.limitBlock` and `hl.ocr.contextBlock`
+query parameters](queryparams.md) to control how snippets are generated.
 
 ## hOCR
 
@@ -40,8 +39,8 @@ In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComp
 `org.mdz.search.solrocr.formats.alto.AltoFormat`.
 
 In the **Schema**, make sure that `org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory`
-and `solr.HTMLStripCharFilterFactory` are the first two filters in your indexing analyzer
-chain for OCR fields.
+and `solr.HTMLStripCharFilterFactory` are the first two filters (in this order) in your
+indexing analyzer chain for OCR fields.
 
 **Block type mapping:**
 
@@ -74,6 +73,12 @@ A basic example looks like this:
   </b>
 </p>
 ```
+
+In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
+`org.mdz.search.solrocr.formats.mini.MiniOcrFormat`.
+
+In the **Schema**, make sure that `solr.HTMLStripCharFilterFactory` is the first filter
+in your indexing analyzer chain for OCR fields.
 
 **Block type mapping:**
 
