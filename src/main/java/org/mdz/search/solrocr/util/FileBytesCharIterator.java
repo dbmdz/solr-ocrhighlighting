@@ -5,7 +5,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,9 +20,7 @@ import java.nio.file.StandardOpenOption;
 public class FileBytesCharIterator implements IterableCharSequence {
   private final Path filePath;  // For copy-constructor
   private final MappedByteBuffer buf;
-  private final int startOffset;
   private final int numBytes;
-  private final CharsetDecoder decoder;
   private final Charset charset;
 
   private int current;
@@ -53,17 +50,6 @@ public class FileBytesCharIterator implements IterableCharSequence {
           && ((validationBuf[0] >> 7) != 0)) {
         throw new IllegalArgumentException("File is not UTF-8 encoded");
       }
-      this.decoder = StandardCharsets.UTF_8.newDecoder();
-      if (validationBuf[0] == 0xEF) {
-        this.startOffset = 3;
-      } else {
-        this.startOffset = 0;
-      }
-    } else if (this.charset == StandardCharsets.US_ASCII) {
-      this.decoder = StandardCharsets.US_ASCII.newDecoder();
-      this.startOffset = 0;
-    } else {
-      throw new IllegalArgumentException("Invalid charset: %s, only ASCII or UTF-8 are  supported");
     }
   }
 

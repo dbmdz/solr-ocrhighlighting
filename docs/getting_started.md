@@ -14,6 +14,16 @@ Download the JAR for the latest release from the [GitHub Releases
 website](https://github.com/dbmdz/solr-ocrhighlighting/releases) and drop it
 into your core's `lib` directory.
 
+## Compiling
+If you want to use the latest bleeding-edge version, you can also compile the plugin yourself.
+For this you will need at least Java 8 and Maven:
+
+```sh
+$ mvn package
+```
+
+The JAR will be in `target/solr-ocrhighlighting-$version.jar`.
+
 ## Configuration
 !!! note
     If you're using a format other than hOCR, refer to the [OCR Formats](formats.md)

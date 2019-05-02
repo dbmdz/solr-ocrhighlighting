@@ -29,6 +29,15 @@ The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0
 2. Drop the JAR into the `core/lib/` directory for your Solr core
 3. Refer to the [documentation](TODO: Link to docs) for instructions on how to configure Solr
 
+## Compiling
+If you want to use the latest bleeding-edge version, you can also compile the plugin yourself.
+For this you will need at least Java 8 and Maven:
+
+```sh
+$ mvn package
+```
+
+The JAR will be in `target/solr-ocrhighlighting-$version.jar`.
 
 ## Running the example
 
