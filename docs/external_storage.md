@@ -124,6 +124,9 @@ This approach won't allow directly indexing the OCR documents, you will have to 
 format that includes the byte offset for every token, e.g.
 `Dieſe⚑5107923 leuchtenden⚑5108028 treuherzigen⚑5108138 blauen⚑5108250 Augen,⚑5108357`.
 
+The `⚑` character is the default delimiter that separates the term from its offset, but you can pick your
+own value with the included tool and the `delimiter` attribute in the configuration below.
+
 !!! note
     This format will only be used for indexing, you don't need to store it on disk. For highlighting,
     your unmodified OCR documents will be used.
