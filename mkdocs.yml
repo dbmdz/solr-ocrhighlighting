@@ -12,3 +12,4 @@ markdown_extensions:
     - fenced_code
     - admonition
     - smarty
+repo_url: https://github.com/dbmdz/solr-ocrhighlighting/
