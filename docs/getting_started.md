@@ -67,8 +67,7 @@ For your schema, you will have to define a type that enables the storage of
 offsets and positions. Enabling term vectors is optional, although it
 significantly speeds up highlights wildcard queries. The indexing analyzer chain for
 the field type needs to start with the `HTMLStripCharFilterFactory`. For ALTO,
-it needs to be preceded by the specialized
-`org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory`.
+you need the specialized `org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory` instead.
 
 ```xml
 <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
