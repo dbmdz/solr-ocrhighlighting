@@ -38,7 +38,6 @@ function highlightFieldValue(val, highlights) {
   return out;
 }
 
-
 class SnippetView extends Component {
   constructor(props) {
     super(props);
