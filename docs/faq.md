@@ -1,4 +1,4 @@
-## Can I have documents that point to a part of an OCR document on external storage? {: #partial-docs}
+## Can I have a document that points to a part of an OCR document on external storage? {: #partial-docs}
 
 **Yes, with an ugly hack**. This use case appears e.g. when indexing digital newspapers,
 where you have a single large volume on disk (e.g. the OCR text for the bound volume containing all issues from the
@@ -27,3 +27,8 @@ Minimal example after masking:
 <!---------------------------------------------------------->
 <l>Here's the content you want in the index for this document</l>
 ```
+
+## Can I index multiple OCR files as a single document?
+
+**No, this is not possible**. You will need to merge your files into
+a single file that contains the content you want in your document.

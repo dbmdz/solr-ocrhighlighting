@@ -39,8 +39,7 @@ In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComp
 `org.mdz.search.solrocr.formats.alto.AltoFormat`.
 
 In the **Schema**, make sure that `org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory`
-and `solr.HTMLStripCharFilterFactory` are the first two filters (in this order) in your
-indexing analyzer chain for OCR fields.
+is the first filter in your indexing analyzer chain for OCR fields.
 
 **Block type mapping:**
 
