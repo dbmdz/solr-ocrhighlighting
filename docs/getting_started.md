@@ -25,6 +25,7 @@ $ mvn package
 The JAR will be in `target/solr-ocrhighlighting-$version.jar`.
 
 ## Configuration
+
 !!! note
     If you're using a format other than hOCR, refer to the [OCR Formats](formats.md)
     documentation for the values you need to put into your configuration and schema.
