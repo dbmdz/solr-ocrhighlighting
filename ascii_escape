@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+"""
+xmlescape [infile] [outfile]
+
+Converts UTF-8 input files to ASCII, while XML-escaping Unicode codepoints.
+If called without arguments, reads from stdin and writes to stdout.
+"""
+
+import sys
+
+
+
+def xmlescape(ifp, ofp):
+    for idx, line in enumerate(ifp):
+        line = line.decode('utf8')
+        if idx == 0 and line.startswith('<?xml'):
+            if 'encoding' in line:
+                line = line.replace('UTF-8', 'US-ASCII')
+            else:
+                line = line.replace('?>', 'encoding="US-ASCII"?>')
+        ofp.write(line.encode('ascii', 'xmlcharrefreplace'))
+
+
+def main():
+    if len(sys.argv) not in (1, 3) or '-h' in sys.argv or '--help' in sys.argv:
+        print(__doc__.strip())
+    elif len(sys.argv) == 3:
+        with open(sys.argv[1], 'rb') as ifp, open(sys.argv[2], 'wb') as ofp:
+            xmlescape(ifp, ofp)
+    elif len(sys.argv) == 1:
+        # py2/py3 compatibility
+        ofp = sys.stdout.buffer if hasattr(sys.stdout, 'buffer') else sys.stdout
+        xmlescape(sys.stdin, ofp)
+
+
+if __name__ == '__main__':
+    main()
