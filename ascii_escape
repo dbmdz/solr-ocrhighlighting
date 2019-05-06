@@ -29,8 +29,10 @@ def main():
             xmlescape(ifp, ofp)
     elif len(sys.argv) == 1:
         # py2/py3 compatibility
-        ofp = sys.stdout.buffer if hasattr(sys.stdout, 'buffer') else sys.stdout
-        xmlescape(sys.stdin, ofp)
+        is_py2 = sys.version_info < (3,)
+        ifp = sys.stdin if is_py2 else sys.stdin.buffer
+        ofp = sys.stdout if is_py2 else sys.stdout.buffer
+        xmlescape(ifp, ofp)
 
 
 if __name__ == '__main__':
