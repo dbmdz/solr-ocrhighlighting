@@ -19,7 +19,7 @@ implementation handle those.
 The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0).
 
 ## Features
-- Index hOCR, ALTO or [MiniOCR](TODO: Link to doc page) directly without preprocessing
+- Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/formats/) directly without preprocessing
 - Retrieve all the information needed to render a highlighted snippet view directly from Solr, without postprocessing
 - Keeps your index size manageable by not necessarily storing the OCR in the index
 
@@ -27,7 +27,8 @@ The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0
 
 1. Download the latest JAR from the [GitHub Releases Page](https://github.com/dbmdz/solr-ocrhighlighting/releases)
 2. Drop the JAR into the `core/lib/` directory for your Solr core
-3. Refer to the [documentation](TODO: Link to docs) for instructions on how to configure Solr
+3. Refer to the [Getting Started guide](https://dbmdz.github.io/solr-ocrhighlighting/getting_started/)
+   for instructions on how to configure Solr
 
 ## Compiling
 If you want to use the latest bleeding-edge version, you can also compile the plugin yourself.
@@ -57,7 +58,7 @@ $ docker-compose up -d
 $ ./ingest_google1000.py
 ```
 
-For more information about the example setup, refer to the [documentation](TODO: Link to example docs).
+For more information about the example setup, refer to the [documentation](https://dbmdz.github.io/solr-ocrhighlighting/example/).
 
 
 ## Limitations
