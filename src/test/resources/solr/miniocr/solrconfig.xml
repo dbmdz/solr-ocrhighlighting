@@ -12,9 +12,10 @@
       <str>stored_ocr_text</str>
       <str>external_ocr_text</str>
     </lst>
-    <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader">
+    <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader"
+                 encoding="ascii">
       <lst name="externalFields">
-        <str name="external_ocr_text">src/test/resources/data/{id}_ocr.xml</str>
+        <str name="external_ocr_text">src/test/resources/data/{id}_miniocr.xml</str>
       </lst>
     </fieldLoader>
   </searchComponent>

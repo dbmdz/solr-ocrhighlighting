@@ -8,42 +8,29 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.BreakIterator;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mdz.search.solrocr.formats.hocr.HocrClassBreakIterator;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class ContextBreakIteratorTest {
-  private static final Path utf16Path = Paths.get("src/test/resources/data/31337_ocr.xml");
   private static final Path utf8Path = Paths.get("src/test/resources/data/31337_utf8ocr.xml");
-
-  static Stream<IterableCharSequence> charSeq() throws IOException {
-    return Stream.of(new FileCharIterator(utf16Path), new FileBytesCharIterator(utf8Path));
-  }
 
   private String stripTags(String val) throws IOException {
     HTMLStripCharFilter filter = new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));
     return CharStreams.toString(filter).replaceAll("\n", "").trim();
   }
 
-  @ParameterizedTest
-  @MethodSource("charSeq")
-  void testContext(IterableCharSequence seq) throws IOException {
+  @Test
+  void testContext() throws IOException {
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8);
     BreakIterator baseIter = new TagBreakIterator("w");
     BreakIterator limitIter = new TagBreakIterator("b");
     ContextBreakIterator it = new ContextBreakIterator(baseIter, limitIter, 5);
     it.setText(seq);
-    int center;
-    if (seq instanceof FileBytesCharIterator) {
-      center = 16254;
-    } else {
-      center = 16126;
-    }
+    int center = 16254;
     int start = it.preceding(center);
     int end = it.following(center);
     assertThat(start).isLessThan(end);

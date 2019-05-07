@@ -4,33 +4,27 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class TagBreakIteratorTest {
 
-  private static final Path utf16Path = Paths.get("src/test/resources/data/31337_ocr.xml");
   private static final Path utf8Path = Paths.get("src/test/resources/data/31337_utf8ocr.xml");
-
-  static Stream<IterableCharSequence> charSeq() throws IOException {
-    return Stream.of(new FileCharIterator(utf16Path), new FileBytesCharIterator(utf8Path));
-  }
 
   private String stripTags(String val) throws IOException {
     HTMLStripCharFilter filter = new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));
     return CharStreams.toString(filter).replaceAll("\n", "");
   }
 
-  @ParameterizedTest
-  @MethodSource("charSeq")
-  void firstNext(IterableCharSequence seq) {
+  @Test
+  void firstNext() throws IOException {
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8);
     TagBreakIterator it = new TagBreakIterator("w");
     it.setText(seq);
     int start = it.next();
@@ -41,16 +35,12 @@ class TagBreakIteratorTest {
     assertThat(StringUtils.countMatches(tag, "</w>")).isEqualTo(1);
   }
 
-  @ParameterizedTest
-  @MethodSource("charSeq")
-  void next(IterableCharSequence seq) throws IOException {
+  @Test
+  void next() throws IOException {
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8);
     TagBreakIterator it = new TagBreakIterator("w");
     it.setText(seq);
-    if (seq instanceof FileBytesCharIterator) {
-      seq.setIndex(8267);
-    } else {
-      seq.setIndex(8192);
-    }
+    seq.setIndex(8267);
     int start = it.next();
     int end = it.next();
     String tag = seq.subSequence(start, end).toString();
