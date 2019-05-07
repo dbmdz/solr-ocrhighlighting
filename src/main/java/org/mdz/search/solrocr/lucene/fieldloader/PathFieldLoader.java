@@ -52,10 +52,7 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
       "\\{(?<fieldName>.+?)(?:\\[(?<startIdx>-?\\d+)?(?:(?<rangeChar>:)(?<endIdx>-?\\d+)?)?])?}");
   private static final Set<Charset> supportedCharsets = ImmutableSet.of(
       StandardCharsets.US_ASCII,
-      StandardCharsets.UTF_8,
-      StandardCharsets.UTF_16,
-      StandardCharsets.UTF_16LE,
-      StandardCharsets.UTF_16BE);
+      StandardCharsets.UTF_8);
   private static final Logger logger = LoggerFactory.getLogger(PathFieldLoader.class);
 
   private Map<String, String> fieldPatterns;
@@ -66,14 +63,15 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
   public void init(PluginInfo info) {
     String cset = info.attributes.get("encoding");
     if (cset == null) {
-      cset = "utf-16";
+      throw new SolrException(
+          ErrorCode.FORBIDDEN,
+          "Missing 'encoding' attribute, must be one of 'ascii' or 'utf-8'");
     }
     this.charset = Charset.forName(cset);
     if (!supportedCharsets.contains(this.charset)) {
       throw new SolrException(
           ErrorCode.FORBIDDEN,
-          String.format("Invalid encoding '%s', must be one of 'ascii', 'utf-8', 'utf-16', 'utf-16le' or 'utf-16be'",
-                        cset));
+          String.format("Invalid encoding '%s', must be one of 'ascii' or 'utf-8'",  cset));
     }
     this.requiredFieldValues = new HashSet<>();
     this.fieldPatterns = new HashMap<>();
@@ -137,14 +135,12 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
     String fieldPattern = fieldPatterns.get(fieldName);
     Path p = Paths.get(interpolateVariables(fieldPattern, fields));
     try {
-      if (this.charset == StandardCharsets.UTF_8 || this.charset == StandardCharsets.US_ASCII) {
-        return new FileBytesCharIterator(p, this.charset);
-      } else {
-        return new FileCharIterator(p);
-      }
+      return new FileBytesCharIterator(p, this.charset);
+        return new FileBytesCharIterator(fPath, this.charset);
     } catch (NoSuchFileException e) {
       // NOTE: We don't log these cases, since this is currently also called for documents that weren't indexed with
       //       any value in this field
+      // FIXME: We should really warn/abort if no file is found
       return null;
     }
   }
