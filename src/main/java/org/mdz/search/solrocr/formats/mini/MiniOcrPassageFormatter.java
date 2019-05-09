@@ -14,7 +14,7 @@ import org.mdz.search.solrocr.util.TagBreakIterator;
 
 public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern wordPat = Pattern.compile(
-      "<w x=\"(?<x>\\.?\\d+?) (?<y>\\.?\\d+?) (?<w>\\.?\\d+?) (?<h>\\.?\\d+?)\">(?<text>.+?)</w>");
+      "<w x=\"(?<x>1?\\.?\\d+?) (?<y>1?\\.?\\d+?) (?<w>1?\\.?\\d+?) (?<h>1?\\.?\\d+?)\">(?<text>.+?)</w>");
   private final static Pattern pagePat = Pattern.compile("<p xml:id=\"(?<pageId>.+?)\">");
 
   private final TagBreakIterator pageIter = new TagBreakIterator("p");

@@ -245,6 +245,11 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     assertQ(req,
         "count(//str[@name='page' and text() != '26'])=0",
           "count(//str[@name='page' and text() = '26'])=1");
+  }
 
+  @Test
+  public void testCornerHit() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "Anerkennungsfrage");
+    assertQ(req, "//arr[@name='highlights']/arr/lst/int[@name='lry']='1'");
   }
 }
