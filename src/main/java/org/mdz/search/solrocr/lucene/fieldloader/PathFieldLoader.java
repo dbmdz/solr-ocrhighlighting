@@ -19,7 +19,6 @@ import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.mdz.search.solrocr.util.FileBytesCharIterator;
-import org.mdz.search.solrocr.util.FileCharIterator;
 import org.mdz.search.solrocr.util.IterableCharSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +135,6 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
     Path p = Paths.get(interpolateVariables(fieldPattern, fields));
     try {
       return new FileBytesCharIterator(p, this.charset);
-        return new FileBytesCharIterator(fPath, this.charset);
     } catch (NoSuchFileException e) {
       // NOTE: We don't log these cases, since this is currently also called for documents that weren't indexed with
       //       any value in this field
