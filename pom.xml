@@ -106,7 +106,7 @@
           <javaOptions>
             <inheritIO>true</inheritIO>
             <additionalOptions>
-              <additionalOption>-Dtest.solr.allowed.securerandom=NativePRNG</additionalOption>
+              <additionalOption>-Djava.security.egd=file:/dev/./urandom</additionalOption>
             </additionalOptions>
           </javaOptions>
         </configuration>
