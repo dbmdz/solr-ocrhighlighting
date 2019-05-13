@@ -111,7 +111,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         throw new IllegalArgumentException("field '" + field + "' was indexed without offsets, cannot highlight");
       }
       if (pageId != null) {
-        String passagePageId = ((OcrPassageFormatter) passageFormatter).determinePage(
+        String passagePageId = ((OcrPassageFormatter) passageFormatter).determineStartPage(
             null, start, (IterableCharSequence) breakIterator.getText());
         if (!passagePageId.equals(pageId)) {
           continue;
@@ -196,7 +196,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         continue;
       }
       if (pageId != null) {
-        String passagePageId = ((OcrPassageFormatter) passageFormatter).determinePage(
+        String passagePageId = ((OcrPassageFormatter) passageFormatter).determineStartPage(
             null, offset, (IterableCharSequence) breakIterator.getText());
         if (!passagePageId.equals(pageId)) {
           continue;

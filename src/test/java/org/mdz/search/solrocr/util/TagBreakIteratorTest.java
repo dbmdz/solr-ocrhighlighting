@@ -15,7 +15,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class TagBreakIteratorTest {
 
-  private static final Path utf8Path = Paths.get("src/test/resources/data/31337_utf8ocr.xml");
+  private static final Path utf8Path = Paths.get("src/test/resources/data/miniocr_utf8.xml");
 
   private String stripTags(String val) throws IOException {
     HTMLStripCharFilter filter = new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));

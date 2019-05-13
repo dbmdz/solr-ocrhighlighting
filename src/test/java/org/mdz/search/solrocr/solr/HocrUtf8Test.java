@@ -62,7 +62,7 @@ public class HocrUtf8Test extends SolrTestCaseJ4 {
         "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
             + "Jlluſtrationen zu Lermontoffs „Dämon“: die Verführung <em>Tamaras</em> durch den Dämon, ihre "
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",
-        "//lst[@name='region'][1]/int[@name='ulx']/text()=146",
+        "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=361"
     );
   }

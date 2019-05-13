@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FileBytesCharIteratorTest {
   private static final Pattern OFFSET_PAT = Pattern.compile("\\s(.+?)⚑(\\d+)");
 
-  private final Path ocrPath = Paths.get("src/test/resources/data/31337_utf8ocr.xml");
+  private final Path ocrPath = Paths.get("src/test/resources/data/miniocr_utf8.xml");
   private Map<Integer, String> words;
   private FileBytesCharIterator it;
 

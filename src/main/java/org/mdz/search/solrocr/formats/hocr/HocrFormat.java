@@ -23,9 +23,11 @@ public class HocrFormat implements OcrFormat {
   @Override
   public BreakIterator getBreakIterator(OcrBlock breakBlock, OcrBlock limitBlock, int contextSize) {
     Set<String> breakClasses = blockClassMapping.get(breakBlock);
-    Set<String> limitClasses = blockClassMapping.get(limitBlock);
-    return new ContextBreakIterator(new HocrClassBreakIterator(breakClasses), new HocrClassBreakIterator(limitClasses),
-                                    contextSize);
+    Set<String> limitClasses = limitBlock == null ? null : blockClassMapping.get(limitBlock);
+    return new ContextBreakIterator(
+        new HocrClassBreakIterator(breakClasses),
+        limitClasses != null ? new HocrClassBreakIterator(limitClasses) : null,
+        contextSize);
   }
 
   @Override

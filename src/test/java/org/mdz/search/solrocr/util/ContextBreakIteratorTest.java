@@ -16,7 +16,7 @@ import org.mdz.search.solrocr.formats.hocr.HocrClassBreakIterator;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class ContextBreakIteratorTest {
-  private static final Path utf8Path = Paths.get("src/test/resources/data/31337_utf8ocr.xml");
+  private static final Path utf8Path = Paths.get("src/test/resources/data/miniocr_utf8.xml");
 
   private String stripTags(String val) throws IOException {
     HTMLStripCharFilter filter = new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));
@@ -48,8 +48,8 @@ class ContextBreakIteratorTest {
     BreakIterator limitIter = new HocrClassBreakIterator("ocrx_block");
     ContextBreakIterator it = new ContextBreakIterator(baseIter, limitIter, 5);
     it.setText(seq);
-    int start = it.preceding(5407013);
-    int end = it.following(5407025);
+    int start = it.preceding(5405775);
+    int end = it.following(5405775 + "Japan</span>".length());
     assertThat(start).isLessThan(end);
     String snippet = seq.subSequence(start, end).toString();
     assertThat(StringUtils.countMatches(snippet, "ocr_line")).isEqualTo(1 + 1 + 5);

@@ -16,12 +16,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mdz.search.solrocr.formats.alto.AltoByteOffsetsParser;
 
-public class AltoTest extends SolrTestCaseJ4 {
+public class AltoUtf8Test extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto_utf8");
 
-    Path ocrPath = Paths.get("src/test/resources/data/alto.xml");
+    Path ocrPath = Paths.get("src/test/resources/data/alto_utf8.xml");
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     AltoByteOffsetsParser.parse(Files.readAllBytes(ocrPath), bos);
     String text = bos.toString(StandardCharsets.UTF_8.toString());
@@ -60,7 +60,7 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
         "//str[@name='text'][1]/text()='H.ieifics Menighed Kl. eg for Nicolai Mcniohed Kl. > > Slet. <) Sftensan« om-exler««««« boggeMenighederzNicvlaiMe- Mighed h«r »stenfang paa <em>Svadag</em> ferrkkvm»,cnde. ->) Sknf- «ewaal til Ssndagen holdes i H.geNesKirte sorNicolaiMemghch L?verda.en Kl.«, oz f»r H-geist-S Menighed Kk72. e) Bor-'",
-        "//lst[@name='region'][1]/int[@name='ulx']/text()=436",
+        "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=436",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=1504"
     );
   }

@@ -1282,7 +1282,7 @@ ydpi:300
 </TextBlock>
 </PrintSpace>
 </Page>
-<Page WIDTH="2092" HEIGHT="3850" PHYSICAL_IMG_NR="6" ID="page_6">
+<Page WIDTH="2092" HEIGHT="3850" PHYSICAL_IMG_NR="6" ID="PAGE2">
 <TextBlock ID="block_12" HPOS="83" VPOS="3284" WIDTH="1703" HEIGHT="100">
 <TextLine ID="line_43" HPOS="182" VPOS="3284" WIDTH="1604" HEIGHT="49">
 <String ID="string_493" HPOS="706" VPOS="3285" WIDTH="222" HEIGHT="37" WC="0.72" CONTENT="Permanent"/>

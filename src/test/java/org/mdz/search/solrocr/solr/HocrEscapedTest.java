@@ -65,7 +65,7 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
         "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
             + "Jlluſtrationen zu Lermontoffs „Dämon“: die Verführung <em>Tamaras</em> durch den Dämon, ihre "
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",
-        "//lst[@name='region'][1]/int[@name='ulx']/text()=146",
+        "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=361"
     );
   }
@@ -78,7 +78,7 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
         "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
             + "Jlluſtrationen zu Lermontoffs „Dämon“: die <em>Verführung Tamaras</em> durch den Dämon, ihre "
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",
-        "//lst[@name='region'][1]/int[@name='ulx']/text()=146",
+        "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=83");
   }
 
@@ -120,7 +120,7 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
   public void testAbsoluteHighlightRegions() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Verführung", "hl.ocr.absoluteHighlights", "true");
     assertQ(req,
-            "//lst[@name='region'][1]/int[@name='ulx']/text()=146",
+            "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
             "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=229");
   }
 
@@ -135,6 +135,17 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
   public void testAccidentalMerge() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Robinson");
     assertQ(req, "count(//arr[@name='highlights']/arr)=2");
+  }
+
+  @Test
+  public void testMultiPageSnippet() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"max werner hochzeit\"~10", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "//str[@name='text'][1]/text()='einer Verwandten ihres zukünftigen Mannes, die im Auslande ſtudiert und kürzlich promoviert habe. Tief im Winter, Mitte Januar, reiſte <em>Max Werner zur Hochzeit</em> ſeiner Schweſter in die ruſſiſche Provinz. Dort, auf dem Gut von deren Freunden, wo eine Un-'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='page_31'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='page_32'",
+        "count(//arr[@name='regions']/lst)=2");
   }
 
 }

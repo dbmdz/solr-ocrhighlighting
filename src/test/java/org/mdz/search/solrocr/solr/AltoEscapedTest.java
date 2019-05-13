@@ -17,7 +17,7 @@ import org.junit.Test;
 public class AltoEscapedTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto-escaped");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto_escaped");
 
     Path ocrPath = Paths.get("src/test/resources/data/alto_escaped.xml");
     String text = new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8);
@@ -56,7 +56,7 @@ public class AltoEscapedTest extends SolrTestCaseJ4 {
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
         "//str[@name='text'][1]/text()='H.ieifics Menighed Kl. eg for Nicolai Mcniohed Kl. > > Slet. <) Sftensan« om-exler««««« boggeMenighederzNicvlaiMe- Mighed h«r »stenfang paa <em>Svadag</em> ferrkkvm»,cnde. ->) Sknf- «ewaal til Ssndagen holdes i H.geNesKirte sorNicolaiMemghch L?verda.en Kl.«, oz f»r H-geist-S Menighed Kk72. e) Bor-'",
-        "//lst[@name='region'][1]/int[@name='ulx']/text()=436",
+        "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=436",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=1504"
     );
   }
@@ -71,5 +71,16 @@ public class AltoEscapedTest extends SolrTestCaseJ4 {
   public void testEntityRemoval() throws Exception {
     SolrQueryRequest req = xmlQ("q", "committee");
     assertQ(req, "//str[@name='text'][1]/text()='Permanent <em>Committee</em>'");
+  }
+
+  @Test
+  public void testMultiPageSnippet() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"jursensen permanent\"", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "//str[@name='text'][1]/text()='kaldes, agter om 3 a 4 Dage at atseile berfea til Stokbolm, Hvorhen han medtager Fragtgods og Passagerer. naar Vedkom- mende behager at henvende dem til Megler H. <em>Jursensen.  Permanent</em> Committee'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='PAGE1'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='PAGE2'",
+        "count(//arr[@name='regions']/lst)=2");
   }
 }

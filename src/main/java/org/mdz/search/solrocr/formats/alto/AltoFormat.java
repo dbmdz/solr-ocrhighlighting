@@ -20,7 +20,7 @@ public class AltoFormat implements OcrFormat {
   @Override
   public BreakIterator getBreakIterator(OcrBlock breakBlock, OcrBlock limitBlock, int contextSize) {
     String breakTag = blockTagMapping.get(breakBlock);
-    String limitTag = blockTagMapping.get(limitBlock);
+    String limitTag = limitBlock == null ? null : blockTagMapping.get(limitBlock);
     return new ContextBreakIterator(new TagBreakIterator(breakTag), new TagBreakIterator(limitTag), contextSize);
   }
 

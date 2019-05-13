@@ -14,10 +14,10 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class OcrFieldsTest extends SolrTestCaseJ4 {
+public class MiniOcrEscapedTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr_escaped");
 
     Path dataPath = Paths.get("src", "test", "resources", "data").toAbsolutePath();
 
@@ -29,7 +29,7 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
             + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
             + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
             + "deserunt mollit anim id est laborum.", "id", "1337"));
-    Path ocrPath = dataPath.resolve("31337_miniocr.xml");
+    Path ocrPath = dataPath.resolve("miniocr_escaped.xml");
     assertU(adoc(
         "external_ocr_text", new String(Files.readAllBytes(ocrPath), StandardCharsets.US_ASCII),
         "id", "31337"));
@@ -81,10 +81,10 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst)=3",
             "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>München</em>'",
-            "//lst[@name='region'][1]/float[@name='ulx']/text()='0.4949'",
-            "//lst[@name='region'][1]/float[@name='uly']/text()='0.0071'",
-            "//lst[@name='region'][1]/float[@name='lrx']/text()='0.571'",
-            "//lst[@name='region'][1]/float[@name='lry']/text()='0.028499998'",
+            "//arr[@name='regions'][1]/lst/float[@name='ulx']/text()='0.4949'",
+            "//arr[@name='regions'][1]/lst/float[@name='uly']/text()='0.0071'",
+            "//arr[@name='regions'][1]/lst/float[@name='lrx']/text()='0.571'",
+            "//arr[@name='regions'][1]/lst/float[@name='lry']/text()='0.028499998'",
             "count(//arr[@name='highlights'])=3",
             "//arr[@name='highlights'][1]/arr/lst/float[@name='ulx']/text()='0.2339'",
             "//arr[@name='highlights'][1]/arr/lst/float[@name='uly']/text()='0.7149'",
@@ -244,12 +244,24 @@ public class OcrFieldsTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "München", "hl.ocr.pageId", "26", "fq", "id:31337");
     assertQ(req,
         "count(//str[@name='page' and text() != '26'])=0",
-          "count(//str[@name='page' and text() = '26'])=1");
+          "count(//str[@name='page' and text() = '26'])=2");
   }
 
   @Test
   public void testCornerHit() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Anerkennungsfrage");
     assertQ(req, "//arr[@name='highlights']/arr/lst/int[@name='lry']='1'");
+  }
+
+  @Test
+  public void testMultiPageSnippet() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"london nachrichten\"~5", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "//str[@name='text'][1]/text()='5proc. Metall. 69, 00. 1854er Looſe –. Bankactien 797, 00. Nordbahn –. National-Anlehen 74, 10. Credit-Actien 177, 80. St. Eiſenb.-Actien-Cert. 182, 10. Galizier 197, 00. <em>London 108, 90. ien-Nachrichten</em>. i er in ſº. . . 1 eyhfü „Fºº Är º Heinr P? P. ſ º. - Empfehlen º'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='9'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='10'",
+        "(//arr[@name='regions']/lst/str[@name='page'])[1]='9'",
+        "(//arr[@name='regions']/lst/str[@name='page'])[2]='10'");
   }
 }
