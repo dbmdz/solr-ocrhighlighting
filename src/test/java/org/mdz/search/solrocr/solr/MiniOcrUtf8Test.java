@@ -16,7 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mdz.search.solrocr.formats.mini.MiniOcrByteOffsetsParser;
 
-public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
+public class MiniOcrUtf8Test extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeUtf8Class() throws Exception {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr_utf8");
@@ -31,7 +31,7 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
             + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
             + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
             + "deserunt mollit anim id est laborum.", "id", "1337"));
-    Path ocrPath = dataPath.resolve("31337_utf8ocr.xml");
+    Path ocrPath = dataPath.resolve("miniocr_utf8.xml");
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     MiniOcrByteOffsetsParser.parse(Files.readAllBytes(ocrPath), bos);
     String text = bos.toString(StandardCharsets.UTF_8.toString());
@@ -70,10 +70,10 @@ public class Utf8OcrFieldsTest extends SolrTestCaseJ4 {
     assertQ(req,
             "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=3",
             "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>München</em>'",
-            "//lst[@name='region'][1]/float[@name='ulx']/text()='0.4949'",
-            "//lst[@name='region'][1]/float[@name='uly']/text()='0.0071'",
-            "//lst[@name='region'][1]/float[@name='lrx']/text()='0.571'",
-            "//lst[@name='region'][1]/float[@name='lry']/text()='0.028499998'",
+            "//arr[@name='regions'][1]/lst/float[@name='ulx']/text()='0.4949'",
+            "//arr[@name='regions'][1]/lst/float[@name='uly']/text()='0.0071'",
+            "//arr[@name='regions'][1]/lst/float[@name='lrx']/text()='0.571'",
+            "//arr[@name='regions'][1]/lst/float[@name='lry']/text()='0.028499998'",
             "count(//arr[@name='highlights'])=3",
             "//arr[@name='highlights'][1]/arr/lst/float[@name='ulx']/text()='0.2339'",
             "//arr[@name='highlights'][1]/arr/lst/float[@name='uly']/text()='0.7149'",

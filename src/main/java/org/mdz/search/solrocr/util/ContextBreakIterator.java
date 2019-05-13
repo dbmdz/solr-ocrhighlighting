@@ -38,7 +38,10 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int next() {
-    int limit = this.limitIter.following(this.baseIter.current());
+    int limit = Integer.MAX_VALUE;
+    if (this.limitIter != null) {
+      limit = this.limitIter.following(this.baseIter.current());
+    }
     for (int i=0; i < context * 2 + 1; i++) {
       if (this.baseIter.next() >= limit) {
         return limit;
@@ -49,7 +52,10 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int previous() {
-    int limit = this.limitIter.preceding(this.baseIter.current());
+    int limit = -1;
+    if (this.limitIter != null) {
+      limit = this.limitIter.preceding(this.baseIter.current());
+    }
     for (int i=0; i < context * 2 + 1; i++) {
       if (this.baseIter.previous() <= limit) {
         return limit;
@@ -60,7 +66,10 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int following(int offset) {
-    int limit = this.limitIter.following(offset);
+    int limit = Integer.MAX_VALUE;
+    if (limitIter != null) {
+      limit = this.limitIter.following(offset);
+    }
     this.baseIter.following(offset);
     for (int i=0; i < context; i++) {
       if (this.baseIter.next() >= limit) {
@@ -72,7 +81,10 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int preceding(int offset) {
-    int limit = this.limitIter.preceding(offset);
+    int limit = -1;
+    if (limitIter != null) {
+      limit = this.limitIter.preceding(offset);
+    }
     this.baseIter.preceding(offset);
     for (int i=0; i < context; i++) {
       if (this.baseIter.previous() <= limit) {
@@ -95,6 +107,8 @@ public class ContextBreakIterator extends BreakIterator {
   @Override
   public void setText(CharacterIterator newText) {
     baseIter.setText(newText);
-    limitIter.setText(newText);
+    if (limitIter != null) {
+      limitIter.setText(newText);
+    }
   }
 }

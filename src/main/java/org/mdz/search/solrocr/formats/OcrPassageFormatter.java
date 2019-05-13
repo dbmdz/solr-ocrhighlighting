@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -93,7 +95,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         }
       }
       String xmlFragment = sb.toString();
-      String pageId = determinePage(xmlFragment, passage.getStartOffset(), content);
+      String pageId = determineStartPage(xmlFragment, passage.getStartOffset(), content);
       OcrSnippet snip = parseFragment(xmlFragment, pageId);
       if (snip != null) {
         snippets[i] = snip;
@@ -120,20 +122,23 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
   }
 
   /** Determine the id of the page an OCR fragment resides on. */
-  public abstract String determinePage(String ocrFragment, int startOffset, IterableCharSequence content);
+  public abstract String determineStartPage(String ocrFragment, int startOffset, IterableCharSequence content);
 
   /** Parse an {@link OcrSnippet} from an OCR fragment. */
   protected OcrSnippet parseFragment(String ocrFragment, String pageId) {
     List<List<OcrBox>> hlBoxes = new ArrayList<>();
-    List<OcrBox> wordBoxes = this.parseWords(ocrFragment);
-    if (wordBoxes.isEmpty()) {
+    List<OcrBox> allBoxes = this.parseWords(ocrFragment, pageId);
+    if (allBoxes.isEmpty()) {
       return null;
     }
 
+    Map<String, List<OcrBox>> grouped = allBoxes.stream().collect(Collectors.groupingBy(
+        OcrBox::getPageId, LinkedHashMap::new, Collectors.toList()));
+
     // Get highlighted spans
     List<OcrBox> currentHl = null;
-    for (OcrBox wordBox : wordBoxes) {
-      if (wordBox.isHighlight) {
+    for (OcrBox wordBox : allBoxes) {
+      if (wordBox.isHighlight()) {
         if (currentHl == null) {
           currentHl = new ArrayList<>();
         }
@@ -147,65 +152,77 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       hlBoxes.add(currentHl);
     }
 
-    // Determine the snippet size
-    float snipUlx = wordBoxes.stream().map(b -> b.ulx).min(Float::compareTo).get();
-    float snipUly = wordBoxes.stream().map(b -> b.uly).min(Float::compareTo).get();
-    float snipLrx = wordBoxes.stream().map(b -> b.lrx).max(Float::compareTo).get();
-    float snipLry = wordBoxes.stream().map(b -> b.lry).max(Float::compareTo).get();
-    OcrBox snippetRegion = new OcrBox(null, snipUlx, snipUly, snipLrx, snipLry, false);
-    OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), pageId, snippetRegion);
+    List<OcrBox> snippetRegions = grouped.entrySet().stream()
+        .map(e -> determineSnippetRegion(e.getValue(), e.getKey()))
+        .collect(Collectors.toList());
+
+    OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), snippetRegions);
     this.addHighlightsToSnippet(hlBoxes, snip);
     return snip;
   }
 
+  private OcrBox determineSnippetRegion(List<OcrBox> wordBoxes, String pageId) {
+    float snipUlx = wordBoxes.stream().map(OcrBox::getUlx).min(Float::compareTo).get();
+    float snipUly = wordBoxes.stream().map(OcrBox::getUly).min(Float::compareTo).get();
+    float snipLrx = wordBoxes.stream().map(OcrBox::getLrx).max(Float::compareTo).get();
+    float snipLry = wordBoxes.stream().map(OcrBox::getLry).max(Float::compareTo).get();
+    return new OcrBox(null, pageId, snipUlx, snipUly, snipLrx, snipLry, false);
+  }
+
 
   /** Parse word boxes from an OCR fragment. */
-  protected abstract List<OcrBox> parseWords(String ocrFragment);
+  protected abstract List<OcrBox> parseWords(String ocrFragment, String startPage);
 
   protected void addHighlightsToSnippet(List<List<OcrBox>> hlBoxes, OcrSnippet snippet) {
-    final float xOffset = this.absoluteHighlights ? 0 : snippet.getSnippetRegion().ulx;
-    final float yOffset = this.absoluteHighlights ? 0 : snippet.getSnippetRegion().uly;
-    hlBoxes.stream()
-        .map(bs -> bs.stream()
-            .map(b -> new OcrBox(b.text, b.ulx - xOffset, b.uly - yOffset,
-                                 b.lrx - xOffset, b.lry - yOffset, b.isHighlight))
-            .collect(Collectors.toList()))
-        .forEach(bs -> snippet.addHighlightRegion(this.mergeBoxes(bs)));
+    for (OcrBox region : snippet.getSnippetRegions()) {
+      final float xOffset = this.absoluteHighlights ? 0 : region.getUlx();
+      final float yOffset = this.absoluteHighlights ? 0 : region.getUly();
+      hlBoxes.stream()
+          .map(bs -> bs.stream()
+              .filter(b -> b.getPageId().equals(region.getPageId()))
+              .map(b -> new OcrBox(b.getText(), b.getPageId(), b.getUlx() - xOffset, b.getUly() - yOffset,
+                                   b.getLrx() - xOffset, b.getLry() - yOffset, b.isHighlight()))
+              .collect(Collectors.toList()))
+          .forEach(bs -> snippet.addHighlightRegion(this.mergeBoxes(bs)));
+    }
   }
 
 
   /** Merge adjacent OCR boxes into a single one, taking line breaks into account **/
   protected List<OcrBox> mergeBoxes(List<OcrBox> boxes) {
+    if (boxes.size() < 2) {
+      return boxes;
+    }
     List<OcrBox> out = new ArrayList<>();
     Iterator<OcrBox> it = boxes.iterator();
     OcrBox curBox = it.next();
-    StringBuilder curText = new StringBuilder(curBox.text);
+    StringBuilder curText = new StringBuilder(curBox.getText());
     // Combine word boxes into a single new OCR box until we hit a linebreak
     while (it.hasNext()) {
       OcrBox nextBox = it.next();
       // We consider a box on a new line if its vertical distance from the current box is close to the line height
-      float lineHeight = curBox.lry - curBox.uly;
-      float yDiff = Math.abs(nextBox.uly - curBox.uly);
+      float lineHeight = curBox.getLry() - curBox.getUly();
+      float yDiff = Math.abs(nextBox.getUly() - curBox.getUly());
       if (yDiff > (0.75 * lineHeight)) {
-        curBox.text = curText.toString();
+        curBox.setText(curText.toString());
         out.add(curBox);
         curBox = nextBox;
-        curText = new StringBuilder(curBox.text);
+        curText = new StringBuilder(curBox.getText());
         continue;
       }
       curText.append(" ");
-      curText.append(nextBox.text);
-      if (nextBox.lrx > curBox.lrx) {
-        curBox.lrx = nextBox.lrx;
+      curText.append(nextBox.getText());
+      if (nextBox.getLrx() > curBox.getLrx()) {
+        curBox.setLrx(nextBox.getLrx());
       }
-      if (nextBox.lry > curBox.lry) {
-        curBox.lry = nextBox.lry;
+      if (nextBox.getLry() > curBox.getLry()) {
+        curBox.setLry(nextBox.getLry());
       }
-      if (nextBox.uly < curBox.uly) {
-        curBox.uly = nextBox.uly;
+      if (nextBox.getUly() < curBox.getUly()) {
+        curBox.setUly(nextBox.getUly());
       }
     }
-    curBox.text = curText.toString();
+    curBox.setText(curText.toString());
     out.add(curBox);
     return out;
   }

@@ -13,7 +13,7 @@
     </lst>
     <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="utf-8">
       <lst name="externalFields">
-        <str name="ocr_text">src/test/resources/data/{id}_utf8ocr.xml</str>
+        <str name="ocr_text">src/test/resources/data/miniocr_utf8.xml</str>
       </lst>
     </fieldLoader>
   </searchComponent>
