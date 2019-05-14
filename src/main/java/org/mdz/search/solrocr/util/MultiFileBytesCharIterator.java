@@ -47,7 +47,6 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
   public MultiFileBytesCharIterator(MultiFileBytesCharIterator other) throws IOException {
     this(other.paths, other.charset);
     this.current = other.current;
-
   }
 
   private IterableCharSequence getCharSeq(int offset) {
@@ -79,14 +78,20 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
   }
 
   @Override
-  public char charAt(int index) {
-    IterableCharSequence seq = getCharSeq(index);
-    int adjustedOffset = adjustOffset(index);
+  public char charAt(int offset) {
+    if (offset < 0 || offset >= this.numBytes) {
+      throw new IndexOutOfBoundsException();
+    }
+    IterableCharSequence seq = getCharSeq(offset);
+    int adjustedOffset = adjustOffset(offset);
     return seq.charAt(adjustedOffset);
   }
 
   @Override
   public CharSequence subSequence(int start, int end) {
+    if (start < 0 || end < 0 || end > this.numBytes || end < start) {
+      throw new IndexOutOfBoundsException();
+    }
     if (offsetMap.floorKey(start).equals(offsetMap.floorKey(end))) {
       // Easy mode, start and end are in the same file
       IterableCharSequence seq = getCharSeq(start);
