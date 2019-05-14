@@ -78,7 +78,7 @@ public class AltoEscapedTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "\"jursensen permanent\"", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
     assertQ(
         req,
-        "//str[@name='text'][1]/text()='kaldes, agter om 3 a 4 Dage at atseile berfea til Stokbolm, Hvorhen han medtager Fragtgods og Passagerer. naar Vedkom- mende behager at henvende dem til Megler H. <em>Jursensen.  Permanent</em> Committee'",
+        "//str[@name='text'][1]/text()='kaldes, agter om 3 a 4 Dage at atseile berfea til Stokbolm, Hvorhen han medtager Fragtgods og Passagerer. naar Vedkom- mende behager at henvende dem til Megler H. <em>Jursensen. Permanent</em> Committee'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='PAGE1'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='PAGE2'",
         "count(//arr[@name='regions']/lst)=2");
