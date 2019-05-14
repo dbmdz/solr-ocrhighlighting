@@ -4,15 +4,22 @@ import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.solr.common.util.NamedList;
@@ -20,31 +27,11 @@ import org.apache.solr.core.PluginInfo;
 import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.mdz.search.solrocr.util.FileBytesCharIterator;
 import org.mdz.search.solrocr.util.IterableCharSequence;
+import org.mdz.search.solrocr.util.MultiFileBytesCharIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Load field values from filesystem paths.
- *
- * Must be configured with a mapping of field names to path patterns. In the pattern, <pre>{docId}</pre> is replaced
- * with the <pre>"id"</pre> field of the document that the field content is to be retrieved for.
- *
- * The files the resolver loads from <strong>must be encoded in UTF-16, all other encodings are not supported.</strong>
- * It is recommended to include a Byte-Order marker in the files, although the loader contains some heuristics to
- * detect the endianness without its presence.
- *
- * Example:
- *
- * <pre>
- * {@code
- *  <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader">
- *    <lst name="externalFields">
- *      <str name="ocr_text">/opt/miniocr/content/bsb_content{docId[7-10]}/{docId[0-10]}/xml/standard/2.2/{docId[0-10]}_miniocr.xml</str>
- *    </lst>
- *  </fieldLoader>
- *  }
- * </pre>
- *
- * */
+/** Load field values from filesystem paths. */
 public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitialized {
   // `{fieldName}`, `{fieldName[:-3]`
   private static final Pattern variablePat = Pattern.compile(
@@ -57,6 +44,7 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
   private Map<String, String> fieldPatterns;
   private Set<String> requiredFieldValues;
   private Charset charset;
+  private boolean isMultiFile;
 
   @Override
   public void init(PluginInfo info) {
@@ -72,6 +60,7 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
           ErrorCode.FORBIDDEN,
           String.format("Invalid encoding '%s', must be one of 'ascii' or 'utf-8'",  cset));
     }
+    isMultiFile = info.attributes.getOrDefault("multiple", "false").equals("true");
     this.requiredFieldValues = new HashSet<>();
     this.fieldPatterns = new HashMap<>();
     NamedList<String> args = (NamedList<String>) info.initArgs.get("externalFields");
@@ -132,9 +121,23 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
   @Override
   public IterableCharSequence loadField(Map<String, String> fields, String fieldName) throws IOException {
     String fieldPattern = fieldPatterns.get(fieldName);
-    Path p = Paths.get(interpolateVariables(fieldPattern, fields));
+    Path fPath = Paths.get(interpolateVariables(fieldPattern, fields));
     try {
-      return new FileBytesCharIterator(p, this.charset);
+      if (isMultiFile) {
+        DirectoryStream.Filter<Path> filter = p -> !p.toFile().isDirectory();
+        Path rootDir = fPath;
+        if (fPath.getFileName().toString().contains("*")) {
+          final PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + fPath.toString());
+          filter = matcher::matches;
+          rootDir = fPath.getParent();
+        }
+        List<Path> files = StreamSupport.stream(Files.newDirectoryStream(rootDir, filter).spliterator(), false)
+            .sorted()
+            .collect(Collectors.toList());
+        return new MultiFileBytesCharIterator(files, charset);
+      } else {
+        return new FileBytesCharIterator(fPath, this.charset);
+      }
     } catch (NoSuchFileException e) {
       // NOTE: We don't log these cases, since this is currently also called for documents that weren't indexed with
       //       any value in this field
