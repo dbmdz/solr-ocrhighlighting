@@ -87,6 +87,23 @@ parts of the field values (e.g. `{id[:10]}`, `{id[2:4]}`, `{id[:-5]}`).
     sources other than the file system, the plugin provides an
     [`ExternalFieldLoader`](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/org/mdz/search/solrocr/lucene/fieldloader/ExternalFieldLoader.java)
     interface that you can implement and just pass in the `class` parameter.
+    
+    
+## Indexing multiple files as a single document
+
+In some environments, OCR documents are stored with one file per page in the OCRed document. The plugin supports
+indexing these files **as a single document** if some pre-conditions are met:
+
+- The lexicographical order of the file paths that make up the pages of a document is equal to the order of those pages
+  in the document
+- The files are **concatenated in the same order without any characters in between** at indexing time
+
+If these conditions are met, add the `multiple="true"` option to your field loader configuration and a wildcard
+to your path patterns (e.g. `/local/ocr/{id}/*.xml`). At indexing time, instead of POSTing the contents of a single
+file in your document's OCR field, you submit the **concatenated contents of all files**.
+
+Refer to the [unit test](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/test/java/org/mdz/search/solrocr/solr/AltoMultiTest.java)
+to see an example setup for this use case.
 
 
 ## Encoding: ASCII with XML-Escapes {: #ascii}

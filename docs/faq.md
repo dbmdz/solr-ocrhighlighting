@@ -28,7 +28,7 @@ Minimal example after masking:
 <l>Here's the content you want in the index for this document</l>
 ```
 
-## Can I index multiple OCR files as a single document?
-
-**No, this is not possible**. You will need to merge your files into
-a single file that contains the content you want in your document.
+!!! note
+    This technique is also very useful if you want to exclude certain parts of the OCR document from the index.
+    It can be very helpful to filter out header and footer lines or page numbers from the search index, e.g. to
+    properly support search hits that cross page boundaries.
