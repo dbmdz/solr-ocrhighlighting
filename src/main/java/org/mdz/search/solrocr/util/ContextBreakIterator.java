@@ -23,12 +23,12 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int first() {
-    return this.baseIter.first();
+    return baseIter.first();
   }
 
   @Override
   public int last() {
-    return this.baseIter.last();
+    return baseIter.last();
   }
 
   @Override
@@ -39,59 +39,59 @@ public class ContextBreakIterator extends BreakIterator {
   @Override
   public int next() {
     int limit = Integer.MAX_VALUE;
-    if (this.limitIter != null) {
-      limit = this.limitIter.following(this.baseIter.current());
+    if (limitIter != null) {
+      limit = limitIter.following(baseIter.current());
     }
     for (int i=0; i < context * 2 + 1; i++) {
-      if (this.baseIter.next() >= limit) {
+      if (baseIter.next() >= limit) {
         return limit;
       };
     }
-    return this.baseIter.current();
+    return baseIter.current();
   }
 
   @Override
   public int previous() {
     int limit = -1;
-    if (this.limitIter != null) {
-      limit = this.limitIter.preceding(this.baseIter.current());
+    if (limitIter != null) {
+      limit = limitIter.preceding(baseIter.current());
     }
     for (int i=0; i < context * 2 + 1; i++) {
-      if (this.baseIter.previous() <= limit) {
+      if (baseIter.previous() <= limit) {
         return limit;
       };
     }
-    return this.baseIter.current();
+    return baseIter.current();
   }
 
   @Override
   public int following(int offset) {
     int limit = Integer.MAX_VALUE;
     if (limitIter != null) {
-      limit = this.limitIter.following(offset);
+      limit = limitIter.following(offset);
     }
-    this.baseIter.following(offset);
+    baseIter.following(offset);
     for (int i=0; i < context; i++) {
-      if (this.baseIter.next() >= limit) {
+      if (baseIter.next() >= limit) {
         return limit;
       }
     }
-    return this.baseIter.current();
+    return baseIter.current();
   }
 
   @Override
   public int preceding(int offset) {
     int limit = -1;
     if (limitIter != null) {
-      limit = this.limitIter.preceding(offset);
+      limit = limitIter.preceding(offset);
     }
-    this.baseIter.preceding(offset);
+    baseIter.preceding(offset);
     for (int i=0; i < context; i++) {
-      if (this.baseIter.previous() <= limit) {
+      if (baseIter.previous() <= limit) {
         return limit;
       }
     }
-    return this.baseIter.current();
+    return baseIter.current();
   }
 
   @Override
