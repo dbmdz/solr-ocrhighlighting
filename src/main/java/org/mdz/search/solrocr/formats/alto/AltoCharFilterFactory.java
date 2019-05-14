@@ -20,8 +20,8 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
  * </ul>
  */
 public class AltoCharFilterFactory extends CharFilterFactory {
-  private static final Pattern DESC_PAT = Pattern.compile("<Description>.+</Description>", Pattern.DOTALL);
-  private static final Pattern CONTENT_PAT = Pattern.compile("CONTENT=['\"](.+?)['\"]");
+  private static final Pattern DESC_PAT = Pattern.compile("<Description>.+?</Description>", Pattern.DOTALL);
+  private static final Pattern CONTENT_PAT = Pattern.compile("CONTENT=['\"](.+?)['\"]( |/>)");
   private static final Pattern SUFFIX_PAT = Pattern.compile("<(\\s*)/>");
 
   public AltoCharFilterFactory(Map<String, String> args) {
@@ -36,7 +36,7 @@ public class AltoCharFilterFactory extends CharFilterFactory {
     // HTMLStripCharFilter down the line, so we move it to a text node to keep it safe.
     // We need to keep the replacement the same length as the input, since the offsets inside of the span should not
     // move, so we pad with whitespace where necessary.
-    CharFilter contentFilter = new PatternReplaceCharFilter(CONTENT_PAT, "        >$1<", descFilter);
+    CharFilter contentFilter = new PatternReplaceCharFilter(CONTENT_PAT, "        >$1<$2", descFilter);
     // If the `CONTENT` attribute comes last, the replaced output will have a `</>` suffix that will not
     // be removed by a subsequent HTMLStripCharFilter, so we strip these suffixes
     CharFilter suffixFilter = new PatternReplaceCharFilter(SUFFIX_PAT, " $1  ", contentFilter);

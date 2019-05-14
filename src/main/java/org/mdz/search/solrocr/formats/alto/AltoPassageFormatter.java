@@ -68,8 +68,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
             .replaceAll(endHlTag, END_HL)
             .replaceAll("<SP.*?>", " ")
             .replaceAll("(</?)?TextLine.*?>", " ")
-            .replaceAll("\n", "")
-            .replaceAll("\\s+", " "));
+            .replaceAll("(?s)<Description>.+?</Description>", ""));
     while (true) {
       Matcher m = wordPat.matcher(sb);
       if (!m.find()) {
@@ -79,6 +78,8 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       sb.replace(m.start(), m.end(), content);
     }
     return StringEscapeUtils.unescapeXml(sb.toString().replaceAll("</?[A-Z]?.*?>", ""))
+        .replaceAll("\n", "")
+        .replaceAll("\\s+", " ")
         .trim()
         .replaceAll(START_HL, startHlTag)
         .replaceAll(END_HL, endHlTag);
