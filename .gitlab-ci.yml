@@ -15,3 +15,6 @@ publish_docs:
     - pip3 install mkdocs
   script:
     - mkdocs gh-deploy --force
+  only:
+    refs:
+      - master
