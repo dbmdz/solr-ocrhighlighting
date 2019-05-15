@@ -64,6 +64,9 @@ public class FileBytesCharIterator implements IterableCharSequence {
   }
 
   private int adjustOffset(int offset) {
+    if (offset == numBytes) {
+      return offset;
+    }
     int b = this.buf.get(offset) & 0xFF;
     while ((b >> 6) == 0b10) {
       offset -= 1;
