@@ -15,6 +15,7 @@
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.DelimitedPayloadTokenFilterFactory" delimiter="⚑"
                 encoder="org.mdz.search.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
+        <filter class="org.mdz.search.solrocr.lucene.NonAlphaTrimFilterFactory" />
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>
         <filter class="solr.PorterStemFilterFactory"/>

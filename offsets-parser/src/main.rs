@@ -41,7 +41,7 @@ fn get_regex(ocr: &str) -> &Regex {
     lazy_static! {
         static ref MINIOCR_WORD_RE: Regex = Regex::new(r#"<w.*?>(?P<text>[^\s]+?)</w>"#).unwrap();
         static ref HOCR_WORD_RE: Regex = Regex::new(r#"<span class=['"]ocrx_word['"].+?>(?P<text>[^\s]+?)</span>"#).unwrap();
-        static ref ALTO_WORD_RE: Regex = Regex::new(r#"<String.+?CONTENT="(?P<text>.+?)".*?>"#).unwrap();
+        static ref ALTO_WORD_RE: Regex = Regex::new(r#"<String.+? CONTENT="(?P<text>.+?)".*?>"#).unwrap();
     }
     match get_format(&ocr) {
         OcrFormat::MiniOcr => &MINIOCR_WORD_RE,

@@ -11,10 +11,10 @@
     <lst name="ocrFields">
       <str>ocr_text</str>
     </lst>
-    <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii"
+    <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="utf8"
                  multiple="true">
       <lst name="externalFields">
-        <str name="ocr_text">src/test/resources/data/alto_multi/*.xml</str>
+        <str name="ocr_text">src/test/resources/data/alto_multi_utf8/*.xml</str>
       </lst>
     </fieldLoader>
   </searchComponent>

@@ -100,7 +100,7 @@ indexing these files **as a single document** if some pre-conditions are met:
 
 If these conditions are met, add the `multiple="true"` option to your field loader configuration and a wildcard
 to your path patterns (e.g. `/local/ocr/{id}/*.xml`). At indexing time, instead of POSTing the contents of a single
-file in your document's OCR field, you submit the **concatenated contents of all files**.
+file in your document's OCR field, you submit the **concatenated contents of all files** (or, in the case of [UTF-8 documents](#utf8), the index for the concatenated contents).
 
 Refer to the [unit test](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/test/java/org/mdz/search/solrocr/solr/AltoMultiTest.java)
 to see an example setup for this use case.
@@ -158,6 +158,9 @@ as well as a cross-platform command-line tool (available on the
 ```sh
 # The tool works transparently with all supported formats
 ./offsets-parser ../example/google1000/Volume_0000.hocr > out.txt
+
+#or, for multiple files that should be indexed as one document:
+$ cat page1.xml page2.xml | ./offsets-parser > out.txt
 ```
 
 In your schema, you will have to enable term positions, term vectors and term payloads.
@@ -175,6 +178,9 @@ tokenize on whitespace, split off those offsets during indexing and store them a
     <!-- The delimiter can be any UTF-16 codepoint, "⚑" is used by default in the provided Java implementation and CLI tool -->
     <filter class="solr.DelimitedPayloadTokenFilterFactory" delimiter="⚑"
             encoder="org.mdz.search.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
+    <!-- The WhitespaceTokenizer is really rudimentary. This filter will trim non-letter from the beginning/end,
+         making the terms more similar to what you'd get with the StandardTokenizer. -->
+   <filter class="org.mdz.search.solrocr.lucene.NonAlphaTrimFilterFactory" />
     <!-- rest of your analyzer chain -->
     <!-- ..... -->
   </analyzer>

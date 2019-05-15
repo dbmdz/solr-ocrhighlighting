@@ -1,8 +1,8 @@
 package org.mdz.search.solrocr.solr;
 
 import com.google.common.collect.ImmutableMap;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,26 +16,27 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mdz.search.solrocr.formats.alto.AltoByteOffsetsParser;
 
-public class AltoMultiTest extends SolrTestCaseJ4 {
+public class AltoMultiUtf8Test extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto_multi");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto_multi_utf8");
 
-    Path ocrBasePath = Paths.get("src/test/resources/data/alto_multi");
-    StringBuilder sb = new StringBuilder();
-    Arrays.stream(ocrBasePath.toFile().listFiles())
-        .map(File::toPath)
-        .filter(p -> p.toString().endsWith(".xml"))
-        .sorted()
-        .forEach(p -> {
-          try {
-            sb.append(new String(Files.readAllBytes(p), StandardCharsets.UTF_8));
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        });
-    assertU(adoc("ocr_text", sb.toString(), "id", "42"));
+    Path basePath = Paths.get("src/test/resources/data/alto_multi_utf8");
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    File[] ocrFiles = basePath.toFile().listFiles(pathname -> pathname.getName().endsWith(".xml"));
+    Arrays.sort(ocrFiles);
+    for (int i=0; i < ocrFiles.length; i++) {
+      bos.write(Files.readAllBytes(ocrFiles[i].toPath()));
+    }
+    byte[] ocrData = bos.toByteArray();
+    bos.reset();
+
+    AltoByteOffsetsParser.parse(ocrData, bos);
+    String text = bos.toString(StandardCharsets.UTF_8.toString());
+    Files.write(Paths.get("/tmp/debug.txt"), bos.toByteArray());
+    assertU(adoc("ocr_text", text, "id", "42"));
     assertU(commit());
   }
 
@@ -44,7 +45,6 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         ImmutableMap.<String, String>builder()
            .put("hl", "true")
            .put("hl.fields", "ocr_text")
-            .put("hl.weightMatches", "true")
            .put("hl.usePhraseHighlighter", "true")
            .put("df", "ocr_text")
            .put("hl.ctxTag", "ocr_line")
@@ -74,6 +74,7 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         "count(//arr[@name='snippets']/lst)=3",
         "(//str[@name='page'])[1]/text()='P1'",
         "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='Embranchement de <em>Bettembourg</em> à Esch s/A.'",
+        "(//arr[@name='snippets']/lst/str[@name='text'])[2]/text()='Retour à Luxembourg pour les deux embranchements Départ de <em>Bettembourg</em>: 6h. 50 du soir. |'",
         "(//arr[@name='snippets']/lst/str[@name='text'])[3]/text()='Embranchement de <em>Bettembourg</em> à Ottange.'");
   }
 
@@ -84,7 +85,7 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         req,
         "count(//arr[@name='snippets']/lst)=1",
         "(//str[@name='page'])[1]/text()='P4'",
-        "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='verburcien zu diirfcn. On écrit de Saint-Pétersbourg, en date du 18 novembre, au <em>Moniteur universel</em>:'");
+        "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='verburcien zu diirfcn. On écrit de Saint-Pétersbourg, en date du 18 novembre, au <em>Moniteur</em> <em>universel</em>:'");
   }
 
   @Test
