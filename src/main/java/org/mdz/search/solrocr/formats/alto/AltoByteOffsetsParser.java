@@ -15,7 +15,7 @@ import net.byteseek.searcher.sequence.SequenceMatcherSearcher;
 
 public class AltoByteOffsetsParser {
   private static final Searcher<SequenceMatcher> CONTENT_SEARCHER =
-      new SequenceMatcherSearcher(new ByteSequenceMatcher("CONTENT=\""));
+      new SequenceMatcherSearcher(new ByteSequenceMatcher(" CONTENT=\""));
   private static final Searcher<SequenceMatcher> QUOTE_SEARCHER =
       new SequenceMatcherSearcher(new ByteSequenceMatcher("\""));
 
@@ -25,9 +25,12 @@ public class AltoByteOffsetsParser {
 
     while (it.hasNext()) {
       for (SearchResult<SequenceMatcher> m : it.next()) {
-        int start = (int) m.getMatchPosition() + 9;
+        int start = (int) m.getMatchPosition() + 10;
         int end = (int) new ForwardSearchIterator<>(
             QUOTE_SEARCHER, altoBytes, start).next().get(0).getMatchPosition();
+        if (end == start) {
+          continue;
+        }
         os.write(altoBytes, start, end - start);
         os.write(String.format("⚑%d ", start).getBytes(StandardCharsets.UTF_8));
       }

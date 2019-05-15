@@ -22,11 +22,17 @@ public class ByteOffsetEncoder extends AbstractEncoder {
   }
 
   public static int decode(BytesRef payload) {
+    if (payload == null) {
+      return -1;
+    }
     return new ByteArrayDataInput(payload.bytes, payload.offset, payload.length).readVInt();
   }
 
   @Override
   public BytesRef encode(char[] buffer, int offset, int length) {
+    if (length == 0) {
+      return null;
+    }
     int byteOffset = Integer.parseInt(new String(buffer, offset, length));
     return new BytesRef(encode(byteOffset));
   }

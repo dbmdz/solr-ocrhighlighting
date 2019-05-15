@@ -10,15 +10,15 @@
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
     </fieldType>
-    <fieldtype name="text_ocr" class="solr.TextField" termPositions="true" termVectors="true" termPayloads="true">
+    <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
       <analyzer>
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.DelimitedPayloadTokenFilterFactory" delimiter="⚑"
-                encoder="org.mdz.search.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
+          encoder="org.mdz.search.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
         <filter class="org.mdz.search.solrocr.lucene.NonAlphaTrimFilterFactory" />
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>
-        <filter class="solr.PorterStemFilterFactory"/>
+        <filter class="solr.FrenchLightStemFilterFactory"/>
       </analyzer>
     </fieldtype>
   </types>
