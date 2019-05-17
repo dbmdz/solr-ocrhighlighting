@@ -1,14 +1,22 @@
 include: "https://raw.githubusercontent.com/dbmdz/development/master/ci/.gitlab-ci-base.yml"
 
+variables:
+  TARGET: x86_64-unknown-linux-musl
+
+cache:
+  key: "$CI_COMMIT_SHA"
+  paths:
+    - target/
+    - offsets-parser/target/$TARGET
+
 stages:
   - build
   - test
   - publish
   - release
-  - publish_docs
-
 
 publish_docs:
+  stage: publish
   before_script:
     - git remote rm origin
     - git remote add origin "https://stefan-it:$GITHUB_TOKEN@github.com/$CI_PROJECT_PATH.git"
@@ -18,3 +26,24 @@ publish_docs:
   only:
     refs:
       - master
+
+linux_binary:
+  image: "ekidd/rust-musl-builder"
+  stage: build
+  script:
+    - sudo apt update
+    - sudo apt install -y zip
+    - cd offsets-parser
+    - cargo build --release --target $TARGET
+    - cd target/$TARGET/release
+    - ls -l
+    - zip ../../../../offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip offsets-parser
+    - ls ../../../../
+
+github_release:
+  extends: .release
+  only:
+    - tags
+  script:
+    - if [[ "$CI_COMMIT_TAG" =~ .*RC.* ]]; then exit 0; fi
+    - hub release create -m $CI_COMMIT_TAG $(find . -iname "*.jar" -exec echo -a {} \;) offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip -t $CI_COMMIT_SHA $CI_COMMIT_TAG
