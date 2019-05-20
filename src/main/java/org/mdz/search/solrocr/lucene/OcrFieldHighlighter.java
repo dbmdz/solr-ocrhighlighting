@@ -1,5 +1,6 @@
 package org.mdz.search.solrocr.lucene;
 
+import com.google.common.base.Utf8;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
@@ -187,7 +188,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       int end = offset;
       while (true) {
         char c = this.breakIterator.getText().next();
-        end += Character.toString(c).getBytes(StandardCharsets.UTF_8).length;
+        end += Utf8.encodedLength(Character.toString(c));
         if (!Character.isLetter(c)) {
           break;
         }
