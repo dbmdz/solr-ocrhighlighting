@@ -1,6 +1,6 @@
 # offsets-parser
 
-A small cross-platform command-line utility to generate a sequencde of tokens along with their byte offset
+A small cross-platform command-line utility to generate a sequence of tokens along with their byte offset
 in the input document.
 
 # Usage
