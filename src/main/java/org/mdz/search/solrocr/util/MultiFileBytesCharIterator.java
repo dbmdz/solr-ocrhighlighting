@@ -1,5 +1,6 @@
 package org.mdz.search.solrocr.util;
 
+import com.google.common.base.Utf8;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -129,13 +130,7 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
 
   @Override
   public char next() {
-    char c = this.current();
-    int inc = 1;
-    if (Character.isHighSurrogate(c) || c > '\u07FF') {
-      inc = 3;
-    }  else if (c > '\u007F') {
-      inc = 2;
-    }
+    int inc = Utf8.encodedLength(Character.toString(this.current()));
     this.current = Math.min(this.current + inc, this.numBytes);
     if (this.current == this.numBytes) {
       return DONE;
@@ -146,13 +141,7 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
   @Override
   public char previous() {
     if (this.current > 0) {
-      char c = this.current();
-      int dec = 1;
-      if (Character.isLowSurrogate(c) || c > '\u07FF') {
-        dec = 3;
-      } else if (c > '\u007F') {
-        dec = 2;
-      }
+      int dec = Utf8.encodedLength(Character.toString(this.current()));
       this.current = Math.max(this.current - dec, 0);
       return this.current();
     } else {
