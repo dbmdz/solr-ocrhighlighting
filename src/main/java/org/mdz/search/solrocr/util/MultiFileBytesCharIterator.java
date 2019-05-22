@@ -1,6 +1,5 @@
 package org.mdz.search.solrocr.util;
 
-import com.google.common.base.Utf8;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
