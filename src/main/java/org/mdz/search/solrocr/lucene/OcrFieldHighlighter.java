@@ -1,6 +1,5 @@
 package org.mdz.search.solrocr.lucene;
 
-import com.google.common.base.Utf8;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
@@ -22,6 +21,7 @@ import org.mdz.search.solrocr.lucene.byteoffset.ByteOffsetsEnum;
 import org.mdz.search.solrocr.lucene.byteoffset.FieldByteOffsetStrategy;
 import org.mdz.search.solrocr.util.IterableCharSequence;
 import org.mdz.search.solrocr.util.IterableCharSequence.OffsetType;
+import org.mdz.search.solrocr.util.Utf8;
 
 /**
  * A customization of {@link FieldHighlighter} to support lazy-loaded field values and byte offsets from payloads.
