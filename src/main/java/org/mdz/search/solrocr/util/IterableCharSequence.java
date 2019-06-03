@@ -12,9 +12,13 @@ import java.util.stream.IntStream;
  * this plugin wraps the content is accessed via both interfaces.
  */
 public interface IterableCharSequence extends CharSequence, CharacterIterator {
+
+
   enum OffsetType {
     BYTES, CHARS
   }
+
+  String getIdentifier();
 
   OffsetType getOffsetType();
 
@@ -117,6 +121,11 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
     @Override
     public String toString() {
       return this.s;
+    }
+
+    @Override
+    public String getIdentifier() {
+      return this.s.substring(0, 29) + "...";
     }
 
     @Override

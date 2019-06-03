@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class MultiFileBytesCharIterator implements IterableCharSequence {
   private final List<Path> paths;
@@ -60,6 +61,11 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
 
   private int adjustOffset(int offset) {
     return offset - offsetMap.floorKey(offset);
+  }
+
+  @Override
+  public String getIdentifier() {
+    return String.format("{%s}", this.paths.stream().map(Path::toString).collect(Collectors.joining(", ")));
   }
 
   @Override
