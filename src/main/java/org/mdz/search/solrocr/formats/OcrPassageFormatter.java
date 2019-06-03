@@ -20,14 +20,20 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageFormatter;
+import org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader;
 import org.mdz.search.solrocr.util.IterableCharSequence;
+import org.mdz.search.solrocr.util.IterableCharSequence.OffsetType;
 import org.mdz.search.solrocr.util.OcrBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances.
  */
 public abstract class OcrPassageFormatter extends PassageFormatter {
-  private final static Pattern LAST_INNER_TAG_PAT = Pattern.compile("[a-zA-Z0-9]</");
+  private static final Pattern LAST_INNER_TAG_PAT = Pattern.compile("[a-zA-Z0-9]</");
+
+  private static final Logger logger = LoggerFactory.getLogger(PathFieldLoader.class);
   protected final String startHlTag;
   protected final String endHlTag;
   protected final boolean absoluteHighlights;
@@ -68,41 +74,57 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     OcrSnippet[] snippets = new OcrSnippet[passages.length];
     for (int i=0; i < passages.length; i++) {
       Passage passage = passages[i];
-      StringBuilder sb = new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
-      int extraChars = 0;
-      if (passage.getNumMatches() > 0) {
-        List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
-        for (PassageMatch match : matches) {
-          int matchStart = content.subSequence(passage.getStartOffset(), match.start).toString().length();
-          sb.insert(extraChars + matchStart, startHlTag);
-          extraChars += startHlTag.length();
-          int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
-          String matchText = sb.substring(extraChars + matchStart, extraChars + matchEnd);
-          if (matchText.trim().endsWith(">")) {
-            // Set the end of the match to the position before the last inner closing tag inside of the match.
-            Matcher m = LAST_INNER_TAG_PAT.matcher(matchText);
-            int idx = -1;
-            while (m.find()) {
-              idx = m.start() + 1;
-            }
-            if (idx > -1) {
-              int matchLength = match.end - match.start;
-              matchEnd -= (matchLength - idx);
-            }
-          }
-          sb.insert(Math.min(extraChars + matchEnd, sb.length()), endHlTag);
-          extraChars += endHlTag.length();
+      try {
+        snippets[i] = format(passage, content);
+      } catch (IndexOutOfBoundsException e) {
+        String errorMsg = String.format(
+            "Could not create snippet (start=%d, end=%d) from content at '%s' due to an out-of-bounds error.",
+            passage.getStartOffset(), passage.getEndOffset(), content.getIdentifier());
+        if (content.getOffsetType() == OffsetType.BYTES) {
+          errorMsg += "\nDoes the file on disk correspond to the document that was used for determining the offsets during indexing?";
+        } else {
+          errorMsg += "\nDoes the file on disk correspond to the document that was used during indexing?";
         }
-      }
-      String xmlFragment = sb.toString();
-      String pageId = determineStartPage(xmlFragment, passage.getStartOffset(), content);
-      OcrSnippet snip = parseFragment(xmlFragment, pageId);
-      if (snip != null) {
-        snippets[i] = snip;
-        snippets[i].setScore(passage.getScore());
+        logger.error(errorMsg, e);
       }
     }
     return snippets;
+  }
+
+  private OcrSnippet format(Passage passage, IterableCharSequence content) {
+    StringBuilder sb = new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
+    int extraChars = 0;
+    if (passage.getNumMatches() > 0) {
+      List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
+      for (PassageMatch match : matches) {
+        int matchStart = content.subSequence(passage.getStartOffset(), match.start).toString().length();
+        sb.insert(extraChars + matchStart, startHlTag);
+        extraChars += startHlTag.length();
+        int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
+        String matchText = sb.substring(extraChars + matchStart, extraChars + matchEnd);
+        if (matchText.trim().endsWith(">")) {
+          // Set the end of the match to the position before the last inner closing tag inside of the match.
+          Matcher m = LAST_INNER_TAG_PAT.matcher(matchText);
+          int idx = -1;
+          while (m.find()) {
+            idx = m.start() + 1;
+          }
+          if (idx > -1) {
+            int matchLength = match.end - match.start;
+            matchEnd -= (matchLength - idx);
+          }
+        }
+        sb.insert(Math.min(extraChars + matchEnd, sb.length()), endHlTag);
+        extraChars += endHlTag.length();
+      }
+    }
+    String xmlFragment = sb.toString();
+    String pageId = determineStartPage(xmlFragment, passage.getStartOffset(), content);
+    OcrSnippet snip = parseFragment(xmlFragment, pageId);
+    if (snip != null) {
+      snip.setScore(passage.getScore());
+    }
+    return snip;
   }
 
   /** Helper method to get plaintext from XML/HTML-like fragments */

@@ -218,6 +218,11 @@ public class FileBytesCharIterator implements IterableCharSequence {
   }
 
   @Override
+  public String getIdentifier() {
+    return this.filePath.toAbsolutePath().toString();
+  }
+
+  @Override
   public OffsetType getOffsetType() {
     return OffsetType.BYTES;
   }
