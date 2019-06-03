@@ -139,10 +139,7 @@ public class PathFieldLoader implements ExternalFieldLoader, PluginInfoInitializ
         return new FileBytesCharIterator(fPath, this.charset);
       }
     } catch (NoSuchFileException e) {
-      // NOTE: We don't log these cases, since this is currently also called for documents that weren't indexed with
-      //       any value in this field
-      // FIXME: We should really warn/abort if no file is found
-      return null;
+      throw new IOException(String.format("Could not find file at resolved path '%s'.", fPath), e);
     }
   }
 
