@@ -71,7 +71,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     if (ocrFieldNames.length > 0) {
       OcrHighlighter ocrHighlighter = new OcrHighlighter(
           req.getSearcher(), req.getSchema().getIndexAnalyzer(), fieldLoader, req.getParams());
-      if (fieldLoader.getCharset() == StandardCharsets.UTF_8) {
+      if (fieldLoader != null && fieldLoader.getCharset() == StandardCharsets.UTF_8) {
         Arrays.stream(ocrFieldNames)
             .filter(f -> ocrHighlighter.getFlags(f).contains(HighlightFlag.WEIGHT_MATCHES))
             .forEach(field -> highlightFieldWarnings.put(field, NO_WEIGHT_MATCHES_SUPPORT_MSG));
