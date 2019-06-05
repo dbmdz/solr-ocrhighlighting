@@ -102,7 +102,7 @@ If these conditions are met, add the `multiple="true"` option to your field load
 to your path patterns (e.g. `/local/ocr/{id}/*.xml`). At indexing time, instead of POSTing the contents of a single
 file in your document's OCR field, you submit the **concatenated contents of all files** (or, in the case of [UTF-8 documents](#utf8), the index for the concatenated contents).
 
-Refer to the [unit test](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/test/java/de/digitalcollections/solrocr/solr/AltoMultiTest.java)
+Refer to the [unit test](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/test/java/de/digitalcollections/solrocr/solr/AltoMultiEscapedTest.java)
 to see an example setup for this use case.
 
 
