@@ -6,7 +6,6 @@ variables:
 cache:
   key: "$CI_COMMIT_SHA"
   paths:
-    - target/
     - offsets-parser/target/$TARGET
 
 stages:
@@ -35,10 +34,6 @@ linux_binary:
     - sudo apt install -y zip
     - cd offsets-parser
     - cargo build --release --target $TARGET
-    - cd target/$TARGET/release
-    - ls -l
-    - zip ../../../../offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip offsets-parser
-    - ls ../../../../
 
 github_release:
   extends: .release
@@ -46,4 +41,8 @@ github_release:
     - tags
   script:
     - if [[ "$CI_COMMIT_TAG" =~ .*RC.* ]]; then exit 0; fi
+    - cd offsets-parser/target/$TARGET/release
+    - ls -l
+    - zip ../../../../offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip offsets-parser
+    - ls ../../../../
     - hub release create -m $CI_COMMIT_TAG $(find . -iname "*.jar" -exec echo -a {} \;) offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip -t $CI_COMMIT_SHA $CI_COMMIT_TAG
