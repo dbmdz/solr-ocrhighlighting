@@ -6,13 +6,13 @@
 
   <requestHandler name="/select" class="solr.SearchHandler"/>
 
-  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocrHighlight"
-                   ocrFormat="org.mdz.search.solrocr.formats.mini.MiniOcrFormat">
+  <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocrHighlight"
+                   ocrFormat="de.digitalcollections.solrocr.formats.mini.MiniOcrFormat">
     <lst name="ocrFields">
       <str>stored_ocr_text</str>
       <str>external_ocr_text</str>
     </lst>
-    <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader"
+    <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader"
                  encoding="ascii">
       <lst name="externalFields">
         <str name="external_ocr_text">src/test/resources/data/miniocr_escaped.xml</str>

@@ -3,12 +3,12 @@
   <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
   <schemaFactory class="ClassicIndexSchemaFactory"/>
 
-  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocrHighlight"
-                   ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
+  <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocrHighlight"
+                   ocrFormat="de.digitalcollections.solrocr.formats.hocr.HocrFormat">
     <lst name="ocrFields">
       <str>ocr_text</str>
     </lst>
-    <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
+    <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
       <lst name="externalFields">
         <str name="ocr_text">/google1000/{id}.hocr</str>
       </lst>

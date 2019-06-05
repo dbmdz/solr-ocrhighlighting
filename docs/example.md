@@ -44,14 +44,14 @@ To run the example setup yourself, you will need:
 ```xml
 
 <!-- The Google 1000 books corpus used for the example is in the hOCR format -->
-<searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocrHighlight"
-                 ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
+<searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocrHighlight"
+                 ocrFormat="de.digitalcollections.solrocr.formats.hocr.HocrFormat">
   <!-- We have a single field that contains OCR -->
   <lst name="ocrFields">
     <str>ocr_text</str>
   </lst>
   <!-- The example setup loads the ASCII-encoded OCR documents from local storage -->
-  <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
+  <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
     <lst name="externalFields">
       <!-- E.g. /google1000/Volume_0000.hocr -->
       <str name="ocr_text">/google1000/{id}.hocr</str>

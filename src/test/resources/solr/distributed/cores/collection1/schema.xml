@@ -13,7 +13,7 @@
     <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
       <analyzer>
         <!-- Remove description element -->
-        <charFilter class="org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory" />
+        <charFilter class="de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory" />
         <charFilter class="solr.HTMLStripCharFilterFactory" />
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>

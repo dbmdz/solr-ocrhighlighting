@@ -49,15 +49,15 @@ experience.
 To enable accessing external documents during highlighting, you will have to configure
 a `FieldLoader` in the `<searchComponent>` section of your `solrconfig.xml`.
 For documents on the local filesystem, the loader to use is
-`org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader`.
+`de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader`.
 
 ```xml
-<searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="highlight"
-                 ocrFormat="org.mdz.search.solrocr.formats.alto.AltoFormat">
+<searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="highlight"
+                 ocrFormat="de.digitalcollections.solrocr.formats.alto.AltoFormat">
   <lst name="ocrFields">
     <str>ocr_text</str>
   </lst>
-  <fieldLoader class="org.mdz.search.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
+  <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
     <lst name="externalFields">
       <str name="ocr_text">/google1000/{id}/hOCR.html</str>
     </lst>
@@ -85,7 +85,7 @@ parts of the field values (e.g. `{id[:10]}`, `{id[2:4]}`, `{id[:-5]}`).
 !!! note
     If your use case requires more sophisticated resolving, or you want to load the document contents from
     sources other than the file system, the plugin provides an
-    [`ExternalFieldLoader`](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/org/mdz/search/solrocr/lucene/fieldloader/ExternalFieldLoader.java)
+    [`ExternalFieldLoader`](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/de/digitalcollections/solrocr/lucene/fieldloader/ExternalFieldLoader.java)
     interface that you can implement and just pass in the `class` parameter.
     
     
@@ -102,7 +102,7 @@ If these conditions are met, add the `multiple="true"` option to your field load
 to your path patterns (e.g. `/local/ocr/{id}/*.xml`). At indexing time, instead of POSTing the contents of a single
 file in your document's OCR field, you submit the **concatenated contents of all files** (or, in the case of [UTF-8 documents](#utf8), the index for the concatenated contents).
 
-Refer to the [unit test](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/test/java/org/mdz/search/solrocr/solr/AltoMultiTest.java)
+Refer to the [unit test](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/test/java/de/digitalcollections/solrocr/solr/AltoMultiTest.java)
 to see an example setup for this use case.
 
 
@@ -149,9 +149,9 @@ own value with the included tool and the `delimiter` attribute in the configurat
     your unmodified OCR documents will be used.
 
 You don't have to do this by yourself, we provide a Java implementation for every supported format
-([hOCR](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/org/mdz/search/solrocr/formats/hocr/HocrByteOffsetsParser.java),
-[ALTO](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/org/mdz/search/solrocr/formats/alto/AltoByteOffsetsParser.java)
-and [MiniOCR](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/org/mdz/search/solrocr/formats/mini/MiniOcrByteOffsetsParser.java))
+([hOCR](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/de/digitalcollections/solrocr/formats/hocr/HocrByteOffsetsParser.java),
+[ALTO](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/de/digitalcollections/solrocr/formats/alto/AltoByteOffsetsParser.java)
+and [MiniOCR](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/main/java/de/digitalcollections/solrocr/formats/mini/MiniOcrByteOffsetsParser.java))
 as well as a cross-platform command-line tool (available on the
 [GitHub releases page](https://github.com/dbmdz/solr-ocrhighlighting/releases)):
 
@@ -177,10 +177,10 @@ tokenize on whitespace, split off those offsets during indexing and store them a
     <tokenizer class="solr.WhitespaceTokenizerFactory"/>
     <!-- The delimiter can be any UTF-16 codepoint, "⚑" is used by default in the provided Java implementation and CLI tool -->
     <filter class="solr.DelimitedPayloadTokenFilterFactory" delimiter="⚑"
-            encoder="org.mdz.search.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
+            encoder="de.digitalcollections.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
     <!-- The WhitespaceTokenizer is really rudimentary. This filter will trim non-letter from the beginning/end,
          making the terms more similar to what you'd get with the StandardTokenizer. -->
-   <filter class="org.mdz.search.solrocr.lucene.NonAlphaTrimFilterFactory" />
+   <filter class="de.digitalcollections.solrocr.lucene.NonAlphaTrimFilterFactory" />
     <!-- rest of your analyzer chain -->
     <!-- ..... -->
   </analyzer>

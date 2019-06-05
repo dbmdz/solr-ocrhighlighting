@@ -37,8 +37,8 @@ your fields contain OCR text (i.e. the `solrconfig` is currently tied to the sch
 
 ```xml
 <config>
-  <searchComponent class="org.mdz.search.solrocr.solr.HighlightComponent" name="ocrHighlight"
-                   ocrFormat="org.mdz.search.solrocr.formats.hocr.HocrFormat">
+  <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocrHighlight"
+                   ocrFormat="de.digitalcollections.solrocr.formats.hocr.HocrFormat">
     <lst name="ocrFields">
       <!-- Requires a field named `ocr_text` in the schema -->
       <str>ocr_text</str>
@@ -67,7 +67,7 @@ For your schema, you will have to define a type that enables the storage of
 offsets and positions. Enabling term vectors is optional, although it
 significantly speeds up highlights wildcard queries. The indexing analyzer chain for
 the field type needs to start with the `HTMLStripCharFilterFactory`. For ALTO,
-you need the specialized `org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory` instead.
+you need the specialized `de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory` instead.
 
 ```xml
 <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">

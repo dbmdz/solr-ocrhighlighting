@@ -17,7 +17,7 @@ query parameters](queryparams.md) to control how snippets are generated.
 ## hOCR
 
 In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
-`org.mdz.search.solrocr.formats.hocr.HocrFormat`.
+`de.digitalcollections.solrocr.formats.hocr.HocrFormat`.
 
 In the **Schema**, make sure that `solr.HTMLStripCharFilterFactory` is the first filter
 in your indexing analyzer chain for OCR fields.
@@ -36,9 +36,9 @@ in your indexing analyzer chain for OCR fields.
 ## ALTO
 
 In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
-`org.mdz.search.solrocr.formats.alto.AltoFormat`.
+`de.digitalcollections.solrocr.formats.alto.AltoFormat`.
 
-In the **Schema**, make sure that `org.mdz.search.solrocr.formats.alto.AltoCharFilterFactory`
+In the **Schema**, make sure that `de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory`
 is the first filter in your indexing analyzer chain for OCR fields.
 
 **Block type mapping:**
@@ -74,7 +74,7 @@ A basic example looks like this:
 ```
 
 In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
-`org.mdz.search.solrocr.formats.mini.MiniOcrFormat`.
+`de.digitalcollections.solrocr.formats.mini.MiniOcrFormat`.
 
 In the **Schema**, make sure that `solr.HTMLStripCharFilterFactory` is the first filter
 in your indexing analyzer chain for OCR fields.

@@ -4,10 +4,44 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.mdz.search</groupId>
+  <groupId>de.digitalcollections</groupId>
   <artifactId>solr-ocrhighlighting</artifactId>
   <version>0.1-SNAPSHOT</version>
 
+  <name>Solr OCR Highlighting Plugin</name>
+  <description>
+    Solr plugin to add support for highlighting directly from various OCR formats (hOCR/ALTO/MiniOCR)
+    without having to store the OCR documents in the index.
+  </description>
+  <url>https://dbmdz.github.io/solr-ocrhighlighting</url>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Johannes Baiter</name>
+      <email>johannes.baiter@bsb-muenchen.de</email>
+      <organization>Bavarian State Library</organization>
+      <organizationUrl>https://github.com/dbmdz</organizationUrl>
+    </developer>
+    <developer>
+      <name>Christoph Lorenz</name>
+      <email>christoph.lorenz@bsb-muenchen.de</email>
+      <organization>Bavarian State Library</organization>
+      <organizationUrl>https://github.com/dbmdz</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/dbmdz/solr-ocrhighlighting.git</connection>
+    <developerConnection>scm:git:ssh://github.com:dbmdz/solr-ocrhighlighting.git</developerConnection>
+    <url>https://github.com/dbmdz/solr-ocrhighlighting/tree/master</url>
+  </scm>
 
   <properties>
     <java.version>1.8</java.version>
@@ -129,7 +163,7 @@
           <minimizeJar>true</minimizeJar>
           <artifactSet>
             <includes>
-              <include>org.mdz.search:solr-ocr-plugin</include>
+              <include>de.digitalcollections:solr-ocr-plugin</include>
               <include>net.byteseek:byteseek</include>
               <include>org.apache.commons:commons-text</include>
             </includes>
