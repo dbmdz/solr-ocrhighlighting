@@ -46,6 +46,8 @@ steps:
   - task: GithubRelease@0
     displayName: Add binaries to GitHub release
     inputs:
+      action: edit
+      tag: $(Build.SourceBranchName)
       gitHubConnection: jbaiter-personal
       repositoryName: dbmdz/solr-ocrhighlighting
       assets: $(Build.ArtifactStagingDirectory)/*.zip

@@ -6,6 +6,7 @@ variables:
 cache:
   key: "$CI_COMMIT_SHA"
   paths:
+    - target/
     - offsets-parser/target/$TARGET
 
 stages:
@@ -30,8 +31,6 @@ linux_binary:
   image: "ekidd/rust-musl-builder"
   stage: build
   script:
-    - sudo apt update
-    - sudo apt install -y zip
     - cd offsets-parser
     - cargo build --release --target $TARGET
 
@@ -41,8 +40,7 @@ github_release:
     - tags
   script:
     - if [[ "$CI_COMMIT_TAG" =~ .*RC.* ]]; then exit 0; fi
-    - cd offsets-parser/target/$TARGET/release
-    - ls -l
-    - zip ../../../../offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip offsets-parser
-    - ls ../../../../
-    - hub release create -m $CI_COMMIT_TAG $(find . -iname "*.jar" -exec echo -a {} \;) offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip -t $CI_COMMIT_SHA $CI_COMMIT_TAG
+    - sudo apt update
+    - sudo apt install -y zip
+    - zip -j offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip offsets-parser/target/$TARGET/release/offsets-parser
+    - hub release edit -m $CI_COMMIT_TAG -a target/solr-ocrhighlighting-${CI_COMMIT_TAG}.jar -a offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip -t $CI_COMMIT_SHA $CI_COMMIT_TAG
