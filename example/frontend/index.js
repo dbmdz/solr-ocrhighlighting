@@ -38,6 +38,7 @@ function highlightFieldValue(val, highlights) {
   return out;
 }
 
+// TODO: Add support for snippets with regions from multiple pages
 class SnippetView extends Component {
   constructor(props) {
     super(props);
@@ -48,14 +49,14 @@ class SnippetView extends Component {
 
   get imageBaseUrl() {
     const { docId } = this.props;
-    const { page } = this.props.snippet;
+    const page = this.props.snippet.regions[0].page;
     const pageId = String(parseInt(page.split("_")[1]) - 1).padStart(4, "0");
     return `${IMAGE_API_BASE}/iiif/image/${docId}/Image_${pageId}.JPEG`;
 
   }
 
   getHighlightStyle(hlInfo, hue) {
-    const regionWidth = this.props.snippet.region.lrx - this.props.snippet.region.ulx;
+    const regionWidth = this.props.snippet.regions[0].lrx - this.props.snippet.regions[0].ulx;
     const scaleFactor = this.state.renderedImage.width / regionWidth;
     return {
       position: "absolute",
@@ -68,7 +69,7 @@ class SnippetView extends Component {
   }
 
   getImageUrl(width) {
-    const { region } = this.props.snippet;
+    const region = this.props.snippet.regions[0];
     const regionStr = `${region.ulx},${region.uly},${region.lrx - region.ulx},${region.lry - region.uly}`;
     const widthStr = width ? `${width},` : "full";
     return `${this.imageBaseUrl}/${regionStr}/${widthStr}/0/default.jpg`;
@@ -76,7 +77,8 @@ class SnippetView extends Component {
 
   render() {
     const { docId, query } = this.props;
-    const { text, page, highlights } = this.props.snippet;
+    const { text, highlights } = this.props.snippet;
+    const page = this.props.snippet.regions[0].page;
     const pageIdx = parseInt(page.split("_")[1]) - 1;
     const manifestUri = `${APP_BASE}/iiif/presentation/${docId}/manifest`;
     const viewerUrl = `/viewer/#?manifest=${manifestUri}&cv=${pageIdx}&q=${query}`;
