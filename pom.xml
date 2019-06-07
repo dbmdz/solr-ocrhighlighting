@@ -6,7 +6,7 @@
 
   <groupId>de.digitalcollections</groupId>
   <artifactId>solr-ocrhighlighting</artifactId>
-  <version>0.1</version>
+  <version>0.2-SNAPSHOT</version>
 
   <name>Solr OCR Highlighting Plugin</name>
   <description>
