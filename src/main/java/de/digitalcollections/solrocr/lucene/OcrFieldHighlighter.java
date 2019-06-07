@@ -134,7 +134,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         }
         // advance breakIterator
         passage.setStartOffset(Math.max(this.breakIterator.preceding(start + 1), 0));
-        passage.setEndOffset(Math.min(this.breakIterator.following(start), contentLength));
+        passage.setEndOffset(Math.min(this.breakIterator.following(end), contentLength));
+      } else {
+        passage.setEndOffset(Math.min(this.breakIterator.following(end), contentLength));
       }
       // Add this term to the passage.
       BytesRef term = off.getTerm();// a reference; safe to refer to

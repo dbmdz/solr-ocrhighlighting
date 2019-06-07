@@ -96,6 +96,6 @@ public class AltoMultiEscapedTest extends SolrTestCaseJ4 {
         "count(//arr[@name='snippets']/lst)=1",
         "(//arr[@name='regions']/lst/str[@name='page'])[1]/text()='P2'",
         "(//arr[@name='regions']/lst/str[@name='page'])[2]/text()='P3'",
-        "//arr[@name='snippets']/lst/str[@name='text']/text()='Vcschllisse motivirt hat. wird gcwisi nirgends mchr gcwurdigt und tiaukbarer anerkannt, alS hier in unscrcm Landc; abcr auch <em>nirgendS H bas Bediirfnisi</em> nach ciucr cndlichen That des Bundcs dringender alS hier. Die bishcrige'");
+        "//arr[@name='snippets']/lst/str[@name='text']/text()='Vcschllisse motivirt hat. wird gcwisi nirgends mchr gcwurdigt und tiaukbarer anerkannt, alS hier in unscrcm Landc; abcr auch <em>nirgendS H bas Bediirfnisi</em> nach ciucr cndlichen That des Bundcs dringender alS hier. Die bishcrige Veschliïssc dcs Blindes, welche die Erfullung'");
   }
 }

@@ -258,7 +258,7 @@ public class MiniOcrEscapedTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "\"london nachrichten\"~5", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
     assertQ(
         req,
-        "//str[@name='text'][1]/text()='5proc. Metall. 69, 00. 1854er Looſe –. Bankactien 797, 00. Nordbahn –. National-Anlehen 74, 10. Credit-Actien 177, 80. St. Eiſenb.-Actien-Cert. 182, 10. Galizier 197, 00. <em>London 108, 90. ien-Nachrichten</em>. i er in ſº. . . 1 eyhfü „Fºº Är º Heinr P? P. ſ º. - Empfehlen º'",
+        "//str[@name='text'][1]/text()='5proc. Metall. 69, 00. 1854er Looſe –. Bankactien 797, 00. Nordbahn –. National-Anlehen 74, 10. Credit-Actien 177, 80. St. Eiſenb.-Actien-Cert. 182, 10. Galizier 197, 00. <em>London 108, 90. ien-Nachrichten</em>. i er in ſº. . . 1 eyhfü „Fºº Är º Heinr P? P. ſ º. - Empfehlen º Meyen ( - Leutloff mit -meraüren beenre-e-mehr-die-ergeben Ä-mein Gehrer u. Studirende!'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='9'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='10'",
         "(//arr[@name='regions']/lst/str[@name='page'])[1]='9'",
