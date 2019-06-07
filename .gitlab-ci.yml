@@ -6,7 +6,6 @@ variables:
 cache:
   key: "$CI_COMMIT_SHA"
   paths:
-    - target/
     - offsets-parser/target/$TARGET
 
 stages:
@@ -40,6 +39,7 @@ github_release:
     - tags
   script:
     - if [[ "$CI_COMMIT_TAG" =~ .*RC.* ]]; then exit 0; fi
+    - mvn clean package
     - sudo apt update
     - sudo apt install -y zip
     - zip -j offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip offsets-parser/target/$TARGET/release/offsets-parser
