@@ -160,4 +160,10 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
             + "nonsense sin), yet they transpose it in effect, desiring their\"");
   }
 
+  @Test
+  public void testHyphenationIsResolved() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"themselves to Satan\"", "hl.weightMatches", "true");
+    assertQ(req, "count(//arr[@name='regions']/lst)=1");
+  }
+
 }
