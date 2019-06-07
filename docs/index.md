@@ -8,17 +8,19 @@ and its position on the page at query time:
 
 ```json
 {
-  "page": "page_380",
   "text": "to those parts, subject to unreasonable claims from the pro­prietor "
           "of Maryland, until the year 17C2, when the whole controversy was "
-          "settled by Charles <em>Mason</em> and Jeremiah <em>Dixon</em>, upon "
-          "their return from an observation of the tran­sit of Venus, at the "
-          "Cape of Good Hope, where they",
-  "score": 11110209,
-  "region": { "ulx": 196, "uly": 1703, "lrx": 1232, "lry": 1968 },
-  "highlights": [
-    [{ "text": "Mason",  "ulx": 675, "uly": 110, "lrx": 783, "lry": 141 }],
-    [{ "text": "Dixon,", "ulx": 1,   "uly": 167, "lrx": 119, "lry": 204 }]
+          "settled by Charles <em>Mason and Jeremiah Dixon</em>, upon their "
+          "return from an observation of the tran­sit of Venus, at the Cape of "
+          "Good Hope, where they",
+  "score":5555104.5,
+  "regions":[
+    { "ulx":196, "uly":1703, "lrx":1232, "lry":1968, "page":"page_380" }
+  ],
+  "highlights":[
+    [{ "text":"Mason and Jeremiah", "ulx":675, "uly":110, "lrx":1036, "lry":145,
+       "page":"page_380"},
+     { "text":"Dixon,", "ulx":1, "uly":167, "lrx":119, "lry":204, "page":"page_380"}]
   ]
 }
 ```

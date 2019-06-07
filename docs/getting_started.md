@@ -149,37 +149,15 @@ should yield a response like this:
       "ocr_text": {
         "snippets": [
           {
-            "page": "page_44",
             "text": "Easy to have, impregnable to hold, An Island to be rul'd, and "
                     "I to rule ![Enter a Gladiator, shouting towards <em>Pirates</em>' "
                     "quarter.]GLAD. Ho, there ! what ho ! the troops are on the move, "
                     "My Chief! my Chief! the <em>Pirates</em> steal away !",
-            "score": 881062.75,
-            "region": {
-              "ulx": 194,
-              "uly": 807,
-              "lrx": 1196,
-              "lry": 1008
-            },
-            "highlights": [
-              [
-                {
-                  "text": "Pirates'",
-                  "ulx": 694,
-                  "uly": 82,
-                  "lrx": 823,
-                  "lry": 111
-                }
-              ],
-              [
-                {
-                  "text": "Pirates",
-                  "ulx": 450,
-                  "uly": 162,
-                  "lrx": 563,
-                  "lry": 190
-                }
-              ]
+            "score":1137503.6,
+            "regions":[{ "ulx":194, "uly":807, "lrx":1196, "lry":1008, "page":"page_44"}],
+            "highlights":[
+              [{ "text":"Pirates'", "ulx":694, "uly":82, "lrx":823, "lry":111, "page":"page_44"}],
+              [{ "text":"Pirates", "ulx":450, "uly":162, "lrx":563, "lry":190, "page":"page_44"}]
             ]
           }
         ],
@@ -192,8 +170,8 @@ should yield a response like this:
 
 As you can see, the `ocrHighlighting` component contains for every field in
 every matching document a list of snippets that match the query. The snippet
-contains the page the match occurred on, the matching text, the score of
-the passage and the coordinates of the region on the page image containing the
+contains the regions the match occurred on, the matching text, the score of
+the passage and the coordinates of the regions in the page images containing the
 passage text.
 
 Additionally, it also includes the region and text for every highlighting hit
