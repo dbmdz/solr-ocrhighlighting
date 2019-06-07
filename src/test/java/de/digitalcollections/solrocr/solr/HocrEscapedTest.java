@@ -142,10 +142,22 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "\"max werner hochzeit\"~10", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
     assertQ(
         req,
-        "//str[@name='text'][1]/text()='einer Verwandten ihres zukünftigen Mannes, die im Auslande ſtudiert und kürzlich promoviert habe. Tief im Winter, Mitte Januar, reiſte <em>Max Werner zur Hochzeit</em> ſeiner Schweſter in die ruſſiſche Provinz. Dort, auf dem Gut von deren Freunden, wo eine Un-'",
+        "//str[@name='text'][1]/text()='einer Verwandten ihres zukünftigen Mannes, die im Auslande ſtudiert und kürzlich promoviert habe. Tief im Winter, Mitte Januar, reiſte <em>Max Werner zur Hochzeit</em> ſeiner Schweſter in die ruſſiſche Provinz. Dort, auf dem Gut von deren Freunden, wo eine Un- menge fremder Gäſte untergebracht waren, ſah er mitten'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='page_31'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='page_32'",
         "count(//arr[@name='regions']/lst)=2");
+  }
+
+  @Test
+  public void testMergedRegionExceedsContext() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"lord's prayer\"", "hl.weightMatches", "true");
+    assertQ(req,
+            "count(//arr[@name='regions']/lst)=1",
+            "//str[@name='text'][1]/text()=\"Witches are reported (amongst many other hellish observations, whereby "
+            + "they obh'ge them\u00ADselves to Satan) to say the <em>Lord's prayer</em> back\u00ADwards. "
+            + "Are there not many, who, though they do not. pronounce the syllables of the <em>Lord's "
+            + "prayer</em> retrograde (their discretion will not suf\u00ADfer them to be betrayed to such a "
+            + "nonsense sin), yet they transpose it in effect, desiring their\"");
   }
 
 }

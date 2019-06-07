@@ -40,7 +40,7 @@ public class OcrHighlightResult {
       int snipCount = getSnippetCount(fieldName);
       OcrSnippet[] snips = getFieldSnippets(fieldName);
       NamedList[] outSnips = Arrays.stream(snips)
-          .map(OcrSnippet::toNamedList)
+          .map(snip -> snip == null ? null : snip.toNamedList())
           .toArray(NamedList[]::new);
       fieldOut.add("snippets", outSnips);
       fieldOut.add("numTotal", snipCount);
