@@ -122,8 +122,8 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
                 before = after = None
             anno_ids = []
             for hlbox in hl:
-                x = snip['region']['ulx'] + hlbox['ulx']
-                y = snip['region']['uly'] + hlbox['uly']
+                x = snip['regions'][0]['ulx'] + hlbox['ulx']
+                y = snip['regions'][0]['uly'] + hlbox['uly']
                 w = hlbox['lrx'] - hlbox['ulx']
                 h = hlbox['lry'] - hlbox['uly']
                 ident = make_id(vol_id)
@@ -136,7 +136,7 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query):
                         "@type": "cnt:ContentAsText",
                         "chars": hlbox['text'] 
                     },
-                    "on": f'{protocol}://{location}{app_path}/{vol_id}/canvas/{snip["page"]}#xywh={x},{y},{w},{h}'}
+                    "on": f'{protocol}://{location}{app_path}/{vol_id}/canvas/{snip['regions'][0]["page"]}#xywh={x},{y},{w},{h}'}
                 doc['resources'].append(anno)
             doc['hits'].append({
                 '@type': 'search:Hit',
