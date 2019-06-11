@@ -19,7 +19,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
   private final static String END_HL = "@@ENDHLTAG@@";
   private final static Pattern pagePat = Pattern.compile("<Page ?(?<attribs>.+?)/?>");
   private final static Pattern wordPat = Pattern.compile("<String ?(?<attribs>.+?)/?>");
-  private final static Pattern attribPat = Pattern.compile("(?<key>[A-Z]+?)=\"(?<val>.+?)\"");
+  private final static Pattern attribPat = Pattern.compile("(?<key>[A-Z_]+?)=\"(?<val>.+?)\"");
 
   private final TagBreakIterator pageIter = new TagBreakIterator("Page");
 
@@ -69,13 +69,33 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
             .replaceAll("<SP.*?>", " ")
             .replaceAll("(</?)?TextLine.*?>", " ")
             .replaceAll("(?s)<Description>.+?</Description>", ""));
+    boolean isBeginning = true;
     while (true) {
       Matcher m = wordPat.matcher(sb);
       if (!m.find()) {
         break;
       }
-      String content = parseAttribs(m.group("attribs")).get("CONTENT");
-      sb.replace(m.start(), m.end(), content);
+      int start = m.start();
+      int end = m.end();
+      Map<String, String> attribs = parseAttribs(m.group("attribs"));
+      String content;
+      if ("HypPart1".equals(attribs.get("SUBS_TYPE"))) {
+        if (m.find()) {  // The hyphen end is part of the fragment, so we use the dehyphenated form
+          content = attribs.get("SUBS_CONTENT");
+        } else {  // The hyphen end is not part of the fragment, so we use the hyphenated form
+          content = attribs.get("CONTENT");
+        }
+      } else if ("HypPart2".equals(attribs.get("SUBS_TYPE"))) {
+        if (isBeginning) {  // The hyphen start is not part of the fragment, so we use the hyphenated form
+          content = attribs.get("CONTENT");
+        } else {  // The hyphen start is part of the fragment, so the dehyphenated form is already in the plaintext
+          content = "";
+        }
+      } else {
+        content = attribs.get("CONTENT");
+      }
+      sb.replace(start, end, content);
+      isBeginning = false;
     }
     return StringEscapeUtils.unescapeXml(sb.toString().replaceAll("</?[A-Z]?.*?>", ""))
         .replaceAll("\n", "")
@@ -96,6 +116,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     List<OcrBox> wordBoxes = new ArrayList<>();
     Matcher m = wordPat.matcher(ocrFragment);
     boolean inHighlight = false;
+    boolean highlightHyphenEnd = false;
     while (m.find()) {
       String pageId = startPage;
       if (pageBreaks.floorKey(m.start()) != null) {
@@ -106,17 +127,28 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       int y = Integer.parseInt(attribs.get("VPOS"));
       int w = Integer.parseInt(attribs.get("WIDTH"));
       int h = Integer.parseInt(attribs.get("HEIGHT"));
+      String subsType = attribs.get("SUBS_TYPE");
       String text = attribs.get("CONTENT");
-      if (text.contains(START_HL)) {
+      if ("HypPart1".equals(subsType)) {
+        text += "-";
+      }
+      if (text.contains(START_HL) || attribs.getOrDefault("SUBS_CONTENT", "").contains(START_HL)) {
         inHighlight = true;
       }
       wordBoxes.add(new OcrBox(text.replace(START_HL, "")
                                    .replace(END_HL, ""),
                                pageId,  x, y, x + w, y + h, inHighlight));
-      boolean endOfHl = (
-          text.contains(END_HL)
-          || ocrFragment.substring(m.end(), Math.min(m.end() + END_HL.length(), ocrFragment.length())).equals(END_HL));
-      if (endOfHl) {
+
+      if (inHighlight && subsType != null) {
+        if (subsType.equals("HypPart1") && attribs.get("SUBS_CONTENT").contains(END_HL)) {
+          highlightHyphenEnd = true;
+        } else if (highlightHyphenEnd){
+          highlightHyphenEnd = false;
+          inHighlight = false;
+        }
+      } else if (text.contains(END_HL)) {
+        inHighlight = false;
+      } else if (ocrFragment.substring(m.end(), Math.min(m.end() + END_HL.length(), ocrFragment.length())).equals(END_HL)) {
         inHighlight = false;
       }
     }

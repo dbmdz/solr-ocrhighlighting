@@ -85,7 +85,7 @@ public class AltoMultiEscapedTest extends SolrTestCaseJ4 {
         req,
         "count(//arr[@name='snippets']/lst)=1",
         "(//str[@name='page'])[1]/text()='P4'",
-        "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='verburcien zu diirfcn. On écrit de Saint-Pétersbourg, en date du 18 novembre, au <em>Moniteur universel</em>:'");
+        "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='burcien zu diirfcn. On écrit de Saint-Pétersbourg, en date du 18 novembre, au <em>Moniteur universel</em>:'");
   }
 
   @Test

@@ -24,6 +24,7 @@
     <field name="id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
     <field name="some_text" type="text" indexed="true" stored="true" />
     <field name="ocr_text" type="text_ocr" indexed="true" stored="false" />
+    <field name="fixtureName" type="string" stored="true" required="true"/>
     <dynamicField name="*_ocr" type="text_ocr" indexed="true" stored="false" />
   </fields>
   <uniqueKey>id</uniqueKey>
