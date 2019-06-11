@@ -21,7 +21,10 @@ public class AltoEscapedTest extends SolrTestCaseJ4 {
 
     Path ocrPath = Paths.get("src/test/resources/data/alto_escaped.xml");
     String text = new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8);
-    assertU(adoc("ocr_text", text, "id", "42"));
+    assertU(adoc("ocr_text", text, "id", "42", "fixtureName", "alto_escaped"));
+    ocrPath = Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml");
+    text = new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8);
+    assertU(adoc("ocr_text", text, "id", "43", "fixtureName", "bnl_lunion_1865-04-15"));
     assertU(commit());
   }
 
@@ -82,5 +85,22 @@ public class AltoEscapedTest extends SolrTestCaseJ4 {
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='PAGE1'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='PAGE2'",
         "count(//arr[@name='regions']/lst)=2");
+  }
+
+  @Test
+  public void testHyphenationResolved() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"faux espoir\"", "hl.weightMatches", "true");
+    assertQ(req,
+            "//str[@name='text'][1]/text()=\"— <em>Faux espoir</em>, mon vieil ami, <em>faux espoir</em> ! Je n'ai jamais même vu un seul des anciens compagnons de ses plaisirs. Lui\"",
+            "count(//arr[@name='highlights']/arr/lst)=3",
+            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='Faux espoir,'",
+            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='faux es-'",
+            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[3]='poir'");
+    req = xmlQ("q", "\"elle murmura\"", "hl.weightMatches", "true");
+    assertQ(req,
+            "//str[@name='text'][1]/text()=\"triste signe de tête avec lequel <em>elle murmura</em> :\"",
+            "count(//arr[@name='highlights']/arr/lst)=2",
+            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='elle mur-'",
+            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='mura'");
   }
 }

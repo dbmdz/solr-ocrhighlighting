@@ -43,12 +43,12 @@ public class AltoCharFilterFactory extends CharFilterFactory {
     // Remove all String nodes that have the second part of the hyphenated word
     CharFilter hyphenEndFilter = new PatternReplaceCharFilter(HYPHEN_END_PAT, "", descFilter);
 
-    // Switch the CONTENT and SUBS_CONTENT values for the remaining hyphen start nodes so that the plaintext includes
-    // only the dehyphenated form
+    // Mask out the CONTENT attrib and rename the SUBS_CONTENT to CONTENT so that the plaintext contains only the
+    // dehyphenated form
     CharFilter hyphenStartAFilter = new PatternReplaceCharFilter(
-        HYPHEN_START_PAT_A, " CONTENT='${subsContent}'${ctx} SUBS_CONTENT='${content}'${end}", hyphenEndFilter);
+        HYPHEN_START_PAT_A, " XXXXXXX='${content}'${ctx}      CONTENT='${subsContent}'${end}", hyphenEndFilter);
     CharFilter hyphenStartBFilter = new PatternReplaceCharFilter(
-        HYPHEN_START_PAT_B, " CONTENT='${subsContent}'${ctx} SUBS_CONTENT='${content}'${end}", hyphenStartAFilter);
+        HYPHEN_START_PAT_B, "      CONTENT='${subsContent}'${ctx} XXXXXXX='${content}'${end}", hyphenStartAFilter);
     CharFilter hypFilter = new PatternReplaceCharFilter(HYP_FILTER, "", hyphenStartBFilter);
 
     // The OCR content for a given word is stored in the @CONTENT attribute, which would be stripped by the
