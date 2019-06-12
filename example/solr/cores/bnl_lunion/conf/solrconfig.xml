@@ -1,0 +1,28 @@
+<config>
+  <luceneMatchVersion>7.6</luceneMatchVersion>
+  <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
+  <schemaFactory class="ClassicIndexSchemaFactory"/>
+
+  <lib dir="../../../contrib/ocrsearch/lib" regex=".*\.jar" />
+
+  <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocrHighlight"
+                   ocrFormat="de.digitalcollections.solrocr.formats.alto.AltoFormat">
+    <lst name="ocrFields">
+      <str>ocr_text</str>
+    </lst>
+    <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii"
+                 multiple="true">
+      <lst name="externalFields">
+        <str name="ocr_text">/data/bnl_lunion/{issue_id}/text/*.xml</str>
+      </lst>
+    </fieldLoader>
+  </searchComponent>
+
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <arr name="components">
+      <str>query</str>
+      <str>highlight</str>
+      <str>ocrHighlight</str>
+    </arr>
+  </requestHandler>
+</config>

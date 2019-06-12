@@ -7,9 +7,10 @@ services:
       - "1044:1044"  # Debugging port
       - "8983:8983"  # Solr admin interface
     volumes:
-      - ..:/data
-      - data-solr:/opt/solr/server/solr/ocrtest/data
-      - ./google1000:/google1000
+      - ..:/opt/solr-plugin
+      - data-lunion:/opt/solr/server/solr/bnl_lunion/data
+      - data-google1000:/opt/solr/server/solr/google1000/data
+      - ./data:/data
 
   iiif-prezi:
     command: pipenv run prod
@@ -29,4 +30,5 @@ services:
       - "8181:80"
 
 volumes:
-  data-solr:
+  data-lunion:
+  data-google1000:
