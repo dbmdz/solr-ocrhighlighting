@@ -2,6 +2,8 @@ target
 .idea
 *.iml
 dependency-reduced-pom.xml
-example/google1000
+example/data/google1000/*.hocr
+example/data/bnl_lunion/15*
+example/frontend/node_modules
 site
 __pycache__

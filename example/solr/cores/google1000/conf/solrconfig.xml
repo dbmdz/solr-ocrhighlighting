@@ -3,6 +3,8 @@
   <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
   <schemaFactory class="ClassicIndexSchemaFactory"/>
 
+  <lib dir="../../../contrib/ocrsearch/lib" regex=".*\.jar" />
+
   <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocrHighlight"
                    ocrFormat="de.digitalcollections.solrocr.formats.hocr.HocrFormat">
     <lst name="ocrFields">
@@ -10,7 +12,7 @@
     </lst>
     <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
       <lst name="externalFields">
-        <str name="ocr_text">/google1000/{id}.hocr</str>
+        <str name="ocr_text">/data/google1000/{id}.hocr</str>
       </lst>
     </fieldLoader>
   </searchComponent>
