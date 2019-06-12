@@ -114,7 +114,7 @@ document that can be highlighted in your index.
 
 ## Querying
 At query time, no extra parameters besides `hl=true` and an inclusion of your OCR fields in the
-`hl.fields` parameter are required.
+`hl.fl` parameter are required.
 
 !!! note
     For a list of all available parameters, rever to the [Query Parameters documentation](queryparams.md)

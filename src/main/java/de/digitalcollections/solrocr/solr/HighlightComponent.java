@@ -4,12 +4,9 @@ import de.digitalcollections.solrocr.formats.OcrFormat;
 import de.digitalcollections.solrocr.lucene.fieldloader.ExternalFieldLoader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
-import org.apache.solr.common.params.HighlightParams;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.PluginInfo;
@@ -88,16 +85,7 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
         }
       }
 
-      ModifiableSolrParams ocrParams = new ModifiableSolrParams(params);
-      String[] hlFields = params.getParams(HighlightParams.FIELDS);
-      if (hlFields != null) {
-        ocrParams.set(
-            HighlightParams.FIELDS,
-            Arrays.stream(hlFields).filter(ocrFieldNames::contains).toArray(String[]::new));
-      }
-
       if( highlightQuery != null ) {
-        req.setParams(ocrParams);
         NamedList ocrHighlights = ocrHighlighter.doHighlighting(
             rb.getResults().docList,
             highlightQuery,

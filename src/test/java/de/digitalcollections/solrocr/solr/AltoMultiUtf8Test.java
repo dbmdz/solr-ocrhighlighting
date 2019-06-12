@@ -44,7 +44,7 @@ public class AltoMultiUtf8Test extends SolrTestCaseJ4 {
     Map<String, String> args = new HashMap<>(
         ImmutableMap.<String, String>builder()
            .put("hl", "true")
-           .put("hl.fields", "ocr_text")
+           .put("hl.fl", "ocr_text")
            .put("hl.usePhraseHighlighter", "true")
            .put("df", "ocr_text")
            .put("hl.ctxTag", "ocr_line")

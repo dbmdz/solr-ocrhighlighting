@@ -28,7 +28,7 @@ public class AltoEscapedTest extends SolrTestCaseJ4 {
   private static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
         .put("hl", "true")
-        .put("hl.fields", "ocr_text")
+        .put("hl.fl", "ocr_text")
         .put("hl.usePhraseHighlighter", "true")
         .put("df", "ocr_text")
         .put("hl.ctxTag", "ocr_line")

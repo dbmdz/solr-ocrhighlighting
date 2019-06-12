@@ -43,7 +43,7 @@ public class MiniOcrEscapedTest extends SolrTestCaseJ4 {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
         .put("defType", "edismax")
         .put("hl", "true")
-        .put("hl.fields", "external_ocr_text")
+        .put("hl.fl", "external_ocr_text")
         .put("hl.usePhraseHighlighter", "true")
         .put("df", "external_ocr_text")
         .put("hl.ctxTag", "l")
@@ -68,7 +68,7 @@ public class MiniOcrEscapedTest extends SolrTestCaseJ4 {
   public void testMixedHighlighting() throws Exception {
     SolrQueryRequest req = xmlQ("q", "commodo münchen",
                                 "qf", "some_text external_ocr_text", "df", "some_text",
-                                "hl.fields", "some_text,ocr_text", "hl.weightMatches", "true");
+                                "hl.fl", "some_text,external_ocr_text", "hl.weightMatches", "true");
     assertQ(req,
             "count(//lst[@name='highlighting']/lst[@name='1337']/arr[@name='some_text']/str)=1",
             ".//arr[@name='some_text']/str/text()=' aliquip ex ea <em>commodo</em> consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum'",
@@ -94,7 +94,7 @@ public class MiniOcrEscapedTest extends SolrTestCaseJ4 {
 
   @Test
   public void testStoredHighlighting() throws Exception {
-    SolrQueryRequest req = xmlQ("q", "München", "hl.fields", "stored_ocr_text", "df", "stored_ocr_text");
+    SolrQueryRequest req = xmlQ("q", "München", "hl.fl", "stored_ocr_text", "df", "stored_ocr_text");
     assertQ(req,
             "count(//lst[@name='ocrHighlighting']/lst[@name='41337']/lst[@name='stored_ocr_text']/arr/lst)=3");
   }

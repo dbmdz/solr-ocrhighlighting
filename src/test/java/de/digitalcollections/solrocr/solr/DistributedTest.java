@@ -50,7 +50,7 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
     QueryResponse resp = query(
         "q", "svadag",
         "hl", "true",
-        "hl.fields", "ocr_text",
+        "hl.fl", "ocr_text",
         "hl.usePhraseHighlighter", "true",
         "df", "ocr_text",
         "hl.ctxTag", "ocr_line",

@@ -11,8 +11,10 @@ import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter.HighlightFlag;
 import org.apache.solr.common.params.HighlightParams;
@@ -35,14 +37,14 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
   private ExternalFieldLoader fieldLoader;
   private OcrFormat ocrFormat;
-  private List<String> ocrFieldNames;
+  private Set<String> ocrFieldNames;
 
 
   public SolrOcrHighlighter(ExternalFieldLoader fieldLoader, OcrFormat ocrFormat,
                             List<String> ocrFieldNames) {
     this.fieldLoader = fieldLoader;
     this.ocrFormat = ocrFormat;
-    this.ocrFieldNames = ocrFieldNames;
+    this.ocrFieldNames = new HashSet<>(ocrFieldNames);
   }
 
   @Override
