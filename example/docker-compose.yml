@@ -16,12 +16,13 @@ services:
     command: pipenv run prod
     build: iiif-prezi
     volumes:
-      - ./google1000:/google1000
+      - ./data:/data
     environment:
-      - CFG_SOLR_HANDLER=http://solr:8983/solr/ocrtest/select
+      - CFG_SOLR_BASE=http://solr:8983/solr
       - CFG_SERVER_NAME=localhost:8181
       - CFG_IMAGE_API_BASE=https://ocrhl.jbaiter.de/iiif/image
-      - CFG_GOOGLE1000_PATH=/google1000
+      - CFG_GOOGLE1000_PATH=/data/google1000
+      - CFG_BNL_PATH=/data/bnl_lunion
       - CFG_APP_PATH=/iiif/presentation
 
   frontend:

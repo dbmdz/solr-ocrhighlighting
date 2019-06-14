@@ -66,7 +66,8 @@ def gbooks_load_documents(base_path):
     else:
         for doc_path in base_path.glob('*.hocr'):
             hocr = doc_path.read_text()
-            yield {'id': doc_path.stem, 'ocr_text': hocr,
+            yield {'id': doc_path.stem.split("_")[1],
+                   'ocr_text': hocr,
                    **gbooks_parse_metadata(hocr)}
 
 
@@ -159,8 +160,9 @@ def bnl_load_documents(base_path):
                     if last_vol is not None:
                         vol_path = base_path / last_vol
                         mets_path = next(iter(vol_path.glob("*-mets.xml")))
+                        vol_id = last_vol.replace("newspaper_lunion_", "")
                         yield from bnl_extract_article_docs(
-                            last_vol, etree.parse(str(mets_path)),
+                            vol_id, etree.parse(str(mets_path)),
                             vol_path / 'text')
                     last_vol = ti.name
                 if ti.isdir():
@@ -170,16 +172,18 @@ def bnl_load_documents(base_path):
                     with out_path.open('wb') as fp:
                         fp.write(tf.extractfile(ti).read())
             mets_path = next(iter(Path(last_vol).glob("*-mets.xml")))
+            vol_id = last_vol.replace("newspaper_lunion_", "")
             yield from bnl_extract_article_docs(
-                last_vol, etree.parse(str(mets_path)),
+                vol_id, etree.parse(str(mets_path)),
                 Path(last_vol) / 'texts')
     else:
         for issue_dir in base_path.iterdir():
             if not issue_dir.is_dir() or not issue_dir.name.startswith('15'):
                 continue
             mets_path = next(iter(issue_dir.glob("*-mets.xml")))
+            vol_id = issue_dir.name.replace("newspaper_lunion_", "")
             yield from bnl_extract_article_docs(
-                issue_dir.name, etree.parse(str(mets_path)),
+                vol_id, etree.parse(str(mets_path)),
                 issue_dir / 'text')
 
 
@@ -196,11 +200,16 @@ def index_documents(core_name, docs):
 if __name__ == '__main__':
     print("Indexing BNL/L'Union articles")
     bnl_iter = bnl_load_documents(Path(LUNION_PATH))
+    cur_batch = []
     for idx, doc in enumerate(bnl_iter):
-        print(f"{idx+1:05}/{LUNIN_NUM_ARTICLES}\r")
-        index_documents('bnl_lunion', [doc])
+        cur_batch.append(doc)
+        if len(cur_batch) == 100:
+            print(f"\r{idx+1:05}/{LUNIN_NUM_ARTICLES}", end='')
+            index_documents('bnl_lunion', cur_batch)
+            cur_batch = []
     print("\nIndexing Google 1000 Books volumes")
     gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
     for idx, doc in enumerate(gbooks_iter):
-        print(f"{idx+1:04}/{GOOGLE1000_NUM_VOLUMES}\r")
+        print(f"\r{idx+1:04}/{GOOGLE1000_NUM_VOLUMES}", end='')
         index_documents('google1000', [doc])
+    print("\n")
