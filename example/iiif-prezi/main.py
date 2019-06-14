@@ -21,6 +21,7 @@ import gbooks
 # of 1/10mm units in an inch
 BNL_10MM_TO_PIX_FACTOR = 300 / 254
 
+HL_PAT = re.compile("<em>(.+?)</em>")
 GBOOKS_PAT = re.compile(r'gbooks:\d{4}') 
 BNL_ISSUE_PAT = re.compile(r'bnl:\d{7}_\d{4}-\d{2}-\d{2}')
 BNL_ARTICLE_PAT = re.compile(r'bnl:\d{7}_\d{4}-\d{2}-\d{2}-\d+')
@@ -80,12 +81,13 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query, core):
     doc['within']['total'] = hlresp['numTotal']
     doc['within']['ignored'] = ignored_fields
     for snip in hlresp['snippets']:
-        text = snip['text'].replace('<em>', '').replace('</em>', '')
-        for hl in snip['highlights']:
-            hl_text = " ".join(b['text'] for b in hl)
+        for idx, hl in enumerate(snip['highlights']):
+            text = snip['text']
+            hl_text = HL_PAT.findall(text)[idx]
             try:
-                before = text[:text.index(hl_text)]
-                after = text[text.index(hl_text) + len(hl_text):]
+                before = text[:text.index('<em>')]
+                after = text[text.index('</em>') + len('</em>'):]
+                text = text.replace('<em>', '').replace('</em>', '')
             except ValueError:
                 before = after = None
             anno_ids = []
@@ -95,10 +97,10 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query, core):
                 w = hlbox['lrx'] - hlbox['ulx']
                 h = hlbox['lry'] - hlbox['uly']
                 if core == "bnl_lunion":
-                    x *= BNL_10MM_TO_PIX_FACTOR 
-                    y *= BNL_10MM_TO_PIX_FACTOR 
-                    w *= BNL_10MM_TO_PIX_FACTOR 
-                    h *= BNL_10MM_TO_PIX_FACTOR 
+                    x = int(x * BNL_10MM_TO_PIX_FACTOR)
+                    y = int(y * BNL_10MM_TO_PIX_FACTOR)
+                    w = int(w * BNL_10MM_TO_PIX_FACTOR)
+                    h = int(h * BNL_10MM_TO_PIX_FACTOR)
                 ident = common.make_id(app, vol_id)
                 anno_ids.append(ident)
                 anno = {
