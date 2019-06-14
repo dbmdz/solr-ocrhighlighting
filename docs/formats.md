@@ -41,6 +41,12 @@ In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComp
 In the **Schema**, make sure that `de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory`
 is the first filter in your indexing analyzer chain for OCR fields.
 
+!!! caution
+    The coordinates returned by the plugin are not always pixel values, since ALTO supports a variety
+    of different reference units for the coordinates. Check the `<MeasurementUnit>` value in your ALTO
+    files, if its value is anything other than `pixel`, you will have to do some additional calculations
+    on the client side to convert to pixel coordinates.
+
 **Block type mapping:**
 
 | Block     | ALTO tag                    | notes                            |
