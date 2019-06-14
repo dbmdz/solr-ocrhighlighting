@@ -13,7 +13,7 @@
     <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii"
                  multiple="true">
       <lst name="externalFields">
-        <str name="ocr_text">/data/bnl_lunion/{issue_id}/text/*.xml</str>
+        <str name="ocr_text">/data/bnl_lunion/{issue_id[:7]}_newspaper_lunion_{issue_id[8:]}/text/*.xml</str>
       </lst>
     </fieldLoader>
   </searchComponent>
