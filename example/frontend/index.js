@@ -31,13 +31,12 @@ var CORE_PARAMS = {
   }
 };
 var BNL_10MM_TO_PIX_FACTOR = 300 / 254;
-//var IMAGE_API_BASE = 'https://ocrhl.jbaiter.de'
-var IMAGE_API_BASE = 'http://localhost:8080/image/v2';
-//if (typeof window !== 'undefined') {
-//  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
-//} else {
-var APP_BASE = 'http://localhost:8181';  // TODO: Read from environment?
-//}
+var IMAGE_API_BASE = 'https://ocrhl.jbaiter.de/iiif/image/v2'
+if (typeof window !== 'undefined') {
+  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
+} else {
+  var APP_BASE = 'http://localhost:8181';  // TODO: Read from environment?
+}
 
 function highlightDocument(doc, highlights) {
   Object.keys(highlights).forEach(field => {

@@ -14,7 +14,7 @@ GOOGLE1000_URL = 'https://ocrhl.jbaiter.de/data/gbooks1000_hocr.tar.xz'
 GOOGLE1000_NUM_VOLUMES = 1000
 LUNION_PATH = './data/bnl_lunion'
 LUNION_TEXTS_URL = 'https://ocrhl.jbaiter.de/data/bnl_lunion_texts.tar.gz'
-LUNIN_NUM_ARTICLES = 41446
+LUNION_NUM_ARTICLES = 41446
 SOLR_HOST = 'localhost:8983'
 HOCR_METADATA_PAT = re.compile(
     r'<meta name="DC\.(?P<key>.+?)" content="(?P<value>.+?)"\s*/>')
@@ -124,13 +124,13 @@ def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
         block_ids = [e.attrib['BEGIN'] for e in elem.findall('.//mets:fptr//mets:area',
                                                              namespaces=NSMAP)]
         mods_meta = mets_tree.find(
-            f'.//mets:dmdSec[@ID="{meta_id}"]//mods:mods',
+            './/mets:dmdSec[@ID="{}"]//mods:mods'.format(meta_id),
             namespaces=NSMAP)
         masked_text = bnl_mask_ocr_text(ocr_text, block_ids)
         issue_date = mets_tree.findtext('.//mods:dateIssued', namespaces=NSMAP)
         article_no = meta_id.replace("MODSMD_ARTICLE", "")
         yield {
-            'id': f'{issue_id}-{article_no}',
+            'id': '{}-{}'.format(issue_id, article_no),
             'issue_id': issue_id,
             'date': issue_date + 'T00:00:00Z',
             'newspaper_title': newspaper_title,
@@ -204,6 +204,7 @@ def generate_batches(it, chunk_size):
         if len(cur_batch) == chunk_size:
             yield cur_batch
             cur_batch = []
+    return cur_batch
 
 
 if __name__ == '__main__':
@@ -213,7 +214,7 @@ if __name__ == '__main__':
         bnl_iter = bnl_load_documents(Path(LUNION_PATH))
         for idx, batch in enumerate(generate_batches(bnl_iter, 100)):
             futs.append(pool.submit(index_documents, 'bnl_lunion', batch))
-            print(f"\r{(idx+1)*100:05}/{LUNIN_NUM_ARTICLES}", end='')
+            print("\r{:05}/{}".format((idx+1)*100, LUNION_NUM_ARTICLES), end='')
         for fut in as_completed(futs):
             fut.result()
         print("\nIndexing Google 1000 Books volumes")
@@ -221,7 +222,7 @@ if __name__ == '__main__':
         gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
         for idx, batch in enumerate(generate_batches(gbooks_iter, 4)):
             futs.append(pool.submit(index_documents, 'google1000', batch))
-            print(f"\r{(idx+1)*4:04}/{GOOGLE1000_NUM_VOLUMES}", end='')
+            print("\r{:04}/{}".format((idx+1)*4, GOOGLE1000_NUM_VOLUMES), end='')
         for fut in as_completed(futs):
             fut.result()
     print("\n")
