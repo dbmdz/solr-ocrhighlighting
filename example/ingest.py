@@ -4,6 +4,7 @@ import re
 import sys
 import tarfile
 import xml.etree.ElementTree as etree
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from urllib import request
 
@@ -61,7 +62,7 @@ def gbooks_load_documents(base_path):
                     with doc_path.open('wb') as fp:
                         fp.write(ocr_text)
                 hocr = ocr_text.decode('utf8')
-                yield {'id': vol_id, 'ocr_text': hocr,
+                yield {'id': vol_id.split("_")[-1], 'ocr_text': hocr,
                        **gbooks_parse_metadata(hocr)}
     else:
         for doc_path in base_path.glob('*.hocr'):
@@ -100,8 +101,6 @@ def bnl_mask_ocr_text(ocr_text, block_ids):
         end_pat = re.compile(r'</{tag}>'.format(tag=start_match.group(1)))
         end_match = end_pat.search(ocr_text, pos=start)
         end = end_match.end()
-        #padding = "<!" + (start - masking_start - 3)*"-" + ">"
-        #if len(padding) <= 6:
         padding = (start - masking_start) * " "
         masked_text.append(padding)
         masked_text.append(ocr_text[start:end])
@@ -171,11 +170,12 @@ def bnl_load_documents(base_path):
                     out_path = base_path / ti.name
                     with out_path.open('wb') as fp:
                         fp.write(tf.extractfile(ti).read())
-            mets_path = next(iter(Path(last_vol).glob("*-mets.xml")))
+            vol_path = base_path / last_vol
+            mets_path = next(iter(vol_path.glob("*-mets.xml")))
             vol_id = last_vol.replace("newspaper_lunion_", "")
             yield from bnl_extract_article_docs(
                 vol_id, etree.parse(str(mets_path)),
-                Path(last_vol) / 'texts')
+                vol_path / 'text')
     else:
         for issue_dir in base_path.iterdir():
             if not issue_dir.is_dir() or not issue_dir.name.startswith('15'):
@@ -197,19 +197,31 @@ def index_documents(core_name, docs):
         raise SolrException(json.loads(resp.read()), docs)
 
 
-if __name__ == '__main__':
-    print("Indexing BNL/L'Union articles")
-    bnl_iter = bnl_load_documents(Path(LUNION_PATH))
+def generate_batches(it, chunk_size):
     cur_batch = []
-    for idx, doc in enumerate(bnl_iter):
-        cur_batch.append(doc)
-        if len(cur_batch) == 100:
-            print(f"\r{idx+1:05}/{LUNIN_NUM_ARTICLES}", end='')
-            index_documents('bnl_lunion', cur_batch)
+    for x in it:
+        cur_batch.append(x)
+        if len(cur_batch) == chunk_size:
+            yield cur_batch
             cur_batch = []
-    print("\nIndexing Google 1000 Books volumes")
-    gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
-    for idx, doc in enumerate(gbooks_iter):
-        print(f"\r{idx+1:04}/{GOOGLE1000_NUM_VOLUMES}", end='')
-        index_documents('google1000', [doc])
+
+
+if __name__ == '__main__':
+    with ProcessPoolExecutor(max_workers=8) as pool:
+        print("Indexing BNL/L'Union articles")
+        futs = []
+        bnl_iter = bnl_load_documents(Path(LUNION_PATH))
+        for idx, batch in enumerate(generate_batches(bnl_iter, 100)):
+            futs.append(pool.submit(index_documents, 'bnl_lunion', batch))
+            print(f"\r{(idx+1)*100:05}/{LUNIN_NUM_ARTICLES}", end='')
+        for fut in as_completed(futs):
+            fut.result()
+        print("\nIndexing Google 1000 Books volumes")
+        futs = []
+        gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
+        for idx, batch in enumerate(generate_batches(gbooks_iter, 4)):
+            futs.append(pool.submit(index_documents, 'google1000', batch))
+            print(f"\r{(idx+1)*4:04}/{GOOGLE1000_NUM_VOLUMES}", end='')
+        for fut in as_completed(futs):
+            fut.result()
     print("\n")

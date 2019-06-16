@@ -6,6 +6,7 @@ import Typography from 'preact-material-components/Typography';
 import Elevation from 'preact-material-components/Elevation';
 import Slider from 'preact-material-components/Slider';
 import FormField from 'preact-material-components/FormField';
+import Select from 'preact-material-components/Select';
 
 import 'preact-material-components/TextField/style.css';
 import 'preact-material-components/LinearProgress/style.css';
@@ -13,18 +14,38 @@ import 'preact-material-components/Typography/style.css';
 import 'preact-material-components/Elevation/style.css';
 import 'preact-material-components/Slider/style.css';
 import 'preact-material-components/FormField/style.css';
+import 'preact-material-components/Select/style.css';
 
 
-var IMAGE_API_BASE = 'https://ocrhl.jbaiter.de'
-if (typeof window !== 'undefined') {
-  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
-} else {
-  var APP_BASE = 'http://localhost:8008';  // TODO: Read from environment?
-}
+var CORES = ['google1000', 'bnl_lunion'];
+var CORE_PARAMS = {
+  google1000: {
+    'fl': 'id,title,creator,publisher,date,language',
+    'qf': 'title^20.0 creator^10.0 publisher^5.0 ocr_text^0.3',
+    'hl.fl': 'title,creator,publisher,ocr_text',
+  },
+  bnl_lunion: {
+    'fl': 'id,issue_id,title,subtitle,newspaper_part,author,date',
+    'qf': 'title^20.0 subtitle^16.0 author^10.0 newspaper_part^5.0 ocr_text^0.3',
+    'hl.fl': 'title,subtitle,author,ocr_text',
+  }
+};
+var BNL_10MM_TO_PIX_FACTOR = 300 / 254;
+//var IMAGE_API_BASE = 'https://ocrhl.jbaiter.de'
+var IMAGE_API_BASE = 'http://localhost:8080/image/v2';
+//if (typeof window !== 'undefined') {
+//  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
+//} else {
+var APP_BASE = 'http://localhost:8181';  // TODO: Read from environment?
+//}
 
 function highlightDocument(doc, highlights) {
   Object.keys(highlights).forEach(field => {
-    doc[field] = highlightFieldValue(doc[field], highlights[field]);
+    if (Array.isArray(doc[field])) {
+      doc[field] = doc[field].map((fval) => highlightFieldValue(fval, highlights[field]));
+    } else {
+      doc[field] = highlightFieldValue(doc[field], highlights[field]);
+    }
   })
   return doc;
 }
@@ -33,7 +54,9 @@ function highlightFieldValue(val, highlights) {
   let out = val;
   highlights.forEach((hl => {
     const rawText = hl.replace(/<\/?em>/g, '');
-    out = out.split(rawText).join(hl);
+    if (out.indexOf(rawText) > -1) {
+      out = out.split(rawText).join(hl);
+    }
   }))
   return out;
 }
@@ -45,14 +68,6 @@ class SnippetView extends Component {
     this.state = {
       renderedImage: undefined,
     }
-  }
-
-  get imageBaseUrl() {
-    const { docId } = this.props;
-    const page = this.props.snippet.regions[0].page;
-    const pageId = String(parseInt(page.split("_")[1]) - 1).padStart(4, "0");
-    return `${IMAGE_API_BASE}/iiif/image/${docId}/Image_${pageId}.JPEG`;
-
   }
 
   getHighlightStyle(hlInfo, hue) {
@@ -68,24 +83,21 @@ class SnippetView extends Component {
     };
   }
 
-  getImageUrl(width) {
-    const region = this.props.snippet.regions[0];
-    const regionStr = `${region.ulx},${region.uly},${region.lrx - region.ulx},${region.lry - region.uly}`;
-    const widthStr = width ? `${width},` : "full";
-    return `${this.imageBaseUrl}/${regionStr}/${widthStr}/0/default.jpg`;
-  }
-
   render() {
-    const { docId, query } = this.props;
-    const { text, highlights } = this.props.snippet;
-    const page = this.props.snippet.regions[0].page;
-    const pageIdx = parseInt(page.split("_")[1]) - 1;
-    const manifestUri = `${APP_BASE}/iiif/presentation/${docId}/manifest`;
-    const viewerUrl = `/viewer/#?manifest=${manifestUri}&cv=${pageIdx}&q=${query}`;
+    const { docId, query, getImageUrl, snippet, manifestUri} = this.props;
+    const { text, highlights } = snippet;
+    let pageIdx = 0;
+    const page = snippet.regions[0].page;
+    if (page[0] === 'P') {
+      pageIdx = parseInt(page.substring(1))
+    } else {
+      pageIdx = parseInt(page.split("_")[1]);
+    }
+    const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${pageIdx}&q=${query}`;
     return (
       <div class="snippet-display">
         <a href={viewerUrl} target="_blank" title="Open page in viewer">
-          <img ref={i => this.img = i} src={this.getImageUrl()} />
+          <img ref={i => this.img = i} src={getImageUrl(snippet.regions[0])} />
         </a>
         {this.state.renderedImage && highlights.flatMap(
           hls => hls.map(hl =>
@@ -119,25 +131,85 @@ class SnippetView extends Component {
   }
 }
 
-
-class ResultDocument extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      collapsed: true
-    }
+class NewspaperResultDocument extends Component {
+  getImageUrl(region, width) {
+    const issueId = this.props.doc.issue_id;
+    const pageNo = region.page.substring(1).padStart(5, '0');
+    const x = parseInt(BNL_10MM_TO_PIX_FACTOR * region.ulx);
+    const y = parseInt(BNL_10MM_TO_PIX_FACTOR * region.uly);
+    const w = parseInt(BNL_10MM_TO_PIX_FACTOR * (region.lrx - region.ulx));
+    const h = parseInt(BNL_10MM_TO_PIX_FACTOR * (region.lry - region.uly));
+    const regionStr = `${x},${y},${w},${h}`;
+    const widthStr = width ? `${width},` : "full";
+    return `${IMAGE_API_BASE}/bnl:${issueId}_${pageNo}/${regionStr}/${widthStr}/0/default.jpg`
   }
 
   render() {
     const { hl, ocr_hl, query } = this.props;
     const doc = highlightDocument(this.props.doc, hl);
-    const manifestUri = `${APP_BASE}/iiif/presentation/${doc.id}/manifest`;
-    const viewerUrl = `/viewer/#?manifest=${manifestUri}&q=${query}`;
+    const manifestUri = `${APP_BASE}/iiif/presentation/bnl:${doc.issue_id}/manifest`;
+    const pageIdx = parseInt(ocr_hl.snippets[0].regions[0].page.substring(1)) - 1;
+    const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${pageIdx}&q=${query}`;
     return (
       <div class="result-document">
         <Elevation z={4}>
           <Typography tag="div" headline4>
-            <a className="highlightable" href={viewerUrl} title="Open in viewer" target="_blank" dangerouslySetInnerHTML={{ __html: doc.title }} />
+            <a
+              className="highlightable"
+              href={viewerUrl}
+              title="Open in viewer"
+              target="_blank"
+              dangerouslySetInnerHTML={{ __html: doc.title }}
+            />
+          </Typography>
+          {doc.subtitle &&
+            <Typography tag="div" subtitle1>
+              {doc.subtitle.map(t => <a className="highlightable" href={viewerUrl} title="Open in viewer" target="_blank" dangerouslySetInnerHTML={{ __html: t }} />)}
+            </Typography>}
+          <Typography subtitle1>
+            {ocr_hl ? ocr_hl.numTotal : 'No'} matching passages in the article found
+          </Typography>
+          <ul className="metadata">
+            {/* TODO: Creators */}
+            <li><strong>Issue</strong> {doc.newspaper_part}</li>
+            <li><strong>Published </strong> {doc.date}</li>
+          </ul>
+          {ocr_hl && ocr_hl.snippets.map(snip => (
+            <SnippetView
+              snippet={snip} docId={doc.issue_id} query={query}
+              manifestUri={manifestUri}
+              getImageUrl={this.getImageUrl.bind(this)} />))}
+        </Elevation>
+      </div>);
+  }
+}
+
+
+class GoogleResultDocument extends Component {
+  getImageUrl(region, width) {
+    const volId = this.props.doc.id;
+    const pageId = String(parseInt(region.page.split("_")[1]) - 1).padStart(4, "0");
+    const regionStr = `${region.ulx},${region.uly},${region.lrx - region.ulx},${region.lry - region.uly}`;
+    const widthStr = width ? `${width},` : "full";
+    return `${IMAGE_API_BASE}/gbooks:${volId}_${pageId}/${regionStr}/${widthStr}/0/default.jpg`;
+  }
+
+  render() {
+    const { hl, ocr_hl, query } = this.props;
+    const doc = highlightDocument(this.props.doc, hl);
+    const manifestUri = `${APP_BASE}/iiif/presentation/gbooks:${doc.id}/manifest`;
+    const viewerUrl = `/viewer/?manifest=${manifestUri}&q=${query}`;
+    return (
+      <div class="result-document">
+        <Elevation z={4}>
+          <Typography tag="div" headline4>
+            <a
+              className="highlightable"
+              href={viewerUrl}
+              title="Open in viewer"
+              target="_blank"
+              dangerouslySetInnerHTML={{ __html: doc.title }}
+            />
           </Typography>
           <Typography subtitle1>
             { ocr_hl ? ocr_hl.numTotal : 'No' } matching passages in the text found
@@ -147,7 +219,12 @@ class ResultDocument extends Component {
             <li><strong>Published in</strong> {doc.date} <strong>by</strong> <span className="highlightable" dangerouslySetInnerHTML={{ __html: doc.publisher }} /></li>
             <li><strong>Language:</strong> {doc.language}</li>
           </ul>
-          {ocr_hl && ocr_hl.snippets.map(snip => <SnippetView snippet={snip} docId={doc.id} query={query} />)}
+          {ocr_hl &&
+           ocr_hl.snippets.map(snip => (
+             <SnippetView
+               snippet={snip} docId={doc.id} query={query}
+               manifestUri={manifestUri}
+               getImageUrl={this.getImageUrl.bind(this)} />))}
         </Elevation>
       </div>);
   }
@@ -155,13 +232,33 @@ class ResultDocument extends Component {
 
 
 export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isSearchPending: false,
+      coreIdx: 0,
+      queryParams: {
+        'defType': 'edismax',
+        'hl.snippets': 10,
+        'hl.weightMatches': true,
+        'hl': 'on'
+      },
+      searchResults: undefined
+    };
+  }
+
   onSubmit(evt) {
     if (evt) {
       evt.preventDefault();
     }
     const query = document.querySelector(".search-form input").value;
-    const params = { ...this.state.queryParams, q: query };
-    fetch(`${APP_BASE}/solr/ocrtest/select?${new URLSearchParams(params)}`)
+    const coreName = CORES[this.state.coreIdx];
+    const params = {
+      ...CORE_PARAMS[coreName],
+      ...this.state.queryParams,
+      q: query
+    };
+    fetch(`${APP_BASE}/solr/${coreName}/select?${new URLSearchParams(params)}`)
       .then(resp => resp.json())
       .then((data) => this.setState({ searchResults: data, isSearchPending: false }))
       .catch((err) => {
@@ -173,46 +270,47 @@ export default class App extends Component {
       queryParams: params });
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isSearchPending: false,
-      queryParams: {
-        'defType': 'edismax',
-        'fl': 'id,title,creator,publisher,date,language',
-        'qf': 'title^20.0 creator^10.0 publisher^5.0 ocr_text^0.3',
-        'hl.fl': 'title,creator,publisher,ocr_text',
-        'hl.snippets': 10,
-        'hl.weightMatches': true,
-        'hl': 'on'
-      },
-      searchResults: undefined
-    };
-  }
-
   onSliderChange(evt) {
     const val = evt.detail.value;
     if (typeof val === "number" && !Number.isNaN(val)) {
       this.setState({
         queryParams: {
           ...this.state.queryParams,
-          'hl.snippets': val}})
+          'hl.snippets': val
+        }
+      });
       this.onSubmit();
     }
   }
 
   render() {
-    const { searchResults, isSearchPending, queryParams } = this.state;
+    const { searchResults, isSearchPending, queryParams, coreIdx } = this.state;
+    const coreName = CORES[coreIdx];
     return (
       <main>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
         <form className="search-form" onSubmit={this.onSubmit.bind(this)}>
-          <TextField label="Search" outlined trailingIcon="search" />
-          <FormField>
+          <TextField
+            disabled={isSearchPending}
+            label="Search" outlined trailingIcon="search" />
+          <FormField className="core-picker">
+            <Select
+              outlined
+              disabled={isSearchPending}
+              selectedIndex={coreIdx}
+              onChange={e => this.setState({
+                coreIdx: e.target.selectedIndex,
+                searchResults: undefined})}>
+              <Select.Item>Google Books</Select.Item>
+              <Select.Item>Newspaper L'Union (BNL)</Select.Item>
+            </Select>
+          </FormField>
+          <FormField className="passage-slider">
             <label for="passage-slider">Number of snippets</label>
             <Slider
               discrete step={1} value={this.state.queryParams['hl.snippets']} max={50}
-              onChange={this.onSliderChange.bind(this)} id="passage-slider" />
+              onChange={this.onSliderChange.bind(this)} id="passage-slider"
+              disabled={isSearchPending} />
           </FormField>
           {isSearchPending &&
             <LinearProgress indeterminate />}
@@ -233,7 +331,9 @@ export default class App extends Component {
                   hl: searchResults.highlighting[doc.id] }
               })
               .map(({ key, doc, hl, ocrHl }) =>
-                <ResultDocument key={key} hl={hl} ocr_hl={ocrHl} doc={doc} query={queryParams.q} />)}
+                coreName === 'google1000'
+                  ? <GoogleResultDocument key={key} hl={hl} ocr_hl={ocrHl} doc={doc} query={queryParams.q} />
+                  : <NewspaperResultDocument key={key} hl={hl} ocr_hl={ocrHl} doc={doc} query={queryParams.q} />)}
         </section>
       </main>
     );
