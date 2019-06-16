@@ -19,14 +19,27 @@ section, form {
 	grid-row: 1;
 }
 
-.search-form .mdc-form-field {
+.search-form .mdc-text-field::after {
+	display: none;
+}
+
+.search-form .mdc-text-field::before {
+	display: none;
+}
+
+.search-form .mdc-form-field.core-picker {
 	grid-column: 1/7;
 	grid-row: 2;
 }
 
-.search-form .mdc-linear-progress {
+.search-form .mdc-form-field.passage-slider {
 	grid-column: 1/7;
 	grid-row: 3;
+}
+
+.search-form .mdc-linear-progress {
+	grid-column: 1/7;
+	grid-row: 4;
 }
 
 .search-form .mdc-typography {
@@ -84,7 +97,11 @@ a {
 		grid-column: 2/6;
 	}
 
-	.search-form .mdc-form-field {
+	.search-form .mdc-form-field.core-picker {
+		grid-column: 2/6;
+	}
+
+	.search-form .mdc-form-field.passage-slider {
 		grid-column: 2/6;
 	}
 

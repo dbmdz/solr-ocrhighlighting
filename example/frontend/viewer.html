@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <title>Mirador</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+  </head>
+  <body>
+    <div id="mirador" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0;"></div>
+    <script>document.write("<script type='text/javascript' src='https://mirador-dev.netlify.com/dist/mirador.min.js?v=" + Date.now() + "'><\/script>");</script>
+    <script type="text/javascript">
+      var params = new URL(window.location.href).searchParams;
+      var pageId = params.get("cv")
+      var pageIdx = 0;
+      if (pageId[0] == 'P') {
+        pageIdx = parseInt(pageId.substring(1)) - 1;
+      } else if (pageId) {
+        pageIdx = parseInt(pageId) - 1;
+      }
+      var miradorInstance = Mirador.viewer({
+        id: 'mirador',
+        windows: [{
+          loadedManifest: params.get("manifest"),
+          canvasIndex: pageIdx,
+          thumbnailNavigationPosition: 'far-bottom',
+        }],
+        window: {
+          allowFullscreen: true,
+          hideSearchPanel: false,
+          sideBarOpenByDefault: true,
+        }
+      });
+      if (params.has("q")) {
+        let searchTriggered = false;
+        miradorInstance.store.subscribe(() => {
+          if (searchTriggered) {
+            return;
+          }
+          var state = miradorInstance.store.getState();
+          if (Object.values(state.manifests)[0].isFetching) {
+            return;
+          }
+          var companionWindows = Object.values(state.companionWindows)
+            .filter((obj) => obj.content !== 'thumbnailNavigation');
+          if (companionWindows.length === 0) {
+            return;
+          }
+          searchTriggered = true
+          var state = miradorInstance.store.getState();
+          var targetId = Object.keys(state.windows)[0];
+          var searchService = Object.values(state.manifests)[0].json.service['@id'];
+          miradorInstance.store.dispatch(
+            miradorInstance.actions.updateCompanionWindow(
+              targetId, companionWindows[0].id, {content: 'search', position: 'left'}));
+          miradorInstance.store.dispatch(
+            miradorInstance.actions.fetchSearch(
+              targetId, companionWindows[0].id, `${searchService}?q=${params.get("q")}`));
+        });
+      }
+    </script>
+  </body>
+</html>
