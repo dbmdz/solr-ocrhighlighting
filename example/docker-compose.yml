@@ -20,7 +20,7 @@ services:
     environment:
       - CFG_SOLR_BASE=http://solr:8983/solr
       - CFG_SERVER_NAME=localhost:8181
-      - CFG_IMAGE_API_BASE=https://ocrhl.jbaiter.de/iiif/image
+      - CFG_IMAGE_API_BASE=https://ocrhl.jbaiter.de/iiif/image/v2
       - CFG_GOOGLE1000_PATH=/data/google1000
       - CFG_BNL_PATH=/data/bnl_lunion
       - CFG_APP_PATH=/iiif/presentation
