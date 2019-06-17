@@ -253,8 +253,8 @@ export default class App extends Component {
     const query = document.querySelector(".search-form input").value;
     const coreName = CORES[this.state.coreIdx];
     const params = {
-      ...CORE_PARAMS[coreName],
       ...this.state.queryParams,
+      ...CORE_PARAMS[coreName],
       q: query
     };
     fetch(`${APP_BASE}/solr/${coreName}/select?${new URLSearchParams(params)}`)
