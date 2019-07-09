@@ -15,7 +15,10 @@
    height="483.41"
    id="svg95"
    sodipodi:docname="query_params.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:export-filename="/home/jbaiter/src_new/labs/solr-ocr-plugin/docs/img/query_params.png"
+   inkscape:export-xdpi="231.71001"
+   inkscape:export-ydpi="231.71001">
   <metadata
      id="metadata99">
     <rdf:RDF>
@@ -41,13 +44,13 @@
      inkscape:window-height="1309"
      id="namedview97"
      showgrid="false"
-     inkscape:zoom="2.085965"
-     inkscape:cx="143.82897"
-     inkscape:cy="258.397"
+     inkscape:zoom="1.0429825"
+     inkscape:cx="225.22481"
+     inkscape:cy="152.33627"
      inkscape:window-x="6"
      inkscape:window-y="22"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg95" />
+     inkscape:current-layer="g91" />
   <defs
      id="defs23">
     <path
@@ -202,7 +205,8 @@
            width="100%"
            height="100%" />
         <g
-           id="g41">
+           id="g41"
+           transform="matrix(0.99997804,0,0,1.0053117,0.0070312,-1.1755601)">
           <use
              xlink:href="#ax3JeAX9y"
              id="use39"
@@ -269,7 +273,8 @@
            height="100%" />
       </g>
       <g
-         id="g67">
+         id="g67"
+         transform="translate(0.98305084,-0.42372882)">
         <use
            xlink:href="#b2Gr4iyRbf"
            id="use65"
