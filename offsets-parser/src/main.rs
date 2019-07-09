@@ -77,7 +77,10 @@ fn main() -> Result<()> {
     };
     let word_re = get_regex(&ocr_text);
     for cap in word_re.captures_iter(&ocr_text) {
-        let text = decode_html_entities(&cap["text"]).unwrap();
+        let text = match decode_html_entities(&cap["text"]) {
+            Ok(t) => t,
+            Err(_) => (&cap["text"]).to_string()
+        };
         match cap.get(0) {
             Some(mat) => write!(out_writer, "{}{}{} ", text, delimiter, mat.start())?,
             None => ()
