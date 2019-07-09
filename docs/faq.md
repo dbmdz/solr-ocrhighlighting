@@ -5,10 +5,10 @@ where you have a single large volume on disk (e.g. the OCR text for the bound vo
 year 1878) but you want your Solr documents to be more fine-grained (e.g. on the issue or even article level).
 A problem in Solr is that the source of the offsets that are used for highlighting are always relative to the actual
 document that was used for indexing and cannot be easily customized. To work around this:<br/>
-**Replace all of the content preceding your sub-section with a single XML comment tag that is exactly as long as the
-old content and discard all content that follows after the sub-section** (We told you the solution was hacky, didn't
-we?). This will lead the analyzer chain to discard all of the undesired content, while still storing the correct offsets
-for the sub-section content in the index.
+**Replace all of the content preceding your sub-section with a single XML comment tag or a sequence of whitespace that
+is exactly as long as the old content and discard all content that follows after the sub-section** (We told you the
+solution was hacky, didn't we?). This will lead the analyzer chain to discard all of the undesired content, while
+still storing the correct offsets for the sub-section contentin the index.
 
 !!! note
     Since the plugin doesn't do any actual XML parsing, the masked documents don't have to be valid XML.
@@ -24,9 +24,13 @@ Minimal example before masking:
 Minimal example after masking:
 
 ```xml
-<!---------------------------------------------------------->
+<!--                                                       ->
 <l>Here's the content you want in the index for this document</l>
 ```
+
+!!! note
+    If the area to mask is smaller than 5 characters, use a sequence of whitespace (`    `), since
+    XML comment blocks need to be at least 5 characters long (`<!--->`).
 
 !!! note
     This technique is also very useful if you want to exclude certain parts of the OCR document from the index.

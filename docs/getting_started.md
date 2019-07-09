@@ -4,10 +4,6 @@
 - OCR documents need to be in [hOCR](formats.md#hocr), [ALTO](formats.md#alto)
   or [MiniOCR](formats.md#miniocr) formats, with at least page-, and word-level
   segmentation
-- One OCR file needs to correspond to one document in the search index<br>
-  There is a [hack to support multiple index documents per file](faq.md#partial-docs),
-  but the reverse (multiple files per index document) is not possible,
-  you will have to merge the files.
 
 ## Installation
 Download the JAR for the latest release from the [GitHub Releases
@@ -66,14 +62,17 @@ your fields contain OCR text (i.e. the `solrconfig` is currently tied to the sch
 For your schema, you will have to define a type that enables the storage of
 offsets and positions. Enabling term vectors is optional, although it
 significantly speeds up highlights wildcard queries. The indexing analyzer chain for
-the field type needs to start with the `HTMLStripCharFilterFactory`. For ALTO,
-you need the specialized `de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory` instead.
+the field type needs to start with:
+
+- hOCR: `de.digitalcollections.solrocr.formats.hocr.HocrCharFilterFactory`
+- ALTO: `de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory`
+- MiniOCR: `HTMLStripCharFilterFactory`
 
 ```xml
 <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
   <analyzer>
-    <!-- Strip away the XML/HTML tags to arrive at a plaintext version of the OCR -->
-    <charFilter class="solr.HTMLStripCharFilterFactory" />
+    <!-- Strip away the XML/HTML tags to arrive at a plaintext version of the OCR and do some other clean-up -->
+    <charFilter class="de.digitalcollections.solrocr.formats.hocr.HocrCharFilterFactory" />
     <!-- rest of your analyzer chain -->
     <!-- ..... -->
   </analyzer>

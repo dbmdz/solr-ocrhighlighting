@@ -19,8 +19,8 @@ query parameters](queryparams.md) to control how snippets are generated.
 In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
 `de.digitalcollections.solrocr.formats.hocr.HocrFormat`.
 
-In the **Schema**, make sure that `solr.HTMLStripCharFilterFactory` is the first filter
-in your indexing analyzer chain for OCR fields.
+In the **Schema**, make sure that `de.digitalcollections.solrocr.formats.hocr.HocrCharFilterFactory`
+is the first filter in your indexing analyzer chain for OCR fields.
 
 **Block type mapping:**
 

@@ -45,7 +45,7 @@ The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0
     * [MiniOCR](formats.md#miniocr)
 - Retrieve all the information needed to render a highlighted snippet view
   directly from Solr, without postprocessing
-- Keeps your index size manageable by re-using OCR documents on disk for
+- Keep your index size manageable by re-using OCR documents on disk for
   highlighting
 
 ## Getting Started

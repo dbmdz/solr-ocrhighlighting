@@ -13,3 +13,14 @@ These parameters can be changed at query time:
   "Search on this page" feature (e.g. for the [IIIF Content Search API](https://iiif.io/api/search/1.0/)).
 - `hl.ocr.absoluteHighlights`: Return the coordinates of highlighted regions as absolute coordinates (i.e. relative to
   the page, not the snippet region)
+
+To demonstrate the effects of the `contextBlock`, `contextSize` and `limitBlock` parameter, consider this image which
+visualizes how a snippet with two highlights on adjacent lines is built when `contextBlock=line`, `contextSize=2` and
+`limitBlock=block`:
+
+![](img/query_params.png)
+
+First of all, the snippet size is determined by selecting `contextSize=2` blocks of type `contextBlock=line` above the
+first highlight and below the last highlight in the snippet. In this example, there is only one `line` block remaining in
+the containing `block`. Since the `limitBlock` parameter is set to `block`, the snippet ends here, the next line from
+the next block is not included in the snippet.

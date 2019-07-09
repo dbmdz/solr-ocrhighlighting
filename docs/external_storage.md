@@ -5,7 +5,7 @@ on the fields in the schema.
 However, this approach has several drawbacks, that might not make it practical for your use case:
 
 - **Index size:** Raw OCR documents need to be stored in the Solr index, depending on the format
-  these regularly reach sizes  above 100MiB, which adds up really quickly with thousands of documents
+  these regularly reach sizes above 100MiB, which adds up really quickly with thousands of documents
 - **Memory Usage:** During highlighting, Solr will load the full contents of the stored field into memory.
   Here again, the document sizes involved can make this problematic.
 
@@ -21,10 +21,10 @@ the indexed terms in the input document in the index. Given these offsets, we ca
 the input document and retrieve just the parts that are needed.
 
 There is, however, one complication: Internally, Solr works with UTF-16 strings, where every
-character takes up exactly 2 bytes, which is also what the stored character offsets are based on.
-In a UTF-16 encoded document, given a character offset of `32`, you can obtain the character at this
-position by simply seeking into the input document at position `64` (two bytes per character) and
-reading the two bytes that make up the character
+`char` takes up exactly 2 bytes, which is also what the stored character offsets are based on.
+In a UTF-16 encoded document, given a character offset of `32`, you can obtain the `char` at this
+position by simply seeking into the input document at position `64` (two bytes per `char`) and
+reading the two bytes that make up the `char`.
 
 This would easy, but almost nobody stores documents in UTF-16, since it is very space-inefficient.
 Most real-world documents will be stored in UTF-8, which is a *variable length encoding*, meaning
@@ -35,13 +35,12 @@ given only the character offset.
 To get around this limitation, you have two options:
 
 1. [Encode the input documents in ASCII](#ascii) (= always one byte per character) and
-   format non-ASCII codepoints as XML character entities
-   (i.e. `ſ` becomes `&#383;`)
+   format non-ASCII codepoints as XML character entities (i.e. `ſ` becomes `&#383;`)
 2. [Leave the input documents in UTF-8](#utf8) and store the byte offset for
    every term in the Solr index
 
 **Option #1 is the recommended way**: It only requires a slight modification to
-your input documents with no effects on other consumers and offer the best
+your input documents with no effects on other consumers and offers the best
 experience.
 
 ## Document resolving
@@ -100,9 +99,11 @@ indexing these files **as a single document** if some pre-conditions are met:
 
 If these conditions are met, add the `multiple="true"` option to your field loader configuration and a wildcard
 to your path patterns (e.g. `/local/ocr/{id}/*.xml`). At indexing time, instead of POSTing the contents of a single
-file in your document's OCR field, you submit the **concatenated contents of all files** (or, in the case of [UTF-8 documents](#utf8), the index for the concatenated contents).
+file in your document's OCR field, you submit the **concatenated contents of all files** (or, in the case of
+[UTF-8 documents](#utf8), the index for the concatenated contents).
 
 Refer to the [unit test](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/src/test/java/de/digitalcollections/solrocr/solr/AltoMultiEscapedTest.java)
+and the [ALTO example](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/solr/cores/bnl_lunion/conf/solrconfig.xml)
 to see an example setup for this use case.
 
 
@@ -164,9 +165,9 @@ $ cat page1.xml page2.xml | ./offsets-parser > out.txt
 ```
 
 In your schema, you will have to enable term positions, term vectors and term payloads.
-In your indexing analyzer chain, you need to remove the `HTMLStripCharFilterFactory`
-(and the `AltoCharFilterFactory` if using ALTO) and instead tell Solr to
-tokenize on whitespace, split off those offsets during indexing and store them as payloads.
+In your indexing analyzer chain, you need to remove the `CharFilterFactory`
+and your default tokenizer and instead tell Solr to tokenize on whitespace,
+split off those offsets during indexing and store them as payloads.
 
 ```xml
 <!-- Positions, Term Vectors and Term Payloads are mandatory with this approach. -->
@@ -178,7 +179,7 @@ tokenize on whitespace, split off those offsets during indexing and store them a
     <!-- The delimiter can be any UTF-16 codepoint, "⚑" is used by default in the provided Java implementation and CLI tool -->
     <filter class="solr.DelimitedPayloadTokenFilterFactory" delimiter="⚑"
             encoder="de.digitalcollections.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
-    <!-- The WhitespaceTokenizer is really rudimentary. This filter will trim non-letter from the beginning/end,
+    <!-- The WhitespaceTokenizer is really rudimentary. This filter will trim non-letters from the beginning/end,
          making the terms more similar to what you'd get with the StandardTokenizer. -->
    <filter class="de.digitalcollections.solrocr.lucene.NonAlphaTrimFilterFactory" />
     <!-- rest of your analyzer chain -->
