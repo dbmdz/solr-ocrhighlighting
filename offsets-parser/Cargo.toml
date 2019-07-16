@@ -1,6 +1,6 @@
 [package]
 name = "offsets-parser"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Johannes Baiter <johannes.baiter@bsb-muenchen.de>"]
 edition = "2018"
 
