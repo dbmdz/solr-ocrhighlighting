@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
 import de.digitalcollections.solrocr.util.OcrBox;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class HocrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern wordPat = Pattern.compile(
@@ -64,7 +65,7 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
       int y0 = Integer.parseInt(m.group("uly"));
       int x1 = Integer.parseInt(m.group("lrx"));
       int y1 = Integer.parseInt(m.group("lry"));
-      String text = m.group("text");
+      String text = StringEscapeUtils.unescapeXml(m.group("text"));
       if (text.contains(startHlTag)) {
         inHighlight = true;
       }
