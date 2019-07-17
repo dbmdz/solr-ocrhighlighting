@@ -128,7 +128,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       int w = Integer.parseInt(attribs.get("WIDTH"));
       int h = Integer.parseInt(attribs.get("HEIGHT"));
       String subsType = attribs.get("SUBS_TYPE");
-      String text = attribs.get("CONTENT");
+      String text = StringEscapeUtils.unescapeXml(attribs.get("CONTENT"));
       if ("HypPart1".equals(subsType)) {
         text += "-";
       }

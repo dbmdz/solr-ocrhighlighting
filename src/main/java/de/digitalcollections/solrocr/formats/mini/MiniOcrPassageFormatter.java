@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.search.uhighlight.Passage;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.formats.OcrSnippet;
@@ -89,7 +90,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       float y = Float.valueOf(m.group("y"));
       float width = Float.valueOf(m.group("w"));
       float height = Float.valueOf(m.group("h"));
-      String text = m.group("text");
+      String text = StringEscapeUtils.unescapeXml(m.group("text"));
       if (text.contains(startHlTag)) {
         inHighlight = true;
       }

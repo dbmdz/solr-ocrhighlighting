@@ -166,4 +166,10 @@ public class HocrEscapedTest extends SolrTestCaseJ4 {
     assertQ(req, "count(//arr[@name='regions']/lst)=1");
   }
 
+  @Test
+  public void testHighlightTextUnescaped() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "\"alſo beſſer\"", "hl.weightMatches", "true");
+    assertQ(req, "//arr[@name='highlights']//str[@name='text']/text()='alſo beſſer,'");
+  }
+
 }
