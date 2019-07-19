@@ -12,20 +12,13 @@
       <str>stored_ocr_text</str>
       <str>external_ocr_text</str>
     </lst>
-    <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader"
-                 encoding="utf8">
-      <lst name="externalFields">
-        <str name="external_ocr_text">src/test/resources/data/miniocr.xml</str>
-      </lst>
-    </fieldLoader>
   </searchComponent>
 
   <requestHandler name="/select" class="solr.SearchHandler">
     <arr name="components">
       <str>query</str>
-      <str>highlight</str>
       <str>ocrHighlight</str>
+      <str>highlight</str>
     </arr>
   </requestHandler>
-
 </config>

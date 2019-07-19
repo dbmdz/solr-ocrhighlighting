@@ -20,7 +20,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageFormatter;
-import de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
 import de.digitalcollections.solrocr.util.IterableCharSequence.OffsetType;
 import de.digitalcollections.solrocr.util.OcrBox;
@@ -33,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public abstract class OcrPassageFormatter extends PassageFormatter {
   private static final Pattern LAST_INNER_TAG_PAT = Pattern.compile("[a-zA-Z0-9]</");
 
-  private static final Logger logger = LoggerFactory.getLogger(PathFieldLoader.class);
+  private static final Logger logger = LoggerFactory.getLogger(OcrPassageFormatter.class);
   protected final String startHlTag;
   protected final String endHlTag;
   protected final boolean absoluteHighlights;

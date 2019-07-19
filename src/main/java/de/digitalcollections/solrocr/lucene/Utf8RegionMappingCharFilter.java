@@ -1,6 +1,6 @@
 package de.digitalcollections.solrocr.lucene;
 
-import de.digitalcollections.solrocr.util.Region;
+import de.digitalcollections.solrocr.util.SourcePointer;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedList;
@@ -28,10 +28,10 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
   private int currentOutOffset;
 
   private boolean nextIsOffset = false;
-  private Queue<Region> remainingRegions;
-  private Region currentRegion;
+  private Queue<SourcePointer.Region> remainingRegions;
+  private SourcePointer.Region currentRegion;
 
-  public Utf8RegionMappingCharFilter(Reader input, List<Region> regions) throws IOException {
+  public Utf8RegionMappingCharFilter(Reader input, List<SourcePointer.Region> regions) throws IOException {
     super(input);
     this.currentOutOffset = 0;
     this.currentOffset = 0;

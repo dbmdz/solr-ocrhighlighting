@@ -4,7 +4,6 @@ import de.digitalcollections.solrocr.formats.OcrBlock;
 import de.digitalcollections.solrocr.formats.OcrFormat;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.lucene.OcrHighlighter;
-import de.digitalcollections.solrocr.lucene.fieldloader.ExternalFieldLoader;
 import de.digitalcollections.solrocr.util.OcrHighlightResult;
 import java.io.IOException;
 import java.text.BreakIterator;
@@ -29,14 +28,11 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrOcrHighlighter.class);
 
-  private ExternalFieldLoader fieldLoader;
   private OcrFormat ocrFormat;
   private Set<String> ocrFieldNames;
 
 
-  public SolrOcrHighlighter(ExternalFieldLoader fieldLoader, OcrFormat ocrFormat,
-                            List<String> ocrFieldNames) {
-    this.fieldLoader = fieldLoader;
+  public SolrOcrHighlighter(OcrFormat ocrFormat, List<String> ocrFieldNames) {
     this.ocrFormat = ocrFormat;
     this.ocrFieldNames = new HashSet<>(ocrFieldNames);
   }
@@ -66,7 +62,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     // Highlight OCR fields
     if (ocrFieldNames.length > 0) {
       OcrHighlighter ocrHighlighter = new OcrHighlighter(
-          req.getSearcher(), req.getSchema().getIndexAnalyzer(), fieldLoader, req.getParams());
+          req.getSearcher(), req.getSchema().getIndexAnalyzer(), req.getParams());
       String limitBlock = params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase();
       BreakIterator ocrBreakIterator = ocrFormat.getBreakIterator(
           OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()),

@@ -1,13 +1,14 @@
 package de.digitalcollections.solrocr.solr;
 
 import de.digitalcollections.solrocr.formats.OcrFormat;
-import de.digitalcollections.solrocr.lucene.fieldloader.ExternalFieldLoader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
-import org.apache.solr.common.params.SolrParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.core.SolrCore;
@@ -18,7 +19,6 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
   private PluginInfo info;
   private OcrFormat ocrFormat;
   private ArrayList<String> ocrFieldNames;
-  private ExternalFieldLoader fieldLoader;
   private SolrOcrHighlighter ocrHighlighter;
 
   @Override
@@ -56,19 +56,13 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
     this.ocrFieldNames = new ArrayList<>();
     ocrFieldInfo.forEach((k, fieldName) -> ocrFieldNames.add(fieldName));
 
-    PluginInfo fieldLoaderInfo = info.getChild("fieldLoader");
-    if (fieldLoaderInfo != null) {
-      this.fieldLoader = core.createInitInstance(
-          fieldLoaderInfo, ExternalFieldLoader.class, "", null);
-    }
-    this.ocrHighlighter = new SolrOcrHighlighter(fieldLoader, ocrFormat, ocrFieldNames);
+    this.ocrHighlighter = new SolrOcrHighlighter(ocrFormat, ocrFieldNames);
   }
 
   @Override
   public void process(ResponseBuilder rb) throws IOException {
     if (rb.doHighlights) {
       SolrQueryRequest req = rb.req;
-      SolrParams params = req.getParams();
       String[] defaultHighlightFields = rb.getQparser() != null ? rb.getQparser().getDefaultHighlightFields() : null;
       Query highlightQuery = rb.getHighlightQuery();
       if(highlightQuery==null) {
@@ -94,6 +88,22 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
           rb.rsp.add(highlightingResponseField(), ocrHighlights);
         }
       }
+
+      // Remove OCR fields from highlighting param, so they don't get caught
+      // by the default highlighter
+      ModifiableSolrParams params = new ModifiableSolrParams(rb.req.getParams());
+      if (params.get("hl.fl") != null) {
+        String[] remainingHls = Arrays.stream(params.get("hl.fl").split(","))
+            .filter(f -> !ocrFieldNames.contains(f))
+            .toArray(String[]::new);
+        if (remainingHls.length == 0) {
+          params.remove("hl.fl");
+          params.set("hl", "false");
+        } else {
+          params.set("hl.fl", StringUtils.join(remainingHls, ","));
+        }
+      }
+      rb.req.setParams(params);
     }
   }
 

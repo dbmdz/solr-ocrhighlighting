@@ -2,17 +2,18 @@ package de.digitalcollections.solrocr.lucene;
 
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.formats.OcrSnippet;
-import de.digitalcollections.solrocr.lucene.fieldloader.ExternalFieldLoader;
 import de.digitalcollections.solrocr.solr.OcrHighlightParams;
+import de.digitalcollections.solrocr.util.FileBytesCharIterator;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
 import de.digitalcollections.solrocr.util.OcrHighlightResult;
+import de.digitalcollections.solrocr.util.SourcePointer;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -22,7 +23,6 @@ import org.apache.lucene.index.BaseCompositeReader;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.FilterLeafReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.MultiReader;
@@ -59,14 +59,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }
   }
 
-  private final ExternalFieldLoader fieldLoader;
   private final SolrParams params;
 
 
-  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, ExternalFieldLoader fieldLoader,
-      SolrParams params) {
+  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, SolrParams params) {
     super(indexSearcher, indexAnalyzer);
-    this.fieldLoader = fieldLoader;
     this.params = params;
   }
 
@@ -226,28 +223,24 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
   protected List<IterableCharSequence[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
     List<IterableCharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
-    List<String> storedFields = Arrays.stream(fields)
-        .filter(f -> fieldLoader == null || !fieldLoader.isExternalField(f))
-        .collect(Collectors.toList());
-    if (fieldLoader != null) {
-      storedFields.addAll(fieldLoader.getRequiredFields());
-    }
-
-    String[] visitorArgs = storedFields.stream().toArray(String[]::new);
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-      DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor(visitorArgs);
+      DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor(fields);
       IterableCharSequence[] ocrVals = new IterableCharSequence[fields.length];
       searcher.doc(docId, docIdVisitor);
       for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {
         String fieldName = fields[fieldIdx];
-        if (fieldLoader == null || !fieldLoader.isExternalField(fieldName)) {
-          ocrVals[fieldIdx] = IterableCharSequence.fromString(docIdVisitor.getDocument().get(fieldName));
+        String fieldValue = docIdVisitor.getDocument().get(fieldName);
+        if (fieldValue != null) {
+          if (SourcePointer.isPointer(fieldValue)) {
+            SourcePointer sourcePointer = SourcePointer.parse(fieldValue);
+            ocrVals[fieldIdx] = new FileBytesCharIterator(
+                sourcePointer.sources.get(0).path, StandardCharsets.UTF_8);
+          } else {
+            ocrVals[fieldIdx] = IterableCharSequence.fromString(fieldValue);
+          }
         } else {
-          Map<String, String> fvals = docIdVisitor.getDocument().getFields().stream()
-              .filter(f -> f.stringValue() != null)
-              .collect(Collectors.toMap(IndexableField::name, IndexableField::stringValue));
-          ocrVals[fieldIdx] = fieldLoader.loadField(fvals, fieldName);
+          ocrVals[fieldIdx] = null;
         }
       }
       fieldValues.add(ocrVals);

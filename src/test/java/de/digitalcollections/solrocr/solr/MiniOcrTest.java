@@ -165,8 +165,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   public void testWildcardQueryWithWildcardForUmlautInTheMiddle() throws Exception {
     SolrQueryRequest req = xmlQ("q", "M?nchen");
     assertQ(req,
-        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])>0");
-    assertQ(req,
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])>0",
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'manche')])>0");
   }
 
@@ -202,8 +201,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   public void testCombinedFuzzyQuery() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Magdepurg~ OR baurisch~3", "hl.snippets", "100");
     assertQ(req,
-        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
-    assertQ(req,
+        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1",
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='external_ocr_text']/arr/lst/str[@name='text' and contains(text(),'Magdebur')])>1");
   }
 

@@ -40,9 +40,8 @@
   <fields>
     <field name="id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
     <field name="some_text" type="text" indexed="true" stored="true" />
-    <field name="external_ocr_text" type="text_ocr_external" indexed="true" stored="false" />
+    <field name="external_ocr_text" type="text_ocr_external" indexed="true" stored="true" />
     <field name="stored_ocr_text" type="text_ocr" indexed="true" stored="true" />
-    <dynamicField name="*_ocr" type="text_ocr" indexed="true" stored="false" />
   </fields>
   <uniqueKey>id</uniqueKey>
 </schema>

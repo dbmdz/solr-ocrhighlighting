@@ -16,10 +16,5 @@
     <lst name="ocrFields">
       <str>ocr_text</str>
     </lst>
-    <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="utf8">
-      <lst name="externalFields">
-        <str name="ocr_text">src/test/resources/data/hocr.html</str>
-      </lst>
-    </fieldLoader>
   </searchComponent>
 </config>
