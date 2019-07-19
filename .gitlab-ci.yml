@@ -1,13 +1,5 @@
 include: "https://raw.githubusercontent.com/dbmdz/development/master/ci/.gitlab-ci-base.yml"
 
-variables:
-  TARGET: x86_64-unknown-linux-musl
-
-cache:
-  key: "$CI_COMMIT_SHA"
-  paths:
-    - offsets-parser/target/$TARGET
-
 stages:
   - build
   - test
@@ -26,13 +18,6 @@ publish_docs:
     refs:
       - master
 
-linux_binary:
-  image: "ekidd/rust-musl-builder"
-  stage: build
-  script:
-    - cd offsets-parser
-    - cargo build --release --target $TARGET
-
 github_release:
   extends: .release
   only:
@@ -40,7 +25,4 @@ github_release:
   script:
     - if [[ "$CI_COMMIT_TAG" =~ .*RC.* ]]; then exit 0; fi
     - mvn clean package
-    - sudo apt update
-    - sudo apt install -y zip
-    - zip -j offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip offsets-parser/target/$TARGET/release/offsets-parser
-    - hub release edit -m $CI_COMMIT_TAG -a target/solr-ocrhighlighting-${CI_COMMIT_TAG}.jar -a offsets-parser-${CI_COMMIT_TAG}-${TARGET}.zip -t $CI_COMMIT_SHA $CI_COMMIT_TAG
+    - hub release edit -m $CI_COMMIT_TAG -a target/solr-ocrhighlighting-${CI_COMMIT_TAG}.jar -t $CI_COMMIT_SHA $CI_COMMIT_TAG
