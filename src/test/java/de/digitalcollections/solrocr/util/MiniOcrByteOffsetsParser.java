@@ -1,5 +1,6 @@
-package de.digitalcollections.solrocr.formats.mini;
+package de.digitalcollections.solrocr.util;
 
+import com.google.common.collect.Streams;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,7 +21,6 @@ import net.byteseek.searcher.sequence.SequenceMatcherSearcher;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import de.digitalcollections.solrocr.util.Streams;
 
 public class MiniOcrByteOffsetsParser {
 

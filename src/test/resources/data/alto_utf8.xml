@@ -508,7 +508,7 @@ ydpi:300
 <SP ID="SP177" WIDTH="48" HPOS="3044" VPOS="5816"/>
 <String ID="S203" CONTENT="til" WC="0.889" CC="8 8 8" HEIGHT="156" WIDTH="136" HPOS="3096" VPOS="5824"/>
 <SP ID="SP178" WIDTH="40" HPOS="3236" VPOS="5812"/>
-<String ID="S204" CONTENT="Eftersyn." WC="0.877" CC="8 9 8 8 6 8 8 7 9" HEIGHT="168" WIDTH="532" HPOS="3280" VPOS="5812"/>
+<String ID="S204" CONTENT="ligesom" WC="0.877" CC="8 9 8 8 6 8 8 7 9" HEIGHT="168" WIDTH="532" HPOS="3280" VPOS="5812"/>
 </TextLine>
 <TextLine ID="LINE28" STYLEREFS="TS8" HEIGHT="164" WIDTH="3652" HPOS="480" VPOS="6264">
 <String ID="S205" CONTENT="aende" WC="0.756" CC="6 9 7 6 6" HEIGHT="128" WIDTH="332" HPOS="480" VPOS="6332"/>
@@ -1282,5 +1282,15 @@ ydpi:300
 </TextBlock>
 </PrintSpace>
 </Page>
+  <Page WIDTH="2092" HEIGHT="3850" PHYSICAL_IMG_NR="6" ID="PAGE2">
+    <TextBlock ID="block_12" HPOS="83" VPOS="3284" WIDTH="1703" HEIGHT="100">
+      <TextLine ID="line_43" HPOS="182" VPOS="3284" WIDTH="1604" HEIGHT="49">
+        <String ID="string_493" HPOS="706" VPOS="3285" WIDTH="222" HEIGHT="37" WC="0.72" CONTENT="Permanent"/>
+        <SP WIDTH="31" VPOS="3285" HPOS="928"/>
+        <String ID="string_494" HPOS="959" VPOS="3285" WIDTH="216" HEIGHT="36" WC="0.95" CONTENT="Committee"/>
+        <SP WIDTH="30" VPOS="3285" HPOS="1175"/>
+      </TextLine>
+    </TextBlock>
+  </Page>
 </Layout>
 </alto>

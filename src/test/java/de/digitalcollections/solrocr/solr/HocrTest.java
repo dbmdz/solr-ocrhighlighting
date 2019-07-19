@@ -12,12 +12,12 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class HocrServerLoadTest extends SolrTestCaseJ4 {
+public class HocrTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "hocr_serverload");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "hocr");
 
-    Path ocrPath = Paths.get("src/test/resources/data/hocr_utf8.html");
+    Path ocrPath = Paths.get("src/test/resources/data/hocr.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
     assertU(adoc("ocr_text", String.format("%s[3034454:3067549]", ocrPath.toString()), "id", "84"));
     assertU(commit());
@@ -84,7 +84,7 @@ public class HocrServerLoadTest extends SolrTestCaseJ4 {
             + "bei dieſer Erinnerung'");
     req = xmlQ("q", "\"Volfslieder heller von den Lippen\"", "hl.weightMatches", "true");
     assertQ(req,
-            "count(//lst[@name='ocrHighlighting']/lst)=2");
+            "count(//lst[@name='ocrHighlighting']/lst)=1");
   }
 
     @Test
@@ -132,7 +132,7 @@ public class HocrServerLoadTest extends SolrTestCaseJ4 {
         "//str[@name='text'][1]/text()='einer Verwandten ihres zukünftigen Mannes, die im Auslande ſtudiert und kürzlich promoviert habe. Tief im Winter, Mitte Januar, reiſte <em>Max Werner zur Hochzeit</em> ſeiner Schweſter in die ruſſiſche Provinz. Dort, auf dem Gut von deren Freunden, wo eine Un- menge fremder Gäſte untergebracht waren, ſah er mitten'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='page_31'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='page_32'",
-        "count(//arr[@name='regions']/lst)=4");
+        "count(//arr[@name='regions']/lst)=2");
   }
 
   @Test

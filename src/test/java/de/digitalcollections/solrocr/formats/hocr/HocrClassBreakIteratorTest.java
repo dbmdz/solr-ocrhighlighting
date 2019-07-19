@@ -16,7 +16,7 @@ import de.digitalcollections.solrocr.util.IterableCharSequence;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class HocrClassBreakIteratorTest {
-  private static final Path utf8Path = Paths.get("src/test/resources/data/hocr_utf8.html");
+  private static final Path utf8Path = Paths.get("src/test/resources/data/hocr.html");
 
   private String stripTags(String val) throws IOException {
     HTMLStripCharFilter filter = new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));

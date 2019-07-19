@@ -14,10 +14,10 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class MiniOcrEscapedTest extends SolrTestCaseJ4 {
+public class MiniOcrTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr_escaped");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "miniocr");
 
     Path dataPath = Paths.get("src", "test", "resources", "data").toAbsolutePath();
 
@@ -29,12 +29,11 @@ public class MiniOcrEscapedTest extends SolrTestCaseJ4 {
             + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
             + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
             + "deserunt mollit anim id est laborum.", "id", "1337"));
-    Path ocrPath = dataPath.resolve("miniocr_escaped.xml");
+    Path ocrPath = dataPath.resolve("miniocr.xml");
     assertU(adoc(
-        "external_ocr_text", new String(Files.readAllBytes(ocrPath), StandardCharsets.US_ASCII),
-        "id", "31337"));
+        "external_ocr_text", ocrPath.toString(), "id", "31337"));
     assertU(adoc(
-        "stored_ocr_text", new String(Files.readAllBytes(ocrPath), StandardCharsets.US_ASCII),
+        "stored_ocr_text", new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
         "id", "41337"));
     assertU(commit());
   }

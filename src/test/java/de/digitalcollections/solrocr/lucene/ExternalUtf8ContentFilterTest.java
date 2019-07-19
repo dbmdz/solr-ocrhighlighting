@@ -38,7 +38,7 @@ public class ExternalUtf8ContentFilterTest {
 
   @Test
   public void extractFully() throws IOException {
-    Path p = Paths.get("src/test/resources/data/hocr_utf8.html");
+    Path p = Paths.get("src/test/resources/data/hocr.html");
     CharFilter filter = new Utf8MappingCharFilter(new BufferedReader(new FileReader(p.toFile())));
     String filtered = CharStreams.toString(filter);
     assertThat(filtered).isNotEmpty();
@@ -46,7 +46,7 @@ public class ExternalUtf8ContentFilterTest {
 
   @Test
   public void extractRegion() throws IOException {
-    Path p = Paths.get("src/test/resources/data/hocr_utf8.html");
+    Path p = Paths.get("src/test/resources/data/hocr.html");
     String fieldValue = p.toString() + "[3033216:3066308]";
     byte[] fileBytes = Files.readAllBytes(p);
     String fullFile = new String(fileBytes, StandardCharsets.UTF_8);

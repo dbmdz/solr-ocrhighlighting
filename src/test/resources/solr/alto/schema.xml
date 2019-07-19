@@ -10,15 +10,18 @@
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
     </fieldType>
-    <fieldtype name="text_ocr" class="solr.TextField" termPositions="true" termVectors="true" termPayloads="true">
-      <analyzer>
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-        <filter class="solr.DelimitedPayloadTokenFilterFactory" delimiter="⚑"
-          encoder="de.digitalcollections.solrocr.lucene.byteoffset.ByteOffsetEncoder" />
-        <filter class="de.digitalcollections.solrocr.lucene.NonAlphaTrimFilterFactory" />
+    <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
+      <analyzer type="index">
+        <charFilter class="de.digitalcollections.solrocr.lucene.ExternalUtf8ContentFilterFactory" />
+        <charFilter class="de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory" />
+        <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>
-        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
       </analyzer>
     </fieldtype>
   </types>
@@ -27,6 +30,7 @@
     <field name="id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
     <field name="some_text" type="text" indexed="true" stored="true" />
     <field name="ocr_text" type="text_ocr" indexed="true" stored="false" />
+    <field name="fixtureName" type="string" stored="true" required="true"/>
     <dynamicField name="*_ocr" type="text_ocr" indexed="true" stored="false" />
   </fields>
   <uniqueKey>id</uniqueKey>

@@ -1,8 +1,6 @@
 package de.digitalcollections.solrocr.solr;
 
 import com.google.common.collect.ImmutableMap;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -14,17 +12,15 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class AltoEscapedTest extends SolrTestCaseJ4 {
+public class AltoTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto_escaped");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto");
 
-    Path ocrPath = Paths.get("src/test/resources/data/alto_escaped.xml");
-    String text = new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8);
-    assertU(adoc("ocr_text", text, "id", "42", "fixtureName", "alto_escaped"));
+    Path ocrPath = Paths.get("src/test/resources/data/alto_utf8.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "42", "fixtureName", "alto_utf8"));
     ocrPath = Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml");
-    text = new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8);
-    assertU(adoc("ocr_text", text, "id", "43", "fixtureName", "bnl_lunion_1865-04-15"));
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "43", "fixtureName", "bnl_lunion_1865-04-15"));
     assertU(commit());
   }
 

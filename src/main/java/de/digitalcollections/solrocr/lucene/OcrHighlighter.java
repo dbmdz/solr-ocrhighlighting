@@ -2,13 +2,10 @@ package de.digitalcollections.solrocr.lucene;
 
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.formats.OcrSnippet;
-import de.digitalcollections.solrocr.lucene.byteoffset.ByteOffsetPhraseHelper;
-import de.digitalcollections.solrocr.lucene.byteoffset.FieldByteOffsetStrategy;
-import de.digitalcollections.solrocr.lucene.byteoffset.FieldByteOffsetStrategy.PostingsByteOffsetStrategy;
-import de.digitalcollections.solrocr.lucene.byteoffset.FieldByteOffsetStrategy.PostingsWithTermVectorsByteOffsetStrategy;
-import de.digitalcollections.solrocr.lucene.byteoffset.FieldByteOffsetStrategy.TermVectorByteOffsetStrategy;
-import de.digitalcollections.solrocr.lucene.byteoffset.NoOpByteOffsetStrategy;
 import de.digitalcollections.solrocr.lucene.fieldloader.ExternalFieldLoader;
+import de.digitalcollections.solrocr.solr.OcrHighlightParams;
+import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.util.OcrHighlightResult;
 import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.ArrayList;
@@ -36,15 +33,13 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.uhighlight.PassageScorer;
 import org.apache.lucene.search.uhighlight.PhraseHelper;
+import org.apache.lucene.search.uhighlight.UHComponents;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.InPlaceMergeSorter;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
-import de.digitalcollections.solrocr.solr.OcrHighlightParams;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.OcrHighlightResult;
 
 /**
  * A {@link UnifiedHighlighter} variant to support lazy-loading field values from arbitrary storage and using byte
@@ -267,45 +262,13 @@ public class OcrHighlighter extends UnifiedHighlighter {
     BytesRef[] terms = filterExtractedTerms(fieldMatcher, allTerms);
     Set<HighlightFlag> highlightFlags = getFlags(field);
     PhraseHelper phraseHelper = getPhraseHelper(field, query, highlightFlags);
-    ByteOffsetPhraseHelper byteOffsetPhraseHelper = getByteOffsetPhraseHelper(
-        field, query, highlightFlags);
     CharacterRunAutomaton[] automata = getAutomata(field, query, highlightFlags);
     OffsetSource offsetSource = getOptimizedOffsetSource(field, terms, phraseHelper, automata);
-    OcrHComponents components = new OcrHComponents(field, fieldMatcher, query, terms, phraseHelper,
-                                                   byteOffsetPhraseHelper, automata, highlightFlags);
+    UHComponents components = new UHComponents(field, fieldMatcher, query, terms, phraseHelper,
+                                               automata, highlightFlags);
     return new OcrFieldHighlighter(
-        field, getOffsetStrategy(offsetSource, components), getByteOffsetStrategy(offsetSource, components),
+        field, getOffsetStrategy(offsetSource, components),
         getScorer(field), breakIter, formatter, maxPassages, getMaxNoHighlightPassages(field));
-  }
-
-  protected ByteOffsetPhraseHelper getByteOffsetPhraseHelper(
-      String field, Query query, Set<HighlightFlag> highlightFlags) {
-    boolean useWeightMatchesIter = highlightFlags.contains(HighlightFlag.WEIGHT_MATCHES);
-    if (useWeightMatchesIter) {
-      return ByteOffsetPhraseHelper.NONE; // will be handled by Weight.matches which always considers phrases
-    }
-    boolean highlightPhrasesStrictly = highlightFlags.contains(HighlightFlag.PHRASES);
-    boolean handleMultiTermQuery = highlightFlags.contains(HighlightFlag.MULTI_TERM_QUERY);
-    return highlightPhrasesStrictly ?
-           new ByteOffsetPhraseHelper(query, field, getFieldMatcher(field),
-                            this::requiresRewrite,
-                            this::preSpanQueryRewrite,
-                            !handleMultiTermQuery)
-           : ByteOffsetPhraseHelper.NONE;
-  }
-  protected FieldByteOffsetStrategy getByteOffsetStrategy(OffsetSource offsetSource, OcrHComponents components) {
-    switch (offsetSource) {
-      case NONE_NEEDED:
-        return NoOpByteOffsetStrategy.INSTANCE;
-      case TERM_VECTORS:
-        return new TermVectorByteOffsetStrategy(components);
-      case POSTINGS:
-        return new PostingsByteOffsetStrategy(components);
-      case POSTINGS_WITH_TERM_VECTORS:
-        return new PostingsWithTermVectorsByteOffsetStrategy(components);
-      default:
-        throw new IllegalArgumentException("Unrecognized offset source " + offsetSource);
-    }
   }
 
   // FIXME: This is copied straight from UnifiedHighlighter because it has private access there. Maybe open an issue to

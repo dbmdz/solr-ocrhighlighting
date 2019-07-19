@@ -11,10 +11,14 @@
       </analyzer>
     </fieldType>
     <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
-      <analyzer>
-        <!-- Remove description element -->
+      <analyzer type="index">
+        <charFilter class="de.digitalcollections.solrocr.lucene.ExternalUtf8ContentFilterFactory" />
         <charFilter class="de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory" />
-        <charFilter class="solr.HTMLStripCharFilterFactory" />
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>

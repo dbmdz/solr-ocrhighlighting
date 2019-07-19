@@ -11,7 +11,7 @@
     <lst name="ocrFields">
       <str>ocr_text</str>
     </lst>
-    <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="ascii">
+    <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader" encoding="utf8">
       <lst name="externalFields">
         <str name="ocr_text">src/test/resources/data/{fixtureName}.xml</str>
       </lst>

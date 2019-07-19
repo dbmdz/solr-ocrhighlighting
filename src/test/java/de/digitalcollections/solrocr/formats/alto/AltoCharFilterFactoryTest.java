@@ -13,7 +13,7 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AltoCharFilterFactoryTest {
-  final Path altoPath = Paths.get("src/test/resources/data/alto_escaped.xml");
+  final Path altoPath = Paths.get("src/test/resources/data/alto_utf8.xml");
   final Path hyphenPath = Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml");
   final AltoCharFilterFactory fac = new AltoCharFilterFactory(new HashMap<>());
 
@@ -27,7 +27,7 @@ public class AltoCharFilterFactoryTest {
   @Test
   public void extractsCorrectText() throws IOException {
     Reader reader = fac.create(new InputStreamReader(new FileInputStream(altoPath.toFile())));
-    String s = CharStreams.toString(reader).replaceAll("\n+", " ");
+    String s = CharStreams.toString(reader).replaceAll("[\n\r]+", " ");
     assertThat(s).doesNotContain("<String");
     assertThat(s).doesNotContain("/>");
     assertThat(s).contains("forinden kan erfare");

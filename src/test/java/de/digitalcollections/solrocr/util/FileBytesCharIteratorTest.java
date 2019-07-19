@@ -13,14 +13,13 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
-import de.digitalcollections.solrocr.formats.mini.MiniOcrByteOffsetsParser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FileBytesCharIteratorTest {
   private static final Pattern OFFSET_PAT = Pattern.compile("\\s(.+?)⚑(\\d+)");
 
-  private final Path ocrPath = Paths.get("src/test/resources/data/miniocr_utf8.xml");
+  private final Path ocrPath = Paths.get("src/test/resources/data/miniocr.xml");
   private Map<Integer, String> words;
   private FileBytesCharIterator it;
 

@@ -13,9 +13,9 @@
       <str>external_ocr_text</str>
     </lst>
     <fieldLoader class="de.digitalcollections.solrocr.lucene.fieldloader.PathFieldLoader"
-                 encoding="ascii">
+                 encoding="utf8">
       <lst name="externalFields">
-        <str name="external_ocr_text">src/test/resources/data/miniocr_escaped.xml</str>
+        <str name="external_ocr_text">src/test/resources/data/miniocr.xml</str>
       </lst>
     </fieldLoader>
   </searchComponent>

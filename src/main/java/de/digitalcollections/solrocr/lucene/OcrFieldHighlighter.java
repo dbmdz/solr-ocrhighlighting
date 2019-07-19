@@ -2,10 +2,7 @@ package de.digitalcollections.solrocr.lucene;
 
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.formats.OcrSnippet;
-import de.digitalcollections.solrocr.lucene.byteoffset.ByteOffsetsEnum;
-import de.digitalcollections.solrocr.lucene.byteoffset.FieldByteOffsetStrategy;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.Utf8;
 import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.Arrays;
@@ -25,15 +22,12 @@ import org.apache.lucene.util.BytesRef;
  * A customization of {@link FieldHighlighter} to support lazy-loaded field values and byte offsets from payloads.
  */
 public class OcrFieldHighlighter extends FieldHighlighter {
-  protected FieldByteOffsetStrategy fieldByteOffsetStrategy;
   private Map<Integer, Integer> numMatches;
 
   public OcrFieldHighlighter(String field, FieldOffsetStrategy fieldOffsetStrategy,
-                             FieldByteOffsetStrategy fieldByteOffsetStrategy, PassageScorer passageScorer,
-                             BreakIterator breakIter, OcrPassageFormatter formatter, int maxPassages,
-                             int maxNoHighlightPassages) {
+                             PassageScorer passageScorer, BreakIterator breakIter, OcrPassageFormatter formatter,
+                             int maxPassages, int maxNoHighlightPassages) {
     super(field, fieldOffsetStrategy, breakIter, passageScorer, maxPassages, maxNoHighlightPassages, formatter);
-    this.fieldByteOffsetStrategy = fieldByteOffsetStrategy;
     this.numMatches = new HashMap<>();
   }
 
@@ -140,86 +134,6 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
     maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
 
-    this.numMatches.put(docId, numTotal);
-    Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
-    // sort in ascending order
-    Arrays.sort(passages, Comparator.comparingInt(Passage::getStartOffset));
-    return passages;
-  }
-
-  /**
-   * Highlight passages from the document using the byte offsets in the payloads of the matching terms.
-   *
-   * Largely copied from {@link FieldHighlighter#highlightOffsetsEnums(OffsetsEnum)}, modified to load the byte offsets
-   * from the term payloads.
-   */
-  protected Passage[] highlightByteOffsetsEnums(ByteOffsetsEnum off, int docId, String pageId) throws IOException {
-    final int contentLength = this.breakIterator.getText().getEndIndex();
-    if (!off.nextPosition()) {
-      return new Passage[0];
-    }
-    // If we're filtering by a page identifier, we want *all* hits on that page
-    int queueSize = pageId != null ? 4096 : maxPassages;
-    if (queueSize  <= 0) {
-      queueSize = 512;
-    }
-    queueSize = Math.min(512, queueSize);
-
-    PriorityQueue<Passage> passageQueue = new PriorityQueue<>(queueSize, (left, right) -> {
-      if (left.getScore() < right.getScore()) {
-        return -1;
-      } else if (left.getScore() > right.getScore()) {
-        return 1;
-      } else {
-        return left.getStartOffset() - right.getStartOffset();
-      }
-    });
-    Passage passage = new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
-    int numTotal = 0;
-    do {
-      int offset = off.byteOffset();
-      this.breakIterator.getText().setIndex(offset);
-      int end = offset;
-      while (true) {
-        char c = this.breakIterator.getText().next();
-        end += Utf8.encodedLength(Character.toString(c));
-        if (!Character.isLetter(c)) {
-          break;
-        }
-      }
-      if (offset < contentLength && end > contentLength) {
-        continue;
-      }
-      if (pageId != null) {
-        String passagePageId = ((OcrPassageFormatter) passageFormatter).determineStartPage(
-            null, offset, (IterableCharSequence) breakIterator.getText());
-        if (!passagePageId.equals(pageId)) {
-          continue;
-        }
-      }
-      // See if this term should be part of a new passage.
-      if (offset >= passage.getEndOffset()) {
-        if (passage.getStartOffset() >= 0) {
-          numTotal++;
-        }
-        passage = maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
-        // if we exceed limit, we are done
-        if (offset >= contentLength) {
-          break;
-        }
-        // advance breakIterator
-        passage.setStartOffset(Math.max(this.breakIterator.preceding(offset + 1), 0));
-        passage.setEndOffset(Math.min(this.breakIterator.following(offset), contentLength));
-      }
-      // Add this term to the passage.
-      BytesRef term = off.getTerm();// a reference; safe to refer to
-      assert term != null;
-      passage.addMatch(offset, end, term, off.freq());
-    } while (off.nextPosition());
-    if (passage.getStartOffset() >= 0) {
-      numTotal++;
-    }
-    maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
     this.numMatches.put(docId, numTotal);
     Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
     // sort in ascending order

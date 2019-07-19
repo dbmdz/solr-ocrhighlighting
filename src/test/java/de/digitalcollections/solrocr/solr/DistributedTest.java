@@ -1,7 +1,5 @@
 package de.digitalcollections.solrocr.solr;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.solr.BaseDistributedSearchTestCase;
@@ -41,10 +39,8 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
         + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
         + "deserunt mollit anim id est laborum.", "id", "1337");
     Path dataPath = Paths.get("src", "test", "resources", "data").toAbsolutePath();
-    Path ocrPath = dataPath.resolve("alto_escaped.xml");
-    index(
-        "ocr_text", new String(Files.readAllBytes(ocrPath), StandardCharsets.US_ASCII),
-        "id", "31337");
+    Path ocrPath = dataPath.resolve("alto_utf8.xml");
+    index("ocr_text", ocrPath.toString(), "id", "31337");
     commit();
 
     QueryResponse resp = query(

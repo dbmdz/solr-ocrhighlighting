@@ -15,8 +15,10 @@ import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("needs refactor of multi-file indexing")
 public class AltoMultiEscapedTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {

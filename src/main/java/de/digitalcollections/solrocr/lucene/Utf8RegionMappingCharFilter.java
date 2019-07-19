@@ -18,9 +18,14 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
   private int cumulative;
 
   /**
-   * The current <strong>char</strong> offset;
+   * The current <strong>char</strong> offset in the full file;
    */
   private int currentOffset;
+
+  /**
+   * The current <strong>char</strong> offset in the output.
+   */
+  private int currentOutOffset;
 
   private boolean nextIsOffset = false;
   private Queue<Region> remainingRegions;
@@ -28,14 +33,15 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
 
   public Utf8RegionMappingCharFilter(Reader input, List<Region> regions) throws IOException {
     super(input);
+    this.currentOutOffset = 0;
     this.currentOffset = 0;
     this.cumulative = 0;
     this.remainingRegions = new LinkedList<>(regions);
     currentRegion = remainingRegions.remove();
-    if (currentOffset > 0) {
-      int inc = currentRegion.startOffset - currentRegion.start;
-      this.addOffCorrectMap(currentRegion.start, inc);
-      this.cumulative += inc;
+    if (currentRegion.start > 0) {
+      this.currentOffset = currentRegion.start;
+      this.addOffCorrectMap(currentOutOffset, currentRegion.startOffset);
+      this.cumulative += currentRegion.startOffset;
       this.input.skip(currentOffset);
     }
   }
@@ -78,10 +84,11 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
   private void correctOffsets(char[] cbuf, int off, int len) {
     for (int i=off; i < off + len; i++) {
       if (nextIsOffset) {
-        this.addOffCorrectMap(currentOffset, cumulative);
+        this.addOffCorrectMap(currentOutOffset, cumulative);
         nextIsOffset = false;
       }
       currentOffset += 1;
+      currentOutOffset += 1;
       int cp = Character.codePointAt(cbuf, i);
       int increment = charUtf8Size(cp) - 1;
       if (increment > 0) {
