@@ -1,0 +1,38 @@
+<schema name="coordinateHighlight" version="1.0">
+  <types>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+
+    <fieldType name="text" class="solr.TextField">
+      <analyzer>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+    </fieldType>
+    <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
+      <analyzer type="index">
+        <charFilter class="de.digitalcollections.solrocr.lucene.ExternalUtf8ContentFilterFactory" />
+        <charFilter class="de.digitalcollections.solrocr.formats.hocr.HocrCharFilterFactory" />
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+  </types>
+
+  <fields>
+    <field name="id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
+    <field name="some_text" type="text" indexed="true" stored="true" />
+    <field name="ocr_text" type="text_ocr" indexed="true" stored="false" />
+    <dynamicField name="*_ocr" type="text_ocr" indexed="true" stored="false" />
+  </fields>
+  <uniqueKey>id</uniqueKey>
+</schema>

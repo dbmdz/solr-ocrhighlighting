@@ -7,7 +7,6 @@ import de.digitalcollections.solrocr.lucene.OcrHighlighter;
 import de.digitalcollections.solrocr.lucene.fieldloader.ExternalFieldLoader;
 import de.digitalcollections.solrocr.util.OcrHighlightResult;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.uhighlight.UnifiedHighlighter.HighlightFlag;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
@@ -30,10 +28,6 @@ import org.slf4j.LoggerFactory;
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrOcrHighlighter.class);
-
-  public static final String NO_WEIGHT_MATCHES_SUPPORT_MSG =
-      "OCR highlighting in external UTF-8 files does not support hl.weightMatches, classic highlighting approach will "
-    + "be used instead. Switch to escaped ASCII or UTF-16 to avoid this.";
 
   private ExternalFieldLoader fieldLoader;
   private OcrFormat ocrFormat;
@@ -73,11 +67,6 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     if (ocrFieldNames.length > 0) {
       OcrHighlighter ocrHighlighter = new OcrHighlighter(
           req.getSearcher(), req.getSchema().getIndexAnalyzer(), fieldLoader, req.getParams());
-      if (fieldLoader != null && fieldLoader.getCharset() == StandardCharsets.UTF_8) {
-        Arrays.stream(ocrFieldNames)
-            .filter(f -> ocrHighlighter.getFlags(f).contains(HighlightFlag.WEIGHT_MATCHES))
-            .forEach(field -> highlightFieldWarnings.put(field, NO_WEIGHT_MATCHES_SUPPORT_MSG));
-      }
       String limitBlock = params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase();
       BreakIterator ocrBreakIterator = ocrFormat.getBreakIterator(
           OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()),
@@ -96,11 +85,6 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     SimpleOrderedMap out = new SimpleOrderedMap();
     if (ocrSnippets != null) {
       this.addOcrSnippets(out, keys, ocrFieldNames, ocrSnippets);
-    }
-    if (!highlightFieldWarnings.isEmpty()) {
-      SimpleOrderedMap<String> hlWarnings = new SimpleOrderedMap<>();
-      highlightFieldWarnings.forEach(hlWarnings::add);
-      out.add("warnings", hlWarnings);
     }
     return out;
   }

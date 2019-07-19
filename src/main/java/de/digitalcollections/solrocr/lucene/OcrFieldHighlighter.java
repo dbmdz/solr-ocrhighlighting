@@ -4,8 +4,9 @@ import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.formats.OcrSnippet;
 import de.digitalcollections.solrocr.lucene.byteoffset.ByteOffsetsEnum;
 import de.digitalcollections.solrocr.lucene.byteoffset.FieldByteOffsetStrategy;
+import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.util.Utf8;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -19,9 +20,6 @@ import org.apache.lucene.search.uhighlight.OffsetsEnum;
 import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageScorer;
 import org.apache.lucene.util.BytesRef;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.IterableCharSequence.OffsetType;
-import de.digitalcollections.solrocr.util.Utf8;
 
 /**
  * A customization of {@link FieldHighlighter} to support lazy-loaded field values and byte offsets from payloads.
@@ -55,14 +53,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     breakIterator.setText(content);
 
     Passage[] passages;
-    if (content.getOffsetType() == OffsetType.BYTES && content.getCharset() == StandardCharsets.UTF_8) {
-      try (ByteOffsetsEnum byteOffsetsEnums = fieldByteOffsetStrategy.getByteOffsetsEnum(reader, docId)) {
-        passages = highlightByteOffsetsEnums(byteOffsetsEnums, docId,  pageId);
-      }
-    } else {
-      try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
-        passages = highlightOffsetsEnums(offsetsEnums, docId, pageId);// and breakIterator & scorer
-      }
+    try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
+      passages = highlightOffsetsEnums(offsetsEnums, docId, pageId);// and breakIterator & scorer
     }
 
     // Format the resulting Passages.
@@ -229,7 +221,6 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
     maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
     this.numMatches.put(docId, numTotal);
-
     Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
     // sort in ascending order
     Arrays.sort(passages, Comparator.comparingInt(Passage::getStartOffset));

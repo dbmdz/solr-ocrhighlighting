@@ -110,8 +110,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
             idx = m.start() + 1;
           }
           if (idx > -1) {
-            int matchLength = match.end - match.start;
-            matchEnd -= (matchLength - idx);
+            matchEnd -= (matchText.length() - idx);
           }
         }
         sb.insert(Math.min(extraChars + matchEnd, sb.length()), endHlTag);

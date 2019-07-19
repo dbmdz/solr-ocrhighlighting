@@ -1,5 +1,6 @@
 /*
  * Vendored from Guava 25 for compatibility with older Solr versions that ship with Guava < 16.0.
+ * Also includes a new `decodedLength(ByteBuffer buf)` method to calculate the decoded UTF16 length of UTF8 data.
  *
  * Copyright (C) 2013 The Guava Authors
  *
@@ -100,6 +101,45 @@ public final class Utf8 {
       }
     }
     return utf8Length;
+  }
+
+  public static int decodedLength(byte[] buf) {
+    int utf8Length = buf.length;
+    int charLength = utf8Length;
+    int i = 0;
+
+    // Optimized for pure ASCII, no length difference
+    while (i < utf8Length && (buf[i] & 0xFF) < 0x80) {
+      i++;
+    }
+
+    while (i < utf8Length) {
+      int hiBits = ((buf[i] & 0xFF) >> 4) & 0xF;
+      switch (hiBits) {
+        case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+          // U+0000 to U+0080 are 1 byte UTF-8 and 1 char, so no changes neccessary
+          i++;
+          break;
+        case 0xC: case 0xD:
+          // U+0080 to U+07FF are 2 bytes UTF-8 and 1 char, so the char length is decrement by one
+          charLength--;
+          i += 2;
+          break;
+        case 0xE:
+          // U+0800 to U+FFFF are 3 bytes UTF-8 and 1 char, so the char length is decremented by two
+          charLength -= 2;
+          i += 3;
+          break;
+        case 0xF:
+          // U+10000 to U+10FFFF are 4 byts UTF-8 and 2 char, so the char length is decremented by two
+          charLength -= 2;
+          i += 4;
+          break;
+        default:
+          throw new RuntimeException("Illegal UTF8 starting byte.");
+      }
+    }
+    return charLength;
   }
 
   /**
