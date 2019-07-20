@@ -12,13 +12,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.lucene.analysis.CharFilter;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExternalUtf8ContentFilterTest {
+  private ExternalUtf8ContentFilterFactory fac;
+
+  @Before
+  public void setup() {
+    fac = new ExternalUtf8ContentFilterFactory(new HashMap<>());
+  }
+
   @Test
   public void testDecodedLengthCalculation() {
     String randomUnicode = "aaaaaaaaaaaaaaa"
@@ -40,8 +49,12 @@ public class ExternalUtf8ContentFilterTest {
   public void extractFully() throws IOException {
     Path p = Paths.get("src/test/resources/data/hocr.html");
     CharFilter filter = new Utf8MappingCharFilter(new BufferedReader(new FileReader(p.toFile())));
+    String full = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
     String filtered = CharStreams.toString(filter);
     assertThat(filtered).isNotEmpty();
+    assertThat(filter.correctOffset(full.indexOf("id='page_108'"))).isEqualTo(3033238);
+    assertThat(filter.correctOffset(full.indexOf("Sonnenw"))).isEqualTo(3035824);
+    assertThat(filter.correctOffset(full.indexOf("id='word_108_252'"))).isEqualTo(3066094);
   }
 
   @Test
@@ -49,19 +62,45 @@ public class ExternalUtf8ContentFilterTest {
     Path p = Paths.get("src/test/resources/data/hocr.html");
     String fieldValue = p.toString() + "[3033216:3066308]";
     byte[] fileBytes = Files.readAllBytes(p);
-    String fullFile = new String(fileBytes, StandardCharsets.UTF_8);
     String subRegion = new String(
         ArrayUtils.subarray(fileBytes, 3033216, 3066308),
         StandardCharsets.UTF_8);
-    ExternalUtf8ContentFilterFactory fac = new ExternalUtf8ContentFilterFactory(new HashMap<>());
     Utf8RegionMappingCharFilter filter = (Utf8RegionMappingCharFilter) fac.create(new StringReader(fieldValue));
     String filtered = CharStreams.toString(filter);
-    assertThat(filtered).isEqualTo(subRegion);
+    //assertThat(filtered).isEqualTo(subRegion);
     assertThat(filter.correctOffset(subRegion.indexOf("id='page_108'"))).isEqualTo(3033238);
     assertThat(filter.correctOffset(subRegion.indexOf("Sonnenw"))).isEqualTo(3035824);
     assertThat(filter.correctOffset(subRegion.indexOf("id='word_108_252'"))).isEqualTo(3066094);
     assertThat(filtered).contains("<div class='ocr_page' id='page_108'");
     assertThat(filtered).doesNotContain("<div class='ocr_page' id='page_109'");
+  }
+
+  @Test
+  public void multipleFiles() throws IOException {
+    Path basePath = Paths.get("src/test/resources/data/multi_txt");
+    String ptr = Files.list(basePath)
+        .filter(p -> p.getFileName().toString().startsWith("part_"))
+        .map(p -> p.toAbsolutePath().toString())
+        .sorted()
+        .collect(Collectors.joining("+"));
+    Utf8RegionMappingCharFilter filter = (Utf8RegionMappingCharFilter) fac.create(new StringReader(ptr));
+    String filtered = CharStreams.toString(filter);
+    assertThat(filtered).isEqualTo("ene mene mistäes rappelt in der kistäene mene mäckund du bist wäg");
+    assertThat(filter.correctOffset(filtered.indexOf("mistäes"))).isEqualTo(9);
+    assertThat(filter.correctOffset(filtered.indexOf("kistäene"))).isEqualTo(33);
+    assertThat(filter.correctOffset(filtered.indexOf("wäg"))).isEqualTo(65);
+  }
+
+  @Test
+  public void multipleFilesWithRegions() throws IOException {
+    String ptr =
+          "src/test/resources/data/multi_txt/part_1.txt[9:]"
+        + "+src/test/resources/data/multi_txt/part_2.txt[3:10]"
+        + "+src/test/resources/data/multi_txt/part_3.txt[:8]"
+        + "+src/test/resources/data/multi_txt/part_4.txt[4:6,12:]";
+    Utf8RegionMappingCharFilter filter = (Utf8RegionMappingCharFilter) fac.create(new StringReader(ptr));
+    String filtered = CharStreams.toString(filter);
+    assertThat(filtered).isEqualTo("mistärappeltene meneduwäg");
   }
 
 }

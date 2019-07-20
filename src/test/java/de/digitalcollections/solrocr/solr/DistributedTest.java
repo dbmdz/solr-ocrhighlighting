@@ -39,7 +39,7 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
         + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
         + "deserunt mollit anim id est laborum.", "id", "1337");
     Path dataPath = Paths.get("src", "test", "resources", "data").toAbsolutePath();
-    Path ocrPath = dataPath.resolve("alto_utf8.xml");
+    Path ocrPath = dataPath.resolve("alto.xml");
     index("ocr_text", ocrPath.toString(), "id", "31337");
     commit();
 

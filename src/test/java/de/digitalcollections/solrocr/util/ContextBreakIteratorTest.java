@@ -42,14 +42,14 @@ class ContextBreakIteratorTest {
 
   @Test
   void testContextHonorsLimits() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(Paths.get("src/test/resources/data/hocr_escaped.html"),
-                                                         StandardCharsets.US_ASCII);
+    IterableCharSequence seq = new FileBytesCharIterator(Paths.get("src/test/resources/data/hocr.html"),
+                                                         StandardCharsets.UTF_8);
     BreakIterator baseIter = new HocrClassBreakIterator("ocr_line");
     BreakIterator limitIter = new HocrClassBreakIterator("ocrx_block");
     ContextBreakIterator it = new ContextBreakIterator(baseIter, limitIter, 5);
     it.setText(seq);
-    int start = it.preceding(5405775);
-    int end = it.following(5405775 + "Japan</span>".length());
+    int start = it.preceding(5352801);
+    int end = it.following(5352801 + "Japan</span>".length());
     assertThat(start).isLessThan(end);
     String snippet = seq.subSequence(start, end).toString();
     assertThat(StringUtils.countMatches(snippet, "ocr_line")).isEqualTo(1 + 1 + 5);

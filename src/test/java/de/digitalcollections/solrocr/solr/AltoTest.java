@@ -17,10 +17,10 @@ public class AltoTest extends SolrTestCaseJ4 {
   public static void beforeClass() throws Exception {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto");
 
-    Path ocrPath = Paths.get("src/test/resources/data/alto_utf8.xml");
-    assertU(adoc("ocr_text", ocrPath.toString(), "id", "42", "fixtureName", "alto_utf8"));
+    Path ocrPath = Paths.get("src/test/resources/data/alto.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
     ocrPath = Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml");
-    assertU(adoc("ocr_text", ocrPath.toString(), "id", "43", "fixtureName", "bnl_lunion_1865-04-15"));
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "43"));
     assertU(commit());
   }
 

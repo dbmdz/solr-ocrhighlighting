@@ -13,7 +13,7 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
    * The cumulative offset difference between the input (bytes) and the output (chars)
    * at the current position.
    *
-   * currentByteOffset = currentCharOffset + cumulative
+   * current actual byte offset in input = currentOutOffset + cumulative
    */
   private int cumulative;
 
@@ -58,13 +58,17 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
     int numCharsRead = 0;
     while (len - numCharsRead > 0) {
       int charsRemainingInRegion = currentRegion.end - currentOffset;
-      int charsToRead = len;
+      int charsToRead = len - numCharsRead;
       if (charsToRead > charsRemainingInRegion) {
         charsToRead = charsRemainingInRegion;
       }
       int read = this.input.read(cbuf, off, charsToRead);
+      if (read < 0) {
+        break;
+      }
       correctOffsets(cbuf, off, charsToRead);
       numCharsRead += read;
+      off += read;
       if (currentOffset == currentRegion.end) {
         if (remainingRegions.isEmpty()) {
           break;
@@ -74,11 +78,11 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
         if (diff > 0) {
           this.addOffCorrectMap(currentRegion.start, diff);
         }
+        this.input.skip(this.currentRegion.start - this.currentOffset);
         this.currentOffset = currentRegion.start;
-        this.input.skip(this.currentOffset);
       }
     }
-    return numCharsRead;
+    return numCharsRead > 0 ? numCharsRead : -1;
   }
 
   private void correctOffsets(char[] cbuf, int off, int len) {

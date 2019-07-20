@@ -1,43 +1,31 @@
 package de.digitalcollections.solrocr.solr;
 
 import com.google.common.collect.ImmutableMap;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("needs refactor of multi-file indexing")
 public class AltoMultiEscapedTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto_multi_escaped");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto");
 
-    Path ocrBasePath = Paths.get("src/test/resources/data/alto_multi_escaped");
-    StringBuilder sb = new StringBuilder();
-    Arrays.stream(ocrBasePath.toFile().listFiles())
-        .map(File::toPath)
-        .filter(p -> p.toString().endsWith(".xml"))
+    Path ocrBasePath = Paths.get("src/test/resources/data/alto_multi");
+    String ptr = Files.list(ocrBasePath)
+        .filter(p -> p.getFileName().toString().endsWith(".xml"))
+        .map(p -> p.toAbsolutePath().toString())
         .sorted()
-        .forEach(p -> {
-          try {
-            sb.append(new String(Files.readAllBytes(p), StandardCharsets.UTF_8));
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        });
-    assertU(adoc("ocr_text", sb.toString(), "id", "42"));
+        .collect(Collectors.joining("+"));
+    assertU(adoc("ocr_text", ptr, "id", "42"));
     assertU(commit());
   }
 

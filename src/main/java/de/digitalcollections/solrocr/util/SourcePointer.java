@@ -35,6 +35,13 @@ public class SourcePointer {
       this(start, end);
       this.startOffset = startOffset;
     }
+
+    @Override
+    public String toString() {
+      final StringBuffer sb = new StringBuffer("Region{");
+      sb.append(start).append(":").append(end).append("}");
+      return sb.toString();
+    }
   }
 
   private static final Pattern POINTER_PAT = Pattern.compile("^(?<path>.+?)(?:\\[(?<regions>[0-9:,]+)])?$");
@@ -42,18 +49,21 @@ public class SourcePointer {
   public List<FileSource> sources;
 
   public static boolean isPointer(String pointer) {
-    Matcher m = POINTER_PAT.matcher(pointer);
-    return m.matches();
+    return Arrays.stream(pointer.split("\\+"))
+        .allMatch(p -> {
+          Matcher m = POINTER_PAT.matcher(p);
+          return m.matches();
+        });
   }
 
   public static SourcePointer parse(String pointer) {
-    Matcher m = POINTER_PAT.matcher(pointer);
-    if (!m.matches()) {
-      // TODO: Abort with error
-      return null;
+    if (!isPointer(pointer)) {
+      throw new RuntimeException("Could not parse pointer: " + pointer);
     }
     return new SourcePointer(Arrays.stream(pointer.split("\\+"))
         .map(ptr -> {
+          Matcher m = POINTER_PAT.matcher(ptr);
+          m.find();
           Path sourcePath = Paths.get(m.group("path"));
           List<SourcePointer.Region> regions = ImmutableList.of();
           if (m.group("regions") != null) {

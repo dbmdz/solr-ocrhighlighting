@@ -5,6 +5,7 @@ import de.digitalcollections.solrocr.formats.OcrSnippet;
 import de.digitalcollections.solrocr.solr.OcrHighlightParams;
 import de.digitalcollections.solrocr.util.FileBytesCharIterator;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.util.MultiFileBytesCharIterator;
 import de.digitalcollections.solrocr.util.OcrHighlightResult;
 import de.digitalcollections.solrocr.util.SourcePointer;
 import java.io.IOException;
@@ -234,8 +235,14 @@ public class OcrHighlighter extends UnifiedHighlighter {
         if (fieldValue != null) {
           if (SourcePointer.isPointer(fieldValue)) {
             SourcePointer sourcePointer = SourcePointer.parse(fieldValue);
-            ocrVals[fieldIdx] = new FileBytesCharIterator(
-                sourcePointer.sources.get(0).path, StandardCharsets.UTF_8);
+            if (sourcePointer.sources.size() == 1) {
+              ocrVals[fieldIdx] = new FileBytesCharIterator(
+                  sourcePointer.sources.get(0).path, StandardCharsets.UTF_8);
+            } else {
+              ocrVals[fieldIdx] = new MultiFileBytesCharIterator(
+                  sourcePointer.sources.stream().map(s -> s.path).collect(Collectors.toList()),
+                  StandardCharsets.UTF_8);
+            }
           } else {
             ocrVals[fieldIdx] = IterableCharSequence.fromString(fieldValue);
           }

@@ -21,17 +21,10 @@ class MultiFileBytesCharIteratorTest {
   private static final Pattern OFFSET_PAT = Pattern.compile("\\s(.+?)⚑(\\d+)");
 
   private final List<Path> utfPaths = ImmutableList.of(
-      Paths.get("src/test/resources/data/multi_utf8/part_1.txt"),
-      Paths.get("src/test/resources/data/multi_utf8/part_2.txt"),
-      Paths.get("src/test/resources/data/multi_utf8/part_3.txt"),
-      Paths.get("src/test/resources/data/multi_utf8/part_4.txt"));
-
-  private final List<Path> asciiPaths = ImmutableList.of(
-      Paths.get("src/test/resources/data/multi_ascii/part_1.txt"),
-      Paths.get("src/test/resources/data/multi_ascii/part_2.txt"),
-      Paths.get("src/test/resources/data/multi_ascii/part_3.txt"),
-      Paths.get("src/test/resources/data/multi_ascii/part_4.txt"));
-  private final Path asciiCompletePath;
+      Paths.get("src/test/resources/data/multi_txt/part_1.txt"),
+      Paths.get("src/test/resources/data/multi_txt/part_2.txt"),
+      Paths.get("src/test/resources/data/multi_txt/part_3.txt"),
+      Paths.get("src/test/resources/data/multi_txt/part_4.txt"));
   private final Path utf8CompletePath;
 
   private Map<Integer, Character> utf8Chars;
@@ -42,10 +35,10 @@ class MultiFileBytesCharIteratorTest {
 
   public MultiFileBytesCharIteratorTest() throws IOException {
     utf8It = new MultiFileBytesCharIterator(utfPaths, StandardCharsets.UTF_8);
-    utf8CompletePath = Paths.get("src/test/resources/data/multi_utf8/complete.txt");
+    utf8CompletePath = Paths.get("src/test/resources/data/multi_txt/complete.txt");
     utf8Text = new String(Files.readAllBytes(utf8CompletePath), StandardCharsets.UTF_8);
     Matcher m = OFFSET_PAT.matcher(new String(
-        Files.readAllBytes(Paths.get("src/test/resources/data/multi_utf8/index.txt")),
+        Files.readAllBytes(Paths.get("src/test/resources/data/multi_txt/index.txt")),
         StandardCharsets.UTF_8));
     utf8Chars = new HashMap<>();
     while (m.find()) {
@@ -53,28 +46,6 @@ class MultiFileBytesCharIteratorTest {
       String offsetStr = m.group(2);
       int offset = Integer.parseInt(offsetStr);
       utf8Chars.put(offset, charStr.charAt(0));
-    }
-    asciiIt = new MultiFileBytesCharIterator(asciiPaths, StandardCharsets.US_ASCII);
-    asciiCompletePath = Paths.get("src/test/resources/data/multi_ascii/complete.txt");
-    asciiText = new String(Files.readAllBytes(asciiCompletePath), StandardCharsets.US_ASCII);
-  }
-
-  @Test
-  public void testAscii() throws IOException {
-    StringBuilder sb = new StringBuilder();
-    int start = 0;
-    int charIdx = 0;
-    char c = asciiIt.first();
-    sb.append(c);
-    charIdx++;
-    while ((c = asciiIt.next()) != CharacterIterator.DONE) {
-      sb.append(c);
-      charIdx++;
-      if (sb.length() == 100) {
-        assertThat(sb.toString()).isEqualTo(asciiText.substring(start, charIdx));
-        start = charIdx;
-        sb = new StringBuilder();
-      }
     }
   }
 
