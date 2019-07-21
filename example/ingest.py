@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import itertools
 import json
 import re
 import sys
@@ -42,8 +43,15 @@ def gbooks_parse_metadata(hocr):
     # I know, the <center> won't hold, but I think it's okay in this case,
     # especially since we 100% know what data this script is going to work with
     # and we don't want an external lxml dependency in here
-    return {key: int(value) if value.isdigit() else value
-            for key, value in HOCR_METADATA_PAT.findall(hocr)}
+    raw_meta =  {key: int(value) if value.isdigit() else value
+                 for key, value in HOCR_METADATA_PAT.findall(hocr)}
+    return {
+        'author': [raw_meta.get('creator')] if 'creator' in raw_meta else [],
+        'title': [raw_meta['title']],
+        'date': '{}-01-01T00:00:00Z'.format(raw_meta['date']),
+        **{k: v for k, v in raw_meta.items()
+           if k not in ('creator', 'title', 'date')}
+    }
 
 
 def gbooks_load_documents(base_path):
@@ -62,13 +70,14 @@ def gbooks_load_documents(base_path):
                     with doc_path.open('wb') as fp:
                         fp.write(ocr_text)
                 hocr = ocr_text.decode('utf8')
-                yield {'id': vol_id.split("_")[-1], 'ocr_text': hocr,
+                yield {'id': vol_id.split("_")[-1],
+                       'ocr_text': '/data/google1000/' + doc_path.name,
                        **gbooks_parse_metadata(hocr)}
     else:
         for doc_path in base_path.glob('*.hocr'):
             hocr = doc_path.read_text()
             yield {'id': doc_path.stem.split("_")[1],
-                   'ocr_text': hocr,
+                   'ocr_text': '/data/google1000/' + doc_path.name,
                    **gbooks_parse_metadata(hocr)}
 
 
@@ -89,28 +98,32 @@ def bnl_get_metadata(mods_tree):
     }
 
 
-def bnl_mask_ocr_text(ocr_text, block_ids):
-    masked_text = []
-    masking_start = 0
-    for bid in sorted(block_ids, key=lambda i: ocr_text.index(i)):
-        start_match = re.search(r'<([A-Za-z]+?) ID="{bid}"'.format(bid=bid),
-                                ocr_text)
-        start = start_match.start()
-        if start < masking_start:
-            raise Exception("block_ids were out of order, aborting.")
-        end_pat = re.compile(r'</{tag}>'.format(tag=start_match.group(1)))
-        end_match = end_pat.search(ocr_text, pos=start)
-        end = end_match.end()
-        padding = (start - masking_start) * " "
-        masked_text.append(padding)
-        masked_text.append(ocr_text[start:end])
-        masking_start = end
-    return "".join(masked_text)
+def bnl_get_article_pointer(path_regions):
+    grouped = {
+        p: sorted(bid for bid, _ in bids)
+        for p, bids in itertools.groupby(path_regions, key=lambda x: x[1])}
+    pointer_parts = []
+    for page_path, block_ids in grouped.items():
+        local_path = Path(LUNION_PATH) / page_path
+        regions = []
+        with local_path.open('rb') as fp:
+            page_bytes = fp.read()
+        for block_id in block_ids:
+            start_match = re.search(
+                rb'<([A-Za-z]+?) ID="%b"' % (block_id.encode()), page_bytes)
+            start = start_match.start()
+            end_tag = b'</%b>' % (start_match.group(1),)
+            end = page_bytes.index(end_tag, start) + len(end_tag)
+            regions.append((start, end))
+        pointer_parts.append(
+            '/data/bnl_lunion/{}[{}]'.format(
+                page_path,
+                ','.join('{}:{}'.format(*r) for r in sorted(regions))))
+    return '+'.join(pointer_parts)
 
 
 def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
-    ocr_text = "".join(p.read_text()
-                       for p in sorted(alto_basedir.glob("*.xml")))
+    ocr_paths = sorted(alto_basedir.glob("*.xml"))
     article_elems = mets_tree.findall(
         ".//mets:structMap[@TYPE='LOGICAL']//mets:div[@TYPE='ARTICLE']",
         namespaces=NSMAP)
@@ -119,14 +132,20 @@ def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
         namespaces=NSMAP)
     newspaper_title = title_info.findtext('./mods:title', namespaces=NSMAP)
     newspaper_part = title_info.findtext('./mods:partNumber', namespaces=NSMAP)
+    file_mapping = {
+        e.attrib['ID']: next(iter(e)).attrib['{http://www.w3.org/1999/xlink}href'][9:]
+        for e in mets_tree.findall('.//mets:fileGrp[@USE="Text"]/mets:file',
+                                   namespaces=NSMAP)}
     for elem in article_elems:
         meta_id = elem.attrib['DMDID']
-        block_ids = [e.attrib['BEGIN'] for e in elem.findall('.//mets:fptr//mets:area',
-                                                             namespaces=NSMAP)]
+        path_regions = [
+            (e.attrib['BEGIN'],
+             alto_basedir.parent.name + '/' + file_mapping.get(e.attrib['FILEID']))
+            for e in elem.findall('.//mets:fptr//mets:area',
+                                  namespaces=NSMAP)]
         mods_meta = mets_tree.find(
             './/mets:dmdSec[@ID="{}"]//mods:mods'.format(meta_id),
             namespaces=NSMAP)
-        masked_text = bnl_mask_ocr_text(ocr_text, block_ids)
         issue_date = mets_tree.findtext('.//mods:dateIssued', namespaces=NSMAP)
         article_no = meta_id.replace("MODSMD_ARTICLE", "")
         yield {
@@ -135,7 +154,7 @@ def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
             'date': issue_date + 'T00:00:00Z',
             'newspaper_title': newspaper_title,
             'newspaper_part': newspaper_part,
-            'ocr_text': masked_text,
+            'ocr_text': bnl_get_article_pointer(path_regions),
             **bnl_get_metadata(mods_meta),
         }
 
@@ -187,9 +206,9 @@ def bnl_load_documents(base_path):
                 issue_dir / 'text')
 
 
-def index_documents(core_name, docs):
+def index_documents(docs):
     req = request.Request(
-        "http://{}/solr/{}/update?softCommit=true".format(SOLR_HOST, core_name),
+        "http://{}/solr/ocr/update?softCommit=true".format(SOLR_HOST),
         data=json.dumps(docs).encode('utf8'),
         headers={'Content-Type': 'application/json'})
     resp = request.urlopen(req)
@@ -204,7 +223,8 @@ def generate_batches(it, chunk_size):
         if len(cur_batch) == chunk_size:
             yield cur_batch
             cur_batch = []
-    return cur_batch
+    if cur_batch:
+        yield cur_batch
 
 
 if __name__ == '__main__':
@@ -213,7 +233,7 @@ if __name__ == '__main__':
         futs = []
         bnl_iter = bnl_load_documents(Path(LUNION_PATH))
         for idx, batch in enumerate(generate_batches(bnl_iter, 100)):
-            futs.append(pool.submit(index_documents, 'bnl_lunion', batch))
+            futs.append(pool.submit(index_documents, batch))
             print("\r{:05}/{}".format((idx+1)*100, LUNION_NUM_ARTICLES), end='')
         for fut in as_completed(futs):
             fut.result()
@@ -221,7 +241,7 @@ if __name__ == '__main__':
         futs = []
         gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
         for idx, batch in enumerate(generate_batches(gbooks_iter, 4)):
-            futs.append(pool.submit(index_documents, 'google1000', batch))
+            futs.append(pool.submit(index_documents, batch))
             print("\r{:04}/{}".format((idx+1)*4, GOOGLE1000_NUM_VOLUMES), end='')
         for fut in as_completed(futs):
             fut.result()

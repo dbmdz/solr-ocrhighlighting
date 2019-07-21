@@ -1,0 +1,46 @@
+<schema name="coordinateHighlight" version="1.0">
+  <types>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="int" class="solr.IntPointField" docValues="true" />
+    <fieldType name="date" class="solr.DatePointField" docValues="true" />
+    <fieldType name="text" class="solr.TextField">
+      <analyzer>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+    </fieldType>
+    <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
+      <analyzer type="index">
+        <charFilter class="de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory" />
+        <charFilter class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory" />
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+  </types>
+
+  <fields>
+    <field name="id"              type="string"   multiValued="false" indexed="true" stored="true" required="true"/>
+    <field name="issue_id"        type="string"   multiValued="false" indexed="true" stored="true" />
+    <field name="title"           type="text"     multiValued="true"  indexed="true" stored="true" />
+    <field name="subtitle"        type="text"     multiValued="true"  indexed="true" stored="true" />
+    <field name="newspaper_title" type="string"   multiValued="false" indexed="true" stored="true" />
+    <field name="newspaper_part"  type="string"   multiValued="false" indexed="true" stored="true" />
+    <field name="author"          type="text"     multiValued="true"  indexed="true" stored="true" />
+    <field name="publisher"       type="text"     multiValued="false" indexed="true" stored="true" />
+    <field name="language"        type="string"   multiValued="false" indexed="true" stored="true" />
+    <field name="date"            type="date"     multiValued="false" indexed="true" stored="true" />
+    <field name="ocr_text"        type="text_ocr" multiValued="false" indexed="true" stored="true" />
+  </fields>
+  <uniqueKey>id</uniqueKey>
+</schema>

@@ -48,9 +48,9 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
   }
 
   /**
-   * Read {@param len} <tt>char</tt>s into {@param cbuf}, starting from character index {@param off} relative to
-   * the beginning of {@param cbuf} and return the number of <tt>char</tt>s read.
-   */
+   * Read <tt>len</tt> <tt>char</tt>s into <tt>cbuf</tt>, starting from character index <tt>off</tt> relative to
+   * the beginning of <tt>cbuf</tt> and return the number of <tt>char</tt>s read.
+   **/
   @Override
   public int read(char[] cbuf, int off, int len) throws IOException {
     if (currentOffset == currentRegion.end) {
