@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AltoCharFilterFactoryTest {
   final Path altoPath = Paths.get("src/test/resources/data/alto.xml");
   final Path hyphenPath = Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml");
-  final AltoCharFilterFactory fac = new AltoCharFilterFactory(new HashMap<>());
+  final AltoCharFilterFactory fac = new AltoCharFilterFactory();
 
   @Test
   public void stripsDescription() throws IOException {

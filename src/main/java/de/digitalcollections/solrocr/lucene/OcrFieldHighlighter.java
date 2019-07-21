@@ -19,15 +19,14 @@ import org.apache.lucene.search.uhighlight.PassageScorer;
 import org.apache.lucene.util.BytesRef;
 
 /**
- * A customization of {@link FieldHighlighter} to support lazy-loaded field values and byte offsets from payloads.
+ * A customization of {@link FieldHighlighter} to support OCR fields
  */
 public class OcrFieldHighlighter extends FieldHighlighter {
   private Map<Integer, Integer> numMatches;
 
   public OcrFieldHighlighter(String field, FieldOffsetStrategy fieldOffsetStrategy,
-                             PassageScorer passageScorer, BreakIterator breakIter, OcrPassageFormatter formatter,
-                             int maxPassages, int maxNoHighlightPassages) {
-    super(field, fieldOffsetStrategy, breakIter, passageScorer, maxPassages, maxNoHighlightPassages, formatter);
+                             PassageScorer passageScorer, int maxPassages, int maxNoHighlightPassages) {
+    super(field, fieldOffsetStrategy, null, passageScorer, maxPassages, maxNoHighlightPassages, null);
     this.numMatches = new HashMap<>();
   }
 
@@ -35,9 +34,10 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    * The primary method -- highlight this doc, assuming a specific field and given this content.
    *
    * Largely copied from {@link FieldHighlighter#highlightFieldForDoc(LeafReader, int, String)}, modified to support
-   * an {@link IterableCharSequence} as content.
+   * an {@link IterableCharSequence} as content and dynamically setting the break iterator and the formatter.
    */
-  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, IterableCharSequence content, String pageId)
+  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, BreakIterator breakIterator,
+                                           OcrPassageFormatter formatter, IterableCharSequence content, String pageId)
       throws IOException {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
     if (content.length() == 0) {
@@ -48,7 +48,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
 
     Passage[] passages;
     try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
-      passages = highlightOffsetsEnums(offsetsEnums, docId, pageId);// and breakIterator & scorer
+      passages = highlightOffsetsEnums(offsetsEnums, docId, breakIterator, formatter, pageId);
     }
 
     // Format the resulting Passages.
@@ -58,18 +58,19 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
 
     if (passages.length > 0) {
-      return ((OcrPassageFormatter) passageFormatter).format(passages, content);
+      return formatter.format(passages, content);
     } else {
       return null;
     }
   }
   @Override
   protected Passage[] highlightOffsetsEnums(OffsetsEnum off) throws IOException {
-    return this.highlightOffsetsEnums(off, -1, null);
+    throw new UnsupportedOperationException();
   }
 
-  protected Passage[] highlightOffsetsEnums(OffsetsEnum off, int docId, String pageId) throws IOException {
-        final int contentLength = this.breakIterator.getText().getEndIndex();
+  protected Passage[] highlightOffsetsEnums(OffsetsEnum off, int docId, BreakIterator breakIter,
+                                            OcrPassageFormatter formatter, String pageId) throws IOException {
+        final int contentLength = breakIter.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
     }
@@ -98,8 +99,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         throw new IllegalArgumentException("field '" + field + "' was indexed without offsets, cannot highlight");
       }
       if (pageId != null) {
-        String passagePageId = ((OcrPassageFormatter) passageFormatter).determineStartPage(
-            null, start, (IterableCharSequence) breakIterator.getText());
+        String passagePageId = formatter.determineStartPage(
+            null, start, (IterableCharSequence) breakIter.getText());
         if (!passagePageId.equals(pageId)) {
           continue;
         }
@@ -119,10 +120,10 @@ public class OcrFieldHighlighter extends FieldHighlighter {
           break;
         }
         // advance breakIterator
-        passage.setStartOffset(Math.max(this.breakIterator.preceding(start + 1), 0));
-        passage.setEndOffset(Math.min(this.breakIterator.following(end), contentLength));
+        passage.setStartOffset(Math.max(breakIter.preceding(start + 1), 0));
+        passage.setEndOffset(Math.min(breakIter.following(end), contentLength));
       } else {
-        passage.setEndOffset(Math.min(this.breakIterator.following(end), contentLength));
+        passage.setEndOffset(Math.min(breakIter.following(end), contentLength));
       }
       // Add this term to the passage.
       BytesRef term = off.getTerm();// a reference; safe to refer to

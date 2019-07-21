@@ -14,10 +14,10 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class AltoMultiEscapedTest extends SolrTestCaseJ4 {
+public class AltoMultiTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "general");
 
     Path ocrBasePath = Paths.get("src/test/resources/data/alto_multi");
     String ptr = Files.list(ocrBasePath)
@@ -33,7 +33,7 @@ public class AltoMultiEscapedTest extends SolrTestCaseJ4 {
     Map<String, String> args = new HashMap<>(
         ImmutableMap.<String, String>builder()
            .put("hl", "true")
-           .put("hl.fl", "ocr_text")
+           .put("hl.ocr.fl", "ocr_text")
            .put("hl.weightMatches", "true")
            .put("hl.usePhraseHighlighter", "true")
            .put("df", "ocr_text")

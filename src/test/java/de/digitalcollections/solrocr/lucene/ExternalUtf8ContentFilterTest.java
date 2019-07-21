@@ -1,7 +1,11 @@
 package de.digitalcollections.solrocr.lucene;
 
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
+import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
+import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilter;
+import de.digitalcollections.solrocr.util.SourcePointer;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -48,7 +52,9 @@ public class ExternalUtf8ContentFilterTest {
   @Test
   public void extractFully() throws IOException {
     Path p = Paths.get("src/test/resources/data/hocr.html");
-    CharFilter filter = new Utf8MappingCharFilter(new BufferedReader(new FileReader(p.toFile())));
+    CharFilter filter = new ExternalUtf8ContentFilter(
+        new BufferedReader(new FileReader(p.toFile())),
+        ImmutableList.of(new SourcePointer.Region(0, (int) p.toFile().length())));
     String full = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
     String filtered = CharStreams.toString(filter);
     assertThat(filtered).isNotEmpty();
@@ -65,7 +71,7 @@ public class ExternalUtf8ContentFilterTest {
     String subRegion = new String(
         ArrayUtils.subarray(fileBytes, 3033216, 3066308),
         StandardCharsets.UTF_8);
-    Utf8RegionMappingCharFilter filter = (Utf8RegionMappingCharFilter) fac.create(new StringReader(fieldValue));
+    ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(fieldValue));
     String filtered = CharStreams.toString(filter);
     //assertThat(filtered).isEqualTo(subRegion);
     assertThat(filter.correctOffset(subRegion.indexOf("id='page_108'"))).isEqualTo(3033238);
@@ -83,7 +89,7 @@ public class ExternalUtf8ContentFilterTest {
         .map(p -> p.toAbsolutePath().toString())
         .sorted()
         .collect(Collectors.joining("+"));
-    Utf8RegionMappingCharFilter filter = (Utf8RegionMappingCharFilter) fac.create(new StringReader(ptr));
+    ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(ptr));
     String filtered = CharStreams.toString(filter);
     assertThat(filtered).isEqualTo("ene mene mistäes rappelt in der kistäene mene mäckund du bist wäg");
     assertThat(filter.correctOffset(filtered.indexOf("mistäes"))).isEqualTo(9);
@@ -98,9 +104,8 @@ public class ExternalUtf8ContentFilterTest {
         + "+src/test/resources/data/multi_txt/part_2.txt[3:10]"
         + "+src/test/resources/data/multi_txt/part_3.txt[:8]"
         + "+src/test/resources/data/multi_txt/part_4.txt[4:6,12:]";
-    Utf8RegionMappingCharFilter filter = (Utf8RegionMappingCharFilter) fac.create(new StringReader(ptr));
+    ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(ptr));
     String filtered = CharStreams.toString(filter);
     assertThat(filtered).isEqualTo("mistärappeltene meneduwäg");
   }
-
 }

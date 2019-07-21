@@ -1,7 +1,13 @@
 package de.digitalcollections.solrocr.lucene;
 
+import com.google.common.collect.ImmutableSet;
+import de.digitalcollections.solrocr.formats.OcrBlock;
+import de.digitalcollections.solrocr.formats.OcrFormat;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.formats.OcrSnippet;
+import de.digitalcollections.solrocr.formats.alto.AltoFormat;
+import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
+import de.digitalcollections.solrocr.formats.mini.MiniOcrFormat;
 import de.digitalcollections.solrocr.solr.OcrHighlightParams;
 import de.digitalcollections.solrocr.util.FileBytesCharIterator;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
@@ -43,12 +49,16 @@ import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 
 /**
- * A {@link UnifiedHighlighter} variant to support lazy-loading field values from arbitrary storage and using byte
- * offsets from term payloads for highlighting instead of character offsets.
+ * A {@link UnifiedHighlighter} variant to support generating snippets with text coordinates from OCR data and
+ * lazy-loading field values from external storage.
  */
 public class OcrHighlighter extends UnifiedHighlighter {
 
-  static final IndexSearcher EMPTY_INDEXSEARCHER;
+  private static final IndexSearcher EMPTY_INDEXSEARCHER;
+  private static final Set<OcrFormat> FORMATS = ImmutableSet.of(
+      new HocrFormat(),
+      new AltoFormat(),
+      new MiniOcrFormat());
 
   static {
     try {
@@ -59,6 +69,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       throw new RuntimeException(bogus);
     }
   }
+
 
   private final SolrParams params;
 
@@ -96,8 +107,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   public OcrHighlightResult[] highlightOcrFields(
-      String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr, BreakIterator breakIter,
-      OcrPassageFormatter formatter, String pageId) throws IOException {
+      String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr) throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
     }
@@ -127,7 +137,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     int numPostings = 0;
     for (int f = 0; f < fields.length; f++) {
       OcrFieldHighlighter fieldHighlighter = getOcrFieldHighlighter(
-          fields[f], query, queryTerms, maxPassages[f], breakIter, formatter);
+          fields[f], query, queryTerms, maxPassages[f]);
       fieldHighlighters[f] = fieldHighlighter;
 
       switch (fieldHighlighter.getOffsetSource()) {
@@ -187,7 +197,19 @@ public class OcrHighlighter extends UnifiedHighlighter {
           }
           int docInIndex = docInIndexes[docIdx];//original input order
           assert resultByDocIn[docInIndex] == null;
-          resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(leafReader, docId, content, pageId);
+          OcrFormat ocrFormat = getFormat(content);
+          String limitBlock = params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase();
+          BreakIterator breakIter = ocrFormat.getBreakIterator(
+              OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()),
+              limitBlock.equals("NONE") ? null : OcrBlock.valueOf(limitBlock),
+              params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
+          OcrPassageFormatter formatter = ocrFormat.getPassageFormatter(
+              params.get(HighlightParams.TAG_PRE, "<em>"),
+              params.get(HighlightParams.TAG_POST, "</em>"),
+              params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false));
+          resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
+              leafReader, docId, breakIter, formatter, content,
+              params.get(OcrHighlightParams.PAGE_ID));
           snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
         }
       }
@@ -255,9 +277,16 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return fieldValues;
   }
 
-  private OcrFieldHighlighter getOcrFieldHighlighter(
-      String field, Query query, Set<Term> allTerms, int maxPassages, BreakIterator breakIter,
-      OcrPassageFormatter formatter) {
+  private OcrFormat getFormat(IterableCharSequence content) throws IOException {
+    // Sample the first 2k characters to determine the format
+    String sampleChunk = content.subSequence(0, Math.min(2048, content.length())).toString();
+    return FORMATS.stream()
+        .filter(fmt -> fmt.hasFormat(sampleChunk))
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException("Could not determine OCR format for sample '" + sampleChunk + "'"));
+  }
+
+  private OcrFieldHighlighter getOcrFieldHighlighter(String field, Query query, Set<Term> allTerms, int maxPassages) {
     Predicate<String> fieldMatcher = getFieldMatcher(field);
     BytesRef[] terms = filterExtractedTerms(fieldMatcher, allTerms);
     Set<HighlightFlag> highlightFlags = getFlags(field);
@@ -268,7 +297,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                                                automata, highlightFlags);
     return new OcrFieldHighlighter(
         field, getOffsetStrategy(offsetSource, components),
-        getScorer(field), breakIter, formatter, maxPassages, getMaxNoHighlightPassages(field));
+        getScorer(field), maxPassages, getMaxNoHighlightPassages(field));
   }
 
   // FIXME: This is copied straight from UnifiedHighlighter because it has private access there. Maybe open an issue to

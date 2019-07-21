@@ -1,7 +1,7 @@
 package de.digitalcollections.solrocr.formats.alto;
 
 import java.io.Reader;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 import org.apache.lucene.analysis.CharFilter;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
@@ -30,8 +30,8 @@ public class AltoCharFilterFactory extends CharFilterFactory {
   private static final Pattern SUFFIX_PAT = Pattern.compile("<(\\s*)/>");
   private static final Pattern HYPHEN_END_PAT = Pattern.compile("<String (.+?)SUBS_TYPE=['\"]HypPart2['\"](.+?)/>");
 
-  public AltoCharFilterFactory(Map<String, String> args) {
-    super(args);
+  public AltoCharFilterFactory() {
+    super(new HashMap<>());
   }
 
   @Override

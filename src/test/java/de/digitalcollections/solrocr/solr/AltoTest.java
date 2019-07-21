@@ -15,7 +15,7 @@ import org.junit.Test;
 public class AltoTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "alto");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "general");
 
     Path ocrPath = Paths.get("src/test/resources/data/alto.xml");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
@@ -27,7 +27,7 @@ public class AltoTest extends SolrTestCaseJ4 {
   private static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
         .put("hl", "true")
-        .put("hl.fl", "ocr_text")
+        .put("hl.ocr.fl", "ocr_text")
         .put("hl.usePhraseHighlighter", "true")
         .put("df", "ocr_text")
         .put("hl.ctxTag", "ocr_line")

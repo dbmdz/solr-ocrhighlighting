@@ -8,13 +8,9 @@
     <arr name="components">
       <str>query</str>
       <str>ocr_highlight</str>
+      <str>highlight</str>
     </arr>
   </requestHandler>
 
-  <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocr_highlight"
-                  ocrFormat="de.digitalcollections.solrocr.formats.hocr.HocrFormat">
-    <lst name="ocrFields">
-      <str>ocr_text</str>
-    </lst>
-  </searchComponent>
+  <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocr_highlight" />
 </config>

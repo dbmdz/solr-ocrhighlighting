@@ -1,15 +1,19 @@
 package de.digitalcollections.solrocr.formats.mini;
 
 import com.google.common.collect.ImmutableMap;
-import java.text.BreakIterator;
-import java.util.Map;
 import de.digitalcollections.solrocr.formats.OcrBlock;
 import de.digitalcollections.solrocr.formats.OcrFormat;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
+import de.digitalcollections.solrocr.lucene.filters.DehyphenatingHtmlCharFilterFactory;
 import de.digitalcollections.solrocr.util.ContextBreakIterator;
 import de.digitalcollections.solrocr.util.TagBreakIterator;
+import java.io.Reader;
+import java.text.BreakIterator;
+import java.util.Map;
+import org.apache.lucene.analysis.util.CharFilterFactory;
 
 public class MiniOcrFormat implements OcrFormat {
+  private static final CharFilterFactory filterFactory = new DehyphenatingHtmlCharFilterFactory();
   private static final Map<OcrBlock, String> blockTagMapping = ImmutableMap.of(
       OcrBlock.PAGE, "p",
       OcrBlock.SECTION, "s",
@@ -31,5 +35,18 @@ public class MiniOcrFormat implements OcrFormat {
   public OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag,
                                                  boolean absoluteHighlights) {
     return new MiniOcrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights);
+  }
+
+  @Override
+  public Reader filter(Reader input) {
+    return filterFactory.create(input);
+  }
+
+  @Override
+  public boolean hasFormat(String ocrChunk) {
+    return blockTagMapping.values().stream()
+        .anyMatch(
+            t -> ocrChunk.contains("<" + t + " ")
+              || ocrChunk.contains("<" + t + ">"));
   }
 }

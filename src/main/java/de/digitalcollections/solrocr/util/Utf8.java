@@ -143,6 +143,31 @@ public final class Utf8 {
   }
 
   /**
+   * Returns the number of bytes required to encode the given Unicode codepoint into UTF8.
+   */
+  public static int encodedLength(int codePoint) {
+    if (codePoint < 0x80) {
+      return 1;
+    } else if (codePoint < 0x800) {
+      return 2;
+    } else if (codePoint < 0x10000 || codePoint >= 0x110000) {
+      return 3;
+    } else {
+      return 4;
+    }
+  }
+
+  public static int encodedLength(char c) {
+    if (c < 0x80) {
+      return 1;
+    } else if (c < 0x800) {
+      return ((0x7f - c) >>> 31);
+    } else {
+      return 2;
+    }
+  }
+
+  /**
    * Returns {@code true} if {@code bytes} is a <i>well-formed</i> UTF-8 byte sequence according to
    * Unicode 6.0. Note that this is a stronger criterion than simply whether the bytes can be
    * decoded. For example, some versions of the JDK decoder will accept "non-shortest form" byte

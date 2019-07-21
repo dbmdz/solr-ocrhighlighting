@@ -1,15 +1,11 @@
 package de.digitalcollections.solrocr.solr;
 
-import de.digitalcollections.solrocr.formats.OcrFormat;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrException;
-import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
+import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -17,8 +13,6 @@ import org.apache.solr.request.SolrQueryRequest;
 
 public class HighlightComponent extends org.apache.solr.handler.component.HighlightComponent {
   private PluginInfo info;
-  private OcrFormat ocrFormat;
-  private ArrayList<String> ocrFieldNames;
   private SolrOcrHighlighter ocrHighlighter;
 
   @Override
@@ -31,32 +25,10 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
     this.info = info;
   }
 
-
-
   @Override
   public void inform(SolrCore core) {
     super.inform(core);
-    String formatClsName = info.attributes.get("ocrFormat");
-    if (formatClsName == null) {
-      throw new SolrException(
-          ErrorCode.FORBIDDEN,
-          "Please configure your OCR format with the `ocrFormat` attribute on <highlighting>. "
-          + "Refer to the de.digitalcollections.solrocr.formats package for available formats.");
-    }
-    this.ocrFormat = SolrCore.createInstance(
-        formatClsName, OcrFormat.class, null, null, core.getResourceLoader());
-
-    NamedList<String> ocrFieldInfo = (NamedList) info.initArgs.get("ocrFields");
-    if (ocrFieldInfo == null) {
-      throw new SolrException(
-          ErrorCode.FORBIDDEN,
-          "Please define the fields that OCR highlighting should apply to in a ocrFields list in your solrconfig.xml. "
-          + "Example: <lst name\"ocrFields\"><str>ocr_text</str></lst>");
-    }
-    this.ocrFieldNames = new ArrayList<>();
-    ocrFieldInfo.forEach((k, fieldName) -> ocrFieldNames.add(fieldName));
-
-    this.ocrHighlighter = new SolrOcrHighlighter(ocrFormat, ocrFieldNames);
+    this.ocrHighlighter = new SolrOcrHighlighter();
   }
 
   @Override
@@ -89,19 +61,14 @@ public class HighlightComponent extends org.apache.solr.handler.component.Highli
         }
       }
 
-      // Remove OCR fields from highlighting param, so they don't get caught
-      // by the default highlighter
+      // Disable further highlighting if fields are not set to prevent the default highlighter
+      // from highlighting our OCR fields, which will break.
       ModifiableSolrParams params = new ModifiableSolrParams(rb.req.getParams());
-      if (params.get("hl.fl") != null) {
-        String[] remainingHls = Arrays.stream(params.get("hl.fl").split(","))
-            .filter(f -> !ocrFieldNames.contains(f))
-            .toArray(String[]::new);
-        if (remainingHls.length == 0) {
-          params.remove("hl.fl");
-          params.set("hl", "false");
-        } else {
-          params.set("hl.fl", StringUtils.join(remainingHls, ","));
-        }
+      if (params.get("hl.fl") == null) {
+        params.set("hl", "false");
+        rb.doHighlights = false;
+        // Set the highlighting result to an empty list
+        rb.rsp.add("highlighting", new SimpleOrderedMap<>());
       }
       rb.req.setParams(params);
     }

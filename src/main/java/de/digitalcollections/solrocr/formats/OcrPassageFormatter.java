@@ -2,6 +2,8 @@ package de.digitalcollections.solrocr.formats;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
+import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.util.OcrBox;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayDeque;
@@ -20,9 +22,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageFormatter;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.IterableCharSequence.OffsetType;
-import de.digitalcollections.solrocr.util.OcrBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,13 +76,9 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         snippets[i] = format(passage, content);
       } catch (IndexOutOfBoundsException e) {
         String errorMsg = String.format(
-            "Could not create snippet (start=%d, end=%d) from content at '%s' due to an out-of-bounds error.",
+            "Could not create snippet (start=%d, end=%d) from content at '%s' due to an out-of-bounds error.\n"
+          + "\nDoes the file on disk correspond to the document that was used during indexing?",
             passage.getStartOffset(), passage.getEndOffset(), content.getIdentifier());
-        if (content.getOffsetType() == OffsetType.BYTES) {
-          errorMsg += "\nDoes the file on disk correspond to the document that was used for determining the offsets during indexing?";
-        } else {
-          errorMsg += "\nDoes the file on disk correspond to the document that was used during indexing?";
-        }
         logger.error(errorMsg, e);
       }
     }

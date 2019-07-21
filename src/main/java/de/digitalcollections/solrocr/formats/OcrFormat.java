@@ -1,5 +1,6 @@
 package de.digitalcollections.solrocr.formats;
 
+import java.io.Reader;
 import java.text.BreakIterator;
 
 /**
@@ -23,4 +24,14 @@ public interface OcrFormat {
    *                           and not the containing snippet
    */
   OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag, boolean absoluteHighlights);
+
+  Reader filter(Reader input);
+
+  /**
+   * Check if the string chunk contains data formatted according to the implementing format.
+   *
+   * @param ocrChunk a chunk of a file's content
+   * @return whether the chunk is formatted according to the implementing format.
+   */
+  boolean hasFormat(String ocrChunk);
 }

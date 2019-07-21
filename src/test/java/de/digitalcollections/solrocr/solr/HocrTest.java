@@ -15,7 +15,8 @@ import org.junit.Test;
 public class HocrTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "hocr");
+    //initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "hocr");
+    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "general");
 
     Path ocrPath = Paths.get("src/test/resources/data/hocr.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
@@ -26,7 +27,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   private static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
         .put("hl", "true")
-        .put("hl.fl", "ocr_text")
+        .put("hl.ocr.fl", "ocr_text")
         .put("hl.usePhraseHighlighter", "true")
         .put("df", "ocr_text")
         .put("hl.ctxTag", "ocr_line")
@@ -49,7 +50,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testEscapedHocr() throws Exception {
+  public void testHocr() throws Exception {
     SolrQueryRequest req = xmlQ("q", "tamara");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=2",

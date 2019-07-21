@@ -1,7 +1,7 @@
-package de.digitalcollections.solrocr.formats.hocr;
+package de.digitalcollections.solrocr.lucene.filters;
 
 import java.io.Reader;
-import java.util.Map;
+import java.util.HashMap;
 import org.apache.lucene.analysis.CharFilter;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.analysis.charfilter.MappingCharFilter;
@@ -10,7 +10,7 @@ import org.apache.lucene.analysis.charfilter.NormalizeCharMap.Builder;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 
 /**
- * CharFilter to convert hOCR to plaintext while resolving hyphenation.
+ * CharFilter to convert HTML/XML to plaintext while resolving hyphenation.
  *
  * This filter will:
  * <ul>
@@ -18,11 +18,11 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
  *   <li>Strip all soft hyphens to make Lucene consider hyphenated tokens as one</li>
  * </ul>
  */
-public class HocrCharFilterFactory extends CharFilterFactory {
+public class DehyphenatingHtmlCharFilterFactory extends CharFilterFactory {
   private final NormalizeCharMap normMap;
 
-  public HocrCharFilterFactory(Map<String, String> args) {
-    super(args);
+  public DehyphenatingHtmlCharFilterFactory() {
+    super(new HashMap<>());
     Builder builder = new Builder();
     builder.add("\u00AD", "");
     this.normMap = builder.build();

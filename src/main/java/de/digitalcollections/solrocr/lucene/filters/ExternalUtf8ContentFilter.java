@@ -1,6 +1,7 @@
-package de.digitalcollections.solrocr.lucene;
+package de.digitalcollections.solrocr.lucene.filters;
 
 import de.digitalcollections.solrocr.util.SourcePointer;
+import de.digitalcollections.solrocr.util.Utf8;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedList;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Queue;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 
-public class Utf8RegionMappingCharFilter extends BaseCharFilter {
+public class ExternalUtf8ContentFilter extends BaseCharFilter {
   /**
    * The cumulative offset difference between the input (bytes) and the output (chars)
    * at the current position.
@@ -31,7 +32,7 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
   private Queue<SourcePointer.Region> remainingRegions;
   private SourcePointer.Region currentRegion;
 
-  public Utf8RegionMappingCharFilter(Reader input, List<SourcePointer.Region> regions) throws IOException {
+  public ExternalUtf8ContentFilter(Reader input, List<SourcePointer.Region> regions) throws IOException {
     super(input);
     this.currentOutOffset = 0;
     this.currentOffset = 0;
@@ -94,24 +95,11 @@ public class Utf8RegionMappingCharFilter extends BaseCharFilter {
       currentOffset += 1;
       currentOutOffset += 1;
       int cp = Character.codePointAt(cbuf, i);
-      int increment = charUtf8Size(cp) - 1;
+      int increment = Utf8.encodedLength(cp) - 1;
       if (increment > 0) {
         cumulative += increment;
         nextIsOffset = true;
       }
     }
   }
-
-  private static int charUtf8Size(int cp) {
-    if (cp < 0x80) {
-      return 1;
-    } else if (cp < 0x800) {
-      return 2;
-    } else if (cp < 0x10000 || cp >= 0x110000) {
-      return 3;
-    } else {
-      return 4;
-    }
-  }
-
 }

@@ -1,4 +1,4 @@
-package de.digitalcollections.solrocr.lucene;
+package de.digitalcollections.solrocr.lucene.filters;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
@@ -17,6 +17,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 
+/**
+ * A CharFilter implementation that loads the field value from an external UTF8-encoded source and maps Java character
+ * offsets to their correct UTF8 byte-offsets in the source.
+ *
+ * For more information on these source pointers, refer to {@link SourcePointer}.
+ */
 public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
   public ExternalUtf8ContentFilterFactory(Map<String, String> args) {
     super(args);
@@ -28,28 +34,26 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
   @Override
   public Reader create(Reader input) {
     try {
+      // Read the input fully to obtain the source pointer
       String ptrStr = CharStreams.toString(input);
       SourcePointer pointer = SourcePointer.parse(ptrStr);
-      if (pointer == null) {
-        throw new RuntimeException("Could not parse source pointer: " + ptrStr);
-      }
       pointer.sources.forEach(this::validateSource);
-      if (pointer.sources.size() > 1 || pointer.sources.stream().anyMatch(s -> !s.regions.isEmpty())) {
-        toCharOffsets(pointer);
-        Reader r;
-        if (pointer.sources.size() > 1) {
-          r = new MultiFileReader(pointer.sources.stream().map(s -> s.path).collect(Collectors.toList()));
-        } else {
-          r = new FileReader(pointer.sources.get(0).path.toFile());
-        }
-        List<SourcePointer.Region> charRegions = pointer.sources.stream()
-            .flatMap(s -> s.regions.stream())
-            .collect(Collectors.toList());
-        return new Utf8RegionMappingCharFilter(new BufferedReader(r), charRegions);
+
+      // Regions contained in source pointers are defined by byte offsets.
+      // We need to convert these to Java character offsets so they can be used by the filter.
+      toCharOffsets(pointer);
+
+      Reader r;
+      if (pointer.sources.size() > 1) {
+        r = new MultiFileReader(pointer.sources.stream().map(s -> s.path).collect(Collectors.toList()));
       } else {
-        return new Utf8MappingCharFilter(
-            new BufferedReader(new FileReader(pointer.sources.get(0).path.toFile())));
+        r = new FileReader(pointer.sources.get(0).path.toFile());
       }
+
+      List<SourcePointer.Region> charRegions = pointer.sources.stream()
+          .flatMap(s -> s.regions.stream())
+          .collect(Collectors.toList());
+      return new ExternalUtf8ContentFilter(new BufferedReader(r), charRegions);
     } catch (IOException e) {
       return null;
     }

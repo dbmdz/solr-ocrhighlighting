@@ -1,18 +1,13 @@
 package de.digitalcollections.solrocr.solr;
 
-import de.digitalcollections.solrocr.formats.OcrBlock;
-import de.digitalcollections.solrocr.formats.OcrFormat;
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.lucene.OcrHighlighter;
 import de.digitalcollections.solrocr.util.OcrHighlightResult;
 import java.io.IOException;
-import java.text.BreakIterator;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
@@ -20,25 +15,20 @@ import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
+import org.apache.solr.schema.SchemaField;
 import org.apache.solr.search.DocList;
+import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.solr.util.SolrPluginUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
+  private static final Logger log = LoggerFactory.getLogger(SolrOcrHighlighter.class);
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SolrOcrHighlighter.class);
-
-  private OcrFormat ocrFormat;
-  private Set<String> ocrFieldNames;
-
-
-  public SolrOcrHighlighter(OcrFormat ocrFormat, List<String> ocrFieldNames) {
-    this.ocrFormat = ocrFormat;
-    this.ocrFieldNames = new HashSet<>(ocrFieldNames);
-  }
+  private LinkedList<String> storedHighlightFieldNames;
 
   @Override
-  public NamedList<Object> doHighlighting(DocList docs, Query query, SolrQueryRequest req, String[] defaultFields)
+  public NamedList<Object> doHighlighting(DocList docs, Query query, SolrQueryRequest req, String[] _defaultFields)
       throws IOException {
     // Copied from superclass
     // - *snip* -
@@ -54,27 +44,15 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     // - *snap* -
 
     // query-time parameters
-    String[] ocrFieldNames = getOcrHighlightFields(query, req, defaultFields);
+    String[] ocrFieldNames = getOcrHighlightFields(req);
     int[] maxPassagesOcr = getMaxPassages(ocrFieldNames, params);
 
-    Map<String, String> highlightFieldWarnings = new HashMap<>();
     OcrHighlightResult[] ocrSnippets = null;
     // Highlight OCR fields
     if (ocrFieldNames.length > 0) {
       OcrHighlighter ocrHighlighter = new OcrHighlighter(
           req.getSearcher(), req.getSchema().getIndexAnalyzer(), req.getParams());
-      String limitBlock = params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase();
-      BreakIterator ocrBreakIterator = ocrFormat.getBreakIterator(
-          OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()),
-          limitBlock.equals("NONE") ? null : OcrBlock.valueOf(limitBlock),
-          params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
-      OcrPassageFormatter ocrFormatter = ocrFormat.getPassageFormatter(
-          params.get(HighlightParams.TAG_PRE, "<em>"),
-          params.get(HighlightParams.TAG_POST, "</em>"),
-          params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false));
-      ocrSnippets = ocrHighlighter.highlightOcrFields(
-          ocrFieldNames, query, docIDs, maxPassagesOcr, ocrBreakIterator, ocrFormatter,
-          params.get(OcrHighlightParams.PAGE_ID, null));
+      ocrSnippets = ocrHighlighter.highlightOcrFields(ocrFieldNames, query, docIDs, maxPassagesOcr);
     }
 
     // Assemble output data
@@ -110,10 +88,66 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   }
 
   /** Obtain all fields among the requested fields that contain OCR data. */
-  private String[] getOcrHighlightFields(Query query, SolrQueryRequest req, String[] defaultFields) {
-    return Arrays.stream(getHighlightFields(query, req, defaultFields))
-        .distinct()
-        .filter(ocrFieldNames::contains)
-        .toArray(String[]::new);
+  private String[] getOcrHighlightFields(SolrQueryRequest req) {
+    String[] fields = req.getParams().getParams(OcrHighlightParams.OCR_FIELDS);
+
+    if (fields.length > 0) {
+      Set<String> expandedFields = new LinkedHashSet<String>();
+      Collection<String> storedHighlightFieldNames = req.getSearcher().getDocFetcher().getStoredHighlightFieldNames();
+      for (String field : fields) {
+        expandWildcardsInHighlightFields(
+            expandedFields,
+            storedHighlightFieldNames,
+            SolrPluginUtils.split(field));
+      }
+      fields = expandedFields.toArray(new String[]{});
+    }
+    // Trim them now in case they haven't been yet.  Not needed for all code-paths above but do it here.
+    for (int i = 0; i < fields.length; i++) {
+      fields[i] = fields[i].trim();
+    }
+    return fields;
+  }
+
+  public Collection<String> getStoredHighlightFieldNames(SolrIndexSearcher searcher) {
+    // Copied verbatim from SolrHighlighter
+    synchronized (this) {
+      if (storedHighlightFieldNames == null) {
+        storedHighlightFieldNames = new LinkedList<>();
+        for (FieldInfo fieldInfo : searcher.getFieldInfos()) {
+          final String fieldName = fieldInfo.name;
+          try {
+            SchemaField field = searcher.getSchema().getField(fieldName);
+            if (field.stored() && ((field.getType() instanceof org.apache.solr.schema.TextField)
+                || (field.getType() instanceof org.apache.solr.schema.StrField))) {
+              storedHighlightFieldNames.add(fieldName);
+            }
+          } catch (RuntimeException e) { // getField() throws a SolrException, but it arrives as a RuntimeException
+            log.warn("Field [{}] found in index, but not defined in schema.", fieldName);
+          }
+        }
+      }
+      return storedHighlightFieldNames;
+    }
+  }
+
+  static private void expandWildcardsInHighlightFields (
+      // Copied verbatim from SolrHighlighter
+      Set<String> expandedFields,
+      Collection<String> storedHighlightFieldNames,
+      String... fields) {
+    for (String field : fields) {
+      if (field.contains("*")) {
+        // create a Java regular expression from the wildcard string
+        String fieldRegex = field.replaceAll("\\*", ".*");
+        for (String storedFieldName : storedHighlightFieldNames) {
+          if (storedFieldName.matches(fieldRegex)) {
+            expandedFields.add(storedFieldName);
+          }
+        }
+      } else {
+        expandedFields.add(field);
+      }
+    }
   }
 }

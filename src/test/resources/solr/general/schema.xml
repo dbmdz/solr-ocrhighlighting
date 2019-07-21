@@ -10,10 +10,25 @@
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
     </fieldType>
+    <fieldtype name="text_ocr_stored" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
+      <analyzer type="index">
+        <charFilter class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory" />
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+    </fieldtype>
     <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
       <analyzer type="index">
-        <charFilter class="de.digitalcollections.solrocr.lucene.ExternalUtf8ContentFilterFactory" />
-        <charFilter class="de.digitalcollections.solrocr.formats.hocr.HocrCharFilterFactory" />
+        <charFilter class="de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory" />
+        <charFilter class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory" />
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>
@@ -32,6 +47,7 @@
     <field name="id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
     <field name="some_text" type="text" indexed="true" stored="true" />
     <field name="ocr_text" type="text_ocr" indexed="true" stored="true" />
+    <field name="ocr_text_stored" type="text_ocr_stored" indexed="true" stored="true" />
     <dynamicField name="*_ocr" type="text_ocr" indexed="true" stored="false" />
   </fields>
   <uniqueKey>id</uniqueKey>
