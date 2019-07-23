@@ -80,7 +80,7 @@ public class SourcePointer {
     if (r.startsWith(":")) {
       return new SourcePointer.Region(0, Integer.parseInt(r.substring(1)));
     } else if (r.endsWith(":")) {
-      return new SourcePointer.Region(Integer.parseInt(r.substring(0, r.length() - 1)), Integer.MAX_VALUE);
+      return new SourcePointer.Region(Integer.parseInt(r.substring(0, r.length() - 1)), -1);
     } else {
       String[] offsets = r.split(":");
       return new SourcePointer.Region(Integer.parseInt(offsets[0]), Integer.parseInt(offsets[1]));

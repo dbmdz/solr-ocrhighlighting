@@ -1,11 +1,11 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.CharStreams;
 import de.digitalcollections.solrocr.util.MultiFileReader;
 import de.digitalcollections.solrocr.util.SourcePointer;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -15,7 +15,10 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
 import org.apache.lucene.analysis.util.CharFilterFactory;
+import org.apache.solr.common.SolrException;
+import org.apache.solr.common.SolrException.ErrorCode;
 
 /**
  * A CharFilter implementation that loads the field value from an external UTF8-encoded source and maps Java character
@@ -35,7 +38,7 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
   public Reader create(Reader input) {
     try {
       // Read the input fully to obtain the source pointer
-      String ptrStr = CharStreams.toString(input);
+      String ptrStr = IOUtils.toString(input);
       SourcePointer pointer = SourcePointer.parse(ptrStr);
       pointer.sources.forEach(this::validateSource);
 
@@ -62,52 +65,62 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
   private void validateSource(SourcePointer.FileSource src) {
     // TODO: Check if sourcePath is located under one of the whitelisted base directories, abort otherwise
     // TODO: Check if sourcePath's filename matches one of the whitelisted file name patterns, abort otherwise
-    // TODO: Check if sourcePath exists, abort otherwise
+    File f = src.path.toFile();
+    if (!f.exists() || !f.canRead()) {
+      throw new SolrException(
+          ErrorCode.BAD_REQUEST,
+          String.format("File at %s either does not exist or cannot be read.", src.path));
+    }
   }
 
   private void toCharOffsets(SourcePointer ptr) throws IOException {
     int byteOffset = 0;
     int charOffset = 0;
     // TODO: Use a queue for the file sources so we don't have to read until the end of the last file every time
+    // TODO: Think about building the UTF8 -> UTF16 offset map right here if the mapping part should become a
+    //       bottle neck
     for (SourcePointer.FileSource src : ptr.sources) {
-      FileChannel fChan = FileChannel.open(src.path, StandardOpenOption.READ);
-      final int fSize = (int) fChan.size();
+      try (FileChannel fChan = FileChannel.open(src.path, StandardOpenOption.READ)) {
+        final int fSize = (int) fChan.size();
 
-      // Offset of the current file from the beginning of the first file
-      final int baseOffset = byteOffset;
-      if (src.regions.isEmpty()) {
-        src.regions = ImmutableList.of(new SourcePointer.Region(0, fSize));
-      }
-      for (SourcePointer.Region region : src.regions) {
-        // Make region offsets relative to the beginning of the first file
-        region.start += baseOffset;
-        // The abs is to protect from overflow
-        region.end = Math.min(Math.abs(region.end + baseOffset), fSize + baseOffset);
-        // Read until the start of the region
-        if (byteOffset != region.start) {
-          // Read the data between the current offset and the start of the region
-          int len = region.start - byteOffset;
+        // Byte offset of the current file from the beginning of the first file
+        final int baseOffset = byteOffset;
+        if (src.regions.isEmpty()) {
+          src.regions = ImmutableList.of(new SourcePointer.Region(0, fSize));
+        }
+        for (SourcePointer.Region region : src.regions) {
+          // Make region offsets relative to the beginning of the first file
+          region.start += baseOffset;
+          if (region.end < 0) {
+            region.end = fSize;
+          }
+          region.end = Math.min(region.end + baseOffset, fSize + baseOffset);
+          // Read until the start of the region
+          if (byteOffset != region.start) {
+            // Read the data between the current offset and the start of the region
+            int len = region.start - byteOffset;
+            byte[] dst = new byte[len];
+            byteOffset += fChan.read(ByteBuffer.wrap(dst));
+            // Determine how many `char`s are in the data
+            charOffset += Utf8.decodedLength(dst);
+          }
+
+          int regionSize = region.end - region.start;
+          region.start = charOffset;
+          region.startOffset = byteOffset;
+          // Read region, determine character offsett of region end
+          byte[] dst = new byte[regionSize];
+          byteOffset += fChan.read(ByteBuffer.wrap(dst));
+          charOffset += Utf8.decodedLength(dst);
+          region.end = charOffset;
+        }
+        // Determine character offset of the end of the file
+        if (byteOffset != baseOffset + fSize) {
+          int len = (baseOffset + fSize) - byteOffset;
           byte[] dst = new byte[len];
           byteOffset += fChan.read(ByteBuffer.wrap(dst));
-          // Determine how many `char`s are in the data
           charOffset += Utf8.decodedLength(dst);
         }
-
-        int regionSize = region.end - region.start;
-        region.start = charOffset;
-        region.startOffset = byteOffset;
-        // Read region, determine character offsett of region end
-        byte[] dst = new byte[regionSize];
-        byteOffset += fChan.read(ByteBuffer.wrap(dst));
-        charOffset += Utf8.decodedLength(dst);
-        region.end = charOffset;
-      }
-      // Determine character offset of the end of the file
-      if (byteOffset != baseOffset + fSize) {
-        int len = (baseOffset + fSize) - byteOffset;
-        byte[] dst = new byte[len];
-        byteOffset += fChan.read(ByteBuffer.wrap(dst));
-        charOffset += Utf8.decodedLength(dst);
       }
     }
   }
