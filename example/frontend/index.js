@@ -6,7 +6,7 @@ import Typography from 'preact-material-components/Typography';
 import Elevation from 'preact-material-components/Elevation';
 import Slider from 'preact-material-components/Slider';
 import FormField from 'preact-material-components/FormField';
-import Select from 'preact-material-components/Select';
+import Checkbox from 'preact-material-components/Checkbox';
 
 import 'preact-material-components/TextField/style.css';
 import 'preact-material-components/LinearProgress/style.css';
@@ -14,21 +14,14 @@ import 'preact-material-components/Typography/style.css';
 import 'preact-material-components/Elevation/style.css';
 import 'preact-material-components/Slider/style.css';
 import 'preact-material-components/FormField/style.css';
-import 'preact-material-components/Select/style.css';
+import 'preact-material-components/Checkbox/style.css';
 
 
-var CORES = ['google1000', 'bnl_lunion'];
-var CORE_PARAMS = {
-  google1000: {
-    'fl': 'id,title,creator,publisher,date,language',
-    'qf': 'title^20.0 creator^10.0 publisher^5.0 ocr_text^0.3',
-    'hl.fl': 'title,creator,publisher,ocr_text',
-  },
-  bnl_lunion: {
-    'fl': 'id,issue_id,title,subtitle,newspaper_part,author,date',
-    'qf': 'title^20.0 subtitle^16.0 author^10.0 newspaper_part^5.0 ocr_text^0.3',
-    'hl.fl': 'title,subtitle,author,ocr_text',
-  }
+var PARAMS = {
+  'fl': 'id,source,issue_id,title,subtitle,newspaper_part,author,publisher,date,language',
+  'qf': 'title^20.0 subtitle^16.0 author^10.0 newspaper_part^5.0 publisher^5.0 ocr_text^0.3',
+  'hl.fl': 'title,subtitle,author,publisher',
+  'hl.ocr.fl': 'ocr_text',
 };
 var BNL_10MM_TO_PIX_FACTOR = 300 / 254;
 var IMAGE_API_BASE = 'https://ocrhl.jbaiter.de/iiif/image/v2'
@@ -87,12 +80,7 @@ class SnippetView extends Component {
     const { text, highlights } = snippet;
     let pageIdx = 0;
     const page = snippet.regions[0].page;
-    if (page[0] === 'P') {
-      pageIdx = parseInt(page.substring(1))
-    } else {
-      pageIdx = parseInt(page.split("_")[1]);
-    }
-    const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${pageIdx}&q=${query}`;
+    const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${page}&q=${query}`;
     return (
       <div class="snippet-display">
         <a href={viewerUrl} target="_blank" title="Open page in viewer">
@@ -214,8 +202,8 @@ class GoogleResultDocument extends Component {
             { ocr_hl ? ocr_hl.numTotal : 'No' } matching passages in the text found
           </Typography>
           <ul className="metadata">
-            <li><strong>Created by</strong> <span className="highlightable" dangerouslySetInnerHTML={{ __html: doc.creator }} /></li>
-            <li><strong>Published in</strong> {doc.date} <strong>by</strong> <span className="highlightable" dangerouslySetInnerHTML={{ __html: doc.publisher }} /></li>
+            {doc.author && <li><strong>Created by</strong> <span className="highlightable" dangerouslySetInnerHTML={{ __html: doc.author[0] }} /></li>}
+            {doc.publisher && <li><strong>Published in</strong> {doc.date.split("-")[0]} <strong>by</strong> <span className="highlightable" dangerouslySetInnerHTML={{ __html: doc.publisher }} /></li>}
             <li><strong>Language:</strong> {doc.language}</li>
           </ul>
           {ocr_hl &&
@@ -235,13 +223,13 @@ export default class App extends Component {
     super(props);
     this.state = {
       isSearchPending: false,
-      coreIdx: 0,
       queryParams: {
         'defType': 'edismax',
         'hl.snippets': 10,
         'hl.weightMatches': true,
         'hl': 'on'
       },
+      sources: ['gbooks', 'lunion'],
       searchResults: undefined
     };
   }
@@ -251,13 +239,15 @@ export default class App extends Component {
       evt.preventDefault();
     }
     const query = document.querySelector(".search-form input").value;
-    const coreName = CORES[this.state.coreIdx];
     const params = {
       ...this.state.queryParams,
-      ...CORE_PARAMS[coreName],
+      ...PARAMS,
       q: query
     };
-    fetch(`${APP_BASE}/solr/${coreName}/select?${new URLSearchParams(params)}`)
+    if (this.state.sources.length == 1) {
+      params.fq = 'source:' + this.state.sources[0];
+    }
+    fetch(`${APP_BASE}/solr/ocr/select?${new URLSearchParams(params)}`)
       .then(resp => resp.json())
       .then((data) => this.setState({ searchResults: data, isSearchPending: false }))
       .catch((err) => {
@@ -282,28 +272,45 @@ export default class App extends Component {
     }
   }
 
+  onSourceToggle(source, enabled) {
+    let { sources } = this.state;
+    if (enabled) {
+      sources.push(source);
+    } else {
+      sources = sources.filter(s => s !== source);
+    }
+    this.setState({
+      sources
+    });
+  }
+
   render() {
-    const { searchResults, isSearchPending, queryParams, coreIdx } = this.state;
-    const coreName = CORES[coreIdx];
+    const { searchResults, isSearchPending, queryParams, sources } = this.state;
     return (
       <main>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
         <form className="search-form" onSubmit={this.onSubmit.bind(this)}>
           <TextField
-            disabled={isSearchPending}
+            disabled={isSearchPending || sources.length === 0}
             label="Search" outlined trailingIcon="search" />
-          <FormField className="core-picker">
-            <Select
-              outlined
-              disabled={isSearchPending}
-              selectedIndex={coreIdx}
-              onChange={e => this.setState({
-                coreIdx: e.target.selectedIndex,
-                searchResults: undefined})}>
-              <Select.Item>Google Books</Select.Item>
-              <Select.Item>Newspaper L'Union (BNL)</Select.Item>
-            </Select>
-          </FormField>
+          <div className="source-picker">
+            <FormField>
+              <Checkbox
+                id="search-gbooks" checked={sources.indexOf('gbooks') > -1}
+                onChange={evt => this.onSourceToggle('gbooks', evt.target.checked)} />
+              <label for="search-gbooks">
+                Google Books 1000 
+              </label>
+            </FormField>
+            <FormField>
+              <Checkbox
+                id="search-bnl" checked={sources.indexOf('lunion') > -1}
+                onChange={evt => this.onSourceToggle('lunion', evt.target.checked)} />
+              <label for="search-bnl">
+                L'Union Newspaper
+              </label>
+            </FormField>
+          </div>
           <FormField className="passage-slider">
             <label for="passage-slider">Number of snippets</label>
             <Slider
@@ -330,7 +337,7 @@ export default class App extends Component {
                   hl: searchResults.highlighting[doc.id] }
               })
               .map(({ key, doc, hl, ocrHl }) =>
-                coreName === 'google1000'
+                doc.source === 'gbooks'
                   ? <GoogleResultDocument key={key} hl={hl} ocr_hl={ocrHl} doc={doc} query={queryParams.q} />
                   : <NewspaperResultDocument key={key} hl={hl} ocr_hl={ocrHl} doc={doc} query={queryParams.q} />)}
         </section>

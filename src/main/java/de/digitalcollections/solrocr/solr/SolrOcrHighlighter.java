@@ -45,15 +45,16 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
     // query-time parameters
     String[] ocrFieldNames = getOcrHighlightFields(req);
+    // No output if no fields were defined
+    if (ocrFieldNames == null || ocrFieldNames.length == 0) {
+      return null;
+    }
     int[] maxPassagesOcr = getMaxPassages(ocrFieldNames, params);
 
-    OcrHighlightResult[] ocrSnippets = null;
     // Highlight OCR fields
-    if (ocrFieldNames.length > 0) {
-      OcrHighlighter ocrHighlighter = new OcrHighlighter(
-          req.getSearcher(), req.getSchema().getIndexAnalyzer(), req.getParams());
-      ocrSnippets = ocrHighlighter.highlightOcrFields(ocrFieldNames, query, docIDs, maxPassagesOcr);
-    }
+    OcrHighlighter ocrHighlighter = new OcrHighlighter(
+        req.getSearcher(), req.getSchema().getIndexAnalyzer(), req.getParams());
+    OcrHighlightResult[] ocrSnippets = ocrHighlighter.highlightOcrFields(ocrFieldNames, query, docIDs, maxPassagesOcr);
 
     // Assemble output data
     SimpleOrderedMap out = new SimpleOrderedMap();
@@ -91,7 +92,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private String[] getOcrHighlightFields(SolrQueryRequest req) {
     String[] fields = req.getParams().getParams(OcrHighlightParams.OCR_FIELDS);
 
-    if (fields.length > 0) {
+    if (fields != null && fields.length > 0) {
       Set<String> expandedFields = new LinkedHashSet<String>();
       Collection<String> storedHighlightFieldNames = req.getSearcher().getDocFetcher().getStoredHighlightFieldNames();
       for (String field : fields) {
@@ -101,10 +102,10 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
             SolrPluginUtils.split(field));
       }
       fields = expandedFields.toArray(new String[]{});
-    }
-    // Trim them now in case they haven't been yet.  Not needed for all code-paths above but do it here.
-    for (int i = 0; i < fields.length; i++) {
-      fields[i] = fields[i].trim();
+      // Trim them now in case they haven't been yet.  Not needed for all code-paths above but do it here.
+      for (int i = 0; i < fields.length; i++) {
+        fields[i] = fields[i].trim();
+      }
     }
     return fields;
   }

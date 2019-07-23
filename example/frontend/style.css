@@ -27,7 +27,7 @@ section, form {
 	display: none;
 }
 
-.search-form .mdc-form-field.core-picker {
+.search-form .source-picker {
 	grid-column: 1/7;
 	grid-row: 2;
 }
@@ -97,7 +97,7 @@ a {
 		grid-column: 2/6;
 	}
 
-	.search-form .mdc-form-field.core-picker {
+	.search-form .source-picker {
 		grid-column: 2/6;
 	}
 

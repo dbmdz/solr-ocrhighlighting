@@ -13,18 +13,14 @@
     <script>document.write("<script type='text/javascript' src='https://mirador-dev.netlify.com/dist/mirador.min.js?v=" + Date.now() + "'><\/script>");</script>
     <script type="text/javascript">
       var params = new URL(window.location.href).searchParams;
+      var manifestId = params.get("manifest");
       var pageId = params.get("cv")
-      var pageIdx = 0;
-      if (pageId[0] == 'P') {
-        pageIdx = parseInt(pageId.substring(1)) - 1;
-      } else if (pageId) {
-        pageIdx = parseInt(pageId) - 1;
-      }
+      var canvasId = canvasId = manifestId.replace("/manifest", "/canvas/" + pageId)
       var miradorInstance = Mirador.viewer({
         id: 'mirador',
         windows: [{
-          loadedManifest: params.get("manifest"),
-          canvasIndex: pageIdx,
+          loadedManifest: manifestId,
+          canvasId,
           thumbnailNavigationPosition: 'far-bottom',
         }],
         window: {

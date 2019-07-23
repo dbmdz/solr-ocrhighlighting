@@ -8,8 +8,7 @@ services:
       - "8983:8983"  # Solr admin interface
     volumes:
       - ..:/opt/solr-plugin
-      - data-lunion:/opt/solr/server/solr/bnl_lunion/data
-      - data-google1000:/opt/solr/server/solr/google1000/data
+      - index-data:/opt/solr/server/solr/ocr/data
       - ./data:/data
 
   iiif-prezi:
@@ -31,5 +30,4 @@ services:
       - "8181:80"
 
 volumes:
-  data-lunion:
-  data-google1000:
+  index-data:

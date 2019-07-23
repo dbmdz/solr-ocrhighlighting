@@ -44,19 +44,19 @@ RESPONSE_TEMPLATE = {
 app = Sanic(load_env="CFG_")
 
 
-async def query_solr(core: str, query: str, fq: str):
+async def query_solr(query: str, fq: str):
     params = {
         'q': f'{query}',
         'df': 'ocr_text',
         'fq': fq,
         'rows': 500,
         'hl': 'on',
-        'hl.fl': 'ocr_text',
+        'hl.ocr.fl': 'ocr_text',
         'hl.snippets': 4096,
         'hl.weightMatches': 'true',
     }
     solr_base = app.config.get('SOLR_BASE', "http://127.0.0.1:8983/solr")
-    solr_url = f"{solr_base}/{core}/select"
+    solr_url = f"{solr_base}/ocr/select"
     async with app.aiohttp_session.get(solr_url, params=params) as resp:
         result_doc = await resp.json()
         ocr_hls = result_doc['ocrHighlighting']
@@ -71,7 +71,7 @@ async def query_solr(core: str, query: str, fq: str):
         return out
 
 
-def make_contentsearch_response(hlresp, ignored_fields, vol_id, query, core):
+def make_contentsearch_response(hlresp, ignored_fields, vol_id, query, is_bnl):
     protocol = app.config.get('PROTOCOL', 'http')
     location = app.config.get('SERVER_NAME', 'localhost:8008')
     app_path = app.config.get('APP_PATH', '')
@@ -96,7 +96,7 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query, core):
                 y = snip['regions'][0]['uly'] + hlbox['uly']
                 w = hlbox['lrx'] - hlbox['ulx']
                 h = hlbox['lry'] - hlbox['uly']
-                if core == "bnl_lunion":
+                if is_bnl:
                     x = int(x * BNL_10MM_TO_PIX_FACTOR)
                     y = int(y * BNL_10MM_TO_PIX_FACTOR)
                     w = int(w * BNL_10MM_TO_PIX_FACTOR)
@@ -136,19 +136,15 @@ async def finish(app, loop):
 @app.route("/<doc_id>/search", methods=['GET', 'OPTIONS'])
 async def search(request: Request, doc_id) -> HTTPResponse:
     query: str = request.args.get("q")
-    if GBOOKS_PAT.match(doc_id):
-        core = 'google1000'
-        fq = f'id:{doc_id.split(":")[1]}'
-    elif BNL_ARTICLE_PAT.match(doc_id):
-        core = 'bnl_lunion'
+    if GBOOKS_PAT.match(doc_id) or BNL_ARTICLE_PAT.match(doc_id):
         fq = f'id:{doc_id.split(":")[1]}'
     elif BNL_ISSUE_PAT.match(doc_id):
-        core = 'bnl_lunion'
         fq = f'issue_id:{doc_id.split(":")[1]}'
-    resp = await query_solr(core, query, fq)
+    resp = await query_solr(query, fq)
     ignored_params = [k for k in request.args.keys() if k != "q"]
     return json(make_contentsearch_response(
-        resp, ignored_params, doc_id, query, core))
+        resp, ignored_params, doc_id, query,
+        BNL_ARTICLE_PAT.match(doc_id) or BNL_ISSUE_PAT.match(doc_id)))
 
 
 @app.route('/<volume_id>/manifest', methods=['GET', 'OPTIONS'])

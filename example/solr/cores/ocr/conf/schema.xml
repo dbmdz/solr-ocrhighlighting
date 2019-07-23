@@ -30,7 +30,8 @@
   </types>
 
   <fields>
-    <field name="id"              type="string"   multiValued="false" indexed="true" stored="true" required="true"/>
+    <field name="id"              type="string"   multiValued="false" indexed="true" stored="true" required="true" />
+    <field name="source"          type="string"   multiValued="false" indexed="true" stored="true" required="true" />
     <field name="issue_id"        type="string"   multiValued="false" indexed="true" stored="true" />
     <field name="title"           type="text"     multiValued="true"  indexed="true" stored="true" />
     <field name="subtitle"        type="text"     multiValued="true"  indexed="true" stored="true" />

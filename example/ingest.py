@@ -71,12 +71,14 @@ def gbooks_load_documents(base_path):
                         fp.write(ocr_text)
                 hocr = ocr_text.decode('utf8')
                 yield {'id': vol_id.split("_")[-1],
+                       'source': 'gbooks',
                        'ocr_text': '/data/google1000/' + doc_path.name,
                        **gbooks_parse_metadata(hocr)}
     else:
         for doc_path in base_path.glob('*.hocr'):
             hocr = doc_path.read_text()
             yield {'id': doc_path.stem.split("_")[1],
+                   'source': 'gbooks',
                    'ocr_text': '/data/google1000/' + doc_path.name,
                    **gbooks_parse_metadata(hocr)}
 
@@ -150,6 +152,7 @@ def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
         article_no = meta_id.replace("MODSMD_ARTICLE", "")
         yield {
             'id': '{}-{}'.format(issue_id, article_no),
+            'source': 'bnl_lunion',
             'issue_id': issue_id,
             'date': issue_date + 'T00:00:00Z',
             'newspaper_title': newspaper_title,
