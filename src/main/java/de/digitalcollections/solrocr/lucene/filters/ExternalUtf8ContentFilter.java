@@ -53,7 +53,7 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
    **/
   @Override
   public int read(char[] cbuf, int off, int len) throws IOException {
-    if (currentOffset == currentRegion.end) {
+    if (currentInOffset == currentRegion.end) {
       return -1;
     }
     int numCharsRead = 0;
