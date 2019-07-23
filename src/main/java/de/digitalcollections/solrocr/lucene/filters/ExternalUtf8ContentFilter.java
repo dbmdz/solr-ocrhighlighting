@@ -21,7 +21,7 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
   /**
    * The current <strong>char</strong> offset in the full file;
    */
-  private int currentOffset;
+  private int currentInOffset;
 
   /**
    * The current <strong>char</strong> offset in the output.
@@ -35,15 +35,14 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
   public ExternalUtf8ContentFilter(Reader input, List<SourcePointer.Region> regions) throws IOException {
     super(input);
     this.currentOutOffset = 0;
-    this.currentOffset = 0;
+    this.currentInOffset = 0;
     this.cumulative = 0;
     this.remainingRegions = new LinkedList<>(regions);
     currentRegion = remainingRegions.remove();
     if (currentRegion.start > 0) {
-      this.currentOffset = currentRegion.start;
       this.addOffCorrectMap(currentOutOffset, currentRegion.startOffset);
       this.cumulative += currentRegion.startOffset;
-      this.input.skip(currentOffset);
+      this.currentInOffset = (int) this.input.skip(currentRegion.start);
     }
   }
 
@@ -56,31 +55,36 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
     if (currentInOffset == currentRegion.end) {
       return -1;
     }
+
     int numCharsRead = 0;
     while (len - numCharsRead > 0) {
-      int charsRemainingInRegion = currentRegion.end - currentOffset;
+      int charsRemainingInRegion = currentRegion.end - currentInOffset;
       int charsToRead = len - numCharsRead;
       if (charsToRead > charsRemainingInRegion) {
         charsToRead = charsRemainingInRegion;
       }
+
       int read = this.input.read(cbuf, off, charsToRead);
       if (read < 0) {
         break;
       }
-      correctOffsets(cbuf, off, charsToRead);
+      correctOffsets(cbuf, off, read);
       numCharsRead += read;
       off += read;
-      if (currentOffset == currentRegion.end) {
+
+      if (currentInOffset == currentRegion.end) {
         if (remainingRegions.isEmpty()) {
           break;
         }
         currentRegion = remainingRegions.remove();
-        int diff = currentRegion.startOffset - currentRegion.start - cumulative;
-        if (diff > 0) {
-          this.addOffCorrectMap(currentRegion.start, diff);
+
+        cumulative = currentRegion.startOffset - currentOutOffset;
+        this.addOffCorrectMap(currentOutOffset, cumulative);
+        int toSkip = this.currentRegion.start - this.currentInOffset;
+        if (toSkip > 0) {
+          this.input.skip(this.currentRegion.start - this.currentInOffset);
         }
-        this.input.skip(this.currentRegion.start - this.currentOffset);
-        this.currentOffset = currentRegion.start;
+        this.currentInOffset = currentRegion.start;
       }
     }
     return numCharsRead > 0 ? numCharsRead : -1;
@@ -92,7 +96,7 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
         this.addOffCorrectMap(currentOutOffset, cumulative);
         nextIsOffset = false;
       }
-      currentOffset += 1;
+      currentInOffset += 1;
       currentOutOffset += 1;
       int cp = Character.codePointAt(cbuf, i);
       int increment = Utf8.encodedLength(cp) - 1;
