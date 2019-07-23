@@ -1,7 +1,6 @@
 package de.digitalcollections.solrocr.formats;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.CharStreams;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
 import de.digitalcollections.solrocr.util.OcrBox;
 import java.io.IOException;
@@ -18,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.search.uhighlight.Passage;
@@ -126,7 +126,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         new StringReader(xmlFragment),
         ImmutableSet.of(startHlTag.substring(1, startHlTag.length() - 1)));
     try {
-      String text = CharStreams.toString(filter);
+      String text = IOUtils.toString(filter);
       return StringEscapeUtils.unescapeXml(text)
           .replaceAll("\n", "")
           .replaceAll("\\s+", " ")

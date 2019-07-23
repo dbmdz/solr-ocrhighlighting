@@ -74,7 +74,7 @@ public class ExternalUtf8ContentFilterTest {
         StandardCharsets.UTF_8);
     ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(fieldValue));
     String filtered = IOUtils.toString(filter);
-    //assertThat(filtered).isEqualTo(subRegion);
+    assertThat(filtered).isEqualTo(subRegion);
     assertThat(filter.correctOffset(subRegion.indexOf("id='page_108'"))).isEqualTo(3033238);
     assertThat(filter.correctOffset(subRegion.indexOf("Sonnenw"))).isEqualTo(3035824);
     assertThat(filter.correctOffset(subRegion.indexOf("id='word_108_252'"))).isEqualTo(3066094);

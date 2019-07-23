@@ -1,12 +1,12 @@
 package de.digitalcollections.solrocr.util;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ class TagBreakIteratorTest {
 
   private String stripTags(String val) throws IOException {
     HTMLStripCharFilter filter = new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));
-    return CharStreams.toString(filter).replaceAll("\n", "");
+    return IOUtils.toString(filter).replaceAll("\n", "");
   }
 
   @Test
