@@ -2,9 +2,9 @@ package de.digitalcollections.solrocr.lucene;
 
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.CharStreams;
-import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilter;
+import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
+import de.digitalcollections.solrocr.util.MultiFileReader;
 import de.digitalcollections.solrocr.util.SourcePointer;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.BufferedReader;
@@ -17,17 +17,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.lucene.analysis.CharFilter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExternalUtf8ContentFilterTest {
   private ExternalUtf8ContentFilterFactory fac;
 
-  @Before
+  @BeforeEach
   public void setup() {
     fac = new ExternalUtf8ContentFilterFactory(new HashMap<>());
   }
@@ -56,7 +57,7 @@ public class ExternalUtf8ContentFilterTest {
         new BufferedReader(new FileReader(p.toFile())),
         ImmutableList.of(new SourcePointer.Region(0, (int) p.toFile().length())));
     String full = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
-    String filtered = CharStreams.toString(filter);
+    String filtered = IOUtils.toString(filter);
     assertThat(filtered).isNotEmpty();
     assertThat(filter.correctOffset(full.indexOf("id='page_108'"))).isEqualTo(3033238);
     assertThat(filter.correctOffset(full.indexOf("Sonnenw"))).isEqualTo(3035824);
@@ -72,7 +73,7 @@ public class ExternalUtf8ContentFilterTest {
         ArrayUtils.subarray(fileBytes, 3033216, 3066308),
         StandardCharsets.UTF_8);
     ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(fieldValue));
-    String filtered = CharStreams.toString(filter);
+    String filtered = IOUtils.toString(filter);
     //assertThat(filtered).isEqualTo(subRegion);
     assertThat(filter.correctOffset(subRegion.indexOf("id='page_108'"))).isEqualTo(3033238);
     assertThat(filter.correctOffset(subRegion.indexOf("Sonnenw"))).isEqualTo(3035824);
@@ -90,7 +91,7 @@ public class ExternalUtf8ContentFilterTest {
         .sorted()
         .collect(Collectors.joining("+"));
     ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(ptr));
-    String filtered = CharStreams.toString(filter);
+    String filtered = IOUtils.toString(filter);
     assertThat(filtered).isEqualTo("ene mene mistäes rappelt in der kistäene mene mäckund du bist wäg");
     assertThat(filter.correctOffset(filtered.indexOf("mistäes"))).isEqualTo(9);
     assertThat(filter.correctOffset(filtered.indexOf("kistäene"))).isEqualTo(33);
@@ -105,7 +106,51 @@ public class ExternalUtf8ContentFilterTest {
         + "+src/test/resources/data/multi_txt/part_3.txt[:8]"
         + "+src/test/resources/data/multi_txt/part_4.txt[4:6,12:]";
     ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(ptr));
-    String filtered = CharStreams.toString(filter);
+    String filtered = IOUtils.toString(filter);
     assertThat(filtered).isEqualTo("mistärappeltene meneduwäg");
+    assertThat(filter.correctOffset(filtered.indexOf("rappelt"))).isEqualTo(18);
+    assertThat(filter.correctOffset(filtered.indexOf("ene mene"))).isEqualTo(39);
+    assertThat(filter.correctOffset(filtered.indexOf("du"))).isEqualTo(57);
+    assertThat(filter.correctOffset(filtered.indexOf("wäg"))).isEqualTo(65);
+  }
+
+  @Test
+  public void multipleRegions() throws IOException {
+    String ptr = "src/test/resources/data/multi_txt/complete.txt[4:8,18:25,33:39]";
+    ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(ptr));
+    String filtered = IOUtils.toString(filter);
+    assertThat(filtered).isEqualTo("menerappeltkistä");
+    assertThat(filter.correctOffset(4)).isEqualTo(18);
+    assertThat(filter.correctOffset(11)).isEqualTo(33);
+  }
+
+  @Test
+  public void multipleLongerFiles() throws IOException {
+    Path aPath = Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00001.xml");
+    Path bPath = Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00002.xml");
+    String aText = new String(Files.readAllBytes(aPath), StandardCharsets.UTF_8);
+    String bText = new String(Files.readAllBytes(bPath), StandardCharsets.UTF_8);
+    String fullText = aText + bText;
+    String fullPtr = aPath.toString() + "+" + bPath.toString();
+    try (ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(fullPtr))) {
+      String filtered = IOUtils.toString(filter);
+      System.out.println("Truncated by " + (fullText.length() - filtered.length()) + " characters!");
+      System.out.println("From files is equal to filtered: " + filtered.equals(fullText));
+      assertThat(filtered.length()).isEqualTo(fullText.length());
+      assertThat(filtered).isEqualTo(fullText);
+    }
+  }
+
+  @Test
+  public void testMultiFileReader() throws IOException {
+    Path aPath = Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00001.xml");
+    Path bPath = Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00002.xml");
+    try (MultiFileReader r = new MultiFileReader(ImmutableList.of(aPath, bPath))) {
+      String fromReader = IOUtils.toString(r);
+      String aText = new String(Files.readAllBytes(aPath), StandardCharsets.UTF_8);
+      String bText = new String(Files.readAllBytes(bPath), StandardCharsets.UTF_8);
+      String fromFiles = aText + bText;
+      assertThat(fromReader).isEqualTo(fromFiles);
+    }
   }
 }

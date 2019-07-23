@@ -21,11 +21,18 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
 
     Path ocrBasePath = Paths.get("src/test/resources/data/alto_multi");
     String ptr = Files.list(ocrBasePath)
-        .filter(p -> p.getFileName().toString().endsWith(".xml"))
+        .filter(p -> p.getFileName().toString().startsWith("1860-11-30_01"))
         .map(p -> p.toAbsolutePath().toString())
         .sorted()
         .collect(Collectors.joining("+"));
     assertU(adoc("ocr_text", ptr, "id", "42"));
+    String debugPtr =
+        Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00001.xml").toAbsolutePath()
+      + "[35835:36523,36528:37059,37064:86504,86509:138873,138878:193611,193616:244420,244425:247169]+"
+      + Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00002.xml").toAbsolutePath()
+      + "[2223:25803,25808:32247,32252:38770,38775:85408,85413:88087,88092:120911,120916:149458,"
+      +  "149463:178686,178691:220893,220898:231618,231623:242459]";
+    assertU(adoc("ocr_text", debugPtr, "id", "84"));
     assertU(commit());
   }
 
@@ -88,4 +95,15 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         "(//arr[@name='regions']/lst/str[@name='page'])[2]/text()='P3'",
         "//arr[@name='snippets']/lst/str[@name='text']/text()='Vcschllisse motivirt hat. wird gcwisi nirgends mchr gcwurdigt und tiaukbarer anerkannt, alS hier in unscrcm Landc; abcr auch <em>nirgendS H bas Bediirfnisi</em> nach ciucr cndlichen That des Bundcs dringender alS hier. Die bishcrige Veschliïssc dcs Blindes, welche die Erfullung'");
   }
+
+  @Test
+  public void testRegionsWithHyphenation() {
+    SolrQueryRequest req = xmlQ("q", "Kalifat");
+    assertQ(
+        req,
+        "count(//arr[@name='snippets']/lst)=1",
+        "contains(//arr[@name='snippets']/lst/str[@name='text']/text(), '<em>kalifat</em>')",
+        "count(//arr[@name='highlights']/arr/lst)=2");
+  }
+
 }
