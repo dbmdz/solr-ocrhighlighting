@@ -18,7 +18,7 @@ LUNION_TEXTS_URL = 'https://ocrhl.jbaiter.de/data/bnl_lunion_texts.tar.gz'
 LUNION_NUM_ARTICLES = 41446
 SOLR_HOST = 'localhost:8983'
 HOCR_METADATA_PAT = re.compile(
-    r"<meta name='DC\.(?P<key>.+?)' content='(?P<value>.+?)'\s*/?>")
+    r'<meta name=[\'"]DC\.(?P<key>.+?)[\'"] content=[\'"](?P<value>.+?)[\'"]\s*/?>')
 NSMAP = {
     'mets': 'http://www.loc.gov/METS/',
     'mods': 'http://www.loc.gov/mods/v3'
