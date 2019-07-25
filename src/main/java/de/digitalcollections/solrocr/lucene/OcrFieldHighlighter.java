@@ -79,7 +79,6 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     if (queueSize  <= 0) {
       queueSize = 512;
     }
-    queueSize = Math.min(512, queueSize);
 
     PriorityQueue<Passage> passageQueue = new PriorityQueue<>(queueSize, (left, right) -> {
       if (left.getScore() < right.getScore()) {
