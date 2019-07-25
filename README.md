@@ -59,12 +59,10 @@ text within them.
 
 To run:
 
-```
 1. `cd example`
 2. `docker-compose up -d`
 3. `./ingest.py`
 4. Access `http://localhost:8181` in your browser
-```
 
 For more information about the example setup, refer to the [documentation](https://dbmdz.github.io/solr-ocrhighlighting/example/).
 
