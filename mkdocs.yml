@@ -7,6 +7,7 @@ nav:
     - Querying: query.md
     - Example Setup: example.md
     - Supported Formats: formats.md
+    - Change Log: changes.md
 markdown_extensions:
     - def_list
     - attr_list
