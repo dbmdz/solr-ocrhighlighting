@@ -11,10 +11,7 @@ you want to have highlighted in the `hl.ocr.fl` parameter.
 With OCR highlighting enabled, your Solr response will now include a new item `ocrHighlighting`, mapping all
 highlighted OCR fields to their highlighting snippets:
 
-```
-GET http://solr.server:8983/solr/core/select
-  ?q="ocr_text:Mason Dixon"~10"&hl=true&hl.ocr.fl=ocr_text`
-```
+`GET` [`https://ocrhl.jbaiter.de/solr/ocr/select?q=ocr_text:%22Mason%20Dixon%22~10&hl=true&hl.ocr.fl=ocr_text`](https://ocrhl.jbaiter.de/solr/ocr/select?q=ocr_text:%22Mason%20Dixon%22~10&hl=true&hl.ocr.fl=ocr_text)
 ```json
 {
   "responseHeader": {
