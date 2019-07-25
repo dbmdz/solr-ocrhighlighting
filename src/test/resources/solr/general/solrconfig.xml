@@ -12,5 +12,5 @@
     </arr>
   </requestHandler>
 
-  <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent" name="ocr_highlight" />
+  <searchComponent class="de.digitalcollections.solrocr.solr.OcrHighlightComponent" name="ocr_highlight" />
 </config>

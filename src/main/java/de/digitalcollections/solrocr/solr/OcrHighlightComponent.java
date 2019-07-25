@@ -11,7 +11,7 @@ import org.apache.solr.core.SolrCore;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.request.SolrQueryRequest;
 
-public class HighlightComponent extends org.apache.solr.handler.component.HighlightComponent {
+public class OcrHighlightComponent extends org.apache.solr.handler.component.HighlightComponent {
   private PluginInfo info;
   private SolrOcrHighlighter ocrHighlighter;
 
