@@ -134,8 +134,6 @@ public class ExternalUtf8ContentFilterTest {
     String fullPtr = aPath.toString() + "+" + bPath.toString();
     try (ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(fullPtr))) {
       String filtered = IOUtils.toString(filter);
-      System.out.println("Truncated by " + (fullText.length() - filtered.length()) + " characters!");
-      System.out.println("From files is equal to filtered: " + filtered.equals(fullText));
       assertThat(filtered.length()).isEqualTo(fullText.length());
       assertThat(filtered).isEqualTo(fullText);
     }

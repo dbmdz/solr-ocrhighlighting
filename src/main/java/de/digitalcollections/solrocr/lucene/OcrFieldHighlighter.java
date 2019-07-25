@@ -37,7 +37,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    * an {@link IterableCharSequence} as content and dynamically setting the break iterator and the formatter.
    */
   public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, BreakIterator breakIterator,
-                                           OcrPassageFormatter formatter, IterableCharSequence content, String pageId)
+                                           OcrPassageFormatter formatter, IterableCharSequence content, String pageId,
+                                           int snippetLimit)
       throws IOException {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
     if (content.length() == 0) {
@@ -48,7 +49,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
 
     Passage[] passages;
     try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
-      passages = highlightOffsetsEnums(offsetsEnums, docId, breakIterator, formatter, pageId);
+      passages = highlightOffsetsEnums(offsetsEnums, docId, breakIterator, formatter, pageId, snippetLimit);
     }
 
     // Format the resulting Passages.
@@ -68,9 +69,10 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     throw new UnsupportedOperationException();
   }
 
-  protected Passage[] highlightOffsetsEnums(OffsetsEnum off, int docId, BreakIterator breakIter,
-                                            OcrPassageFormatter formatter, String pageId) throws IOException {
-        final int contentLength = breakIter.getText().getEndIndex();
+  protected Passage[] highlightOffsetsEnums(
+      OffsetsEnum off, int docId, BreakIterator breakIter, OcrPassageFormatter formatter, String pageId,
+      int snippetLimit) throws IOException {
+    final int contentLength = breakIter.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
     }
@@ -91,6 +93,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     });
     Passage passage = new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
 
+    // If we've reached the limit, no longer calculate passages, only count matches as passages
+    boolean limitReached = false;
     int numTotal = 0;
     do {
       int start = off.startOffset();
@@ -106,6 +110,13 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
       int end = off.endOffset();
       if (start < contentLength && end > contentLength) {
+        continue;
+      }
+      // Since building passages is expensive when using external files, we forego it past a certain limit
+      // (which can be set by the user) and just update the total count, counting each match as a single passage.
+      if (limitReached || numTotal > snippetLimit) {
+        numTotal++;
+        limitReached = true;
         continue;
       }
       // See if this term should be part of a new passage.

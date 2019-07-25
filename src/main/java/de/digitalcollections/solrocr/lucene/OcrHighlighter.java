@@ -59,6 +59,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       new HocrFormat(),
       new AltoFormat(),
       new MiniOcrFormat());
+  private static final int DEFAULT_SNIPPET_LIMIT = 100;
 
   static {
     try {
@@ -207,9 +208,12 @@ public class OcrHighlighter extends UnifiedHighlighter {
               params.get(HighlightParams.TAG_PRE, "<em>"),
               params.get(HighlightParams.TAG_POST, "</em>"),
               params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false));
+          int snippetLimit = Math.max(
+              maxPassages[fieldIdx],
+              params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
           resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
               leafReader, docId, breakIter, formatter, content,
-              params.get(OcrHighlightParams.PAGE_ID));
+              params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
           snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
         }
       }

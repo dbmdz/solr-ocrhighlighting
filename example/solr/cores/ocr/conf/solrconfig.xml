@@ -5,7 +5,7 @@
 
   <lib dir="../../../contrib/ocrsearch/lib" regex=".*\.jar" />
 
-  <searchComponent class="de.digitalcollections.solrocr.solr.HighlightComponent"
+  <searchComponent class="de.digitalcollections.solrocr.solr.OcrHighlightComponent"
                    name="ocrHighlight" />
 
   <requestHandler name="/select" class="solr.SearchHandler">

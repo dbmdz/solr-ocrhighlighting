@@ -63,6 +63,7 @@ public class FileBytesCharIterator implements IterableCharSequence {
     return numBytes;
   }
 
+  /** Move offset to the left until we're on an UTF8 starting byte **/
   private int adjustOffset(int offset) {
     if (offset == numBytes) {
       return offset;
@@ -86,20 +87,27 @@ public class FileBytesCharIterator implements IterableCharSequence {
     if (offset < 0 || offset >= this.numBytes) {
       throw new IndexOutOfBoundsException();
     }
+    // If we know the input is valid ASCII throughout, we can assume
+    // 1 byte == 1 char and go on with our lives.
     if (this.charset == StandardCharsets.US_ASCII) {
       return (char) buf.get(offset);
     }
+
+    // Otherwise things get complicated...
     int originalOffset = offset;
     offset = adjustOffset(offset);
     int b = buf.get(offset) & 0xFF;  // bytes are signed in Java....
+    if (b < 0x80) {
+      // Optimization: It's just ASCII, so simply cast to a char
+      return (char) b;
+    }
+    int hiBits = (b >> 4) & 0xF;
     int bytesToRead;
-    if ((b >> 7) == 0) {
-      bytesToRead = 1;
-    } else if ((b >> 5) == 0b110) {
+    if (hiBits == 0xC || hiBits == 0xD) {
       bytesToRead = 2;
-    } else if ((b >> 4) == 0b1110) {
+    } else if (hiBits == 0xE) {
       bytesToRead = 3;
-    } else if ((b >> 3) == 0b11110) {
+    } else if (hiBits == 0xF) {
       bytesToRead = 4;
     } else {
       throw new IllegalArgumentException("Invalid UTF8?");
