@@ -2,12 +2,13 @@
 
 ![](docs/img/snippet.png)
 
-**[Documentation](https://dbmdz.github.io/solr-ocrhighlighting)**
+**[Documentation](https://dbmdz.github.io/solr-ocrhighlighting)**<br>
+**[Demo](https://ocrhl.jbaiter.de)**
 
 This Solr plugin lets you put word-level OCR text into one or more of you documents'
 fields and then allows you to obtain structured highlighting data with the text
 and its position on the page at query time. All this without having to store
-the OCR data in the index itself, but at arbitrary external locations instead.
+the OCR data in the index itself, instead reusing the existing OCR files on disk.
 
 It works by extending Solr's standard `UnifiedHighlighter` with support for
 loading external field values and determining OCR positions from those field
@@ -21,14 +22,14 @@ The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0
 ## Features
 - Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/formats/) directly without preprocessing
 - Retrieve all the information needed to render a highlighted snippet view directly from Solr, without postprocessing
-- Keeps your index size manageable by not necessarily storing the OCR in the index
+- Keeps your index size manageable by not storing the OCR in the index
 
 ## Installation
 
 1. Download the latest JAR from the [GitHub Releases Page](https://github.com/dbmdz/solr-ocrhighlighting/releases)
 2. Drop the JAR into the `core/lib/` directory for your Solr core
-3. Refer to the [Getting Started guide](https://dbmdz.github.io/solr-ocrhighlighting/getting_started/)
-   for instructions on how to configure Solr
+3. Refer to the [Documentation](https://dbmdz.github.io/solr-ocrhighlighting)
+   for instructions on how to configure Solr and index documents
 
 ## Compiling
 If you want to use the latest bleeding-edge version, you can also compile the plugin yourself.
@@ -42,20 +43,27 @@ The JAR will be in `target/solr-ocrhighlighting-$version.jar`.
 
 ## Running the example
 
-The repository includes a full-fledged Docker-based example setup based on the
-[Google Books 1000 Dataset](http://yaroslavvb.blogspot.com/2011/11/google1000-dataset_09.html).
-It consists of 1000 Volumes along with their OCRed text in the hOCR format and all book pages as
-full resolution JPEG images. The example ships with a search interface that allows querying the
-OCRed texts and displays the matching passages as highlighted image and text snippets.
-Also included is a small IIIF-Viewer that allows viewing the complete volumes and searching for text within
-them.
+
+The repository includes a full-fledged example setup based on the [Google
+Books 1000](http://yaroslavvb.blogspot.com/2011/11/google1000-dataset_09.html)
+and the [BNL L'Union Newspaper](https://data.bnl.lu/data/historical-newspapers/) datasets.
+The Google Books dataset consists of 1000 Volumes along with their OCRed text
+in the hOCR format and all book pages as full resolution JPEG images.
+The BNL dataset consists of 2712 newspaper issues in the ALTO format and all
+pages as high resolution TIF images.
+
+The example ships with a search interface that allows querying the OCRed texts and displays
+the matching passages as highlighted image and text snippets. Also included
+is a small IIIF-Viewer that allows viewing the documents and searching for
+text within them.
 
 To run:
 
 ```
-$ cd example
-$ docker-compose up -d
-$ ./ingest_google1000.py
+1. `cd example`
+2. `docker-compose up -d`
+3. `./ingest.py`
+4. Access `http://localhost:8181` in your browser
 ```
 
 For more information about the example setup, refer to the [documentation](https://dbmdz.github.io/solr-ocrhighlighting/example/).
@@ -64,8 +72,6 @@ For more information about the example setup, refer to the [documentation](https
 ## Limitations
 
 - The supported file size is limited to 2GiB, since Lucene uses 32 bit integers throughout for storing offsets
-- The `hl.weightMatches` parameter is not supported when using external UTF-8 files, i.e. it will be ignored and the
-  classical highlighting approach will be used instead.
 
 
 ## Contributing

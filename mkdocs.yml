@@ -1,13 +1,14 @@
 site_name: Solr OCR Highlighting Plugin
 theme: readthedocs
 nav:
-    - Getting Started: getting_started.md
-    - OCR Formats: formats.md
-    - External Storage: external_storage.md
+    - Introduction: index.md
+    - Installation: installation.md
+    - Indexing: indexing.md
+    - Querying: query.md
     - Example Setup: example.md
-    - Query Parameters: queryparams.md
-    - Frequently Asked Questions: faq.md
+    - Supported Formats: formats.md
 markdown_extensions:
+    - def_list
     - attr_list
     - fenced_code
     - admonition

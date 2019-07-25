@@ -25,29 +25,38 @@ and its position on the page at query time:
 }
 ```
 
-All this can optionally be done without having to store any OCR text in the
-index itself: The plugin can lazy-load only the parts required for highlighting
-at query time from your original OCR input documents. 
+All this is done **without having to store any OCR text in the index itself**:
+The plugin can lazy-load only the parts required for highlighting at both index
+and query time from your original OCR input documents. 
 
 It works by extending Solr's standard `UnifiedHighlighter` with support for
 loading external field values and determining OCR positions from those field
-values. This means that all options and query types supported by the
+values. This means that most options and query types supported by the
 `UnifiedHighlighter` are also supported for OCR highlighting. The plugin also
-works transparently with non-OCR fields and just lets the default
-implementation handle those.
+does not interfere with Solr's standard highlighting component, i.e. it works
+transparently with non-OCR fields and just lets the default implementation handle
+those.
 
 The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0).
 
 ## Features
-- Index various OCR formats without little to no preprocessing
+- Index various [OCR formats](formats.md) directly without any pre-processing
     * [hOCR](formats.md#hocr)
     * [ALTO](formats.md#alto)
     * [MiniOCR](formats.md#miniocr)
 - Retrieve all the information needed to render a highlighted snippet view
-  directly from Solr, without postprocessing
+  directly from Solr, without post-processing
 - Keep your index size manageable by re-using OCR documents on disk for
   highlighting
 
 ## Getting Started
 
-To get started, refer to the [Getting Started documentation](getting_started.md).
+To **get started setting up** OCR highlighting for your Solr server, head over to
+the [Installation Instructions](installation.md).
+
+If you want to see the **plugin in action**, you can play around with the
+[example setup](example.md) hosted at [https://ocrhl.jbaiter.de](https://ocrhl.jbaiter.de)
+
+Should you want to **run the example on your own computer** and play around with the
+settings, the [Docker-based setup is available on GitHub](https://github.com/dbmdz/solr-ocrhighlighting/tree/master/example)
+and instructions for using it are in the [Example Setup chapter](example.md)

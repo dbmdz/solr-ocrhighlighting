@@ -11,14 +11,14 @@ from urllib import request
 
 
 GOOGLE1000_PATH = './data/google1000'
-GOOGLE1000_URL = 'https://ocrhl.jbaiter.de/data/gbooks1000_hocr.tar.xz'
+GOOGLE1000_URL = 'https://ocrhl.jbaiter.de/data/google1000_texts.tar.gz'
 GOOGLE1000_NUM_VOLUMES = 1000
 LUNION_PATH = './data/bnl_lunion'
 LUNION_TEXTS_URL = 'https://ocrhl.jbaiter.de/data/bnl_lunion_texts.tar.gz'
 LUNION_NUM_ARTICLES = 41446
 SOLR_HOST = 'localhost:8983'
 HOCR_METADATA_PAT = re.compile(
-    r'<meta name="DC\.(?P<key>.+?)" content="(?P<value>.+?)"\s*/>')
+    r"<meta name='DC\.(?P<key>.+?)' content='(?P<value>.+?)'\s*/?>")
 NSMAP = {
     'mets': 'http://www.loc.gov/METS/',
     'mods': 'http://www.loc.gov/mods/v3'
@@ -59,7 +59,7 @@ def gbooks_load_documents(base_path):
         print("Downloading missing volumes to {}".format(base_path))
         base_path.mkdir(exist_ok=True)
         with request.urlopen(GOOGLE1000_URL) as resp:
-            tf = tarfile.open(fileobj=resp, mode='r|xz')
+            tf = tarfile.open(fileobj=resp, mode='r|gz')
             for ti in tf:
                 if not ti.name.endswith('.hocr'):
                     continue
@@ -69,11 +69,11 @@ def gbooks_load_documents(base_path):
                 if not doc_path.exists():
                     with doc_path.open('wb') as fp:
                         fp.write(ocr_text)
-                hocr = ocr_text.decode('utf8')
+                hocr_header = ocr_text[:1024].decode('utf8')
                 yield {'id': vol_id.split("_")[-1],
                        'source': 'gbooks',
                        'ocr_text': '/data/google1000/' + doc_path.name,
-                       **gbooks_parse_metadata(hocr)}
+                       **gbooks_parse_metadata(hocr_header)}
     else:
         for doc_path in base_path.glob('*.hocr'):
             hocr = doc_path.read_text()
@@ -125,7 +125,6 @@ def bnl_get_article_pointer(path_regions):
 
 
 def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
-    ocr_paths = sorted(alto_basedir.glob("*.xml"))
     article_elems = mets_tree.findall(
         ".//mets:structMap[@TYPE='LOGICAL']//mets:div[@TYPE='ARTICLE']",
         namespaces=NSMAP)

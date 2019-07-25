@@ -3,24 +3,18 @@ in a hierarchy of **blocks**. For all supported formats, we map their
 block types to these general types:
 
 - **Page**: optional if there is only a single page in a document
-- **Block**: optional if [`hl.ocr.limitBlock`](queryparams.md) is set to a different value at
+- **Block**: optional if [`hl.ocr.limitBlock`](query.md#available-highlighting-parameters) is set to a different value at
   query time
 - **Section**: optional
 - **Paragraph**: optional
-- **Line**: (optional if [`hl.ocr.contextBlock`](queryparams.md) is set to a different value
+- **Line**: (optional if [`hl.ocr.contextBlock`](query.md#available-highlighting-parameters) is set to a different value
   at query time)
 - **Word**: *required*
 
 These block types can be used in the [`hl.ocr.limitBlock` and `hl.ocr.contextBlock`
-query parameters](queryparams.md) to control how snippets are generated.
+query parameters](query.md#params) to control how snippets are generated.
 
 ## hOCR
-
-In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
-`de.digitalcollections.solrocr.formats.hocr.HocrFormat`.
-
-In the **Schema**, make sure that `de.digitalcollections.solrocr.formats.hocr.HocrCharFilterFactory`
-is the first filter in your indexing analyzer chain for OCR fields.
 
 **Block type mapping:**
 
@@ -35,14 +29,8 @@ is the first filter in your indexing analyzer chain for OCR fields.
 
 ## ALTO
 
-In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
-`de.digitalcollections.solrocr.formats.alto.AltoFormat`.
-
-In the **Schema**, make sure that `de.digitalcollections.solrocr.formats.alto.AltoCharFilterFactory`
-is the first filter in your indexing analyzer chain for OCR fields.
-
 !!! caution
-    The coordinates returned by the plugin are not always pixel values, since ALTO supports a variety
+    The coordinates returned by the plugin are **not always pixel values**, since ALTO supports a variety
     of different reference units for the coordinates. Check the `<MeasurementUnit>` value in your ALTO
     files, if its value is anything other than `pixel`, you will have to do some additional calculations
     on the client side to convert to pixel coordinates.
@@ -61,29 +49,22 @@ is the first filter in your indexing analyzer chain for OCR fields.
 
 ## MiniOCR
 
-This plugin also includes support for a custom non-standard OCR format that
-we dubbed *MiniOCR*. This format is intended for use cases where reusing the
-existing OCR files is not possible (e.g. because they're in an unsupported
-format or because you don't want to ASCII-encode them and still use the
-modern highlighting approach). In these cases, minimizing the storage
-requirements for the derived OCR files is important, which is why we defined
-this minimalistic format.
+This plugin also includes support for a custom non-standard OCR format that we dubbed *MiniOCR*.
+This format is intended for use cases where reusing the existing OCR files is not possible or
+practical. In these cases, minimizing the storage requirements for the derived OCR files is important,
+which is why we defined this minimalistic format.
 
 A basic example looks like this:
 
 ```xml
-<p id="page_identifier">
-  <b>
-    <l><w x="50 50 100 100">A</w> <w x="150 50 100 100">Line</w></l>
-  </b>
-</p>
+<ocr>
+  <p id="page_identifier">
+    <b>
+      <l><w x="50 50 100 100">A</w> <w x="150 50 100 100">Line</w></l>
+    </b>
+  </p>
+</ocr>
 ```
-
-In the **Solr configuration**, set the `ocrFormat` attribute on the `<searchComponent />` to
-`de.digitalcollections.solrocr.formats.mini.MiniOcrFormat`.
-
-In the **Schema**, make sure that `solr.HTMLStripCharFilterFactory` is the first filter
-in your indexing analyzer chain for OCR fields.
 
 **Block type mapping:**
 
