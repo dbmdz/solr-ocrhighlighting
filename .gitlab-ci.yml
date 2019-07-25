@@ -25,4 +25,4 @@ github_release:
   script:
     - if [[ "$CI_COMMIT_TAG" =~ .*RC.* ]]; then exit 0; fi
     - mvn clean package
-    - hub release edit -m $CI_COMMIT_TAG -a target/solr-ocrhighlighting-${CI_COMMIT_TAG}.jar -t $CI_COMMIT_SHA $CI_COMMIT_TAG
+    - hub release create -m $CI_COMMIT_TAG -a target/solr-ocrhighlighting-${CI_COMMIT_TAG}.jar -t $CI_COMMIT_SHA $CI_COMMIT_TAG
