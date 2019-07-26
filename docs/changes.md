@@ -1,3 +1,8 @@
+## 0.3.1 (2019-07-26)
+
+This is patch release that fixes compatibility with Solr/Lucene 8.2.
+
+
 ## 0.3 (2019-07-25)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.3)
 
