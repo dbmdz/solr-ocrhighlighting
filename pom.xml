@@ -68,11 +68,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.byteseek</groupId>
-      <artifactId>byteseek</artifactId>
-      <version>${version.byteseek}</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-text</artifactId>
       <version>${version.commons-text}</version>
@@ -124,6 +119,12 @@
       <version>${version.slf4j}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>net.byteseek</groupId>
+      <artifactId>byteseek</artifactId>
+      <version>${version.byteseek}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -162,7 +163,6 @@
           <artifactSet>
             <includes>
               <include>de.digitalcollections:solr-ocr-plugin</include>
-              <include>net.byteseek:byteseek</include>
               <include>org.apache.commons:commons-text</include>
             </includes>
           </artifactSet>
@@ -181,7 +181,6 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>${version.maven-javadoc-plugin}</version>
         <configuration>
-          <additionalparam>-Xdoclint:none</additionalparam>
           <additionalOptions>-Xdoclint:none</additionalOptions>
           <additionalJOption>-Xdoclint:none</additionalJOption>
         </configuration>
