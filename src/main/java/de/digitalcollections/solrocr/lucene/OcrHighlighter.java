@@ -15,6 +15,8 @@ import de.digitalcollections.solrocr.util.MultiFileBytesCharIterator;
 import de.digitalcollections.solrocr.util.OcrHighlightResult;
 import de.digitalcollections.solrocr.util.SourcePointer;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.text.BreakIterator;
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import org.apache.lucene.search.uhighlight.UHComponents;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.InPlaceMergeSorter;
+import org.apache.lucene.util.Version;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
@@ -296,12 +299,50 @@ public class OcrHighlighter extends UnifiedHighlighter {
     Set<HighlightFlag> highlightFlags = getFlags(field);
     PhraseHelper phraseHelper = getPhraseHelper(field, query, highlightFlags);
     CharacterRunAutomaton[] automata = getAutomata(field, query, highlightFlags);
-    OffsetSource offsetSource = getOptimizedOffsetSource(field, terms, phraseHelper, automata);
-    UHComponents components = new UHComponents(field, fieldMatcher, query, terms, phraseHelper,
-                                               automata, highlightFlags);
+
+    // Obtaining these two values has changed with Solr 8.2, so we need to do some reflection for older versions
+    OffsetSource offsetSource;
+    UHComponents components;
+    if (Version.LATEST.major < 8 || (Version.LATEST.major == 8  && Version.LATEST.minor < 2)) {
+      offsetSource = this.getOffsetSourceLegacy(field, terms, phraseHelper, automata);
+      components = this.getUHComponentsLegacy(
+          field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
+    } else {
+      components = new UHComponents(
+          field, fieldMatcher, query, terms, phraseHelper, automata, hasUnrecognizedQuery(fieldMatcher, query),
+          highlightFlags);
+      offsetSource = getOptimizedOffsetSource(components);
+    }
     return new OcrFieldHighlighter(
         field, getOffsetStrategy(offsetSource, components),
         getScorer(field), maxPassages, getMaxNoHighlightPassages(field));
+  }
+
+  private OffsetSource getOffsetSourceLegacy(String field, BytesRef[] terms, PhraseHelper phraseHelper,
+                                            CharacterRunAutomaton[] automata) {
+    try {
+      Method offsetSourceGetter = UnifiedHighlighter.class.getDeclaredMethod(
+          "getOptimizedOffsetSource", String.class, BytesRef[].class, PhraseHelper.class,
+          CharacterRunAutomaton[].class);
+      return (OffsetSource) offsetSourceGetter.invoke(this, field, terms, phraseHelper, automata);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("JavaReflectionMemberAccess")
+  private UHComponents getUHComponentsLegacy(
+      String field, Predicate<String> fieldMatcher, Query query, BytesRef[] terms, PhraseHelper phraseHelper,
+      CharacterRunAutomaton[] automata, Set<HighlightFlag> highlightFlags) {
+    try {
+      Constructor<UHComponents> componentsConstructor = UHComponents.class.getDeclaredConstructor(
+          String.class, Predicate.class, Query.class, BytesRef[].class, PhraseHelper.class,
+          CharacterRunAutomaton[].class, Set.class);
+      return componentsConstructor.newInstance(
+          field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   // FIXME: This is copied straight from UnifiedHighlighter because it has private access there. Maybe open an issue to
