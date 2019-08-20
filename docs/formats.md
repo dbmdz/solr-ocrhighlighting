@@ -21,7 +21,7 @@ query parameters](query.md#params) to control how snippets are generated.
 | Block     | hOCR class                  | notes                            |
 | --------- | --------------------------- | -------------------------------- |
 | Word      | `ocrx_word`                 | needs to have a `bbox` attribute with the coordinates on the page |
-| Page      | `ocr_page`                  | needs to have a `ppageno` attribute with a page identifier |
+| Page      | `ocr_page`                  | needs to have an `id` attribute with a page identifier or a `ppageno` entry in the `title` attribute |
 | Block     | `ocr_carea`/`ocrx_block`    |                                  |
 | Section   | `ocr_chapter`/`ocr_section`/<br>`ocr_subsection`/`ocr_subsubsection` | |
 | Paragraph | `ocr_par`                   |                                  |
