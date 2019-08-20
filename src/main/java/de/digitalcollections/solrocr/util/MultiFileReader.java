@@ -42,6 +42,9 @@ public class MultiFileReader extends Reader {
           this.currentReader = new FileReader(this.remainingSources.remove().toFile());
         }
       }
+      if (read < 0) {
+        continue;
+      }
       numRead += read;
       off += read;
       len -= read;
