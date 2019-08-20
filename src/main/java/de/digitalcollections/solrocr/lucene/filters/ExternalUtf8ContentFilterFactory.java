@@ -58,7 +58,7 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
           .collect(Collectors.toList());
       return new ExternalUtf8ContentFilter(new BufferedReader(r), charRegions);
     } catch (IOException e) {
-      return null;
+      throw new RuntimeException("Error while reading external content: " + e.toString(), e);
     }
   }
 
