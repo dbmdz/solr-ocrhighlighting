@@ -1,11 +1,13 @@
 package de.digitalcollections.solrocr.util;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -15,8 +17,11 @@ public class SourcePointer {
     public Path path;
     public List<Region> regions;
 
-    public FileSource(Path path, List<Region> regions) {
+    public FileSource(Path path, List<Region> regions) throws IOException {
       this.path = path;
+      if (path.toFile().length() == 0) {
+        throw new IOException(String.format("File at %s is empty, skipping.", path.toString()));
+      }
       this.regions = regions;
     }
   }
@@ -72,8 +77,12 @@ public class SourcePointer {
                 .sorted(Comparator.comparingInt(r -> r.start))
                 .collect(Collectors.toList());
           }
-          return new FileSource(sourcePath, regions);
-        }).collect(Collectors.toList()));
+          try {
+            return new FileSource(sourcePath, regions);
+          } catch (IOException e) {
+            return null;
+          }
+        }).filter(Objects::nonNull).collect(Collectors.toList()));
   }
 
   private static SourcePointer.Region parseRegion(String r) {
