@@ -15,7 +15,7 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
       "<span class=['\"]ocrx_word['\"].+?title=['\"].*?"
       + "bbox (?<ulx>\\d+) (?<uly>\\d+) (?<lrx>\\d+) (?<lry>\\d+);?.*?>(?<text>.+?)</span>");
   private final static Pattern pagePat = Pattern.compile(
-      "<div.+?class=['\"]ocr_page['\"].+?id=['\"](?<pageId>.+?)['\"]");
+      "<div.+?class=['\"]ocr_page['\"].+?(?:id=['\"](?<pageId>.+?)['\"]|ppageno (?<pageNo>\\d+))");
 
   private final HocrClassBreakIterator pageIter;
   private final String startHlTag;
@@ -36,7 +36,11 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
         pageOffset, Math.min(pageOffset + 256, content.length())).toString();
     Matcher m = pagePat.matcher(pageFragment);
     if (m.find()) {
-      return m.group("pageId");
+      String pageId = m.group("pageId");
+      if (pageId == null) {
+        pageId = m.group("pageNo");
+      }
+      return pageId;
     }
     return null;
   }
