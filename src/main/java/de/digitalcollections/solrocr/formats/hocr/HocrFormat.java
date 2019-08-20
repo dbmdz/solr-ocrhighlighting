@@ -12,10 +12,12 @@ import java.text.BreakIterator;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import org.apache.lucene.analysis.pattern.PatternReplaceCharFilter;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 
 public class HocrFormat implements OcrFormat {
-  private static final CharFilterFactory filterFactory = new DehyphenatingHtmlCharFilterFactory();
+  private static final CharFilterFactory baseFilterFactory = new DehyphenatingHtmlCharFilterFactory();
   private static final Map<OcrBlock, Set<String>> blockClassMapping = ImmutableMap.<OcrBlock, Set<String>>builder()
       .put(OcrBlock.PAGE, ImmutableSet.of("ocr_page"))
       .put(OcrBlock.BLOCK, ImmutableSet.of("ocr_carea", "ocrx_block"))
@@ -24,6 +26,7 @@ public class HocrFormat implements OcrFormat {
       .put(OcrBlock.LINE, ImmutableSet.of("ocr_line", "ocrx_line"))
       .put(OcrBlock.WORD, ImmutableSet.of("ocrx_word"))
       .build();
+  private static final Pattern TITLE_PAT = Pattern.compile("<title>.*?</title>");
 
   @Override
   public BreakIterator getBreakIterator(OcrBlock breakBlock, OcrBlock limitBlock, int contextSize) {
@@ -43,7 +46,8 @@ public class HocrFormat implements OcrFormat {
 
   @Override
   public Reader filter(Reader input) {
-    return filterFactory.create(input);
+    Reader filtered = baseFilterFactory.create(input);
+    return new PatternReplaceCharFilter(TITLE_PAT, "", filtered);
   }
 
   @Override

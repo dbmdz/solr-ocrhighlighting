@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class OcrPassageFormatter extends PassageFormatter {
   private static final Pattern LAST_INNER_TAG_PAT = Pattern.compile("[a-zA-Z0-9]</");
+  private static final Pattern TITLE_PAT = Pattern.compile("<title>.*?</title>");
 
   private static final Logger logger = LoggerFactory.getLogger(OcrPassageFormatter.class);
   protected final String startHlTag;
@@ -123,7 +124,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
   /** Helper method to get plaintext from XML/HTML-like fragments */
   protected String getTextFromXml(String xmlFragment) {
     HTMLStripCharFilter filter = new HTMLStripCharFilter(
-        new StringReader(xmlFragment),
+        new StringReader(TITLE_PAT.matcher(xmlFragment).replaceAll("")),
         ImmutableSet.of(startHlTag.substring(1, startHlTag.length() - 1)));
     try {
       String text = IOUtils.toString(filter);
