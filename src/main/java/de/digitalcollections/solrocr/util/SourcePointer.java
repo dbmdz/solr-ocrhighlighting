@@ -11,16 +11,27 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SourcePointer {
+  private static final Logger logger = LoggerFactory.getLogger(SourcePointer.class);
+
   public static class FileSource {
     public Path path;
     public List<Region> regions;
 
     public FileSource(Path path, List<Region> regions) throws IOException {
       this.path = path;
+      if (!path.toFile().exists()) {
+        String msg = String.format("File at %s does not exist, skipping.", path.toString());
+        logger.warn(msg);
+        throw new IOException(msg);
+      }
       if (path.toFile().length() == 0) {
-        throw new IOException(String.format("File at %s is empty, skipping.", path.toString()));
+        String msg = String.format("File at %s is empty, skipping.", path.toString());
+        logger.warn(msg);
+        throw new IOException(msg);
       }
       this.regions = regions;
     }
