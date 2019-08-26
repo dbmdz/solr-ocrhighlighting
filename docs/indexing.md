@@ -13,18 +13,21 @@ the (again, potentially very large) contents themselves in the index.
 !!! note "Performance"
     When using external files for highlighting, the performance depends almost exclusively on
     how fast the underlying storage is able to perform random I/O. This is why **using flash storage
-    for the documents is highly recommended**. Another option to increase highlighting performance is
+    for the documents is highly recommended**.
+    
+    Another option to increase highlighting performance is
     to **switch from UTF8 to ASCII** (with XML-escaped Unicode codepoints) for the encoding of the OCR
     files. This requires less CPU during decoding, since we don't have to take multi-byte sequences into
-    account.
+    account. To signal to the plugin that a given source path is encoded in ASCII, include the `{ascii}`
+    string after the path, e.g. `/mnt/data/ocrdoc.xml{ascii}[31337:41337]`.
 
 How the source pointers are structured depends on how your actual OCR files on disk map to documents in the Solr
 index.
 
 !!! caution "Encoding"
-    The files pointed at by the source pointers **need to be UTF-8 encoded**. Other encodings will lead to
-    unexpected errors and weird behaviour, so make sure that the files are in the correct encoding before
-    you index them.
+    The files pointed at by the source pointers **need to be UTF-8 or ASCII encoded**. Other encodings will lead
+    to unexpected errors and weird behaviour, so make sure that the files are in the correct encoding before you
+    index them.
 
 ## One file per Solr document (`1:1`)
 

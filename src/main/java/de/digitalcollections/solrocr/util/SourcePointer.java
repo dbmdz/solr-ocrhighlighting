@@ -20,8 +20,9 @@ public class SourcePointer {
   public static class FileSource {
     public Path path;
     public List<Region> regions;
+    public boolean isAscii;
 
-    public FileSource(Path path, List<Region> regions) throws IOException {
+    public FileSource(Path path, List<Region> regions, boolean isAscii) throws IOException {
       this.path = path;
       if (!path.toFile().exists()) {
         String msg = String.format("File at %s does not exist, skipping.", path.toString());
@@ -34,6 +35,7 @@ public class SourcePointer {
         throw new IOException(msg);
       }
       this.regions = regions;
+      this.isAscii = isAscii;
     }
   }
 
@@ -60,7 +62,9 @@ public class SourcePointer {
     }
   }
 
-  private static final Pattern POINTER_PAT = Pattern.compile("^(?<path>.+?)(?:\\[(?<regions>[0-9:,]+)])?$");
+  private static final Pattern POINTER_PAT = Pattern.compile(
+      "^(?<path>.+?)(?<isAscii>\\{ascii})?(?:\\[(?<regions>[0-9:,]+)])?$");
+
 
   public List<FileSource> sources;
 
@@ -89,7 +93,7 @@ public class SourcePointer {
                 .collect(Collectors.toList());
           }
           try {
-            return new FileSource(sourcePath, regions);
+            return new FileSource(sourcePath, regions, m.group("isAscii") != null);
           } catch (IOException e) {
             return null;
           }
