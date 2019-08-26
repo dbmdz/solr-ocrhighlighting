@@ -47,7 +47,13 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       toCharOffsets(pointer);
 
       Reader r;
-      if (pointer.sources.size() > 1) {
+      if (pointer.sources.isEmpty()) {
+        throw new RuntimeException(
+            "No source files could be determined from pointer. " +
+            "Is it pointing to files that exist and are readable? " +
+            "Pointer was: " + ptrStr);
+      }
+      else if (pointer.sources.size() > 1) {
         r = new MultiFileReader(pointer.sources.stream().map(s -> s.path).collect(Collectors.toList()));
       } else {
         r = new FileReader(pointer.sources.get(0).path.toFile());
@@ -89,6 +95,12 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
           src.regions = ImmutableList.of(new SourcePointer.Region(0, fSize));
         }
         for (SourcePointer.Region region : src.regions) {
+          if (src.isAscii) {
+            // Optimization for pure-ASCII sources, where we don't need to do any mapping
+            region.start += baseOffset;
+            region.end = Math.min(region.end + baseOffset, fSize + baseOffset);
+            continue;
+          }
           // Make region offsets relative to the beginning of the first file
           region.start += baseOffset;
           if (region.end < 0) {
@@ -115,7 +127,9 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
           region.end = charOffset;
         }
         // Determine character offset of the end of the file
-        if (byteOffset != baseOffset + fSize) {
+        if (src.isAscii) {
+          byteOffset += fSize;
+        } else if (byteOffset != baseOffset + fSize) {
           int len = (baseOffset + fSize) - byteOffset;
           byte[] dst = new byte[len];
           byteOffset += fChan.read(ByteBuffer.wrap(dst));
