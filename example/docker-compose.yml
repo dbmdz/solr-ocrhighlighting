@@ -1,11 +1,12 @@
 version: '2'
 services:
   solr:
-    build: solr
+    image: solr:8.2
     ports:
       - "1044:1044"  # Debugging port
       - "8983:8983"  # Solr admin interface
     volumes:
+      - ./solr/install-plugin.sh:/docker-entrypoint-initdb.d/install-plugin.sh
       - ./solr/core:/opt/core-config
       - index-data:/var/solr/data
       - ./data:/data

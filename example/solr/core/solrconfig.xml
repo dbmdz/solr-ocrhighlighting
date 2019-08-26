@@ -3,7 +3,7 @@
   <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
   <schemaFactory class="ClassicIndexSchemaFactory"/>
 
-  <lib dir="/opt/solr/contrib/ocrsearch/lib" regex=".*\.jar" />
+  <lib dir="/var/solr/data/plugins" regex=".*\.jar" />
 
   <searchComponent class="de.digitalcollections.solrocr.solr.OcrHighlightComponent"
                    name="ocrHighlight" />
