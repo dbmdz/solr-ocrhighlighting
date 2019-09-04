@@ -67,7 +67,7 @@ If you run into problems, a look into these sections of the Solr user's guide mi
 - [RequestHandlers and SearchComponents in SolrConfig](https://lucene.apache.org/solr/guide/8_1/requesthandlers-and-searchcomponents-in-solrconfig.html)
 
 
-## Schema 
+## Schema
 
 In the core's `schema.xml`, you need to:
 
@@ -113,3 +113,9 @@ difference that there are two extra *character filters* at the beginning of your
 
 If you struggle with setting up your schema, a look into the [Schema Design](https://lucene.apache.org/solr/guide/8_1/documents-fields-and-schema-design.html)
 chapter of the Solr user's guide might be helpful.
+
+!!! caution "No support for multi-valued fields"
+    Due to certain limitations in Lucene/Solr, it is currently **not possible
+    to use multi-valued fields for OCR highlighting**. You can work around
+    this by leveraging some of the advanced features of [source pointers](./indexing.md),
+    though.
