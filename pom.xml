@@ -53,7 +53,7 @@
     <version.assertj-json>1.2.0</version.assertj-json>
     <version.byteseek>2.0.3</version.byteseek>
     <version.commons-text>1.7</version.commons-text>
-    <version.junit>5.5.1</version.junit>
+    <version.junit>5.5.2</version.junit>
     <version.log4j>2.11.1</version.log4j>
     <version.slf4j>1.7.28</version.slf4j>
     <version.solr>8.2.0</version.solr>
