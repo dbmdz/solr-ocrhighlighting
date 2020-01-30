@@ -8,6 +8,7 @@ import de.digitalcollections.solrocr.formats.OcrSnippet;
 import de.digitalcollections.solrocr.formats.alto.AltoFormat;
 import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
 import de.digitalcollections.solrocr.formats.mini.MiniOcrFormat;
+import de.digitalcollections.solrocr.legacy.MultiTermHighlightingLegacy;
 import de.digitalcollections.solrocr.solr.OcrHighlightParams;
 import de.digitalcollections.solrocr.util.FileBytesCharIterator;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
@@ -40,6 +41,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.uhighlight.LabelledCharArrayMatcher;
 import org.apache.lucene.search.uhighlight.PassageScorer;
 import org.apache.lucene.search.uhighlight.PhraseHelper;
 import org.apache.lucene.search.uhighlight.UHComponents;
@@ -57,6 +59,7 @@ import org.apache.solr.common.params.SolrParams;
  */
 public class OcrHighlighter extends UnifiedHighlighter {
 
+  private static final CharacterRunAutomaton[] ZERO_LEN_AUTOMATA_ARRAY_LEGACY = new CharacterRunAutomaton[0];
   private static final IndexSearcher EMPTY_INDEXSEARCHER;
   private static final Set<OcrFormat> FORMATS = ImmutableSet.of(
       new HocrFormat(),
@@ -294,31 +297,65 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   private OcrFieldHighlighter getOcrFieldHighlighter(String field, Query query, Set<Term> allTerms, int maxPassages) {
+    // This method and some associated types changed in v8.2 and v8.4, so we have to delegate to an adapter method for
+    // these versions
+    if (Version.LATEST.major < 8 || (Version.LATEST.major == 8  && Version.LATEST.minor < 4)) {
+      return getOcrFieldHighligherLegacy(field, query, allTerms, maxPassages);
+    }
+
     Predicate<String> fieldMatcher = getFieldMatcher(field);
     BytesRef[] terms = filterExtractedTerms(fieldMatcher, allTerms);
     Set<HighlightFlag> highlightFlags = getFlags(field);
     PhraseHelper phraseHelper = getPhraseHelper(field, query, highlightFlags);
-    CharacterRunAutomaton[] automata = getAutomata(field, query, highlightFlags);
+    LabelledCharArrayMatcher[] automata = getAutomata(field, query, highlightFlags);
+
+    UHComponents components = new UHComponents(
+        field, fieldMatcher, query, terms, phraseHelper, automata, hasUnrecognizedQuery(fieldMatcher, query),
+        highlightFlags);
+    OffsetSource offsetSource = getOptimizedOffsetSource(components);
+    return new OcrFieldHighlighter(
+        field, getOffsetStrategy(offsetSource, components),
+        getScorer(field), maxPassages, getMaxNoHighlightPassages(field));
+  }
+
+  private OcrFieldHighlighter getOcrFieldHighligherLegacy(
+      String field, Query query, Set<Term> allTerms,  int maxPassages) {
+    Predicate<String> fieldMatcher = getFieldMatcher(field);
+    BytesRef[] terms = filterExtractedTerms(fieldMatcher, allTerms);
+    Set<HighlightFlag> highlightFlags = getFlags(field);
+    PhraseHelper phraseHelper = getPhraseHelper(field, query, highlightFlags);
+    CharacterRunAutomaton[] automata = getAutomataLegacy(field, query, highlightFlags);
 
     // Obtaining these two values has changed with Solr 8.2, so we need to do some reflection for older versions
     OffsetSource offsetSource;
     UHComponents components;
     if (Version.LATEST.major < 8 || (Version.LATEST.major == 8  && Version.LATEST.minor < 2)) {
-      offsetSource = this.getOffsetSourceLegacy(field, terms, phraseHelper, automata);
-      components = this.getUHComponentsLegacy(
+      offsetSource = this.getOffsetSourcePre82(field, terms, phraseHelper, automata);
+      components = this.getUHComponentsPre82(
           field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
     } else {
-      components = new UHComponents(
-          field, fieldMatcher, query, terms, phraseHelper, automata, hasUnrecognizedQuery(fieldMatcher, query),
-          highlightFlags);
-      offsetSource = getOptimizedOffsetSource(components);
+      components = this.getUHComponentsPre84(
+          field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
+      offsetSource = this.getOptimizedOffsetSource(components);
     }
     return new OcrFieldHighlighter(
         field, getOffsetStrategy(offsetSource, components),
         getScorer(field), maxPassages, getMaxNoHighlightPassages(field));
   }
 
-  private OffsetSource getOffsetSourceLegacy(String field, BytesRef[] terms, PhraseHelper phraseHelper,
+  private CharacterRunAutomaton[] getAutomataLegacy(String field, Query query, Set<HighlightFlag> highlightFlags) {
+    // do we "eagerly" look in span queries for automata here, or do we not and let PhraseHelper handle those?
+    // if don't highlight phrases strictly,
+    final boolean lookInSpan =
+        !highlightFlags.contains(HighlightFlag.PHRASES) // no PhraseHelper
+            || highlightFlags.contains(HighlightFlag.WEIGHT_MATCHES); // Weight.Matches will find all
+
+    return highlightFlags.contains(HighlightFlag.MULTI_TERM_QUERY)
+        ? MultiTermHighlightingLegacy.extractAutomata(query, getFieldMatcher(field), lookInSpan)
+        : ZERO_LEN_AUTOMATA_ARRAY_LEGACY;
+  }
+
+  private OffsetSource getOffsetSourcePre82(String field, BytesRef[] terms, PhraseHelper phraseHelper,
                                             CharacterRunAutomaton[] automata) {
     try {
       Method offsetSourceGetter = UnifiedHighlighter.class.getDeclaredMethod(
@@ -331,7 +368,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   @SuppressWarnings("JavaReflectionMemberAccess")
-  private UHComponents getUHComponentsLegacy(
+  private UHComponents getUHComponentsPre82(
       String field, Predicate<String> fieldMatcher, Query query, BytesRef[] terms, PhraseHelper phraseHelper,
       CharacterRunAutomaton[] automata, Set<HighlightFlag> highlightFlags) {
     try {
@@ -340,6 +377,22 @@ public class OcrHighlighter extends UnifiedHighlighter {
           CharacterRunAutomaton[].class, Set.class);
       return componentsConstructor.newInstance(
           field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("JavaReflectionMemberAccess")
+  private UHComponents getUHComponentsPre84(
+      String field, Predicate<String> fieldMatcher, Query query, BytesRef[] terms, PhraseHelper phraseHelper,
+      CharacterRunAutomaton[] automata, Set<HighlightFlag> highlightFlags) {
+    try {
+      Constructor<UHComponents> componentsConstructor = UHComponents.class.getDeclaredConstructor(
+          String.class, Predicate.class, Query.class, BytesRef[].class, PhraseHelper.class,
+          CharacterRunAutomaton[].class, boolean.class, Set.class);
+      return componentsConstructor.newInstance(
+          field, fieldMatcher, query, terms, phraseHelper, automata, hasUnrecognizedQuery(fieldMatcher, query),
+          highlightFlags);
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
