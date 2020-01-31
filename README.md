@@ -17,7 +17,7 @@ values. This means that all options and query types supported by the
 works transparently with non-OCR fields and just lets the default
 implementation handle those.
 
-The plugin **works with all Solr versions >= 7.x** (tested with 7.6, 7.7 and 8.0).
+The plugin **works with all Solr versions >= 7.5**.
 
 ## Features
 - Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/formats/) directly without preprocessing

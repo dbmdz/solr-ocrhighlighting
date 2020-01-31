@@ -1,0 +1,27 @@
+<schema name="coordinateHighlight" version="1.0">
+  <types>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
+      <analyzer type="index">
+        <charFilter class="de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory" />
+        <charFilter class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory" />
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+  </types>
+
+  <fields>
+    <field name="id"              type="string"   multiValued="false" indexed="true" stored="true" required="true" />
+    <field name="ocr_text"        type="text_ocr" multiValued="false" indexed="true" stored="true" />
+  </fields>
+  <uniqueKey>id</uniqueKey>
+</schema>
