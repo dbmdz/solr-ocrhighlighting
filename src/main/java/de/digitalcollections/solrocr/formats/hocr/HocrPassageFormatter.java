@@ -1,21 +1,24 @@
 package de.digitalcollections.solrocr.formats.hocr;
 
+import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
+import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.util.OcrBox;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.OcrBox;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 public class HocrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern wordPat = Pattern.compile(
       "<span class=['\"]ocrx_word['\"].+?title=['\"].*?"
       + "bbox (?<ulx>\\d+) (?<uly>\\d+) (?<lrx>\\d+) (?<lry>\\d+);?.*?>(?<text>.+?)</span>");
-  private final static Pattern pagePat = Pattern.compile(
-      "<div.+?class=['\"]ocr_page['\"].+?(?:id=['\"](?<pageId>.+?)['\"]|ppageno (?<pageNo>\\d+))");
+  private final static Pattern pageElemPat = Pattern.compile("<div.+?class=['\"]ocr_page['\"] ?(?<attribs>.+?)>");
+  private final static Pattern pageIdPat = Pattern.compile(
+      "(?:id=['\"](?<id>.+?)['\"]|x_source (?<source>.+?)['\";]|ppageno (?<pageno>\\d+))");
 
   private final HocrClassBreakIterator pageIter;
   private final String startHlTag;
@@ -28,28 +31,42 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
     this.endHlTag = endHlTag;
   }
 
+  private String getPageId(String pageAttribs) {
+    if (pageAttribs == null) {
+      return null;
+    }
+    Matcher idMatch = pageIdPat.matcher(pageAttribs);
+    if (idMatch.find()) {
+      return Stream.of("id", "source", "pageno")
+          .map(idMatch::group)
+          .filter(StringUtils::isNotEmpty)
+          .findFirst().orElse(null);
+    }
+    return null;
+  }
+
   @Override
   public String determineStartPage(String ocrFragment, int startOffset, IterableCharSequence content) {
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
         pageOffset, Math.min(pageOffset + 256, content.length())).toString();
-    Matcher m = pagePat.matcher(pageFragment);
-    if (m.find()) {
-      String pageId = m.group("pageId");
-      if (pageId == null) {
-        pageId = m.group("pageNo");
-      }
-      return pageId;
+    String pageId = getPageId(pageFragment);
+    if (StringUtils.isEmpty(pageId)) {
+      pageId = String.format("_unknown_%d", pageOffset);
     }
-    return null;
+    return pageId;
   }
 
   private TreeMap<Integer, String> determinePageBreaks(String ocrFragment) {
     TreeMap<Integer, String> map = new TreeMap<>();
-    Matcher m = pagePat.matcher(ocrFragment);
+    Matcher m = pageElemPat.matcher(ocrFragment);
     while (m.find()) {
-      map.put(m.start(), m.group("pageId"));
+      String pageId = getPageId(m.group("attribs"));
+      if (StringUtils.isEmpty(pageId)) {
+        pageId = String.format("_unknown_%d", m.start());
+      }
+      map.put(m.start(), pageId);
     }
     return map;
   }
