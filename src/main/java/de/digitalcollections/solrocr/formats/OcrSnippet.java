@@ -1,15 +1,17 @@
 package de.digitalcollections.solrocr.formats;
 
+import de.digitalcollections.solrocr.util.OcrBox;
+import de.digitalcollections.solrocr.util.OcrPage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
-import de.digitalcollections.solrocr.util.OcrBox;
 
 /** A structured representation of a highlighted OCR snippet. */
 public class OcrSnippet {
   private final String text;
+  private final List<OcrPage> pages;
   private final List<OcrBox> snippetRegions;
   private final List<OcrBox[]> highlightRegions;
   private float score;
@@ -17,10 +19,12 @@ public class OcrSnippet {
   /**
    * Create a new snippet on the given region on the page along with its plaintext.
    * @param text plaintext version of the highlighted page text with highlighting tags
+   * @param pages Pages this snippet appears on
    * @param snippetRegions regions the snippet is located in
    */
-  public OcrSnippet(String text, List<OcrBox> snippetRegions) {
+  public OcrSnippet(String text, List<OcrPage> pages, List<OcrBox> snippetRegions) {
     this.text = text;
+    this.pages = pages;
     this.snippetRegions = snippetRegions;
     this.highlightRegions = new ArrayList<>();
   }
@@ -65,10 +69,14 @@ public class OcrSnippet {
   }
 
   /** Convert the snippet to a {@link NamedList} that is used by Solr to populate the response. */
+  @SuppressWarnings("rawtypes")
   public NamedList toNamedList() {
     SimpleOrderedMap m = new SimpleOrderedMap();
     m.add("text", this.getText());
     m.add("score", this.getScore());
+    NamedList[] pageEntries = this.pages.stream()
+        .map(OcrPage::toNamedList).toArray(NamedList[]::new);
+    m.add("pages", pageEntries);
     NamedList[] snips = this.snippetRegions.stream()
         .map(OcrBox::toNamedList).toArray(NamedList[]::new);
     m.add("regions", snips);

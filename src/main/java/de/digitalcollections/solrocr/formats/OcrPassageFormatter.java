@@ -3,6 +3,7 @@ package de.digitalcollections.solrocr.formats;
 import com.google.common.collect.ImmutableSet;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
 import de.digitalcollections.solrocr.util.OcrBox;
+import de.digitalcollections.solrocr.util.OcrPage;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayDeque;
@@ -13,6 +14,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -53,7 +56,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     mergedMatches.add(sortedMatches.removeFirst());
     while (!sortedMatches.isEmpty()) {
       PassageMatch candidate = sortedMatches.removeFirst();
-      if (mergedMatches.peekLast().overlaps(candidate)) {
+      if (!mergedMatches.isEmpty() && mergedMatches.peekLast().overlaps(candidate)) {
         mergedMatches.peekLast().merge(candidate);
       } else {
         mergedMatches.add(candidate);
@@ -113,8 +116,8 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       }
     }
     String xmlFragment = sb.toString();
-    String pageId = determineStartPage(xmlFragment, passage.getStartOffset(), content);
-    OcrSnippet snip = parseFragment(xmlFragment, pageId);
+    OcrPage page = determineStartPage(xmlFragment, passage.getStartOffset(), content);
+    OcrSnippet snip = parseFragment(xmlFragment, page);
     if (snip != null) {
       snip.setScore(passage.getScore());
     }
@@ -137,13 +140,14 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     }
   }
 
-  /** Determine the id of the page an OCR fragment resides on. */
-  public abstract String determineStartPage(String ocrFragment, int startOffset, IterableCharSequence content);
+  /** Determine the page an OCR fragment resides on. */
+  public abstract OcrPage determineStartPage(String ocrFragment, int startOffset, IterableCharSequence content);
 
   /** Parse an {@link OcrSnippet} from an OCR fragment. */
-  protected OcrSnippet parseFragment(String ocrFragment, String pageId) {
+  protected OcrSnippet parseFragment(String ocrFragment, OcrPage page) {
     List<List<OcrBox>> hlBoxes = new ArrayList<>();
-    List<OcrBox> allBoxes = this.parseWords(ocrFragment, pageId);
+    TreeMap<Integer, OcrPage> pages = this.parsePages(ocrFragment);
+    List<OcrBox> allBoxes = this.parseWords(ocrFragment, pages, page.id);
     if (allBoxes.isEmpty()) {
       return null;
     }
@@ -171,8 +175,17 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     List<OcrBox> snippetRegions = grouped.entrySet().stream()
         .map(e -> determineSnippetRegion(e.getValue(), e.getKey()))
         .collect(Collectors.toList());
+    Set<String> snippetPageIds = snippetRegions.stream()
+        .map(OcrBox::getPageId).collect(Collectors.toSet());
+    List<OcrPage> allPages = new ArrayList<>();
+    allPages.add(page);
+    allPages.addAll(pages.values());
+    List<OcrPage> snippetPages = allPages.stream()
+        .filter(p -> snippetPageIds.contains(p.id))
+        .distinct()
+        .collect(Collectors.toList());
 
-    OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), snippetRegions);
+    OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), snippetPages, snippetRegions);
     this.addHighlightsToSnippet(hlBoxes, snip);
     return snip;
   }
@@ -187,7 +200,14 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
 
 
   /** Parse word boxes from an OCR fragment. */
-  protected abstract List<OcrBox> parseWords(String ocrFragment, String startPage);
+  protected abstract List<OcrBox> parseWords(String ocrFragment, TreeMap<Integer, OcrPage> pages, String startPage);
+
+  /** Parse pages and their offsets from an OCR fragment.
+   *
+   * The type needs to be a TreeMap, since the downstream tasks need to find keys close to each other,
+   * which is much more efficient with this type.
+   */
+  protected abstract TreeMap<Integer, OcrPage> parsePages(String ocrFragment);
 
   protected void addHighlightsToSnippet(List<List<OcrBox>> hlBoxes, OcrSnippet snippet) {
     for (OcrBox region : snippet.getSnippetRegions()) {

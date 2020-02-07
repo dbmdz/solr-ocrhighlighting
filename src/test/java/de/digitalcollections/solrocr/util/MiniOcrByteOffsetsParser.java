@@ -1,12 +1,9 @@
 package de.digitalcollections.solrocr.util;
 
 import com.google.common.collect.Streams;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +29,7 @@ public class MiniOcrByteOffsetsParser {
   private static int getClosingOffsetFrom(byte[] ocrBytes, char tag, int fromOffset) {
     final Searcher<SequenceMatcher> searcher = new SequenceMatcherSearcher(new ByteSequenceMatcher(
         "</" + tag + ">"));
-    final ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<SequenceMatcher>(
+    final ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<>(
         searcher, ocrBytes, fromOffset);
     if (!it.hasNext()) {
       throw new IllegalArgumentException("Invalid MiniOCR, could not find closing tag for '" + tag + "'");
@@ -55,7 +52,8 @@ public class MiniOcrByteOffsetsParser {
     return (int) it.next().get(0).getMatchPosition();
   }
 
-  public static List<Pair<String, Integer>> parse(byte[] ocrBytes, int startOffset, String firstId, String lastId) throws IOException {
+  @SuppressWarnings("UnstableApiUsage")
+  public static List<Pair<String, Integer>> parse(byte[] ocrBytes, int startOffset, String firstId, String lastId) {
     if (firstId != null) {
       startOffset = getIdOffset(ocrBytes, startOffset, firstId);
     }
@@ -104,14 +102,5 @@ public class MiniOcrByteOffsetsParser {
       os.write(pair.getLeft().getBytes(StandardCharsets.UTF_8));
       os.write(String.format("⚑%d ", pair.getRight()).getBytes(StandardCharsets.UTF_8));
     }
-  }
-
-  public static void main(String[] args) throws IOException {
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    long start = System.nanoTime();
-    parse(Files.readAllBytes(Paths.get("src/test/resources/data/31337_utf8ocr.xml")), bos, "28");
-    System.out.println(String.format("Parsing took %.2fms", (System.nanoTime() - start) / 1e6));
-    String text = bos.toString(StandardCharsets.UTF_8.toString());
-    System.out.println(text);
   }
 }

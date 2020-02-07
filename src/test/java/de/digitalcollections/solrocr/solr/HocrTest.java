@@ -24,7 +24,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(commit());
   }
 
-  private static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
+  private static SolrQueryRequest xmlQ(String... extraArgs) {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
         .put("hl", "true")
         .put("hl.ocr.fl", "ocr_text")
@@ -91,7 +91,13 @@ public class HocrTest extends SolrTestCaseJ4 {
     @Test
   public void testPageNumberAtBeginningOfPage() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"peramentvollere Glänzendere\"", "hl.weightMatches", "true");
-    assertQ(req, "//lst[@name='ocrHighlighting']//str[@name='page']/text()='page_109'");
+    assertQ(
+        req,
+        "count(//arr[@name='pages']/lst)=1",
+        "//arr[@name='pages']/lst/str[@name='id']/text()='page_109'",
+        "//arr[@name='pages']/lst/int[@name='width']/text()='1600'",
+        "//arr[@name='pages']/lst/int[@name='height']/text()='2389'",
+        "//lst[@name='ocrHighlighting']//str[@name='page']/text()='page_109'");
   }
 
   @Test
@@ -131,6 +137,11 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertQ(
         req,
         "//str[@name='text'][1]/text()='einer Verwandten ihres zukünftigen Mannes, die im Auslande ſtudiert und kürzlich promoviert habe. Tief im Winter, Mitte Januar, reiſte <em>Max Werner zur Hochzeit</em> ſeiner Schweſter in die ruſſiſche Provinz. Dort, auf dem Gut von deren Freunden, wo eine Un- menge fremder Gäſte untergebracht waren, ſah er mitten'",
+        "count(//arr[@name='pages']/lst)=2",
+        "(//arr[@name='pages']/lst/str[@name='id'])[1]/text()='page_31'",
+        "(//arr[@name='pages']/lst/int[@name='width'])[1]/text()='1600'",
+        "(//arr[@name='pages']/lst/int[@name='height'])[1]/text()='2389'",
+        "(//arr[@name='pages']/lst/str[@name='id'])[2]/text()='page_32'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='page_31'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='page_32'",
         "count(//arr[@name='regions']/lst)=2");

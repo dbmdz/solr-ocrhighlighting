@@ -24,7 +24,7 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(commit());
   }
 
-  private static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
+  private static SolrQueryRequest xmlQ(String... extraArgs) {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
         .put("hl", "true")
         .put("hl.ocr.fl", "ocr_text")
@@ -78,6 +78,13 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertQ(
         req,
         "//str[@name='text'][1]/text()='kaldes, agter om 3 a 4 Dage at atseile berfea til Stokbolm, Hvorhen han medtager Fragtgods og Passagerer. naar Vedkom- mende behager at henvende dem til Megler H. <em>Jursensen. Permanent</em> Committee'",
+        "count(//arr[@name='pages']/lst)=2",
+        "(//arr[@name='pages']/lst/str[@name='id'])[1]/text()='PAGE1'",
+        "(//arr[@name='pages']/lst/int[@name='width'])[1]/text()='9148'",
+        "(//arr[@name='pages']/lst/int[@name='height'])[1]/text()='10928'",
+        "(//arr[@name='pages']/lst/str[@name='id'])[2]/text()='PAGE2'",
+        "(//arr[@name='pages']/lst/int[@name='width'])[2]/text()='2092'",
+        "(//arr[@name='pages']/lst/int[@name='height'])[2]/text()='3850'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='PAGE1'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='PAGE2'",
         "count(//arr[@name='regions']/lst)=2");

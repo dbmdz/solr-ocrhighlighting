@@ -3,6 +3,8 @@ package de.digitalcollections.solrocr.formats.hocr;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
 import de.digitalcollections.solrocr.util.OcrBox;
+import de.digitalcollections.solrocr.util.OcrPage;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -19,6 +21,7 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern pageElemPat = Pattern.compile("<div.+?class=['\"]ocr_page['\"] ?(?<attribs>.+?)>");
   private final static Pattern pageIdPat = Pattern.compile(
       "(?:id=['\"](?<id>.+?)['\"]|x_source (?<source>.+?)['\";]|ppageno (?<pageno>\\d+))");
+  private final static Pattern pageBboxPat = Pattern.compile("bbox 0 0 (?<width>\\d+) (?<height>\\d+)");
 
   private final HocrClassBreakIterator pageIter;
   private final String startHlTag;
@@ -31,56 +34,62 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
     this.endHlTag = endHlTag;
   }
 
-  private String getPageId(String pageAttribs) {
+  private OcrPage parsePage(String pageAttribs, int pagePos) {
+    String fallbackId = String.format("_unknown_%d", pagePos);
     if (pageAttribs == null) {
-      return null;
+      return new OcrPage(fallbackId, null);
     }
     Matcher idMatch = pageIdPat.matcher(pageAttribs);
+    String pageId = fallbackId;
     if (idMatch.find()) {
-      return Stream.of("id", "source", "pageno")
+      pageId = Stream.of("id", "source", "pageno")
           .map(idMatch::group)
           .filter(StringUtils::isNotEmpty)
-          .findFirst().orElse(null);
+          .findFirst().orElse(pageId);
+    }
+    Dimension pageDims = null;
+    Matcher boxMatch = pageBboxPat.matcher(pageAttribs);
+    if (boxMatch.find()) {
+      pageDims = new Dimension(
+          Integer.parseInt(boxMatch.group("width")),
+          Integer.parseInt(boxMatch.group("height")));
+    }
+    return new OcrPage(pageId, pageDims);
+  }
+
+  @Override
+  public OcrPage determineStartPage(String ocrFragment, int startOffset, IterableCharSequence content) {
+    pageIter.setText(content);
+    int pageOffset = pageIter.preceding(startOffset);
+    String pageFragment = content.subSequence(
+        pageOffset, Math.min(pageOffset + 256, content.length())).toString();
+    Matcher m = pageElemPat.matcher(pageFragment);
+    if (m.find()) {
+      return parsePage(m.group("attribs"), m.start());
     }
     return null;
   }
 
   @Override
-  public String determineStartPage(String ocrFragment, int startOffset, IterableCharSequence content) {
-    pageIter.setText(content);
-    int pageOffset = pageIter.preceding(startOffset);
-    String pageFragment = content.subSequence(
-        pageOffset, Math.min(pageOffset + 256, content.length())).toString();
-    String pageId = getPageId(pageFragment);
-    if (StringUtils.isEmpty(pageId)) {
-      pageId = String.format("_unknown_%d", pageOffset);
-    }
-    return pageId;
-  }
-
-  private TreeMap<Integer, String> determinePageBreaks(String ocrFragment) {
-    TreeMap<Integer, String> map = new TreeMap<>();
+  protected TreeMap<Integer, OcrPage> parsePages(String ocrFragment) {
+    TreeMap<Integer, OcrPage> map = new TreeMap<>();
     Matcher m = pageElemPat.matcher(ocrFragment);
     while (m.find()) {
-      String pageId = getPageId(m.group("attribs"));
-      if (StringUtils.isEmpty(pageId)) {
-        pageId = String.format("_unknown_%d", m.start());
-      }
-      map.put(m.start(), pageId);
+      OcrPage page = parsePage(m.group("attribs"), m.start());
+      map.put(m.start(), page);
     }
     return map;
   }
 
   @Override
-  protected List<OcrBox> parseWords(String ocrFragment, String startPage) {
+  protected List<OcrBox> parseWords(String ocrFragment, TreeMap<Integer, OcrPage> pages, String startPage) {
     List<OcrBox> wordBoxes = new ArrayList<>();
-    TreeMap<Integer, String> pageBreaks = determinePageBreaks(ocrFragment);
     Matcher m = wordPat.matcher(ocrFragment);
     boolean inHighlight = false;
     while (m.find()) {
       String pageId = startPage;
-      if (pageBreaks.floorKey(m.start()) != null) {
-        pageId = pageBreaks.floorEntry(m.start()).getValue();
+      if (pages.floorKey(m.start()) != null) {
+        pageId = pages.floorEntry(m.start()).getValue().id;
       }
       int x0 = Integer.parseInt(m.group("ulx"));
       int y0 = Integer.parseInt(m.group("uly"));

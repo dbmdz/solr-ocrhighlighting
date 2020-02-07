@@ -38,7 +38,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
     assertU(commit());
   }
 
-  protected static SolrQueryRequest xmlQ(String... extraArgs) throws Exception {
+  protected static SolrQueryRequest xmlQ(String... extraArgs) {
     Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
         .put("defType", "edismax")
         .put("hl", "true")
@@ -78,7 +78,10 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   public void testSingleTerm() throws Exception {
     SolrQueryRequest req = xmlQ("q", "München");
     assertQ(req,
-        "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=3",
+          "count(//lst[@name='31337']//arr[@name='pages']/lst)=3",
+            "//lst[@name='31337']//arr[@name='pages']/lst/int[@name='width']='1000'",
+            "//lst[@name='31337']//arr[@name='pages']/lst/int[@name='height']='2000'",
+            "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=3",
             "//str[@name='text'][1]/text()='Bayerische Staatsbibliothek <em>München</em>'",
             "//arr[@name='regions'][1]/lst/float[@name='ulx']/text()='0.4949'",
             "//arr[@name='regions'][1]/lst/float[@name='uly']/text()='0.0071'",
@@ -256,6 +259,11 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
     assertQ(
         req,
         "//str[@name='text'][1]/text()='5proc. Metall. 69, 00. 1854er Looſe –. Bankactien 797, 00. Nordbahn –. National-Anlehen 74, 10. Credit-Actien 177, 80. St. Eiſenb.-Actien-Cert. 182, 10. Galizier 197, 00. <em>London 108, 90. ien-Nachrichten</em>. i er in ſº. . . 1 eyhfü „Fºº Är º Heinr P? P. ſ º. - Empfehlen º Meyen ( - Leutloff mit -meraüren beenre-e-mehr-die-ergeben Ä-mein Gehrer u. Studirende!'",
+        "count(//arr[@name='pages']/lst)='2'",
+        "(//arr[@name='pages']/lst/str[@name='id'])[1]='9'",
+        "(//arr[@name='pages']/lst/int[@name='width'])[1]='2000'",
+        "(//arr[@name='pages']/lst/str[@name='id'])[2]='10'",
+        "(//arr[@name='pages']/lst/int[@name='width'])[2]='1500'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='9'",
         "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='10'",
         "(//arr[@name='regions']/lst/str[@name='page'])[1]='9'",
