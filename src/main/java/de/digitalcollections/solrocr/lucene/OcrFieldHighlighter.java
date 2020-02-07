@@ -65,7 +65,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
   }
   @Override
-  protected Passage[] highlightOffsetsEnums(OffsetsEnum off) throws IOException {
+  protected Passage[] highlightOffsetsEnums(OffsetsEnum off) {
     throw new UnsupportedOperationException();
   }
 
@@ -103,7 +103,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
       if (pageId != null) {
         String passagePageId = formatter.determineStartPage(
-            null, start, (IterableCharSequence) breakIter.getText());
+            null, start, (IterableCharSequence) breakIter.getText()).id;
         if (!passagePageId.equals(pageId)) {
           continue;
         }

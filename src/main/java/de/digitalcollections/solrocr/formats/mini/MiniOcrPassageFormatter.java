@@ -1,5 +1,13 @@
 package de.digitalcollections.solrocr.formats.mini;
 
+import com.google.common.base.Strings;
+import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
+import de.digitalcollections.solrocr.formats.OcrSnippet;
+import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.util.OcrBox;
+import de.digitalcollections.solrocr.util.OcrPage;
+import de.digitalcollections.solrocr.util.TagBreakIterator;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -8,16 +16,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.search.uhighlight.Passage;
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
-import de.digitalcollections.solrocr.formats.OcrSnippet;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.OcrBox;
-import de.digitalcollections.solrocr.util.TagBreakIterator;
 
 public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern wordPat = Pattern.compile(
       "<w x=\"(?<x>1?\\.?\\d+?) (?<y>1?\\.?\\d+?) (?<w>1?\\.?\\d+?) (?<h>1?\\.?\\d+?)\">(?<text>.+?)</w>");
-  private final static Pattern pagePat = Pattern.compile("<p xml:id=\"(?<pageId>.+?)\">");
+  private final static Pattern pagePat = Pattern.compile(
+      "<p xml:id=\"(?<pageId>.+?)\" ?(?:wh=\"(?<w>\\d+) (?<h>\\d+)\")?>");
 
   private final TagBreakIterator pageIter = new TagBreakIterator("p");
 
@@ -26,23 +30,40 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   }
 
   @Override
-  public String determineStartPage(String xmlFragment, int startOffset, IterableCharSequence content) {
+  public OcrPage determineStartPage(String xmlFragment, int startOffset, IterableCharSequence content) {
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
         pageOffset, Math.min(pageOffset + 128, content.length())).toString();
     Matcher m = pagePat.matcher(pageFragment);
     if (m.find()) {
-      return m.group("pageId");
+      Dimension dims = null;
+      if (!Strings.isNullOrEmpty(m.group("w")) && !Strings.isNullOrEmpty(m.group("h"))) {
+        try {
+          dims = new Dimension(Integer.parseInt(m.group("w")), Integer.parseInt(m.group("h")));
+        } catch (NumberFormatException e) {
+          // NOP, we only care about integer dimensions
+        }
+      }
+      return new OcrPage(m.group("pageId"), dims);
     }
     return null;
   }
 
-  private TreeMap<Integer, String> determinePageBreaks(String ocrFragment) {
-    TreeMap<Integer, String> map = new TreeMap<>();
+  @Override
+  protected TreeMap<Integer, OcrPage> parsePages(String ocrFragment) {
+    TreeMap<Integer, OcrPage> map = new TreeMap<>();
     Matcher m = pagePat.matcher(ocrFragment);
     while (m.find()) {
-      map.put(m.start(), m.group("pageId"));
+      Dimension dims = null;
+      if (!Strings.isNullOrEmpty(m.group("w")) && !Strings.isNullOrEmpty(m.group("h"))) {
+        try {
+          dims = new Dimension(Integer.parseInt(m.group("w")), Integer.parseInt(m.group("h")));
+        } catch (NumberFormatException e) {
+          // NOP, we only care about integer dimensions
+        }
+      }
+      map.put(m.start(), new OcrPage(m.group("pageId"), dims));
     }
     return map;
   }
@@ -76,20 +97,19 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   }
 
   @Override
-  protected List<OcrBox> parseWords(String ocrFragment, String startPage) {
+  protected List<OcrBox> parseWords(String ocrFragment, TreeMap<Integer, OcrPage> pages, String startPage) {
     List<OcrBox> wordBoxes = new ArrayList<>();
     boolean inHighlight = false;
-    TreeMap<Integer, String> pageBreaks = determinePageBreaks(ocrFragment);
     Matcher m = wordPat.matcher(ocrFragment);
     while (m.find()) {
       String pageId = startPage;
-      if (pageBreaks.floorKey(m.start()) != null) {
-        pageId = pageBreaks.floorEntry(m.start()).getValue();
+      if (pages.floorKey(m.start()) != null) {
+        pageId = pages.floorEntry(m.start()).getValue().id;
       }
-      float x = Float.valueOf(m.group("x"));
-      float y = Float.valueOf(m.group("y"));
-      float width = Float.valueOf(m.group("w"));
-      float height = Float.valueOf(m.group("h"));
+      float x = Float.parseFloat(m.group("x"));
+      float y = Float.parseFloat(m.group("y"));
+      float width = Float.parseFloat(m.group("w"));
+      float height = Float.parseFloat(m.group("h"));
       String text = StringEscapeUtils.unescapeXml(m.group("text"));
       if (text.contains(startHlTag)) {
         inHighlight = true;

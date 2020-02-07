@@ -1,5 +1,7 @@
 package de.digitalcollections.solrocr.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.ImmutableSet;
 import de.digitalcollections.solrocr.formats.hocr.HocrClassBreakIterator;
 import java.io.IOException;
@@ -12,8 +14,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class ContextBreakIteratorTest {
   private static final Path utf8Path = Paths.get("src/test/resources/data/miniocr.xml");
@@ -30,7 +30,7 @@ class ContextBreakIteratorTest {
     BreakIterator limitIter = new TagBreakIterator("b");
     ContextBreakIterator it = new ContextBreakIterator(baseIter, limitIter, 5);
     it.setText(seq);
-    int center = 16254;
+    int center = 16283;
     int start = it.preceding(center);
     int end = it.following(center);
     assertThat(start).isLessThan(end);

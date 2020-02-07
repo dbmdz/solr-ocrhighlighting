@@ -1,5 +1,11 @@
 package de.digitalcollections.solrocr.formats.alto;
 
+import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
+import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.util.OcrBox;
+import de.digitalcollections.solrocr.util.OcrPage;
+import de.digitalcollections.solrocr.util.TagBreakIterator;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +14,6 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.text.StringEscapeUtils;
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.OcrBox;
-import de.digitalcollections.solrocr.util.TagBreakIterator;
 
 public class AltoPassageFormatter extends OcrPassageFormatter {
 
@@ -36,24 +38,38 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     return attribs;
   }
 
+  private OcrPage parsePage(Map<String, String> attribs) {
+    Dimension dims = null;
+    if (attribs.containsKey("WIDTH") && attribs.containsKey("WIDTH")) {
+      try {
+        dims = new Dimension(Integer.parseInt(attribs.get("WIDTH")), Integer.parseInt(attribs.get("HEIGHT")));
+      } catch (NumberFormatException e) {
+        // NOP, we're only interested in integer dimensions
+      }
+    }
+    return new OcrPage(attribs.get("ID"), dims);
+  }
+
   @Override
-  public String determineStartPage(String ocrFragment, int startOffset, IterableCharSequence content) {
+  public OcrPage determineStartPage(String ocrFragment, int startOffset, IterableCharSequence content) {
     pageIter.setText(content);
     int pageOffset = pageIter.preceding(startOffset);
     String pageFragment = content.subSequence(
         pageOffset, Math.min(pageOffset + 512, content.length())).toString();
     Matcher m = pagePat.matcher(pageFragment);
     if (m.find()) {
-      return parseAttribs(m.group("attribs")).get("ID");
+      Map<String, String> attribs = parseAttribs(m.group("attribs"));
+      return parsePage(attribs);
     }
     return null;
   }
 
-  private TreeMap<Integer, String> determinePageBreaks(String ocrFragment) {
-    TreeMap<Integer, String> map = new TreeMap<>();
+  @Override
+  protected TreeMap<Integer, OcrPage> parsePages(String ocrFragment) {
+    TreeMap<Integer, OcrPage> map = new TreeMap<>();
     Matcher m = pagePat.matcher(ocrFragment);
     while (m.find()) {
-      map.put(m.start(), parseAttribs(m.group("attribs")).get("ID"));
+      map.put(m.start(), parsePage(parseAttribs(m.group("attribs"))));
     }
     return map;
   }
@@ -106,21 +122,20 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
   }
 
   @Override
-  protected List<OcrBox> parseWords(String ocrFragment, String startPage) {
+  protected List<OcrBox> parseWords(String ocrFragment, TreeMap<Integer, OcrPage> pages, String startPage) {
     // NOTE: We have to replace the original start/end highlight tags with non-XML placeholders so we don't break
     //       our rudimentary XML "parsing" to get to the attributes
     ocrFragment = ocrFragment
         .replaceAll(startHlTag, START_HL)
         .replaceAll(endHlTag, END_HL);
-    TreeMap<Integer, String> pageBreaks = determinePageBreaks(ocrFragment);
     List<OcrBox> wordBoxes = new ArrayList<>();
     Matcher m = wordPat.matcher(ocrFragment);
     boolean inHighlight = false;
     boolean highlightHyphenEnd = false;
     while (m.find()) {
       String pageId = startPage;
-      if (pageBreaks.floorKey(m.start()) != null) {
-        pageId = pageBreaks.floorEntry(m.start()).getValue();
+      if (pages.floorKey(m.start()) != null) {
+        pageId = pages.floorEntry(m.start()).getValue().id;
       }
       Map<String, String> attribs = parseAttribs(m.group("attribs"));
       int x = Integer.parseInt(attribs.get("HPOS"));
