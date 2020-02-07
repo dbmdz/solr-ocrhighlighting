@@ -1,3 +1,14 @@
+## 0.3.2 (tbd.)
+
+- Fix compatibility with Solr/Lucene 8.4
+- Fix compatibility with Solr/Lucene 7.6
+- Add new `pages` key to snippet response with page dimensions
+- hocr: Add support for retrieving page identifier from `x_source` an `ppageno` properties
+- hocr: Strip out title tag during indexing and highlighting
+- Improve performance when parsing ASCII-only input documents
+- Log warnings during source pointer parsing
+- Filter out empty files during indexing
+
 ## 0.3.1 (2019-07-26)
 
 This is patch release that fixes compatibility with Solr/Lucene 8.2.
