@@ -14,6 +14,9 @@ and its position on the page at query time:
           "return from an observation of the tran­sit of Venus, at the Cape of "
           "Good Hope, where they",
   "score":5555104.5,
+  "pages": [
+    { "id":  "page_380", "width":  1436, "height":  2427 } 
+  ],
   "regions":[
     { "ulx":196, "uly":1703, "lrx":1232, "lry":1968, "page":"page_380" }
   ],

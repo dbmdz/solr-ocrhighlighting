@@ -43,6 +43,9 @@ The objects contained unter the `snippets` key are structured like this:
           "return from an observation of the tran­sit of Venus, at the Cape of "
           "Good Hope, where they",
   "score": 5555104.5,
+  "pages": [
+    { "id":  "page_380", "width":  1436, "height":  2427 } 
+  ],
   "regions": [
     { "ulx": 196, "uly": 1703, "lrx": 1232, "lry": 1968, "page": "page_380" }
   ],
@@ -57,6 +60,8 @@ The objects contained unter the `snippets` key are structured like this:
 - `text` contains the plain text of the region containing one or more matches. The matches themselves are wrapped
   in `<em>` tags (this can be customized with the `hl.tag.pre` and `hl.tag.post` parameters).
 - `score` contains the numerical score (relative to the whole document) that Solr assigned to the snippet
+- `pages` contains a list of pages the snippet appears on along with their pixel dimensions. This can be useful
+  for rendering highlights, e.g. if the highlighting target image is scaled down from the source image.
 - `regions` contains a list of regions that the snippet is located on. Usually this will contain only one item,
   but in cases where a phrase spans multiple pages, it will contain a region for every page involved in the match.
   The object includes coordinates for all four corners it is defined by, as well as the identifier of the `page` the
