@@ -5,10 +5,12 @@
 
 import difflib
 import json
+import os
 import sys
 from urllib import request
 from urllib.parse import quote
 
+SOLR_HOST = os.environ.get('SOLR_HOST', 'localhost')
 HOCR_DOC = {"id": "test-hocr", "ocr_text": "/ocr-data/hocr.html"}
 HOCR_SNIPS = [
     {
@@ -64,25 +66,25 @@ class SolrException(Exception):
 
 def index_documents(solr_port, docs):
     req = request.Request(
-        "http://localhost:{}/solr/ocr/update?softCommit=true".format(solr_port),
+        "http://{}:{}/solr/ocr/update?softCommit=true".format(SOLR_HOST, solr_port),
         data=json.dumps(docs).encode("utf8"),
         headers={"Content-Type": "application/json"},
     )
     resp = request.urlopen(req)
     if resp.status >= 400:
-        raise SolrException(json.loads(resp.read()), docs)
+        raise SolrException(json.loads(resp.read().decode('utf8')), docs)
 
 
 def run_query(solr_port, query):
     req = request.Request(
-        'http://localhost:{}/solr/ocr/select?fl=id&hl=on&hl.ocr.fl=ocr_text&hl.weightMatches=true&q=ocr_text:"{}"'.format(
-            solr_port, quote(query)
+        'http://{}:{}/solr/ocr/select?fl=id&hl=on&hl.ocr.fl=ocr_text&hl.weightMatches=true&q=ocr_text:"{}"'.format(
+            SOLR_HOST, solr_port, quote(query)
         )
     )
     resp = request.urlopen(req)
     if resp.status >= 400:
-        raise SolrException(json.loads(resp.read()), None)
-    return json.loads(resp.read())
+        raise SolrException(json.loads(resp.read().decode('utf8')), None)
+    return json.loads(resp.read().decode('utf8'))
 
 
 def diff_snippets(fixture, actual):
@@ -125,6 +127,7 @@ def main(solr_port):
         print("INTEGRATION TESTS FAILED")
         sys.exit(1)
     else:
+        print("INTEGRATION TESTS SUCCESSFUL")
         sys.exit(0)
 
 
