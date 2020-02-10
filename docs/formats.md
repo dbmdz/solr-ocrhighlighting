@@ -21,7 +21,7 @@ query parameters](query.md#params) to control how snippets are generated.
 | Block     | hOCR class                  | notes                            |
 | --------- | --------------------------- | -------------------------------- |
 | Word      | `ocrx_word`                 | needs to have a `bbox` attribute with the coordinates on the page |
-| Page      | `ocr_page`                  | needs to have an `id` attribute with a page identifier or a `ppageno` or `x_source` entry in the `title` attribute |
+| Page      | `ocr_page`                  | needs to have a page identifier, either in `id` attribute or in the `ppageno` or `x_source` entry in the `title` attribute |
 | Block     | `ocr_carea`/`ocrx_block`    |                                  |
 | Section   | `ocr_chapter`/`ocr_section`/<br>`ocr_subsection`/`ocr_subsubsection` | |
 | Paragraph | `ocr_par`                   |                                  |
@@ -73,6 +73,6 @@ A basic example looks like this:
 | Word      | `<w/>`       | needs to have `box` attribute with `{x} {y} {width} {height}`. <br>Values can be integers or floats between 0 and 1 |
 | Line      | `<l/>`       |                                  |
 | Block     | `<b/>`       |                                  |
-| Page      | `<p/>`       | needs to have an `id` attribute with a page identifier |
+| Page      | `<p/>`       | needs to have an `id` attribute with a page identifier. Optionally can have a `wh` attribute with the `{width} {height}` values for the page |
 | Section   | *not mapped* |                                  |
 | Paragraph | *not mapped* |                                  |
