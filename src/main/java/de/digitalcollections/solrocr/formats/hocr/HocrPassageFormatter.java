@@ -18,7 +18,7 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   private final static Pattern wordPat = Pattern.compile(
       "<span class=['\"]ocrx_word['\"].+?title=['\"].*?"
       + "bbox (?<ulx>\\d+) (?<uly>\\d+) (?<lrx>\\d+) (?<lry>\\d+);?.*?>(?<text>.+?)</span>");
-  private final static Pattern pageElemPat = Pattern.compile("<div.+?class=['\"]ocr_page['\"] ?(?<attribs>.+?)>");
+  private final static Pattern pageElemPat = Pattern.compile("<div.+?class=['\"]ocr_page['\"]\\s*(?<attribs>.+?)>");
   private final static Pattern pageIdPat = Pattern.compile(
       "(?:id=['\"](?<id>.+?)['\"]|x_source (?<source>.+?)['\";]|ppageno (?<pageno>\\d+))");
   private final static Pattern pageBboxPat = Pattern.compile("bbox 0 0 (?<width>\\d+) (?<height>\\d+)");
