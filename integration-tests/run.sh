@@ -54,3 +54,5 @@ for version in $SOLR7_VERSIONS; do
     docker stop "ocrhltest-$version" > /dev/null
     docker rm "ocrhltest-$version" > /dev/null
 done
+
+echo "INTEGRATION TESTS SUCCEEDED"

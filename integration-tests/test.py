@@ -129,7 +129,6 @@ def main(solr_port):
         print("INTEGRATION TESTS FAILED")
         sys.exit(1)
     else:
-        print("INTEGRATION TESTS SUCCESSFUL")
         sys.exit(0)
 
 
