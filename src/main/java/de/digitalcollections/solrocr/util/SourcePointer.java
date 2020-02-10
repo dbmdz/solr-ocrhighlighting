@@ -80,12 +80,12 @@ public class SourcePointer {
     if (!isPointer(pointer)) {
       throw new RuntimeException("Could not parse pointer: " + pointer);
     }
-    return new SourcePointer(Arrays.stream(pointer.split("\\+"))
+    List<FileSource> fileSources = Arrays.stream(pointer.split("\\+"))
         .map(ptr -> {
           Matcher m = POINTER_PAT.matcher(ptr);
           m.find();
           Path sourcePath = Paths.get(m.group("path"));
-          List<SourcePointer.Region> regions = ImmutableList.of();
+          List<Region> regions = ImmutableList.of();
           if (m.group("regions") != null) {
             regions = Arrays.stream(m.group("regions").split(","))
                 .map(SourcePointer::parseRegion)
@@ -97,7 +97,12 @@ public class SourcePointer {
           } catch (IOException e) {
             return null;
           }
-        }).filter(Objects::nonNull).collect(Collectors.toList()));
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+    if (fileSources.isEmpty()) {
+      return null;
+    } else {
+      return new SourcePointer(fileSources);
+    }
   }
 
   private static SourcePointer.Region parseRegion(String r) {
