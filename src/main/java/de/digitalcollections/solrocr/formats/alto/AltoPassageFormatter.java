@@ -40,7 +40,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
 
   private OcrPage parsePage(Map<String, String> attribs) {
     Dimension dims = null;
-    if (attribs.containsKey("WIDTH") && attribs.containsKey("WIDTH")) {
+    if (attribs.containsKey("WIDTH") && attribs.containsKey("HEIGHT")) {
       try {
         dims = new Dimension(Integer.parseInt(attribs.get("WIDTH")), Integer.parseInt(attribs.get("HEIGHT")));
       } catch (NumberFormatException e) {
