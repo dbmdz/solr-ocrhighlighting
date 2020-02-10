@@ -35,17 +35,19 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   }
 
   private OcrPage parsePage(String pageAttribs, int pagePos) {
-    String fallbackId = String.format("_unknown_%d", pagePos);
+    RuntimeException noPageIdExc = new RuntimeException("Pages must have an identifier, check your source files!");
     if (pageAttribs == null) {
-      return new OcrPage(fallbackId, null);
+      throw noPageIdExc;
     }
     Matcher idMatch = pageIdPat.matcher(pageAttribs);
-    String pageId = fallbackId;
+    String pageId;
     if (idMatch.find()) {
       pageId = Stream.of("id", "source", "pageno")
           .map(idMatch::group)
           .filter(StringUtils::isNotEmpty)
-          .findFirst().orElse(pageId);
+          .findFirst().orElseThrow(() -> noPageIdExc);
+    } else {
+      throw noPageIdExc;
     }
     Dimension pageDims = null;
     Matcher boxMatch = pageBboxPat.matcher(pageAttribs);
