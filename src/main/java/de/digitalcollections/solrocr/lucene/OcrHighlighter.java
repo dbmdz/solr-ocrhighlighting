@@ -54,12 +54,15 @@ import org.apache.lucene.util.Version;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link UnifiedHighlighter} variant to support generating snippets with text coordinates from OCR data and
  * lazy-loading field values from external storage.
  */
 public class OcrHighlighter extends UnifiedHighlighter {
+  private static final Logger log = LoggerFactory.getLogger(OcrHighlighter.class);
 
   private static final CharacterRunAutomaton[] ZERO_LEN_AUTOMATA_ARRAY_LEGACY = new CharacterRunAutomaton[0];
   private static final IndexSearcher EMPTY_INDEXSEARCHER;
@@ -268,9 +271,15 @@ public class OcrHighlighter extends UnifiedHighlighter {
           int snippetLimit = Math.max(
               maxPassages[fieldIdx],
               params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
-          resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
-              leafReader, docId, breakIter, formatter, content,
-              params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
+          try {
+            resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
+                leafReader, docId, breakIter, formatter, content,
+                params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
+          } catch (RuntimeException e) {
+            // This catch-all prevents OCR highlighting from failing the complete query, instead users
+            // get an error message in their Solr log.
+            log.error("Could not highlight OCR content for document", e);
+          }
           snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
         }
       }
