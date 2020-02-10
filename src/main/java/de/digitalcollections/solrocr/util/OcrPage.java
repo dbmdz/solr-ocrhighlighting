@@ -1,6 +1,7 @@
 package de.digitalcollections.solrocr.util;
 
 import java.awt.Dimension;
+import java.util.Objects;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
@@ -10,6 +11,7 @@ public class OcrPage {
   public final Dimension dimensions;
 
   public OcrPage(String id, Dimension dimensions) {
+    Objects.requireNonNull(id, "Pages need to have an identifier, check your source files!");
     this.id = id;
     this.dimensions = dimensions;
   }
