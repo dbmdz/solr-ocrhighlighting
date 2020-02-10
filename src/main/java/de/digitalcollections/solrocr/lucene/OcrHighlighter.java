@@ -315,22 +315,29 @@ public class OcrHighlighter extends UnifiedHighlighter {
       for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {
         String fieldName = fields[fieldIdx];
         String fieldValue = docIdVisitor.getDocument().get(fieldName);
-        if (fieldValue != null) {
-          if (SourcePointer.isPointer(fieldValue)) {
-            SourcePointer sourcePointer = SourcePointer.parse(fieldValue);
-            if (sourcePointer.sources.size() == 1) {
-              ocrVals[fieldIdx] = new FileBytesCharIterator(
-                  sourcePointer.sources.get(0).path, StandardCharsets.UTF_8);
-            } else {
-              ocrVals[fieldIdx] = new MultiFileBytesCharIterator(
-                  sourcePointer.sources.stream().map(s -> s.path).collect(Collectors.toList()),
-                  StandardCharsets.UTF_8);
-            }
-          } else {
-            ocrVals[fieldIdx] = IterableCharSequence.fromString(fieldValue);
-          }
-        } else {
+        if (fieldValue == null) {
+          // No OCR content at all
           ocrVals[fieldIdx] = null;
+          continue;
+        }
+        if (!SourcePointer.isPointer(fieldValue)) {
+          // OCR content as stored text
+          ocrVals[fieldIdx] = IterableCharSequence.fromString(fieldValue);
+          continue;
+        }
+        SourcePointer sourcePointer = SourcePointer.parse(fieldValue);
+        if (sourcePointer == null) {
+          // None of the files in the pointer exist or were readable, log should have warnings
+          ocrVals[fieldIdx] = null;
+          continue;
+        }
+        if (sourcePointer.sources.size() == 1) {
+          ocrVals[fieldIdx] = new FileBytesCharIterator(
+              sourcePointer.sources.get(0).path, StandardCharsets.UTF_8);
+        } else {
+          ocrVals[fieldIdx] = new MultiFileBytesCharIterator(
+              sourcePointer.sources.stream().map(s -> s.path).collect(Collectors.toList()),
+              StandardCharsets.UTF_8);
         }
       }
       fieldValues.add(ocrVals);
