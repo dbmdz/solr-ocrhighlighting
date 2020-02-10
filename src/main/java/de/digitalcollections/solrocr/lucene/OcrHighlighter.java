@@ -346,8 +346,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   private OcrFormat getFormat(IterableCharSequence content) throws IOException {
-    // Sample the first 2k characters to determine the format
-    String sampleChunk = content.subSequence(0, Math.min(2048, content.length())).toString();
+    // Sample the first 4k characters to determine the format
+    String sampleChunk = content.subSequence(0, Math.min(4096, content.length())).toString();
     return FORMATS.stream()
         .filter(fmt -> fmt.hasFormat(sampleChunk))
         .findFirst()
