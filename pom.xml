@@ -60,7 +60,7 @@
 
     <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.1.1</version.maven-javadoc-plugin>
-    <version.maven-shade-plugin>3.2.1</version.maven-shade-plugin>
+    <version.maven-shade-plugin>3.2.2</version.maven-shade-plugin>
     <version.maven-source-plugin>3.2.1</version.maven-source-plugin>
     <version.junit-platform-maven>1.0.0-M5</version.junit-platform-maven>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
