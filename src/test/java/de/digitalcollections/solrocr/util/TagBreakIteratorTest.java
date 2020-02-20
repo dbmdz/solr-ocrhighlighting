@@ -1,5 +1,7 @@
 package de.digitalcollections.solrocr.util;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.StringReader;
@@ -10,8 +12,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class TagBreakIteratorTest {
 
@@ -24,7 +24,7 @@ class TagBreakIteratorTest {
 
   @Test
   void firstNext() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8);
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
     TagBreakIterator it = new TagBreakIterator("w");
     it.setText(seq);
     int start = it.next();
@@ -37,7 +37,7 @@ class TagBreakIteratorTest {
 
   @Test
   void next() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8);
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
     TagBreakIterator it = new TagBreakIterator("w");
     it.setText(seq);
     seq.setIndex(8267);

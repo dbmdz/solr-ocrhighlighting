@@ -22,14 +22,16 @@ public class FileBytesCharIterator implements IterableCharSequence {
   private final MappedByteBuffer buf;
   private final int numBytes;
   private final Charset charset;
+  private final SourcePointer ptr;
 
   private int current;
 
-  public FileBytesCharIterator(Path path) throws IOException {
-    this(path, StandardCharsets.UTF_8);
+  public FileBytesCharIterator(Path path, SourcePointer ptr) throws IOException {
+    this(path, StandardCharsets.UTF_8, ptr);
   }
 
-  public FileBytesCharIterator(Path path, Charset charset) throws IOException {
+  public FileBytesCharIterator(Path path, Charset charset, SourcePointer ptr) throws IOException {
+    this.ptr = ptr;
     this.charset = charset;
     this.filePath = path;
     FileChannel channel = (FileChannel) Files.newByteChannel(path, StandardOpenOption.READ);
@@ -54,7 +56,7 @@ public class FileBytesCharIterator implements IterableCharSequence {
   }
 
   public FileBytesCharIterator(FileBytesCharIterator other) throws IOException {
-    this(other.filePath, other.charset);
+    this(other.filePath, other.charset, other.ptr);
     this.current = other.current;
   }
 
@@ -238,5 +240,10 @@ public class FileBytesCharIterator implements IterableCharSequence {
   @Override
   public Charset getCharset() {
     return this.charset;
+  }
+
+  @Override
+  public SourcePointer getPointer() {
+    return ptr;
   }
 }

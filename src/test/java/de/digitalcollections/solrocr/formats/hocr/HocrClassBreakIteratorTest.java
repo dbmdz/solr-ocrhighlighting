@@ -1,5 +1,7 @@
 package de.digitalcollections.solrocr.formats.hocr;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.ImmutableSet;
 import de.digitalcollections.solrocr.util.FileBytesCharIterator;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
@@ -13,8 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class HocrClassBreakIteratorTest {
   private static final Path utf8Path = Paths.get("src/test/resources/data/hocr.html");
 
@@ -25,7 +25,7 @@ class HocrClassBreakIteratorTest {
 
   @Test
   void firstNext() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8);
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
     HocrClassBreakIterator it = new HocrClassBreakIterator("ocrx_word");
     it.setText(seq);
     int start = it.next();
@@ -37,7 +37,7 @@ class HocrClassBreakIteratorTest {
 
   @Test
   void next() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8);
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
     HocrClassBreakIterator it = new HocrClassBreakIterator("ocrx_word");
     it.setText(seq);
     seq.setIndex(670861);

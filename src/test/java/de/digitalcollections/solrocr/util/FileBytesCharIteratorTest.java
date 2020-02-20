@@ -1,5 +1,7 @@
 package de.digitalcollections.solrocr.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,8 +16,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class FileBytesCharIteratorTest {
   private static final Pattern OFFSET_PAT = Pattern.compile("\\s(.+?)⚑(\\d+)");
 
@@ -24,7 +24,7 @@ class FileBytesCharIteratorTest {
   private FileBytesCharIterator it;
 
   public FileBytesCharIteratorTest() throws IOException {
-    it = new FileBytesCharIterator(ocrPath);
+    it = new FileBytesCharIterator(ocrPath, null);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     MiniOcrByteOffsetsParser.parse(Files.readAllBytes(ocrPath), bos);
     String text = bos.toString(StandardCharsets.UTF_8.toString());

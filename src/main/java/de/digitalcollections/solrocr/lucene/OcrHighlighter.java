@@ -13,6 +13,7 @@ import de.digitalcollections.solrocr.util.FileBytesCharIterator;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
 import de.digitalcollections.solrocr.util.MultiFileBytesCharIterator;
 import de.digitalcollections.solrocr.util.OcrHighlightResult;
+import de.digitalcollections.solrocr.util.PageCacheWarmer;
 import de.digitalcollections.solrocr.util.SourcePointer;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -340,13 +341,14 @@ public class OcrHighlighter extends UnifiedHighlighter {
           ocrVals[fieldIdx] = null;
           continue;
         }
+        PageCacheWarmer.preload(sourcePointer);
         if (sourcePointer.sources.size() == 1) {
           ocrVals[fieldIdx] = new FileBytesCharIterator(
-              sourcePointer.sources.get(0).path, StandardCharsets.UTF_8);
+              sourcePointer.sources.get(0).path, StandardCharsets.UTF_8, sourcePointer);
         } else {
           ocrVals[fieldIdx] = new MultiFileBytesCharIterator(
               sourcePointer.sources.stream().map(s -> s.path).collect(Collectors.toList()),
-              StandardCharsets.UTF_8);
+              StandardCharsets.UTF_8, sourcePointer);
         }
       }
       fieldValues.add(ocrVals);

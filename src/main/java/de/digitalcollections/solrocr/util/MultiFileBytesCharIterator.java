@@ -20,6 +20,7 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
   private final Map<Path, Integer> pathToOffset;
   private final Charset charset;
   private final int numBytes;
+  private final SourcePointer ptr;
   private int current;
 
   private final LoadingCache<Path, FileBytesCharIterator> subiters = CacheBuilder.newBuilder()
@@ -27,11 +28,12 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
       .build(new CacheLoader<Path, FileBytesCharIterator>() {
         @Override
         public FileBytesCharIterator load(Path p) throws Exception {
-          return new FileBytesCharIterator(p, charset);
+          return new FileBytesCharIterator(p, charset, ptr);
         }
       });
 
-  public MultiFileBytesCharIterator(List<Path> filePaths, Charset charset) throws IOException {
+  public MultiFileBytesCharIterator(List<Path> filePaths, Charset charset, SourcePointer ptr) throws IOException {
+    this.ptr = ptr;
     this.paths = filePaths;
     this.charset = charset;
     this.offsetMap = new TreeMap<>();
@@ -46,7 +48,7 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
   }
 
   public MultiFileBytesCharIterator(MultiFileBytesCharIterator other) throws IOException {
-    this(other.paths, other.charset);
+    this(other.paths, other.charset, other.ptr);
     this.current = other.current;
   }
 
@@ -76,6 +78,11 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
   @Override
   public Charset getCharset() {
     return charset;
+  }
+
+  @Override
+  public SourcePointer getPointer() {
+    return ptr;
   }
 
   @Override
