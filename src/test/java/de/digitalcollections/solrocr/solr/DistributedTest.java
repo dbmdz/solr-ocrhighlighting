@@ -1,12 +1,20 @@
 package de.digitalcollections.solrocr.solr;
 
+import com.carrotsearch.randomizedtesting.annotations.ThreadLeakFilters;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.lucene.util.QuickPatchThreadsFilter;
 import org.apache.solr.BaseDistributedSearchTestCase;
+import org.apache.solr.SolrIgnoredThreadsFilter;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+@ThreadLeakFilters(defaultFilters = true, filters = {
+    SolrIgnoredThreadsFilter.class,
+    QuickPatchThreadsFilter.class,
+    CustomThreadsFilter.class
+})
 public class DistributedTest extends BaseDistributedSearchTestCase {
 
   @Override
