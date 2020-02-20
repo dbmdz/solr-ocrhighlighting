@@ -25,7 +25,7 @@ class ContextBreakIteratorTest {
 
   @Test
   void testContext() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8);
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
     BreakIterator baseIter = new TagBreakIterator("w");
     BreakIterator limitIter = new TagBreakIterator("b");
     ContextBreakIterator it = new ContextBreakIterator(baseIter, limitIter, 5);
@@ -43,7 +43,7 @@ class ContextBreakIteratorTest {
   @Test
   void testContextHonorsLimits() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(Paths.get("src/test/resources/data/hocr.html"),
-                                                         StandardCharsets.UTF_8);
+                                                         StandardCharsets.UTF_8, null);
     BreakIterator baseIter = new HocrClassBreakIterator("ocr_line");
     BreakIterator limitIter = new HocrClassBreakIterator("ocrx_block");
     ContextBreakIterator it = new ContextBreakIterator(baseIter, limitIter, 5);

@@ -1,5 +1,7 @@
 package de.digitalcollections.solrocr.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,8 +16,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class MultiFileBytesCharIteratorTest {
   private static final Pattern OFFSET_PAT = Pattern.compile("\\s(.+?)⚑(\\d+)");
@@ -34,7 +34,7 @@ class MultiFileBytesCharIteratorTest {
   private String asciiText;
 
   public MultiFileBytesCharIteratorTest() throws IOException {
-    utf8It = new MultiFileBytesCharIterator(utfPaths, StandardCharsets.UTF_8);
+    utf8It = new MultiFileBytesCharIterator(utfPaths, StandardCharsets.UTF_8, null);
     utf8CompletePath = Paths.get("src/test/resources/data/multi_txt/complete.txt");
     utf8Text = new String(Files.readAllBytes(utf8CompletePath), StandardCharsets.UTF_8);
     Matcher m = OFFSET_PAT.matcher(new String(

@@ -3,6 +3,7 @@ package de.digitalcollections.solrocr.lucene;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.formats.OcrSnippet;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.util.PageCacheWarmer;
 import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.Arrays;
@@ -41,6 +42,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
                                            int snippetLimit)
       throws IOException {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
+
+    // Stop page cache pre-warming, we're doing the IO ourselves now
+    PageCacheWarmer.cancelPreload(content.getPointer());
     if (content.length() == 0) {
       return null; // nothing to do
     }

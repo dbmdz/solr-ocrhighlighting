@@ -24,6 +24,8 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
 
   Charset getCharset();
 
+  SourcePointer getPointer();
+
   static IterableCharSequence fromString(String string) {
     return new IterableStringCharSequence(string);
   }
@@ -136,6 +138,11 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
     @Override
     public Charset getCharset() {
       return StandardCharsets.UTF_16;
+    }
+
+    @Override
+    public SourcePointer getPointer() {
+      return null;
     }
   }
 }
