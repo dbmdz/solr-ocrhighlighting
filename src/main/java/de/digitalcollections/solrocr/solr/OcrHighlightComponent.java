@@ -1,11 +1,13 @@
 package de.digitalcollections.solrocr.solr;
 
+import de.digitalcollections.solrocr.util.PageCacheWarmer;
 import java.io.IOException;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.solr.core.CloseHook;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -29,6 +31,18 @@ public class OcrHighlightComponent extends org.apache.solr.handler.component.Hig
   public void inform(SolrCore core) {
     super.inform(core);
     this.ocrHighlighter = new SolrOcrHighlighter();
+
+    // Shut down the cache warming threads after closing of the core
+    core.addCloseHook(new CloseHook() {
+      @Override
+      public void preClose(SolrCore core) {
+      }
+
+      @Override
+      public void postClose(SolrCore core) {
+        PageCacheWarmer.shutdown();
+      }
+    });
   }
 
   @Override

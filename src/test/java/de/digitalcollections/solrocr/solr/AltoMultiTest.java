@@ -1,6 +1,5 @@
 package de.digitalcollections.solrocr.solr;
 
-import com.carrotsearch.randomizedtesting.annotations.ThreadLeakFilters;
 import com.google.common.collect.ImmutableMap;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,19 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.lucene.util.QuickPatchThreadsFilter;
-import org.apache.solr.SolrIgnoredThreadsFilter;
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.request.SolrQueryRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-@ThreadLeakFilters(defaultFilters = true, filters = {
-    SolrIgnoredThreadsFilter.class,
-    QuickPatchThreadsFilter.class,
-    CustomThreadsFilter.class
-})
 public class AltoMultiTest extends SolrTestCaseJ4 {
   @BeforeClass
   public static void beforeClass() throws Exception {
