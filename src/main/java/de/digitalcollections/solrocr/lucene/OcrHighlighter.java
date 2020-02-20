@@ -9,7 +9,9 @@ import de.digitalcollections.solrocr.formats.alto.AltoFormat;
 import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
 import de.digitalcollections.solrocr.formats.mini.MiniOcrFormat;
 import de.digitalcollections.solrocr.solr.OcrHighlightParams;
+import de.digitalcollections.solrocr.util.ExitingIterCharSeq;
 import de.digitalcollections.solrocr.util.FileBytesCharIterator;
+import de.digitalcollections.solrocr.util.HighlightTimeout;
 import de.digitalcollections.solrocr.util.IterableCharSequence;
 import de.digitalcollections.solrocr.util.MultiFileBytesCharIterator;
 import de.digitalcollections.solrocr.util.OcrHighlightResult;
@@ -26,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.index.BaseCompositeReader;
+import org.apache.lucene.index.ExitableDirectoryReader;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.FilterLeafReader;
 import org.apache.lucene.index.IndexReader;
@@ -55,6 +59,8 @@ import org.apache.lucene.util.Version;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
+import org.apache.solr.response.SolrQueryResponse;
+import org.apache.solr.search.SolrQueryTimeoutImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,7 +175,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   public OcrHighlightResult[] highlightOcrFields(
-      String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr) throws IOException {
+      String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr, Map<String, Object> respHeader)
+      throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
     }
@@ -179,6 +186,12 @@ public class OcrHighlighter extends UnifiedHighlighter {
     if (searcher == null) {
       throw new IllegalStateException("This method requires that an indexSearcher was passed in the "
                                     + "constructor.  Perhaps you mean to call highlightWithoutSearcher?");
+    }
+
+    Long timeAllowed = params.getLong(OcrHighlightParams.TIME_ALLOWED);
+    if (timeAllowed != null) {
+      HighlightTimeout.set(timeAllowed);
+      SolrQueryTimeoutImpl.set(timeAllowed);
     }
 
     // Sort docs & fields for sequential i/o
@@ -243,6 +256,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
           if (content == null) {
             continue;
           }
+          if (timeAllowed != null) {
+            content = new ExitingIterCharSeq(content, HighlightTimeout.getInstance());
+          }
           IndexReader indexReader =
               (fieldHighlighter.getOffsetSource() == OffsetSource.TERM_VECTORS
                   && indexReaderWithTermVecCache != null)
@@ -276,6 +292,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
             resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
                 leafReader, docId, breakIter, formatter, content,
                 params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
+          } catch (ExitingIterCharSeq.ExitingIterCharSeqException | ExitableDirectoryReader.ExitingReaderException e) {
+            log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
+            respHeader.put(SolrQueryResponse.RESPONSE_HEADER_PARTIAL_RESULTS_KEY, Boolean.TRUE);
+            resultByDocIn[docInIndex] = null;
           } catch (RuntimeException e) {
             // This catch-all prevents OCR highlighting from failing the complete query, instead users
             // get an error message in their Solr log.
@@ -288,6 +308,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }
     assert docIdIter.docID() == DocIdSetIterator.NO_MORE_DOCS
         || docIdIter.nextDoc() == DocIdSetIterator.NO_MORE_DOCS;
+    HighlightTimeout.reset();
+    SolrQueryTimeoutImpl.reset();
 
     OcrHighlightResult[] out = new OcrHighlightResult[docIds.length];
     for (int d=0; d < docIds.length; d++) {

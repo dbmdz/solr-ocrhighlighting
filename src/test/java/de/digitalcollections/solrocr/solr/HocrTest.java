@@ -173,4 +173,16 @@ public class HocrTest extends SolrTestCaseJ4 {
         "count(//arr[@name='regions']/lst)=2",
         "contains(//lst[@name='84']//arr[@name='snippets']/lst/str[@name='text']/text(), '<em>Vögelchen</em>')");
   }
+
+  @Test
+  public void testHighlightingTimeout() throws Exception {
+    // This test can only check for the worst case, since checking for partial results is unlikely to be stable across
+    // multiple environments due to timing issues.
+    SolrQueryRequest req = xmlQ("q", "Vögelchen", "hl.ocr.timeAllowed", "1");
+    assertQ(
+        req,
+        "//bool[@name='partialResults']='true'",
+        "count(//lst[@name='ocrHighlighting']/lst)=2",
+        "count(//arr[@name='snippets'])=0");
+  }
 }

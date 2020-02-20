@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.solr.BaseDistributedSearchTestCase;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,8 +28,8 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
     System.setProperty("solr.log.dir", "/tmp/debug-log-solr");
   }
 
-  @Test
-  public void testDistributedSearch() throws Exception {
+  @Before
+  public void before() throws Exception {
     del("*:*");
     index(
         "some_text",
@@ -43,6 +44,10 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
     index("ocr_text", ocrPath.toString(), "id", "31337");
     commit();
 
+  }
+
+  @Test
+  public void testDistributedSearch() throws Exception {
     QueryResponse resp = query(
         "q", "svadag",
         "hl", "true",
@@ -57,4 +62,24 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
     // NOTE: the `query` method itself also validates the response against a non-sharded setup, so we don't have to
     //       do a lot of assertions here, since the general case is already covered by the other tests.
   }
+
+  @Test
+  public void testDistributedTimeout() throws Exception {
+    QueryResponse resp = query(
+        "q", "svadag",
+        "hl", "true",
+        "hl.ocr.fl", "ocr_text",
+        "hl.usePhraseHighlighter", "true",
+        "df", "ocr_text",
+        "hl.ctxTag", "ocr_line",
+        "hl.ctxSize", "2",
+        "hl.snippets", "10",
+        "hl.ocr.timeAllowed", "-1",
+        "shards.tolerant", "true",
+        "fl", "id,score",
+        "sort", "score desc, id asc");
+    assertEquals(1, resp.getResults().getNumFound());
+    assertEquals(true, resp.getHeader().getBooleanArg("partialResults"));
+  }
+
 }
