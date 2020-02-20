@@ -1,6 +1,5 @@
 package de.digitalcollections.solrocr.util;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import de.digitalcollections.solrocr.util.SourcePointer.FileSource;
 import de.digitalcollections.solrocr.util.SourcePointer.Region;
@@ -42,12 +41,10 @@ public class PageCacheWarmer {
   // Set of pending preload operations for file sources, used to allow the cancelling of preloading tasks
   private static final Set<FileSource> pendingPreloads = ConcurrentHashMap.newKeySet(MAX_PENDING_JOBS);
 
-  private static final ExecutorService service = MoreExecutors.getExitingExecutorService(
-      new ThreadPoolExecutor(
-          NUM_THREADS, NUM_THREADS, 60L, TimeUnit.SECONDS, new LinkedBlockingDeque<>(MAX_PENDING_JOBS),
-          new ThreadFactoryBuilder().setNameFormat("solr-ocrhighlighting-cache-warmer-%d").build(),
-          new ThreadPoolExecutor.DiscardOldestPolicy()),
-      0, TimeUnit.MILLISECONDS);
+  private static final ExecutorService service = new ThreadPoolExecutor(
+      NUM_THREADS, NUM_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(MAX_PENDING_JOBS),
+      new ThreadFactoryBuilder().setNameFormat("solr-ocrhighlighting-cache-warmer-%d").build(),
+      new ThreadPoolExecutor.DiscardOldestPolicy());
 
 
   /**
@@ -98,5 +95,9 @@ public class PageCacheWarmer {
       return;
     }
     ptr.sources.forEach(pendingPreloads::remove);
+  }
+
+  public static void shutdown() {
+    service.shutdownNow();
   }
 }
