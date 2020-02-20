@@ -63,6 +63,9 @@ public class PageCacheWarmer {
         int remainingSize = region.end - region.start;
         while (remainingSize > 0 && pendingPreloads.contains(src)) {
           remainingSize -= channel.read(buf);
+          if (Thread.interrupted()) {
+            return;
+          }
         }
       }
     } catch (IOException e) {
