@@ -154,3 +154,11 @@ Additionally, the plugin allows you to customize various OCR-specific parameters
     The default is `100`. The practical result is that only the first `n` matches in a document will be considered
     for highlighting, i.e. if a more relevant passage occurs at the end of the document, it is more likely to not be
     considered if the total number of matches in the document exceeds this number.
+
+`hl.ocr.timeAllowed`:
+:   Due to the fact that generating highlighting snippets from disk can take a very long time, depending on the
+    number of documents and snippets, you can limit the time OCR highlighting should take. The parameter takes the
+    maximum allowed time in **milliseconds**. If the timeout is exceeded during highlighting, the document currently
+    being highlighted and any other remaining documents will be skipped. The highlighting response will then only
+    include snippets from documents that were highlighted before the timeout. The presence of partial results will be
+    indicated by the `partialOcrHighlights` key in the `responseHeader`.

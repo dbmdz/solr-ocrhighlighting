@@ -75,11 +75,9 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
         "hl.ctxSize", "2",
         "hl.snippets", "10",
         "hl.ocr.timeAllowed", "-1",
-        "shards.tolerant", "true",
-        "fl", "id,score",
-        "sort", "score desc, id asc");
+        "fl", "id,score");
     assertEquals(1, resp.getResults().getNumFound());
-    assertEquals(true, resp.getHeader().getBooleanArg("partialResults"));
+    assertEquals(true, resp.getHeader().getBooleanArg("partialOcrHighlights"));
   }
 
 }
