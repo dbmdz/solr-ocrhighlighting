@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
  * lazy-loading field values from external storage.
  */
 public class OcrHighlighter extends UnifiedHighlighter {
+
   private static final Logger log = LoggerFactory.getLogger(OcrHighlighter.class);
 
   private static final CharacterRunAutomaton[] ZERO_LEN_AUTOMATA_ARRAY_LEGACY = new CharacterRunAutomaton[0];
@@ -77,6 +78,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       new AltoFormat(),
       new MiniOcrFormat());
   private static final int DEFAULT_SNIPPET_LIMIT = 100;
+  public static final String PARTIAL_OCR_HIGHLIGHTS = "partialOcrHighlights";
 
   private static final boolean VERSION_IS_PRE81 = Version.LATEST.major < 8 || Version.LATEST.minor < 1;
   private static final boolean VERSION_IS_PRE82 = Version.LATEST.major < 8 || Version.LATEST.minor < 2;
@@ -293,7 +295,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                 params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
           } catch (ExitingIterCharSeq.ExitingIterCharSeqException | ExitableDirectoryReader.ExitingReaderException e) {
             log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
-            respHeader.put("partialOcrHighlights", Boolean.TRUE);
+            respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
             resultByDocIn[docInIndex] = null;
           } catch (RuntimeException e) {
             // This catch-all prevents OCR highlighting from failing the complete query, instead users
