@@ -1,6 +1,7 @@
 package de.digitalcollections.solrocr.solr;
 
 import de.digitalcollections.solrocr.util.PageCacheWarmer;
+import de.digitalcollections.solrocr.lucene.OcrHighlighter;
 import java.io.IOException;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrException;
@@ -103,9 +104,9 @@ public class OcrHighlightComponent extends org.apache.solr.handler.component.Hig
             continue;
           }
           NamedList<Object> rspHeader = (NamedList<Object>) srsp.getSolrResponse().getResponse().get("responseHeader");
-          Boolean partialHls = (Boolean) rspHeader.get("partialOcrHighlights");
+          Boolean partialHls = (Boolean) rspHeader.get(OcrHighlighter.PARTIAL_OCR_HIGHLIGHTS);
           if (partialHls != null && partialHls) {
-            rb.rsp.getResponseHeader().add("partialOcrHighlights", true);
+            rb.rsp.getResponseHeader().add(OcrHighlighter.PARTIAL_OCR_HIGHLIGHTS, true);
           }
         }
       }
