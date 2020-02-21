@@ -59,7 +59,6 @@ import org.apache.lucene.util.Version;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
-import org.apache.solr.response.SolrQueryResponse;
 import org.apache.solr.search.SolrQueryTimeoutImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -294,7 +293,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                 params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
           } catch (ExitingIterCharSeq.ExitingIterCharSeqException | ExitableDirectoryReader.ExitingReaderException e) {
             log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
-            respHeader.put(SolrQueryResponse.RESPONSE_HEADER_PARTIAL_RESULTS_KEY, Boolean.TRUE);
+            respHeader.put("partialOcrHighlights", Boolean.TRUE);
             resultByDocIn[docInIndex] = null;
           } catch (RuntimeException e) {
             // This catch-all prevents OCR highlighting from failing the complete query, instead users

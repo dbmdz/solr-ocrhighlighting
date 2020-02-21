@@ -181,7 +181,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "Vögelchen", "hl.ocr.timeAllowed", "1");
     assertQ(
         req,
-        "//bool[@name='partialResults']='true'",
+        "//bool[@name='partialOcrHighlights']='true'",
         "count(//lst[@name='ocrHighlighting']/lst)=2",
         "count(//arr[@name='snippets'])=0");
   }

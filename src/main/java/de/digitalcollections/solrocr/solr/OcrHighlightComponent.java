@@ -11,6 +11,8 @@ import org.apache.solr.core.CloseHook;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.handler.component.ResponseBuilder;
+import org.apache.solr.handler.component.ShardRequest;
+import org.apache.solr.handler.component.ShardResponse;
 import org.apache.solr.request.SolrQueryRequest;
 
 public class OcrHighlightComponent extends org.apache.solr.handler.component.HighlightComponent {
@@ -85,6 +87,28 @@ public class OcrHighlightComponent extends org.apache.solr.handler.component.Hig
         rb.rsp.add("highlighting", new SimpleOrderedMap<>());
       }
       rb.req.setParams(params);
+    }
+  }
+
+  @Override
+  public void finishStage(ResponseBuilder rb) {
+    super.finishStage(rb);
+    if (rb.doHighlights && rb.stage == ResponseBuilder.STAGE_GET_FIELDS) {
+      for (ShardRequest sreq : rb.finished) {
+        if ((sreq.purpose & ShardRequest.PURPOSE_GET_HIGHLIGHTS) == 0) continue;
+        for (ShardResponse srsp : sreq.responses) {
+          if (srsp.getException() != null) {
+            // can't expect the highlight content if there was an exception for this request
+            // this should only happen when using shards.tolerant=true
+            continue;
+          }
+          NamedList<Object> rspHeader = (NamedList<Object>) srsp.getSolrResponse().getResponse().get("responseHeader");
+          Boolean partialHls = (Boolean) rspHeader.get("partialOcrHighlights");
+          if (partialHls != null && partialHls) {
+            rb.rsp.getResponseHeader().add("partialOcrHighlights", true);
+          }
+        }
+      }
     }
   }
 
