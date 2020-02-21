@@ -244,6 +244,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     int[][] snippetCountsByField = new int[fields.length][docIds.length];
     // Highlight in doc batches determined by loadFieldValues (consumes from docIdIter)
     DocIdSetIterator docIdIter = asDocIdSetIterator(docIds);
+    docLoop:
     for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
       List<IterableCharSequence[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
 
@@ -297,6 +298,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
             log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
             respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
             resultByDocIn[docInIndex] = null;
+            // Stop highlighting
+            break docLoop;
           } catch (RuntimeException e) {
             // This catch-all prevents OCR highlighting from failing the complete query, instead users
             // get an error message in their Solr log.
