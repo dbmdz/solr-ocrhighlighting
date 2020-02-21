@@ -1,19 +1,24 @@
 package de.digitalcollections.solrocr.util;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import de.digitalcollections.solrocr.util.SourcePointer.FileSource;
 import de.digitalcollections.solrocr.util.SourcePointer.Region;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Utility to concurrently "warm" the OS page cache with files that will be used for highlighting.
  *
@@ -35,6 +40,8 @@ public class PageCacheWarmer {
   private static int NUM_THREADS = 8;
   private static int MAX_PENDING_JOBS = 128;
 
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
   // This is the read buffer for every worker thread, so we only do as many allocations as necessary
   private static ThreadLocal<ByteBuffer> BUF = ThreadLocal.withInitial(() -> ByteBuffer.allocate(BUF_SIZE));
 
@@ -52,15 +59,22 @@ public class PageCacheWarmer {
    * @param src file source
    */
   private static void preload(FileSource src) {
-    pendingPreloads.add(src);
     ByteBuffer buf = BUF.get();
     try (SeekableByteChannel channel = Files.newByteChannel(src.path, StandardOpenOption.READ)) {
-      for (Region region : src.regions) {
+      List<Region> regions;
+      if (src.regions.isEmpty()) {
+        regions = ImmutableList.of(new Region(0, (int) channel.size()));
+      } else {
+        regions = src.regions;
+      }
+      for (Region region : regions) {
         channel.position(region.start);
         int remainingSize = region.end - region.start;
-        while (remainingSize > 0 && pendingPreloads.contains(src)) {
+        while (remainingSize > 0) {
+          // Read and immediately clear the buffer, we don't need the data
           remainingSize -= channel.read(buf);
-          if (Thread.interrupted()) {
+          buf.clear();
+          if (Thread.interrupted() || !pendingPreloads.contains(src)) {
             return;
           }
         }
@@ -83,6 +97,7 @@ public class PageCacheWarmer {
       if (pendingPreloads.contains(source)) {
         continue;
       }
+      pendingPreloads.add(source);
       service.submit(() -> preload(source));
     }
   }
