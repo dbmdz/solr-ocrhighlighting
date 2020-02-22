@@ -1,4 +1,4 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.model;
 
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;

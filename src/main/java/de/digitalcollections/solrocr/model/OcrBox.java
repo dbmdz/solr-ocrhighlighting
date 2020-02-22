@@ -1,4 +1,4 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.model;
 
 import java.util.Comparator;
 import org.apache.solr.common.util.NamedList;

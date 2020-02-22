@@ -1,9 +1,9 @@
 package de.digitalcollections.solrocr.formats.hocr;
 
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.OcrBox;
-import de.digitalcollections.solrocr.util.OcrPage;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.model.OcrBox;
+import de.digitalcollections.solrocr.model.OcrPage;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;

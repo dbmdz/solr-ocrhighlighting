@@ -1,6 +1,6 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
-import de.digitalcollections.solrocr.util.SourcePointer;
+import de.digitalcollections.solrocr.model.SourcePointer;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.IOException;
 import java.io.Reader;

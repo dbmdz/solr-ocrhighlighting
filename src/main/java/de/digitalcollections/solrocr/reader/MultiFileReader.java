@@ -1,4 +1,4 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.reader;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

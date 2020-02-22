@@ -1,6 +1,5 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.model;
 
-import de.digitalcollections.solrocr.formats.OcrSnippet;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

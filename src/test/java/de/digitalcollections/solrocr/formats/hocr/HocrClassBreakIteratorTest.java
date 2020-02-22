@@ -3,8 +3,8 @@ package de.digitalcollections.solrocr.formats.hocr;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
-import de.digitalcollections.solrocr.util.FileBytesCharIterator;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.iter.FileBytesCharIterator;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;

@@ -1,5 +1,6 @@
-package de.digitalcollections.solrocr.formats;
+package de.digitalcollections.solrocr.model;
 
+import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import java.io.Reader;
 import java.text.BreakIterator;
 

@@ -1,4 +1,4 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.reader;
 
 import java.io.IOException;
 import java.io.Reader;

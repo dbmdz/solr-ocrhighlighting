@@ -1,8 +1,8 @@
 package de.digitalcollections.solrocr.lucene;
 
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
-import de.digitalcollections.solrocr.formats.OcrSnippet;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
+import de.digitalcollections.solrocr.model.OcrSnippet;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import de.digitalcollections.solrocr.util.PageCacheWarmer;
 import java.io.IOException;
 import java.text.BreakIterator;

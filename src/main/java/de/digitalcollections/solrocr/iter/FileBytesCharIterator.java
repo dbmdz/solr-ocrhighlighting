@@ -1,5 +1,6 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.iter;
 
+import de.digitalcollections.solrocr.model.SourcePointer;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;

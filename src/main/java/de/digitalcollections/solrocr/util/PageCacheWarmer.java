@@ -2,8 +2,9 @@ package de.digitalcollections.solrocr.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import de.digitalcollections.solrocr.util.SourcePointer.FileSource;
-import de.digitalcollections.solrocr.util.SourcePointer.Region;
+import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.model.SourcePointer.FileSource;
+import de.digitalcollections.solrocr.model.SourcePointer.Region;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;

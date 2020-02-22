@@ -1,5 +1,6 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.iter;
 
+import de.digitalcollections.solrocr.model.SourcePointer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.CharacterIterator;

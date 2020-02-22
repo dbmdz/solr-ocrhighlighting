@@ -1,8 +1,8 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
 import com.google.common.collect.ImmutableList;
-import de.digitalcollections.solrocr.util.MultiFileReader;
-import de.digitalcollections.solrocr.util.SourcePointer;
+import de.digitalcollections.solrocr.reader.MultiFileReader;
+import de.digitalcollections.solrocr.model.SourcePointer;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.BufferedReader;
 import java.io.File;
