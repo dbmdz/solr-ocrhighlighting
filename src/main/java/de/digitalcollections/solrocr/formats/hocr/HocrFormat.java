@@ -2,11 +2,11 @@ package de.digitalcollections.solrocr.formats.hocr;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import de.digitalcollections.solrocr.formats.OcrBlock;
-import de.digitalcollections.solrocr.formats.OcrFormat;
+import de.digitalcollections.solrocr.model.OcrBlock;
+import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.lucene.filters.DehyphenatingHtmlCharFilterFactory;
-import de.digitalcollections.solrocr.util.ContextBreakIterator;
+import de.digitalcollections.solrocr.iter.ContextBreakIterator;
 import java.io.Reader;
 import java.text.BreakIterator;
 import java.util.Collection;

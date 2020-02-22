@@ -1,4 +1,4 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.iter;
 
 import java.text.BreakIterator;
 import java.text.CharacterIterator;

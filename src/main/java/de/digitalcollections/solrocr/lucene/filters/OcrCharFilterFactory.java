@@ -1,11 +1,11 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
 import com.google.common.collect.ImmutableSet;
-import de.digitalcollections.solrocr.formats.OcrFormat;
+import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.formats.alto.AltoFormat;
 import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
 import de.digitalcollections.solrocr.formats.mini.MiniOcrFormat;
-import de.digitalcollections.solrocr.util.PeekingReader;
+import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.util.Map;
 import org.apache.lucene.analysis.util.CharFilterFactory;

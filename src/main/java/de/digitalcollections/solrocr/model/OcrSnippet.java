@@ -1,7 +1,5 @@
-package de.digitalcollections.solrocr.formats;
+package de.digitalcollections.solrocr.model;
 
-import de.digitalcollections.solrocr.util.OcrBox;
-import de.digitalcollections.solrocr.util.OcrPage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

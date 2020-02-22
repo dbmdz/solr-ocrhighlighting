@@ -1,9 +1,10 @@
 package de.digitalcollections.solrocr.formats;
 
 import com.google.common.collect.ImmutableSet;
-import de.digitalcollections.solrocr.util.IterableCharSequence;
-import de.digitalcollections.solrocr.util.OcrBox;
-import de.digitalcollections.solrocr.util.OcrPage;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.model.OcrBox;
+import de.digitalcollections.solrocr.model.OcrPage;
+import de.digitalcollections.solrocr.model.OcrSnippet;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayDeque;

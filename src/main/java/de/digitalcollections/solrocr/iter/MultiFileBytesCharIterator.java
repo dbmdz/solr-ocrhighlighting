@@ -1,8 +1,10 @@
-package de.digitalcollections.solrocr.util;
+package de.digitalcollections.solrocr.iter;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.util.Utf8;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;

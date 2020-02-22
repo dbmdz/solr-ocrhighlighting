@@ -1,7 +1,7 @@
 package de.digitalcollections.solrocr.solr;
 
 import de.digitalcollections.solrocr.lucene.OcrHighlighter;
-import de.digitalcollections.solrocr.util.OcrHighlightResult;
+import de.digitalcollections.solrocr.model.OcrHighlightResult;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashSet;

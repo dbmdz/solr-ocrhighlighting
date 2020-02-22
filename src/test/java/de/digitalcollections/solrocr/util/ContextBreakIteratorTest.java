@@ -4,6 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import de.digitalcollections.solrocr.formats.hocr.HocrClassBreakIterator;
+import de.digitalcollections.solrocr.iter.ContextBreakIterator;
+import de.digitalcollections.solrocr.iter.FileBytesCharIterator;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.iter.TagBreakIterator;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;

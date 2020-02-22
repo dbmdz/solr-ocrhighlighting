@@ -2,6 +2,7 @@ package de.digitalcollections.solrocr.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.digitalcollections.solrocr.iter.FileBytesCharIterator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

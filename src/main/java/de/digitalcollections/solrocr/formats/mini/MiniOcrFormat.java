@@ -1,12 +1,12 @@
 package de.digitalcollections.solrocr.formats.mini;
 
 import com.google.common.collect.ImmutableMap;
-import de.digitalcollections.solrocr.formats.OcrBlock;
-import de.digitalcollections.solrocr.formats.OcrFormat;
+import de.digitalcollections.solrocr.model.OcrBlock;
+import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.lucene.filters.DehyphenatingHtmlCharFilterFactory;
-import de.digitalcollections.solrocr.util.ContextBreakIterator;
-import de.digitalcollections.solrocr.util.TagBreakIterator;
+import de.digitalcollections.solrocr.iter.ContextBreakIterator;
+import de.digitalcollections.solrocr.iter.TagBreakIterator;
 import java.io.Reader;
 import java.text.BreakIterator;
 import java.util.Map;
