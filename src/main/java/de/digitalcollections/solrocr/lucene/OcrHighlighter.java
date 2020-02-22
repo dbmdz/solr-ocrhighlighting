@@ -367,7 +367,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
           ocrVals[fieldIdx] = null;
           continue;
         }
-        PageCacheWarmer.preload(sourcePointer);
+        // If preloading is enabled, start warming the cache for the pointer
+        PageCacheWarmer.getInstance().ifPresent(w -> w.preload(sourcePointer));
         if (sourcePointer.sources.size() == 1) {
           ocrVals[fieldIdx] = new FileBytesCharIterator(
               sourcePointer.sources.get(0).path, StandardCharsets.UTF_8, sourcePointer);

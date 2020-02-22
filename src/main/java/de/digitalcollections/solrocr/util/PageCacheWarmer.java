@@ -6,20 +6,18 @@ import de.digitalcollections.solrocr.model.SourcePointer;
 import de.digitalcollections.solrocr.model.SourcePointer.FileSource;
 import de.digitalcollections.solrocr.model.SourcePointer.Region;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Utility to concurrently "warm" the OS page cache with files that will be used for highlighting.
  *
@@ -37,30 +35,52 @@ import org.slf4j.LoggerFactory;
  * latency we might experience anyway.
  */
 public class PageCacheWarmer {
-  private static int BUF_SIZE = 32 * 1024;
-  private static int NUM_THREADS = 8;
-  private static int MAX_PENDING_JOBS = 128;
+  private static final int MAX_PENDING_JOBS = 128;
 
-  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  // The singleton instance of the cache warmer
+  private static PageCacheWarmer instance;
 
   // This is the read buffer for every worker thread, so we only do as many allocations as necessary
-  private static ThreadLocal<ByteBuffer> BUF = ThreadLocal.withInitial(() -> ByteBuffer.allocate(BUF_SIZE));
+  private final ThreadLocal<ByteBuffer> localBuf;
 
   // Set of pending preload operations for file sources, used to allow the cancelling of preloading tasks
-  private static final Set<FileSource> pendingPreloads = ConcurrentHashMap.newKeySet(MAX_PENDING_JOBS);
+  private final Set<FileSource> pendingPreloads = ConcurrentHashMap.newKeySet(MAX_PENDING_JOBS);
 
-  private static final ExecutorService service = new ThreadPoolExecutor(
-      NUM_THREADS, NUM_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(MAX_PENDING_JOBS),
-      new ThreadFactoryBuilder().setNameFormat("solr-ocrhighlighting-cache-warmer-%d").build(),
-      new ThreadPoolExecutor.DiscardOldestPolicy());
+  private final ExecutorService service;
 
+  /**
+   * Enable the page cache warmer.
+   *
+   * @param readBufSize Size of blocks to read for cache warming. Should match the block size of the underlying storage
+   *                    layer for best performance.
+   * @param numThreads Number of worker threads to use for cache warming. Should match the number of parallel I/O
+   *                   operations that are possible with the storage layer
+   */
+  public static void enable(int readBufSize, int numThreads) {
+    if (instance == null) {
+      instance = new PageCacheWarmer(readBufSize, numThreads);
+    }
+  }
+
+  public static Optional<PageCacheWarmer> getInstance() {
+    return Optional.ofNullable(instance);
+  }
+
+
+  private PageCacheWarmer(int bufSize, int numThreads) {
+    this.localBuf = ThreadLocal.withInitial(() -> ByteBuffer.allocate(bufSize));
+    this.service = new ThreadPoolExecutor(
+        numThreads, numThreads, 0, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(MAX_PENDING_JOBS),
+        new ThreadFactoryBuilder().setNameFormat("solr-ocrhighlighting-cache-warmer-%d").build(),
+        new ThreadPoolExecutor.DiscardOldestPolicy());
+  }
 
   /**
    * Reads the file source in 32KiB chunks
    * @param src file source
    */
-  private static void preload(FileSource src) {
-    ByteBuffer buf = BUF.get();
+  private void preload(FileSource src) {
+    ByteBuffer buf = localBuf.get();
     try (SeekableByteChannel channel = Files.newByteChannel(src.path, StandardOpenOption.READ)) {
       List<Region> regions;
       if (src.regions.isEmpty()) {
@@ -90,7 +110,7 @@ public class PageCacheWarmer {
   /**
    * Populate the OS page cache with the targets of the source pointer.
    */
-  public static void preload(SourcePointer ptr) {
+  public void preload(SourcePointer ptr) {
     if (ptr == null) {
       return;
     }
@@ -106,14 +126,14 @@ public class PageCacheWarmer {
   /**
    * Cancel all running and pending preloading tasks for the given source pointer.
    */
-  public static void cancelPreload(SourcePointer ptr) {
+  public void cancelPreload(SourcePointer ptr) {
     if (ptr == null) {
       return;
     }
     ptr.sources.forEach(pendingPreloads::remove);
   }
 
-  public static void shutdown() {
+  public void shutdown() {
     service.shutdownNow();
   }
 }
