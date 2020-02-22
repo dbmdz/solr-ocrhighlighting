@@ -34,16 +34,20 @@ public class OcrHighlightComponent extends org.apache.solr.handler.component.Hig
   public void inform(SolrCore core) {
     super.inform(core);
     this.ocrHighlighter = new SolrOcrHighlighter();
+    if ("true".equals(info.attributes.getOrDefault("enablePreload", "false"))) {
+      PageCacheWarmer.enable(
+          Integer.parseInt(info.attributes.getOrDefault("preloadReadSize", "32768")),
+          Integer.parseInt(info.attributes.getOrDefault("preloadConcurrency", "8")));
+    }
 
     // Shut down the cache warming threads after closing of the core
     core.addCloseHook(new CloseHook() {
       @Override
-      public void preClose(SolrCore core) {
-      }
+      public void preClose(SolrCore core) { }
 
       @Override
       public void postClose(SolrCore core) {
-        PageCacheWarmer.shutdown();
+        PageCacheWarmer.getInstance().ifPresent(PageCacheWarmer::shutdown);
       }
     });
   }

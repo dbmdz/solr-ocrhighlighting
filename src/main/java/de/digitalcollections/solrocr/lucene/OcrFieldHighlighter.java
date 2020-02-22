@@ -43,8 +43,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       throws IOException {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
 
-    // Stop page cache pre-warming, we're doing the IO ourselves now
-    PageCacheWarmer.cancelPreload(content.getPointer());
+    // If page cache pre-warming is enabled, cancel it, since we're doing the I/O ourselves now
+    PageCacheWarmer.getInstance().ifPresent(w -> w.cancelPreload(content.getPointer()));
     if (content.length() == 0) {
       return null; // nothing to do
     }
