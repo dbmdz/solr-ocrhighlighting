@@ -33,7 +33,10 @@ public class ContextBreakIterator extends BreakIterator {
 
   @Override
   public int next(int n) {
-    throw new UnsupportedOperationException();
+    for (int i=n; i > 0; i--) {
+      this.next();
+    }
+    return this.current();
   }
 
   @Override
