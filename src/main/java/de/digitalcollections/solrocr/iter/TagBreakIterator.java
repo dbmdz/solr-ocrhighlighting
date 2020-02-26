@@ -37,7 +37,7 @@ public class TagBreakIterator extends BreakIterator {
 
   @Override
   public int next(int n) {
-    for (int i=n; i > 0; i++) {
+    for (int i=n; i > 0; i--) {
       this.next();
     }
     return this.current;

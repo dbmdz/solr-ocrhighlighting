@@ -1,6 +1,7 @@
 package de.digitalcollections.solrocr.iter;
 
 import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.util.Fastu;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -18,8 +19,14 @@ import java.nio.file.StandardOpenOption;
  *             Please note that this means that this type will only work with {@link java.text.BreakIterator} types
  *             that don't mess with the index themselves.
  */
-public class FileBytesCharIterator implements IterableCharSequence {
+public class FileBytesCharIterator implements IterableCharSequence, AutoCloseable {
+  private static final short[] BYTES_TO_READ = new short[] {
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 2, 2, 3, 4
+  };
+
   private final Path filePath;  // For copy-constructor
+  private final FileChannel chan;
   private final MappedByteBuffer buf;
   private final int numBytes;
   private final Charset charset;
@@ -35,9 +42,9 @@ public class FileBytesCharIterator implements IterableCharSequence {
     this.ptr = ptr;
     this.charset = charset;
     this.filePath = path;
-    FileChannel channel = (FileChannel) Files.newByteChannel(path, StandardOpenOption.READ);
-    this.numBytes = (int) channel.size();
-    this.buf = channel.map(MapMode.READ_ONLY, 0, channel.size());
+    chan = (FileChannel) Files.newByteChannel(path, StandardOpenOption.READ);
+    this.numBytes = (int) chan.size();
+    this.buf = chan.map(MapMode.READ_ONLY, 0, chan.size());
     if (this.charset == StandardCharsets.UTF_8) {
       byte[] b = new byte[4];
       buf.get(b);
@@ -67,16 +74,20 @@ public class FileBytesCharIterator implements IterableCharSequence {
   }
 
   /** Move offset to the left until we're on an UTF8 starting byte **/
-  private int adjustOffset(int offset) {
-    if (offset == numBytes) {
-      return offset;
-    }
-    int b = this.buf.get(offset) & 0xFF;
+  private int adjustOffset(int b, int offset) {
     while ((b >> 6) == 0b10) {
       offset -= 1;
       b = this.buf.get(offset) & 0xFF;
     }
     return offset;
+  }
+
+  private int adjustOffset(int offset) {
+    if (offset == numBytes) {
+      return offset;
+    }
+    int b = this.buf.get(offset) & 0xFF;
+    return adjustOffset(b, offset);
   }
 
   /** Get character at the given byte offset.
@@ -97,28 +108,24 @@ public class FileBytesCharIterator implements IterableCharSequence {
     }
 
     // Otherwise things get complicated...
-    int originalOffset = offset;
-    offset = adjustOffset(offset);
     int b = buf.get(offset) & 0xFF;  // bytes are signed in Java....
     if (b < 0x80) {
       // Optimization: It's just ASCII, so simply cast to a char
       return (char) b;
     }
-    int hiBits = (b >> 4) & 0xF;
-    int bytesToRead;
-    if (hiBits == 0xC || hiBits == 0xD) {
-      bytesToRead = 2;
-    } else if (hiBits == 0xE) {
-      bytesToRead = 3;
-    } else if (hiBits == 0xF) {
-      bytesToRead = 4;
-    } else {
+    int originalOffset = offset;
+    if ((b >> 6) == 0b10) {
+      offset = adjustOffset(b, offset);
+      b = buf.get(offset) & 0xFF;
+    }
+    int bytesToRead = BYTES_TO_READ[(b >> 4) & 0xF];
+    if (bytesToRead == 0) {
       throw new IllegalArgumentException("Invalid UTF8?");
     }
     byte[] buf = new byte[bytesToRead];
     this.buf.position(offset);
     this.buf.get(buf);
-    String s = new String(buf, StandardCharsets.UTF_8);
+    String s = Fastu.decode(buf);
     if (s.length() == 1 || ((originalOffset - offset) < 3)) {
       return s.charAt(0);
     } else {
@@ -246,5 +253,10 @@ public class FileBytesCharIterator implements IterableCharSequence {
   @Override
   public SourcePointer getPointer() {
     return ptr;
+  }
+
+  @Override
+  public void close() throws IOException {
+    chan.close();
   }
 }
