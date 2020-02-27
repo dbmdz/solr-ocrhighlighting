@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.CharacterIterator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,15 +44,6 @@ class FileBytesCharIteratorTest {
   }
 
   @Test
-  public void testCharAt() throws IOException {
-    // TODO: Test with file that has BOM
-    for (Entry<Integer, String> e : words.entrySet()) {
-      char c = it.charAt(e.getKey());
-      assertThat(c).isEqualTo(e.getValue().charAt(0));
-    }
-  }
-
-  @Test
   public void testSubSequence() {
     for (Entry<Integer, String> e : words.entrySet()) {
       int start = e.getKey();
@@ -77,53 +67,5 @@ class FileBytesCharIteratorTest {
     // TODO: Test with file that has multiple bytes for the last codepoint
     // TODO: Test with file that requires a surrogate pair for the last codepoint
     assertThat(it.last()).isEqualTo('\n');
-  }
-
-  @Test
-  public void testNext() throws IOException {
-    StringBuilder sb = new StringBuilder();
-    String text = new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8);
-    int start = 0;
-    int charIdx = 0;
-    char c = it.first();
-    sb.append(c);
-    charIdx++;
-    while ((c = it.next()) != CharacterIterator.DONE) {
-      sb.append(c);
-      charIdx++;
-      if (sb.length() == 100) {
-        assertThat(sb.toString()).isEqualTo(text.substring(start, charIdx));
-        start = charIdx;
-        sb = new StringBuilder();
-      }
-    }
-  }
-
-  @Test
-  public void testPrevious() throws IOException {
-    StringBuilder sb = new StringBuilder();
-    String text = new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8);
-    int end = text.length();
-    int charIdx = text.length();
-    char c = it.last();
-    sb.insert(0, c);
-    charIdx--;
-    while ((c = it.previous()) != CharacterIterator.DONE) {
-      sb.insert(0, c);
-      charIdx--;
-      if (sb.length() == 100) {
-        assertThat(sb.toString()).isEqualTo(text.substring(charIdx, end));
-        end = charIdx;
-        sb = new StringBuilder();
-      }
-    }
-  }
-
-  @Test
-  public void testSetIndex() throws IOException {
-    for (Entry<Integer, String> e : this.words.entrySet()) {
-      char c = it.setIndex(e.getKey());
-      assertThat(c).isEqualTo(e.getValue().charAt(0));
-    }
   }
 }

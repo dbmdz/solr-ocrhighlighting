@@ -1,7 +1,6 @@
 package de.digitalcollections.solrocr.iter;
 
 import de.digitalcollections.solrocr.model.SourcePointer;
-import de.digitalcollections.solrocr.util.Fastu;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -20,10 +19,6 @@ import java.nio.file.StandardOpenOption;
  *             that don't mess with the index themselves.
  */
 public class FileBytesCharIterator implements IterableCharSequence, AutoCloseable {
-  private static final short[] BYTES_TO_READ = new short[] {
-      0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 2, 2, 3, 4
-  };
 
   private final Path filePath;  // For copy-constructor
   private final FileChannel chan;
@@ -90,48 +85,26 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
     return adjustOffset(b, offset);
   }
 
-  /** Get character at the given byte offset.
+  /** Get ASCII character at the given byte offset.
    *
-   * Note that this will seek back if we're landing inside of a UTF-8 codepoint.
-   * Also, if the UTF-8 string results in an multi-char UTF-16 codepoint, this will return the first char if we're on
-   * the first to third byte of the UTF-8 sequence and the second char if we're on the fourth byte. (?? TODO correct ??)
+   * Note that for performance reason this will simply return `?` if the byte at the given position is not ASCII.
+   * This is done for a 25% performance boost while highlighting, with the reasoning that the `charAt` method is only
+   * used by the `BreakIterator` implementations to find OCR blocks. Every format supported by this plugin uses element
+   * names and attribute names that are pure ASCII, so we're not missing out on anything relevant, as long as the user
+   * doesn't put non-ASCII characters into attribute values.
    */
   @Override
   public char charAt(int offset) {
-    if (offset < 0 || offset >= this.numBytes) {
-      throw new IndexOutOfBoundsException();
-    }
-    // If we know the input is valid ASCII throughout, we can assume
-    // 1 byte == 1 char and go on with our lives.
-    if (this.charset == StandardCharsets.US_ASCII) {
-      return (char) buf.get(offset);
-    }
-
-    // Otherwise things get complicated...
     int b = buf.get(offset) & 0xFF;  // bytes are signed in Java....
     if (b < 0x80) {
       // Optimization: It's just ASCII, so simply cast to a char
       return (char) b;
-    }
-    int originalOffset = offset;
-    if ((b >> 6) == 0b10) {
-      offset = adjustOffset(b, offset);
-      b = buf.get(offset) & 0xFF;
-    }
-    int bytesToRead = BYTES_TO_READ[(b >> 4) & 0xF];
-    if (bytesToRead == 0) {
-      throw new IllegalArgumentException("Invalid UTF8?");
-    }
-    byte[] buf = new byte[bytesToRead];
-    this.buf.position(offset);
-    this.buf.get(buf);
-    String s = Fastu.decode(buf);
-    if (s.length() == 1 || ((originalOffset - offset) < 3)) {
-      return s.charAt(0);
     } else {
-      return s.charAt(1);
+      // Dirty dirty dirty speed hack, see method docstring.
+      return '?';
     }
   }
+
 
   @Override
   public CharSequence subSequence(int start, int end) {

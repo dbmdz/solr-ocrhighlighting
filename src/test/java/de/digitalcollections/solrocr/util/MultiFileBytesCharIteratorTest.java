@@ -9,11 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.CharacterIterator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
@@ -56,16 +54,6 @@ class MultiFileBytesCharIteratorTest {
   }
 
   @Test
-  public void testCharAt() throws IOException {
-    // TODO: Test with file that has BOM
-
-    for (Entry<Integer, Character> e : utf8Chars.entrySet()) {
-      char c = utf8It.charAt(e.getKey() - 1);
-      assertThat(c).isEqualTo(e.getValue());
-    }
-  }
-
-  @Test
   public void testFirst() {
     // TODO: Test with file that has BOM
     // TODO: Test with file that has multiple bytes for the first codepoint
@@ -79,51 +67,5 @@ class MultiFileBytesCharIteratorTest {
     // TODO: Test with file that has multiple bytes for the last codepoint
     // TODO: Test with file that requires a surrogate pair for the last codepoint
     assertThat(utf8It.last()).isEqualTo('g');
-  }
-
-  @Test
-  public void testNext() throws IOException {
-    StringBuilder sb = new StringBuilder();
-    int start = 0;
-    int charIdx = 0;
-    char c = utf8It.first();
-    sb.append(c);
-    charIdx++;
-    while ((c = utf8It.next()) != CharacterIterator.DONE) {
-      sb.append(c);
-      charIdx++;
-      if (sb.length() == 10) {
-        assertThat(sb.toString()).isEqualTo(utf8Text.substring(start, charIdx));
-        start = charIdx;
-        sb = new StringBuilder();
-      }
-    }
-  }
-
-  @Test
-  public void testPrevious() throws IOException {
-    StringBuilder sb = new StringBuilder();
-    int end = utf8Text.length();
-    int charIdx = utf8Text.length();
-    char c = utf8It.last();
-    sb.insert(0, c);
-    charIdx--;
-    while ((c = utf8It.previous()) != CharacterIterator.DONE) {
-      sb.insert(0, c);
-      charIdx--;
-      if (sb.length() == 100) {
-        assertThat(sb.toString()).isEqualTo(utf8Text.substring(charIdx, end));
-        end = charIdx;
-        sb = new StringBuilder();
-      }
-    }
-  }
-
-  @Test
-  public void testSetIndex() throws IOException {
-    for (Entry<Integer, Character> e : this.utf8Chars.entrySet()) {
-      char c = utf8It.setIndex(e.getKey() - 1);
-      assertThat(c).isEqualTo(e.getValue());
-    }
   }
 }
