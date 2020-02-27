@@ -304,6 +304,15 @@ public class OcrHighlighter extends UnifiedHighlighter {
             // This catch-all prevents OCR highlighting from failing the complete query, instead users
             // get an error message in their Solr log.
             log.error("Could not highlight OCR content for document", e);
+          } finally {
+            if (content instanceof AutoCloseable) {
+              try {
+                ((AutoCloseable) content).close();
+              } catch (Exception e) {
+                log.warn(
+                    "Encountered error while closing content iterator for {}: {}", content.getPointer(), e.getMessage());
+              }
+            }
           }
           snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
         }

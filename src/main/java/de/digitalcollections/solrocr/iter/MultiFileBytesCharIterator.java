@@ -1,11 +1,9 @@
 package de.digitalcollections.solrocr.iter;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import de.digitalcollections.solrocr.model.SourcePointer;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,10 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MultiFileBytesCharIterator implements IterableCharSequence {
+public class MultiFileBytesCharIterator implements IterableCharSequence, AutoCloseable {
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
   private final List<Path> paths;
   private final TreeMap<Integer, Path> offsetMap;
   private final Map<Path, Integer> pathToOffset;
@@ -24,15 +25,7 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
   private final int numBytes;
   private final SourcePointer ptr;
   private int current;
-
-  private final LoadingCache<Path, FileBytesCharIterator> subiters = CacheBuilder.newBuilder()
-      .maximumSize(1000)
-      .build(new CacheLoader<Path, FileBytesCharIterator>() {
-        @Override
-        public FileBytesCharIterator load(Path p) throws Exception {
-          return new FileBytesCharIterator(p, charset, ptr);
-        }
-      });
+  private final Map<Path, FileBytesCharIterator> subiters = new HashMap<>();
 
   public MultiFileBytesCharIterator(List<Path> filePaths, Charset charset, SourcePointer ptr) throws IOException {
     this.ptr = ptr;
@@ -55,12 +48,17 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
   }
 
   private IterableCharSequence getCharSeq(int offset) {
-    try {
-      Path path = offsetMap.floorEntry(offset).getValue();
-      return subiters.get(path);
-    } catch (ExecutionException e) {
-      throw new RuntimeException(e);
+    Path path = offsetMap.floorEntry(offset).getValue();
+    FileBytesCharIterator it = subiters.get(path);
+    if (it == null) {
+      try {
+        it = new FileBytesCharIterator(path, charset, ptr);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      subiters.put(path, it);
     }
+    return it;
   }
 
   private int adjustOffset(int offset) {
@@ -195,5 +193,16 @@ public class MultiFileBytesCharIterator implements IterableCharSequence {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public void close() {
+    subiters.forEach((p, it) -> {
+      try {
+        it.close();
+      } catch (Exception e) {
+        log.warn("Encountered error while closing sub-iterator for {}: {}", p, e.getMessage());
+      }
+    });
   }
 }
