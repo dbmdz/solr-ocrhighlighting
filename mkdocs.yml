@@ -6,6 +6,7 @@ nav:
     - Indexing: indexing.md
     - Querying: query.md
     - Example Setup: example.md
+    - Performance Tuning: performance.md
     - Supported Formats: formats.md
     - Change Log: changes.md
 markdown_extensions:
