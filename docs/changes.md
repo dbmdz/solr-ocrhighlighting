@@ -1,13 +1,31 @@
-## 0.3.2 (tbd.)
+## 0.4.0 (tbd.)
 
-- Fix compatibility with Solr/Lucene 8.4
-- Fix compatibility with Solr/Lucene 7.6
-- Add new `pages` key to snippet response with page dimensions
+This is a major release with a focus on compatibility and performance.
+
+- **Fixes compatibility with Solr/Lucene 8.4 and 7.6**. We now also have an integration test suite that checks for
+ compatibility with all Solr versions >= 7.5 on every change, so compatibility breakage is kept to a minimum in the
+  future.
+
+**New parameters:**
+- **Add new `pages` key to snippet response with page dimensions**. This can be helpful if you need to calculate
+  the snippet coordinates relative to the page image dimensions.
+
+**Format changes:**
 - hocr: Add support for retrieving page identifier from `x_source` an `ppageno` properties
 - hocr: Strip out title tag during indexing and highlighting
-- Improve performance when parsing ASCII-only input documents
+
+**Performance:**
+- Add concurrent preloading for highlighting target files. This can result in a nice performance boost, since by the
+  time the plugin gets to actually highlighting the files, their contents are already in the OS' page cache. See
+  the [Performance Tuning section in the docs](https://dbmdz.github.io/solr-ocrhighlighting/performance/) for more
+   context.
+- This release changes the way we handle UTF-8 during context generation, resulting in an additional ~25% speed up
+  compared to previous versions.
+
+**Miscellaneous:**
 - Log warnings during source pointer parsing
 - Filter out empty files during indexing
+- Add new documentation section on performance tuning
 
 ## 0.3.1 (2019-07-26)
 
