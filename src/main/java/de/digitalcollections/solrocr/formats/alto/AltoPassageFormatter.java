@@ -42,7 +42,8 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     Dimension dims = null;
     if (attribs.containsKey("WIDTH") && attribs.containsKey("HEIGHT")) {
       try {
-        dims = new Dimension(Integer.parseInt(attribs.get("WIDTH")), Integer.parseInt(attribs.get("HEIGHT")));
+        dims = new Dimension((int) Double.parseDouble(attribs.get("WIDTH")),
+                (int) Double.parseDouble(attribs.get("HEIGHT")));
       } catch (NumberFormatException e) {
         // NOP, we're only interested in integer dimensions
       }
@@ -138,10 +139,10 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         pageId = pages.floorEntry(m.start()).getValue().id;
       }
       Map<String, String> attribs = parseAttribs(m.group("attribs"));
-      int x = Integer.parseInt(attribs.get("HPOS"));
-      int y = Integer.parseInt(attribs.get("VPOS"));
-      int w = Integer.parseInt(attribs.get("WIDTH"));
-      int h = Integer.parseInt(attribs.get("HEIGHT"));
+      int x = (int) Double.parseDouble(attribs.get("HPOS"));
+      int y = (int) Double.parseDouble(attribs.get("VPOS"));
+      int w = (int) Double.parseDouble(attribs.get("WIDTH"));
+      int h = (int) Double.parseDouble(attribs.get("HEIGHT"));
       String subsType = attribs.get("SUBS_TYPE");
       String text = StringEscapeUtils.unescapeXml(attribs.get("CONTENT"));
       if ("HypPart1".equals(subsType)) {

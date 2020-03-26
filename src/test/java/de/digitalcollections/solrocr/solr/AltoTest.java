@@ -21,6 +21,8 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
     ocrPath = Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "43"));
+    ocrPath = Paths.get("src/test/resources/data/alto_float.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "44"));
     assertU(commit());
   }
 
@@ -57,6 +59,15 @@ public class AltoTest extends SolrTestCaseJ4 {
         "//str[@name='text'][1]/text()='H.ieifics Menighed Kl. eg for Nicolai Mcniohed Kl. > > Slet. <) Sftensan« om-exler««««« boggeMenighederzNicvlaiMe- Mighed h«r »stenfang paa <em>Svadag</em> ferrkkvm»,cnde. ->) Sknf- «ewaal til Ssndagen holdes i H.geNesKirte sorNicolaiMemghch L?verda.en Kl.«, oz f»r H-geist-S Menighed Kk72. e) Bor-'",
         "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=436",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=1504"
+    );
+  }
+
+  @Test
+  public void testAltoWithFloat() throws Exception {
+    SolrQueryRequest req = xmlQ("q", "mighty");
+    assertQ(req,
+            "count(//lst[@name='ocrHighlighting']/lst[@name='44']/lst[@name='ocr_text']/arr/lst)=1",
+            "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=524"
     );
   }
 
