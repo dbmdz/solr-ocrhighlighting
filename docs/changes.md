@@ -13,6 +13,7 @@ This is a major release with a focus on compatibility and performance.
 **Format changes:**
 - hocr: Add support for retrieving page identifier from `x_source` an `ppageno` properties
 - hocr: Strip out title tag during indexing and highlighting
+- ALTO: The plugin now supports ALTO files with coordinates expressed as floating point numbers (thanks to @mspalti!)
 
 **Performance:**
 - Add concurrent preloading for highlighting target files. This can result in a nice performance boost, since by the
