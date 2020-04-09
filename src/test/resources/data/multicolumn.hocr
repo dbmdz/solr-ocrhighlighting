@@ -1,0 +1,1121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- std2hocr.xsl 0.3.1.0 -->
+<!-- MDD-hOCR 0.1.0.0 -->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+      <title>bsb10049004</title>
+      <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+      <meta name="ocr-capabilities"
+            content="ocr_block ocr_document ocr_line ocr_page ocr_par ocrp_lang ocrx_word x_source x_wconf"/>
+  </head>
+  <body>
+      <div class="ocr_document">
+         <div class="ocr_page"
+              title="bbox 0 0 2701 3749;x_source bsb10049004_00007;ocrp_lang de">
+            <div class="ocr_block" title="bbox 2234 63 2363 107">
+               <p class="ocr_par" title="bbox 2234 63 2363 107">
+                  <span class="ocr_line" title="bbox 2234 63 2363 107">
+                     <span class="ocrx_word" title="bbox 2234 64 2252 107;x_wconf 78">-</span>
+                     <span class="ocrx_word" title="bbox 2286 64 2299 107;x_wconf 28">-</span>
+                     <span class="ocrx_word" title="bbox 2356 63 2363 106;x_wconf 100">-</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 1935 107 2478 856">
+               <p class="ocr_par" title="bbox 1935 107 2478 856">
+                  <span class="ocr_line" title="bbox 2285 109 2297 162">
+                     <span class="ocrx_word" title="bbox 2285 109 2297 162;x_wconf 0">ſ</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 2447 167 2460 212">
+                     <span class="ocrx_word" title="bbox 2447 167 2460 212;x_wconf 78">-</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1936 196 2325 259">
+                     <span class="ocrx_word" title="bbox 1936 197 2211 259;x_wconf 78">Betriebsbeamte</span>
+                     <span class="ocrx_word" title="bbox 2233 196 2325 257;x_wconf 95">beiden</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1936 250 2593 292">
+                     <span class="ocrx_word" title="bbox 1936 254 1989 292;x_wconf 95">dert</span>
+                     <span class="ocrx_word" title="bbox 2013 254 2044 292;x_wconf 78">zu</span>
+                     <span class="ocrx_word" title="bbox 2070 252 2237 291;x_wconf 78">Mittheilung</span>
+                     <span class="ocrx_word" title="bbox 2264 252 2328 290;x_wconf 95">alles</span>
+                     <span class="ocrx_word" title="bbox 2347 250 2470 289;x_wconf 28">Wiffens</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1937 290 2571 331">
+                     <span class="ocrx_word" title="bbox 1937 293 2048 331;x_wconf 78">werthen</span>
+                     <span class="ocrx_word" title="bbox 2064 293 2091 330;x_wconf 78">in</span>
+                     <span class="ocrx_word" title="bbox 2104 292 2181 330;x_wconf 78">ihrem</span>
+                     <span class="ocrx_word" title="bbox 2195 292 2271 329;x_wconf 95">Fache</span>
+                     <span class="ocrx_word" title="bbox 2283 291 2361 329;x_wconf 95">gegen</span>
+                     <span class="ocrx_word" title="bbox 2373 290 2472 328;x_wconf 0">anſtän</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1938 331 2709 373">
+                     <span class="ocrx_word" title="bbox 1938 335 2010 373;x_wconf 95">diges</span>
+                     <span class="ocrx_word" title="bbox 2028 334 2160 373;x_wconf 61">Honorar,</span>
+                     <span class="ocrx_word" title="bbox 2178 333 2226 372;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 2239 331 2474 371;x_wconf 61">Buchhandlun</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1940 373 2611 413">
+                     <span class="ocrx_word" title="bbox 1940 376 1996 413;x_wconf 100">gen</span>
+                     <span class="ocrx_word" title="bbox 2015 376 2045 413;x_wconf 78">zu</span>
+                     <span class="ocrx_word" title="bbox 2063 374 2222 412;x_wconf 28">Einſendung</span>
+                     <span class="ocrx_word" title="bbox 2245 374 2314 411;x_wconf 95">eines</span>
+                     <span class="ocrx_word" title="bbox 2335 373 2473 411;x_wconf 61">Freierem</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1939 411 2566 451">
+                     <span class="ocrx_word" title="bbox 1939 415 2023 451;x_wconf 95">plares</span>
+                     <span class="ocrx_word" title="bbox 2040 414 2083 450;x_wconf 78">der</span>
+                     <span class="ocrx_word" title="bbox 2106 414 2131 450;x_wconf 61">in</span>
+                     <span class="ocrx_word" title="bbox 2149 413 2226 450;x_wconf 61">ihrem</span>
+                     <span class="ocrx_word" title="bbox 2244 412 2355 449;x_wconf 95">Verlage</span>
+                     <span class="ocrx_word" title="bbox 2378 411 2472 448;x_wconf 11">erſchei</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1940 452 2471 492">
+                     <span class="ocrx_word" title="bbox 1940 454 2043 492;x_wconf 95">nenden,</span>
+                     <span class="ocrx_word" title="bbox 2052 454 2100 491;x_wconf 95">das</span>
+                     <span class="ocrx_word" title="bbox 2109 453 2300 491;x_wconf 78">Ingenieurfach</span>
+                     <span class="ocrx_word" title="bbox 2309 452 2471 490;x_wconf 95">betreffenden</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1942 492 2473 531">
+                     <span class="ocrx_word" title="bbox 1942 494 2071 531;x_wconf 78">Schriften</span>
+                     <span class="ocrx_word" title="bbox 2090 493 2178 530;x_wconf 61">behufs</span>
+                     <span class="ocrx_word" title="bbox 2197 493 2238 529;x_wconf 78">der</span>
+                     <span class="ocrx_word" title="bbox 2249 492 2433 529;x_wconf 78">Beurtheilung</span>
+                     <span class="ocrx_word" title="bbox 2445 492 2473 528;x_wconf 78">in</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1940 532 2474 573">
+                     <span class="ocrx_word" title="bbox 1940 534 2027 573;x_wconf 0">dieſem</span>
+                     <span class="ocrx_word" title="bbox 2031 534 2129 573;x_wconf 78">Blatte.</span>
+                     <span class="ocrx_word" title="bbox 2137 532 2474 572;x_wconf 61">Einrückungsgebühr</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1943 574 2476 613">
+                     <span class="ocrx_word" title="bbox 1943 577 1984 613;x_wconf 78">für</span>
+                     <span class="ocrx_word" title="bbox 2011 575 2222 613;x_wconf 61">Ankündigungen</span>
+                     <span class="ocrx_word" title="bbox 2247 575 2299 611;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 2331 574 2476 611;x_wconf 11">literariſche</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1943 613 2476 653">
+                     <span class="ocrx_word" title="bbox 1943 615 2066 653;x_wconf 78">Anzeigen</span>
+                     <span class="ocrx_word" title="bbox 2084 615 2108 652;x_wconf 78">2</span>
+                     <span class="ocrx_word" title="bbox 2126 615 2194 652;x_wconf 45">Sgr.</span>
+                     <span class="ocrx_word" title="bbox 2216 614 2257 651;x_wconf 45">od.</span>
+                     <span class="ocrx_word" title="bbox 2276 614 2296 651;x_wconf 78">7</span>
+                     <span class="ocrx_word" title="bbox 2316 613 2362 651;x_wconf 61">Kr.</span>
+                     <span class="ocrx_word" title="bbox 2379 613 2417 650;x_wconf 45">rh.</span>
+                     <span class="ocrx_word" title="bbox 2436 613 2476 650;x_wconf 45">für</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1943 653 2477 694">
+                     <span class="ocrx_word" title="bbox 1943 657 1988 694;x_wconf 95">den</span>
+                     <span class="ocrx_word" title="bbox 2001 656 2087 694;x_wconf 28">Raum</span>
+                     <span class="ocrx_word" title="bbox 2102 656 2167 693;x_wconf 61">einer</span>
+                     <span class="ocrx_word" title="bbox 2178 655 2330 693;x_wconf 11">geſpaltenen</span>
+                     <span class="ocrx_word" title="bbox 2340 653 2477 691;x_wconf 61">Petitzeile.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1944 693 2558 733">
+                     <span class="ocrx_word" title="bbox 1944 696 2073 733;x_wconf 0">Adreſſe</span>
+                     <span class="ocrx_word" title="bbox 2090 696 2121 732;x_wconf 45">J.</span>
+                     <span class="ocrx_word" title="bbox 2138 696 2173 732;x_wconf 78">B.</span>
+                     <span class="ocrx_word" title="bbox 2187 694 2377 731;x_wconf 11">Metzler'ſche</span>
+                     <span class="ocrx_word" title="bbox 2394 693 2476 730;x_wconf 78">Buch</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1946 734 2478 774">
+                     <span class="ocrx_word" title="bbox 1946 736 2073 774;x_wconf 61">handlung</span>
+                     <span class="ocrx_word" title="bbox 2089 736 2123 773;x_wconf 78">in</span>
+                     <span class="ocrx_word" title="bbox 2137 735 2315 773;x_wconf 61">Stuttgart,</span>
+                     <span class="ocrx_word" title="bbox 2333 734 2398 772;x_wconf 61">oder,</span>
+                     <span class="ocrx_word" title="bbox 2413 734 2478 771;x_wconf 61">wem</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1946 775 2538 815">
+                     <span class="ocrx_word" title="bbox 1946 777 2042 815;x_wconf 61">Leipzig</span>
+                     <span class="ocrx_word" title="bbox 2060 776 2137 814;x_wconf 61">näher</span>
+                     <span class="ocrx_word" title="bbox 2155 776 2271 814;x_wconf 78">gelegen,</span>
+                     <span class="ocrx_word" title="bbox 2296 775 2402 813;x_wconf 78">Georg</span>
+                     <span class="ocrx_word" title="bbox 2418 775 2478 812;x_wconf 61">Wi</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1946 815 2427 856">
+                     <span class="ocrx_word" title="bbox 1946 817 2040 856;x_wconf 78">gand,</span>
+                     <span class="ocrx_word" title="bbox 2058 816 2234 855;x_wconf 61">Buchhändler</span>
+                     <span class="ocrx_word" title="bbox 2252 816 2279 854;x_wconf 95">in</span>
+                     <span class="ocrx_word" title="bbox 2296 815 2427 854;x_wconf 61">Leipzig.</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 149 234 670 873">
+               <p class="ocr_par" title="bbox 149 234 670 873">
+                  <span class="ocr_line" title="bbox 186 234 693 272">
+                     <span class="ocrx_word" title="bbox 186 236 251 272;x_wconf 95">Jede</span>
+                     <span class="ocrx_word" title="bbox 268 236 355 271;x_wconf 78">Woche</span>
+                     <span class="ocrx_word" title="bbox 372 235 437 270;x_wconf 78">eine</span>
+                     <span class="ocrx_word" title="bbox 451 234 548 270;x_wconf 78">Numer</span>
+                     <span class="ocrx_word" title="bbox 562 234 611 269;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 629 234 661 269;x_wconf 78">ei</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 152 273 711 314">
+                     <span class="ocrx_word" title="bbox 152 277 206 314;x_wconf 78">nem</span>
+                     <span class="ocrx_word" title="bbox 223 276 328 313;x_wconf 78">Bogen,</span>
+                     <span class="ocrx_word" title="bbox 352 275 405 313;x_wconf 78">jede</span>
+                     <span class="ocrx_word" title="bbox 425 275 493 312;x_wconf 78">zweit</span>
+                     <span class="ocrx_word" title="bbox 505 273 593 311;x_wconf 78">Woche</span>
+                     <span class="ocrx_word" title="bbox 615 274 663 311;x_wconf 78">we</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 153 312 662 355">
+                     <span class="ocrx_word" title="bbox 153 315 260 355;x_wconf 11">nigſtens</span>
+                     <span class="ocrx_word" title="bbox 291 314 375 354;x_wconf 95">eine</span>
+                     <span class="ocrx_word" title="bbox 401 312 662 353;x_wconf 61">Zeichnugs-Beilage.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 153 352 663 393">
+                     <span class="ocrx_word" title="bbox 153 354 495 393;x_wconf 61">Abonnementspreisi</span>
+                     <span class="ocrx_word" title="bbox 505 352 663 390;x_wconf 78">Buchhandel</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 152 392 664 432">
+                     <span class="ocrx_word" title="bbox 152 396 196 432;x_wconf 78">12</span>
+                     <span class="ocrx_word" title="bbox 214 394 317 431;x_wconf 45">Gulden</span>
+                     <span class="ocrx_word" title="bbox 336 394 451 431;x_wconf 11">rheiniſch</span>
+                     <span class="ocrx_word" title="bbox 475 394 512 430;x_wconf 45">or</span>
+                     <span class="ocrx_word" title="bbox 529 393 549 429;x_wconf 61">7</span>
+                     <span class="ocrx_word" title="bbox 569 392 664 429;x_wconf 78">Thaler</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 153 430 787 473">
+                     <span class="ocrx_word" title="bbox 153 433 273 473;x_wconf 0">preußiſch</span>
+                     <span class="ocrx_word" title="bbox 284 433 327 472;x_wconf 78">für</span>
+                     <span class="ocrx_word" title="bbox 336 432 382 472;x_wconf 78">den</span>
+                     <span class="ocrx_word" title="bbox 396 431 518 471;x_wconf 45">Jahrgag.</span>
+                     <span class="ocrx_word" title="bbox 541 430 664 470;x_wconf 0">Beſtel</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 151 473 829 515">
+                     <span class="ocrx_word" title="bbox 151 475 268 515;x_wconf 61">lungen</span>
+                     <span class="ocrx_word" title="bbox 294 474 399 514;x_wconf 61">nehmen</span>
+                     <span class="ocrx_word" title="bbox 424 474 471 513;x_wconf 95">alle</span>
+                     <span class="ocrx_word" title="bbox 501 473 665 513;x_wconf 61">uchhandlun</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 153 512 860 554">
+                     <span class="ocrx_word" title="bbox 153 514 215 554;x_wconf 95">gen,</span>
+                     <span class="ocrx_word" title="bbox 241 513 380 553;x_wconf 0">Poſtämter</span>
+                     <span class="ocrx_word" title="bbox 403 513 451 552;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 470 512 665 552;x_wconf 78">Zeungserpedi</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 152 555 664 594">
+                     <span class="ocrx_word" title="bbox 152 557 238 594;x_wconf 95">zionen</span>
+                     <span class="ocrx_word" title="bbox 262 557 307 593;x_wconf 28">des</span>
+                     <span class="ocrx_word" title="bbox 329 556 380 593;x_wconf 61">In-</span>
+                     <span class="ocrx_word" title="bbox 402 556 452 592;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 476 555 602 592;x_wconf 78">Aslandes</span>
+                     <span class="ocrx_word" title="bbox 624 555 664 591;x_wconf 61">an.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 155 592 667 632">
+                     <span class="ocrx_word" title="bbox 155 594 450 632;x_wconf 45">Adminiſtrazionen</span>
+                     <span class="ocrx_word" title="bbox 476 593 549 630;x_wconf 95">widen</span>
+                     <span class="ocrx_word" title="bbox 569 592 667 629;x_wconf 11">erſucht,</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 155 632 668 672">
+                     <span class="ocrx_word" title="bbox 155 636 210 672;x_wconf 61">ihre</span>
+                     <span class="ocrx_word" title="bbox 227 633 509 671;x_wconf 45">Rechenſchaftsberichte</span>
+                     <span class="ocrx_word" title="bbox 525 632 668 669;x_wconf 78">monatliche</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 156 672 669 714">
+                     <span class="ocrx_word" title="bbox 156 674 418 714;x_wconf 45">Frequenz-Ausweiſe</span>
+                     <span class="ocrx_word" title="bbox 450 674 501 712;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 512 672 601 711;x_wconf 95">andere</span>
+                     <span class="ocrx_word" title="bbox 629 673 669 711;x_wconf 78">ihr</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 156 711 669 751">
+                     <span class="ocrx_word" title="bbox 156 714 335 751;x_wconf 78">Unternehmen</span>
+                     <span class="ocrx_word" title="bbox 363 712 504 749;x_wconf 78">betreffende</span>
+                     <span class="ocrx_word" title="bbox 511 711 669 748;x_wconf 95">Nachrichten,</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 158 751 670 792">
+                     <span class="ocrx_word" title="bbox 158 755 182 792;x_wconf 0">ſo</span>
+                     <span class="ocrx_word" title="bbox 208 754 254 791;x_wconf 78">wie</span>
+                     <span class="ocrx_word" title="bbox 276 754 329 791;x_wconf 78">ihre</span>
+                     <span class="ocrx_word" title="bbox 358 751 605 790;x_wconf 61">Ankündigngen</span>
+                     <span class="ocrx_word" title="bbox 631 752 670 789;x_wconf 95">der</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 158 791 670 832">
+                     <span class="ocrx_word" title="bbox 158 794 327 832;x_wconf 45">Redakzion</span>
+                     <span class="ocrx_word" title="bbox 359 793 400 830;x_wconf 61">der</span>
+                     <span class="ocrx_word" title="bbox 427 791 670 830;x_wconf 28">Eiſenbhn-Zeitung</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 156 831 670 873">
+                     <span class="ocrx_word" title="bbox 156 834 261 873;x_wconf 78">zugehen</span>
+                     <span class="ocrx_word" title="bbox 273 834 302 872;x_wconf 61">zu</span>
+                     <span class="ocrx_word" title="bbox 315 833 405 872;x_wconf 0">laſſen;</span>
+                     <span class="ocrx_word" title="bbox 427 832 509 871;x_wconf 45">Inge</span>
+                     <span class="ocrx_word" title="bbox 519 831 603 870;x_wconf 61">ieure</span>
+                     <span class="ocrx_word" title="bbox 621 832 670 870;x_wconf 95">und</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 490 905 2161 1117">
+               <p class="ocr_par" title="bbox 490 905 2161 1117">
+                  <span class="ocr_line" title="bbox 490 905 2161 1117">
+                     <span class="ocrx_word" title="bbox 490 909 1434 1117;x_wconf 61">Eiſenbahn-</span>
+                     <span class="ocrx_word" title="bbox 1493 905 2161 1110;x_wconf 100">Beitung.</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 947 1178 1671 1238">
+               <p class="ocr_par" title="bbox 947 1178 1671 1238">
+                  <span class="ocr_line" title="bbox 947 1178 1671 1238">
+                     <span class="ocrx_word" title="bbox 947 1181 1139 1238;x_wconf 78">Stuttgart</span>
+                     <span class="ocrx_word" title="bbox 1177 1180 1349 1236;x_wconf 28">RS4G.</span>
+                     <span class="ocrx_word" title="bbox 1424 1179 1471 1234;x_wconf 45">'.</span>
+                     <span class="ocrx_word" title="bbox 1508 1178 1671 1234;x_wconf 100">Januar.</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 2263 1173 2483 1231">
+               <p class="ocr_par" title="bbox 2263 1173 2483 1231">
+                  <span class="ocr_line" title="bbox 2263 1173 2483 1231">
+                     <span class="ocrx_word" title="bbox 2263 1173 2377 1231;x_wconf 61">Mro.</span>
+                     <span class="ocrx_word" title="bbox 2417 1173 2483 1230;x_wconf 78">E.</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 163 1294 2487 1491">
+               <p class="ocr_par" title="bbox 163 1294 2487 1491">
+                  <span class="ocr_line" title="bbox 214 1295 2480 1357">
+                     <span class="ocrx_word" title="bbox 214 1307 354 1357;x_wconf 78">Inhalt.</span>
+                     <span class="ocrx_word" title="bbox 385 1307 448 1356;x_wconf 100">Die</span>
+                     <span class="ocrx_word" title="bbox 464 1306 597 1356;x_wconf 78">könilich</span>
+                     <span class="ocrx_word" title="bbox 616 1305 808 1355;x_wconf 28">bayeriſchen</span>
+                     <span class="ocrx_word" title="bbox 828 1303 1047 1353;x_wconf 11">Eiſenbahnen</span>
+                     <span class="ocrx_word" title="bbox 1065 1303 1108 1352;x_wconf 78">im</span>
+                     <span class="ocrx_word" title="bbox 1127 1301 1296 1351;x_wconf 95">Dezember</span>
+                     <span class="ocrx_word" title="bbox 1318 1300 1423 1350;x_wconf 78">1815,</span>
+                     <span class="ocrx_word" title="bbox 1439 1300 1488 1349;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 1508 1299 1613 1349;x_wconf 61">Oskar</span>
+                     <span class="ocrx_word" title="bbox 1630 1299 1689 1348;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 1709 1297 1892 1348;x_wconf 95">Schellerer.</span>
+                     <span class="ocrx_word" title="bbox 1915 1297 1953 1346;x_wconf 45">–</span>
+                     <span class="ocrx_word" title="bbox 1987 1297 2051 1346;x_wconf 100">Die</span>
+                     <span class="ocrx_word" title="bbox 2070 1295 2283 1345;x_wconf 11">europäiſchen</span>
+                     <span class="ocrx_word" title="bbox 2300 1307 2480 1347;x_wconf 0">Eiſenwege</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 1346 2487 1406">
+                     <span class="ocrx_word" title="bbox 165 1361 220 1406;x_wconf 100">für</span>
+                     <span class="ocrx_word" title="bbox 236 1360 294 1405;x_wconf 95">den</span>
+                     <span class="ocrx_word" title="bbox 313 1358 538 1405;x_wconf 78">Welthandel,</span>
+                     <span class="ocrx_word" title="bbox 545 1358 589 1403;x_wconf 61">von</span>
+                     <span class="ocrx_word" title="bbox 610 1358 658 1403;x_wconf 61">Dr.</span>
+                     <span class="ocrx_word" title="bbox 677 1356 810 1402;x_wconf 28">Freiherrn</span>
+                     <span class="ocrx_word" title="bbox 826 1356 850 1401;x_wconf 45">v.</span>
+                     <span class="ocrx_word" title="bbox 871 1355 982 1401;x_wconf 61">Reden.</span>
+                     <span class="ocrx_word" title="bbox 1000 1354 1161 1400;x_wconf 78">(Nachtrag)</span>
+                     <span class="ocrx_word" title="bbox 1177 1354 1213 1399;x_wconf 78">–</span>
+                     <span class="ocrx_word" title="bbox 1231 1353 1333 1399;x_wconf 61">Ueber</span>
+                     <span class="ocrx_word" title="bbox 1352 1352 1575 1398;x_wconf 61">Stützmauern</span>
+                     <span class="ocrx_word" title="bbox 1595 1351 1651 1396;x_wconf 78">für</span>
+                     <span class="ocrx_word" title="bbox 1669 1349 1908 1396;x_wconf 28">Eiſenbahnen,</span>
+                     <span class="ocrx_word" title="bbox 1924 1349 1975 1394;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 1993 1349 2026 1394;x_wconf 28">H.</span>
+                     <span class="ocrx_word" title="bbox 2044 1347 2206 1393;x_wconf 0">Dempſey.</span>
+                     <span class="ocrx_word" title="bbox 2224 1347 2260 1392;x_wconf 61">–</span>
+                     <span class="ocrx_word" title="bbox 2278 1346 2487 1392;x_wconf 0">Franzöſiſche</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 1389 2625 1448">
+                     <span class="ocrx_word" title="bbox 165 1402 536 1448;x_wconf 28">Staats-Eiſenbahnen.</span>
+                     <span class="ocrx_word" title="bbox 542 1402 565 1445;x_wconf 45">–</span>
+                     <span class="ocrx_word" title="bbox 580 1400 845 1445;x_wconf 0">Atmoſphäriſche</span>
+                     <span class="ocrx_word" title="bbox 864 1399 1095 1443;x_wconf 11">Eiſenbahnen.</span>
+                     <span class="ocrx_word" title="bbox 1132 1397 1227 1441;x_wconf 78">Paris</span>
+                     <span class="ocrx_word" title="bbox 1234 1398 1245 1441;x_wconf 78">-</span>
+                     <span class="ocrx_word" title="bbox 1253 1397 1303 1441;x_wconf 61">St.</span>
+                     <span class="ocrx_word" title="bbox 1314 1396 1473 1440;x_wconf 78">Germain.</span>
+                     <span class="ocrx_word" title="bbox 1510 1394 1810 1439;x_wconf 61">London-Croydon.</span>
+                     <span class="ocrx_word" title="bbox 1834 1394 1870 1437;x_wconf 61">–</span>
+                     <span class="ocrx_word" title="bbox 1898 1392 2089 1436;x_wconf 28">Vermiſchte</span>
+                     <span class="ocrx_word" title="bbox 2107 1391 2323 1435;x_wconf 78">Nachrichten.</span>
+                     <span class="ocrx_word" title="bbox 2349 1389 2487 1433;x_wconf 0">Deutſch</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 164 1435 2655 1491">
+                     <span class="ocrx_word" title="bbox 164 1449 243 1491;x_wconf 95">land.</span>
+                     <span class="ocrx_word" title="bbox 273 1448 415 1490;x_wconf 11">(Badiſche,</span>
+                     <span class="ocrx_word" title="bbox 434 1447 577 1489;x_wconf 11">Bayeriſce,</span>
+                     <span class="ocrx_word" title="bbox 596 1446 745 1488;x_wconf 0">Sächſiſche,</span>
+                     <span class="ocrx_word" title="bbox 767 1445 910 1487;x_wconf 0">Preußiſche</span>
+                     <span class="ocrx_word" title="bbox 929 1444 1122 1486;x_wconf 11">Eiſenbahnen)</span>
+                     <span class="ocrx_word" title="bbox 1151 1442 1291 1484;x_wconf 78">Schweiz,</span>
+                     <span class="ocrx_word" title="bbox 1312 1441 1455 1483;x_wconf 95">Belgien.</span>
+                     <span class="ocrx_word" title="bbox 1474 1440 1659 1482;x_wconf 95">Frankreich.</span>
+                     <span class="ocrx_word" title="bbox 1679 1439 1813 1481;x_wconf 95">Italien.</span>
+                     <span class="ocrx_word" title="bbox 1832 1437 2111 1480;x_wconf 61">Großbritannien.</span>
+                     <span class="ocrx_word" title="bbox 2130 1436 2248 1478;x_wconf 61">Türkei.</span>
+                     <span class="ocrx_word" title="bbox 2266 1436 2302 1477;x_wconf 61">–</span>
+                     <span class="ocrx_word" title="bbox 2319 1435 2487 1477;x_wconf 0">Perſonal</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 2347 186 2513 246">
+               <p class="ocr_par" title="bbox 2347 186 2513 246">
+                  <span class="ocr_line" title="bbox 2490 187 2513 213">
+                     <span class="ocrx_word" title="bbox 2490 187 2513 213;x_wconf 45">-</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 2347 203 2492 246">
+                     <span class="ocrx_word" title="bbox 2347 203 2492 246;x_wconf 0">auſgefor-,</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 165 1492 368 1528">
+               <p class="ocr_par" title="bbox 165 1492 368 1528">
+                  <span class="ocr_line" title="bbox 165 1492 368 1528">
+                     <span class="ocrx_word" title="bbox 165 1492 368 1528;x_wconf 78">Nachrichten.</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 271 1659 1190 1802">
+               <p class="ocr_par" title="bbox 271 1659 1190 1802">
+                  <span class="ocr_line" title="bbox 271 1659 1189 1732">
+                     <span class="ocrx_word" title="bbox 271 1664 356 1732;x_wconf 100">Die</span>
+                     <span class="ocrx_word" title="bbox 394 1663 576 1731;x_wconf 78">königliy</span>
+                     <span class="ocrx_word" title="bbox 615 1661 862 1730;x_wconf 28">bayeriſchen</span>
+                     <span class="ocrx_word" title="bbox 902 1659 1189 1728;x_wconf 11">Eiſenbahnen</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 400 1745 975 1801">
+                     <span class="ocrx_word" title="bbox 400 1748 415 1801;x_wconf 100">-</span>
+                     <span class="ocrx_word" title="bbox 487 1748 545 1801;x_wconf 61">im</span>
+                     <span class="ocrx_word" title="bbox 564 1745 807 1800;x_wconf 100">Dezember</span>
+                     <span class="ocrx_word" title="bbox 833 1745 975 1798;x_wconf 45">18'15.</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 537 1823 925 1917">
+               <p class="ocr_par" title="bbox 537 1823 925 1917">
+                  <span class="ocr_line" title="bbox 693 1825 754 1854">
+                     <span class="ocrx_word" title="bbox 693 1825 754 1854;x_wconf 95">Von</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 537 1870 924 1917">
+                     <span class="ocrx_word" title="bbox 537 1871 644 1917;x_wconf 78">Oskar</span>
+                     <span class="ocrx_word" title="bbox 658 1871 718 1917;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 735 1870 924 1916;x_wconf 100">Schellerer.</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 159 1984 1309 3503">
+               <p class="ocr_par" title="bbox 159 1984 1309 3503">
+                  <span class="ocr_line" title="bbox 206 1984 1298 2042">
+                     <span class="ocrx_word" title="bbox 206 2000 260 2042;x_wconf 100">Die</span>
+                     <span class="ocrx_word" title="bbox 278 1999 459 2042;x_wconf 78">gegenwärtig</span>
+                     <span class="ocrx_word" title="bbox 480 1998 562 2041;x_wconf 78">theils</span>
+                     <span class="ocrx_word" title="bbox 588 1998 628 2040;x_wconf 61">em</span>
+                     <span class="ocrx_word" title="bbox 642 1997 754 2040;x_wconf 61">Betrieb</span>
+                     <span class="ocrx_word" title="bbox 773 1996 847 2039;x_wconf 0">ſchon</span>
+                     <span class="ocrx_word" title="bbox 861 1995 1057 2038;x_wconf 78">übergebenen,</span>
+                     <span class="ocrx_word" title="bbox 1081 1984 1163 2033;x_wconf 78">theils</span>
+                     <span class="ocrx_word" title="bbox 1183 1984 1246 2032;x_wconf 78">noch</span>
+                     <span class="ocrx_word" title="bbox 1260 1984 1298 2032;x_wconf 78">im</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 167 2041 1298 2091">
+                     <span class="ocrx_word" title="bbox 167 2048 233 2091;x_wconf 78">Bau</span>
+                     <span class="ocrx_word" title="bbox 252 2047 412 2090;x_wconf 95">begriffenen</span>
+                     <span class="ocrx_word" title="bbox 426 2046 601 2089;x_wconf 11">Eiſenbahnen</span>
+                     <span class="ocrx_word" title="bbox 620 2046 667 2088;x_wconf 78">des</span>
+                     <span class="ocrx_word" title="bbox 681 2044 857 2087;x_wconf 61">Königreichs</span>
+                     <span class="ocrx_word" title="bbox 875 2043 1006 2086;x_wconf 11">erſtrecken</span>
+                     <span class="ocrx_word" title="bbox 1027 2043 1072 2085;x_wconf 0">ſich</span>
+                     <span class="ocrx_word" title="bbox 1093 2042 1148 2085;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 1162 2041 1298 2084;x_wconf 78">München</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 166 2091 1365 2140">
+                     <span class="ocrx_word" title="bbox 166 2097 228 2140;x_wconf 95">nach</span>
+                     <span class="ocrx_word" title="bbox 240 2096 394 2139;x_wconf 61">Augsburg</span>
+                     <span class="ocrx_word" title="bbox 406 2096 462 2138;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 475 2095 530 2138;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 543 2095 578 2137;x_wconf 61">da</span>
+                     <span class="ocrx_word" title="bbox 590 2095 646 2137;x_wconf 78">über</span>
+                     <span class="ocrx_word" title="bbox 653 2093 858 2137;x_wconf 45">Donauwörth,</span>
+                     <span class="ocrx_word" title="bbox 872 2092 1015 2135;x_wconf 78">Harburg,</span>
+                     <span class="ocrx_word" title="bbox 1031 2091 1213 2134;x_wconf 78">Nördlingen,</span>
+                     <span class="ocrx_word" title="bbox 1229 2091 1297 2133;x_wconf 45">Oet</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 2138 1299 2191">
+                     <span class="ocrx_word" title="bbox 165 2145 271 2191;x_wconf 100">tingen,</span>
+                     <span class="ocrx_word" title="bbox 288 2143 554 2190;x_wconf 0">Waſſertrüdingen,</span>
+                     <span class="ocrx_word" title="bbox 569 2142 785 2188;x_wconf 11">Gunzenhauſen,</span>
+                     <span class="ocrx_word" title="bbox 801 2141 955 2187;x_wconf 78">Pleinfeld,</span>
+                     <span class="ocrx_word" title="bbox 972 2139 1050 2185;x_wconf 61">Roth</span>
+                     <span class="ocrx_word" title="bbox 1063 2140 1118 2185;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 1133 2138 1299 2184;x_wconf 78">Schwabach</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 164 2187 1298 2238">
+                     <span class="ocrx_word" title="bbox 164 2194 229 2238;x_wconf 95">nach</span>
+                     <span class="ocrx_word" title="bbox 249 2193 412 2237;x_wconf 45">Nürnberg,</span>
+                     <span class="ocrx_word" title="bbox 433 2193 489 2236;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 508 2192 552 2236;x_wconf 28">wo</span>
+                     <span class="ocrx_word" title="bbox 571 2192 613 2235;x_wconf 0">ſih</span>
+                     <span class="ocrx_word" title="bbox 631 2192 671 2235;x_wconf 61">die</span>
+                     <span class="ocrx_word" title="bbox 685 2191 768 2234;x_wconf 45">Bahn</span>
+                     <span class="ocrx_word" title="bbox 789 2190 854 2234;x_wconf 78">über</span>
+                     <span class="ocrx_word" title="bbox 875 2189 1032 2233;x_wconf 95">Erlangen,</span>
+                     <span class="ocrx_word" title="bbox 1061 2188 1215 2232;x_wconf 78">Forchheim</span>
+                     <span class="ocrx_word" title="bbox 1235 2187 1298 2231;x_wconf 95">nach</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 164 2235 1415 2286">
+                     <span class="ocrx_word" title="bbox 164 2242 304 2286;x_wconf 78">Bamberg</span>
+                     <span class="ocrx_word" title="bbox 318 2242 372 2285;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 386 2241 441 2284;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 455 2241 490 2284;x_wconf 45">da</span>
+                     <span class="ocrx_word" title="bbox 504 2240 570 2284;x_wconf 61">über</span>
+                     <span class="ocrx_word" title="bbox 583 2239 753 2283;x_wconf 28">Staffelſtein,</span>
+                     <span class="ocrx_word" title="bbox 767 2238 933 2282;x_wconf 78">Lichtenfels,</span>
+                     <span class="ocrx_word" title="bbox 950 2237 1097 2281;x_wconf 78">Culmbach</span>
+                     <span class="ocrx_word" title="bbox 1111 2236 1166 2280;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 1181 2235 1298 2279;x_wconf 61">Münch</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 2285 1299 2335">
+                     <span class="ocrx_word" title="bbox 165 2292 228 2335;x_wconf 61">berg</span>
+                     <span class="ocrx_word" title="bbox 247 2292 311 2334;x_wconf 95">nach</span>
+                     <span class="ocrx_word" title="bbox 332 2291 392 2334;x_wconf 78">Hof</span>
+                     <span class="ocrx_word" title="bbox 407 2290 527 2333;x_wconf 0">fortſetzt.</span>
+                     <span class="ocrx_word" title="bbox 563 2290 628 2332;x_wconf 78">Eine</span>
+                     <span class="ocrx_word" title="bbox 641 2289 728 2332;x_wconf 61">zweite</span>
+                     <span class="ocrx_word" title="bbox 750 2288 858 2331;x_wconf 95">Strecke</span>
+                     <span class="ocrx_word" title="bbox 873 2288 928 2330;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 947 2287 1101 2330;x_wconf 78">Augsburg</span>
+                     <span class="ocrx_word" title="bbox 1121 2286 1184 2329;x_wconf 95">nach</span>
+                     <span class="ocrx_word" title="bbox 1197 2285 1299 2328;x_wconf 78">Lindau</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 2334 1032 2383">
+                     <span class="ocrx_word" title="bbox 165 2339 231 2383;x_wconf 95">über</span>
+                     <span class="ocrx_word" title="bbox 242 2338 414 2382;x_wconf 61">Kaufbeuren</span>
+                     <span class="ocrx_word" title="bbox 428 2338 461 2381;x_wconf 0">iſt</span>
+                     <span class="ocrx_word" title="bbox 475 2337 606 2381;x_wconf 45">ebenfalls</span>
+                     <span class="ocrx_word" title="bbox 616 2336 688 2380;x_wconf 0">ſchon</span>
+                     <span class="ocrx_word" title="bbox 700 2336 728 2379;x_wconf 95">in</span>
+                     <span class="ocrx_word" title="bbox 741 2335 854 2379;x_wconf 78">Angriff</span>
+                     <span class="ocrx_word" title="bbox 865 2334 1032 2378;x_wconf 95">genommen.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 204 2382 1299 2432">
+                     <span class="ocrx_word" title="bbox 204 2389 259 2432;x_wconf 100">Die</span>
+                     <span class="ocrx_word" title="bbox 273 2388 492 2431;x_wconf 11">Geſammtlänge</span>
+                     <span class="ocrx_word" title="bbox 511 2387 556 2429;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 570 2386 769 2429;x_wconf 45">Südnordbahn</span>
+                     <span class="ocrx_word" title="bbox 787 2385 851 2428;x_wconf 61">vom</span>
+                     <span class="ocrx_word" title="bbox 869 2384 1017 2427;x_wconf 61">Bahnhofe</span>
+                     <span class="ocrx_word" title="bbox 1034 2384 1066 2426;x_wconf 61">zu</span>
+                     <span class="ocrx_word" title="bbox 1080 2383 1232 2426;x_wconf 61">Augsburg</span>
+                     <span class="ocrx_word" title="bbox 1254 2382 1299 2425;x_wconf 78">bis</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 2429 1300 2481">
+                     <span class="ocrx_word" title="bbox 165 2437 199 2481;x_wconf 78">an</span>
+                     <span class="ocrx_word" title="bbox 221 2436 263 2480;x_wconf 78">die</span>
+                     <span class="ocrx_word" title="bbox 283 2435 415 2480;x_wconf 61">nördliche</span>
+                     <span class="ocrx_word" title="bbox 428 2434 613 2479;x_wconf 61">Reichsgrenze</span>
+                     <span class="ocrx_word" title="bbox 634 2434 674 2478;x_wconf 78">bei</span>
+                     <span class="ocrx_word" title="bbox 686 2433 740 2477;x_wconf 78">Hof</span>
+                     <span class="ocrx_word" title="bbox 758 2432 863 2477;x_wconf 78">beträgt</span>
+                     <span class="ocrx_word" title="bbox 885 2431 1045 2476;x_wconf 61">1,266,370</span>
+                     <span class="ocrx_word" title="bbox 1059 2431 1118 2475;x_wconf 61">Fuß</span>
+                     <span class="ocrx_word" title="bbox 1133 2430 1196 2474;x_wconf 61">oder</span>
+                     <span class="ocrx_word" title="bbox 1209 2429 1300 2474;x_wconf 61">49.85</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 2478 1398 2529">
+                     <span class="ocrx_word" title="bbox 165 2485 277 2529;x_wconf 0">deutſche</span>
+                     <span class="ocrx_word" title="bbox 283 2484 398 2528;x_wconf 78">Meilen.</span>
+                     <span class="ocrx_word" title="bbox 427 2483 532 2527;x_wconf 45">Hievon</span>
+                     <span class="ocrx_word" title="bbox 547 2483 602 2526;x_wconf 0">ſind</span>
+                     <span class="ocrx_word" title="bbox 613 2483 670 2526;x_wconf 78">dem</span>
+                     <span class="ocrx_word" title="bbox 678 2481 791 2525;x_wconf 78">Verkehr</span>
+                     <span class="ocrx_word" title="bbox 800 2481 947 2525;x_wconf 95">übergeben</span>
+                     <span class="ocrx_word" title="bbox 956 2480 997 2524;x_wconf 95">die</span>
+                     <span class="ocrx_word" title="bbox 1005 2479 1129 2523;x_wconf 78">Strecken</span>
+                     <span class="ocrx_word" title="bbox 1139 2479 1194 2522;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 1202 2478 1300 2522;x_wconf 78">Augs</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 2527 1353 2578">
+                     <span class="ocrx_word" title="bbox 165 2533 232 2578;x_wconf 78">burg</span>
+                     <span class="ocrx_word" title="bbox 246 2533 310 2577;x_wconf 78">nach</span>
+                     <span class="ocrx_word" title="bbox 323 2532 515 2577;x_wconf 45">Donauwörth</span>
+                     <span class="ocrx_word" title="bbox 529 2531 583 2575;x_wconf 61">und</span>
+                     <span class="ocrx_word" title="bbox 595 2531 648 2575;x_wconf 78">von</span>
+                     <span class="ocrx_word" title="bbox 662 2530 802 2575;x_wconf 61">Nürnberg</span>
+                     <span class="ocrx_word" title="bbox 817 2529 880 2574;x_wconf 95">nach</span>
+                     <span class="ocrx_word" title="bbox 893 2528 1049 2573;x_wconf 95">Bamberg,</span>
+                     <span class="ocrx_word" title="bbox 1071 2528 1128 2572;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 1143 2527 1187 2571;x_wconf 78">bis</span>
+                     <span class="ocrx_word" title="bbox 1202 2527 1229 2571;x_wconf 78">1.</span>
+                     <span class="ocrx_word" title="bbox 1245 2527 1299 2571;x_wconf 95">Ja</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 164 2576 1300 2626">
+                     <span class="ocrx_word" title="bbox 164 2583 235 2626;x_wconf 95">nuar</span>
+                     <span class="ocrx_word" title="bbox 250 2582 328 2625;x_wconf 78">1846</span>
+                     <span class="ocrx_word" title="bbox 348 2582 411 2625;x_wconf 61">auch</span>
+                     <span class="ocrx_word" title="bbox 427 2582 483 2624;x_wconf 61">von</span>
+                     <span class="ocrx_word" title="bbox 503 2581 537 2624;x_wconf 78">da</span>
+                     <span class="ocrx_word" title="bbox 558 2581 621 2623;x_wconf 61">nach</span>
+                     <span class="ocrx_word" title="bbox 633 2580 791 2623;x_wconf 78">Lichtenfels.</span>
+                     <span class="ocrx_word" title="bbox 833 2579 889 2621;x_wconf 95">Die</span>
+                     <span class="ocrx_word" title="bbox 900 2579 976 2621;x_wconf 95">Linie</span>
+                     <span class="ocrx_word" title="bbox 992 2578 1047 2620;x_wconf 95">von</span>
+                     <span class="ocrx_word" title="bbox 1065 2577 1217 2620;x_wconf 78">Augsburg</span>
+                     <span class="ocrx_word" title="bbox 1238 2576 1300 2619;x_wconf 95">nach</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 166 2623 1299 2673">
+                     <span class="ocrx_word" title="bbox 166 2630 301 2673;x_wconf 61">München</span>
+                     <span class="ocrx_word" title="bbox 314 2629 380 2672;x_wconf 61">dazu</span>
+                     <span class="ocrx_word" title="bbox 395 2628 551 2671;x_wconf 11">geſchlagen,</span>
+                     <span class="ocrx_word" title="bbox 566 2627 705 2670;x_wconf 28">ſummiren</span>
+                     <span class="ocrx_word" title="bbox 719 2627 756 2669;x_wconf 95">die</span>
+                     <span class="ocrx_word" title="bbox 770 2626 926 2669;x_wconf 78">befahrenen</span>
+                     <span class="ocrx_word" title="bbox 939 2625 1063 2668;x_wconf 95">Strecken</span>
+                     <span class="ocrx_word" title="bbox 1076 2624 1168 2667;x_wconf 78">26.15</span>
+                     <span class="ocrx_word" title="bbox 1182 2623 1299 2666;x_wconf 78">Meilen,</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 164 2673 1168 2723">
+                     <span class="ocrx_word" title="bbox 164 2678 243 2723;x_wconf 0">ſomit</span>
+                     <span class="ocrx_word" title="bbox 254 2678 325 2722;x_wconf 78">über</span>
+                     <span class="ocrx_word" title="bbox 389 2677 434 2721;x_wconf 78">der</span>
+                     <span class="ocrx_word" title="bbox 447 2676 547 2721;x_wconf 78">ganzen</span>
+                     <span class="ocrx_word" title="bbox 562 2675 725 2720;x_wconf 45">Bahnlänge</span>
+                     <span class="ocrx_word" title="bbox 736 2675 790 2719;x_wconf 95">von</span>
+                     <span class="ocrx_word" title="bbox 805 2674 941 2719;x_wconf 78">München</span>
+                     <span class="ocrx_word" title="bbox 955 2673 1001 2718;x_wconf 78">bis</span>
+                     <span class="ocrx_word" title="bbox 1015 2673 1080 2717;x_wconf 78">Hof.</span>
+                     <span class="ocrx_word" title="bbox 1163 2699 1168 2714;x_wconf 61">/</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 203 2721 1303 2773">
+                     <span class="ocrx_word" title="bbox 203 2728 259 2773;x_wconf 61">Die</span>
+                     <span class="ocrx_word" title="bbox 273 2725 690 2772;x_wconf 0">Eiſenbahnbau-Kommiſſion,</span>
+                     <span class="ocrx_word" title="bbox 714 2724 818 2769;x_wconf 95">welcher</span>
+                     <span class="ocrx_word" title="bbox 836 2724 878 2768;x_wconf 95">die</span>
+                     <span class="ocrx_word" title="bbox 890 2723 1075 2768;x_wconf 78">Ausführung</span>
+                     <span class="ocrx_word" title="bbox 1095 2722 1149 2767;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 1170 2721 1303 2766;x_wconf 11">techniſche</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 165 2769 1302 2822">
+                     <span class="ocrx_word" title="bbox 165 2776 346 2822;x_wconf 11">Ausſtattung</span>
+                     <span class="ocrx_word" title="bbox 359 2775 426 2821;x_wconf 95">aller</span>
+                     <span class="ocrx_word" title="bbox 439 2774 600 2820;x_wconf 11">bayeriſchen</span>
+                     <span class="ocrx_word" title="bbox 613 2773 795 2819;x_wconf 11">Eiſenbahnen</span>
+                     <span class="ocrx_word" title="bbox 809 2772 968 2818;x_wconf 78">übertragen</span>
+                     <span class="ocrx_word" title="bbox 981 2771 1031 2816;x_wconf 0">iſt,</span>
+                     <span class="ocrx_word" title="bbox 1048 2771 1095 2816;x_wconf 78">hat</span>
+                     <span class="ocrx_word" title="bbox 1108 2770 1185 2816;x_wconf 78">ihren</span>
+                     <span class="ocrx_word" title="bbox 1201 2770 1261 2815;x_wconf 61">Sitz</span>
+                     <span class="ocrx_word" title="bbox 1274 2769 1302 2815;x_wconf 78">in</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 166 2816 1303 2869">
+                     <span class="ocrx_word" title="bbox 166 2823 311 2869;x_wconf 45">Nürnberg</span>
+                     <span class="ocrx_word" title="bbox 324 2822 378 2868;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 393 2821 490 2867;x_wconf 0">beſteht</span>
+                     <span class="ocrx_word" title="bbox 502 2821 556 2867;x_wconf 61">aus</span>
+                     <span class="ocrx_word" title="bbox 570 2821 627 2866;x_wconf 95">dem</span>
+                     <span class="ocrx_word" title="bbox 641 2819 871 2866;x_wconf 95">Generaldirektor</span>
+                     <span class="ocrx_word" title="bbox 884 2818 995 2864;x_wconf 28">Dürig</span>
+                     <span class="ocrx_word" title="bbox 1014 2818 1060 2863;x_wconf 78">als</span>
+                     <span class="ocrx_word" title="bbox 1075 2816 1303 2863;x_wconf 61">adminiſtrativen</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 167 2868 1388 2918">
+                     <span class="ocrx_word" title="bbox 167 2876 221 2918;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 234 2875 291 2917;x_wconf 95">dem</span>
+                     <span class="ocrx_word" title="bbox 304 2874 505 2917;x_wconf 61">Kreisbaurath</span>
+                     <span class="ocrx_word" title="bbox 520 2872 624 2915;x_wconf 78">Pauli</span>
+                     <span class="ocrx_word" title="bbox 637 2873 682 2915;x_wconf 78">als</span>
+                     <span class="ocrx_word" title="bbox 695 2871 843 2914;x_wconf 28">techniſchen</span>
+                     <span class="ocrx_word" title="bbox 856 2870 1006 2913;x_wconf 0">Vorſtand.</span>
+                     <span class="ocrx_word" title="bbox 1032 2869 1209 2912;x_wconf 61">Sämmtliche</span>
+                     <span class="ocrx_word" title="bbox 1218 2868 1303 2911;x_wconf 95">Hoch</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 167 2914 1304 2967">
+                     <span class="ocrx_word" title="bbox 167 2921 265 2967;x_wconf 78">bauten</span>
+                     <span class="ocrx_word" title="bbox 278 2921 326 2966;x_wconf 78">hat</span>
+                     <span class="ocrx_word" title="bbox 337 2920 382 2966;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 395 2919 595 2965;x_wconf 28">Bauinſpektor</span>
+                     <span class="ocrx_word" title="bbox 608 2918 723 2964;x_wconf 61">Rüber</span>
+                     <span class="ocrx_word" title="bbox 733 2917 810 2963;x_wconf 45">unter</span>
+                     <span class="ocrx_word" title="bbox 823 2917 880 2962;x_wconf 0">ſich.</span>
+                     <span class="ocrx_word" title="bbox 895 2917 938 2962;x_wconf 28">–</span>
+                     <span class="ocrx_word" title="bbox 950 2916 1004 2962;x_wconf 78">Die</span>
+                     <span class="ocrx_word" title="bbox 1019 2915 1116 2961;x_wconf 0">oberſte</span>
+                     <span class="ocrx_word" title="bbox 1130 2914 1242 2960;x_wconf 78">Leitung</span>
+                     <span class="ocrx_word" title="bbox 1257 2914 1304 2960;x_wconf 95">des</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 166 2962 1304 3014">
+                     <span class="ocrx_word" title="bbox 166 2969 297 3014;x_wconf 78">Betriebs</span>
+                     <span class="ocrx_word" title="bbox 314 2969 369 3013;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 391 2968 436 3012;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 450 2967 634 3012;x_wconf 78">Verwaltung</span>
+                     <span class="ocrx_word" title="bbox 655 2966 700 3011;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 717 2965 900 3010;x_wconf 11">Eiſenbahnen</span>
+                     <span class="ocrx_word" title="bbox 920 2965 953 3009;x_wconf 0">iſt</span>
+                     <span class="ocrx_word" title="bbox 972 2964 1029 3008;x_wconf 61">dem</span>
+                     <span class="ocrx_word" title="bbox 1051 2963 1235 3008;x_wconf 28">Miniſterium</span>
+                     <span class="ocrx_word" title="bbox 1257 2962 1304 3007;x_wconf 95">des</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 167 3010 1476 3064">
+                     <span class="ocrx_word" title="bbox 167 3017 273 3064;x_wconf 0">Hauſes</span>
+                     <span class="ocrx_word" title="bbox 286 3017 341 3063;x_wconf 61">und</span>
+                     <span class="ocrx_word" title="bbox 353 3016 400 3063;x_wconf 95">des</span>
+                     <span class="ocrx_word" title="bbox 412 3015 538 3062;x_wconf 45">Aeußern</span>
+                     <span class="ocrx_word" title="bbox 551 3014 720 3061;x_wconf 95">übertragen.</span>
+                     <span class="ocrx_word" title="bbox 739 3014 796 3060;x_wconf 61">Als</span>
+                     <span class="ocrx_word" title="bbox 804 3012 1076 3060;x_wconf 45">Verwaltungsſtelle</span>
+                     <span class="ocrx_word" title="bbox 1088 3012 1120 3058;x_wconf 0">iſt</span>
+                     <span class="ocrx_word" title="bbox 1132 3010 1304 3057;x_wconf 61">vorgenann</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 168 3060 1303 3113">
+                     <span class="ocrx_word" title="bbox 168 3068 220 3113;x_wconf 78">tem</span>
+                     <span class="ocrx_word" title="bbox 234 3066 417 3112;x_wconf 28">Miniſterium</span>
+                     <span class="ocrx_word" title="bbox 437 3066 477 3111;x_wconf 78">die</span>
+                     <span class="ocrx_word" title="bbox 498 3064 834 3111;x_wconf 78">„General-Verwaltung</span>
+                     <span class="ocrx_word" title="bbox 856 3063 899 3108;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 919 3062 1078 3108;x_wconf 78">königlichen</span>
+                     <span class="ocrx_word" title="bbox 1099 3060 1303 3107;x_wconf 0">Eiſenbahnen“</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 166 3108 1614 3161">
+                     <span class="ocrx_word" title="bbox 166 3116 220 3161;x_wconf 45">mit</span>
+                     <span class="ocrx_word" title="bbox 230 3115 289 3160;x_wconf 78">dem</span>
+                     <span class="ocrx_word" title="bbox 303 3114 377 3160;x_wconf 61">Sitze</span>
+                     <span class="ocrx_word" title="bbox 390 3114 420 3159;x_wconf 78">in</span>
+                     <span class="ocrx_word" title="bbox 433 3113 566 3159;x_wconf 78">München</span>
+                     <span class="ocrx_word" title="bbox 579 3112 790 3158;x_wconf 95">untergeordnet,</span>
+                     <span class="ocrx_word" title="bbox 804 3111 932 3157;x_wconf 95">während</span>
+                     <span class="ocrx_word" title="bbox 946 3110 987 3156;x_wconf 95">die</span>
+                     <span class="ocrx_word" title="bbox 996 3108 1305 3155;x_wconf 11">Eiſenbahnbau-Kom</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 167 3156 1439 3210">
+                     <span class="ocrx_word" title="bbox 167 3163 274 3210;x_wconf 0">miſſion</span>
+                     <span class="ocrx_word" title="bbox 289 3163 332 3209;x_wconf 78">bis</span>
+                     <span class="ocrx_word" title="bbox 344 3162 392 3209;x_wconf 95">zur</span>
+                     <span class="ocrx_word" title="bbox 406 3161 581 3208;x_wconf 95">Vollendung</span>
+                     <span class="ocrx_word" title="bbox 595 3161 665 3207;x_wconf 61">ihrer</span>
+                     <span class="ocrx_word" title="bbox 680 3159 844 3206;x_wconf 95">eigentlichen</span>
+                     <span class="ocrx_word" title="bbox 858 3158 1000 3205;x_wconf 78">Aufgabe,</span>
+                     <span class="ocrx_word" title="bbox 1015 3157 1098 3204;x_wconf 61">neben</span>
+                     <span class="ocrx_word" title="bbox 1113 3157 1158 3204;x_wconf 78">der</span>
+                     <span class="ocrx_word" title="bbox 1171 3156 1305 3203;x_wconf 100">General</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 168 3203 1389 3260">
+                     <span class="ocrx_word" title="bbox 168 3210 351 3260;x_wconf 61">Verwaltung</span>
+                     <span class="ocrx_word" title="bbox 364 3209 409 3258;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 421 3208 582 3258;x_wconf 78">königlichen</span>
+                     <span class="ocrx_word" title="bbox 595 3207 780 3257;x_wconf 11">Eiſenbahnen</span>
+                     <span class="ocrx_word" title="bbox 799 3206 850 3256;x_wconf 95">mit</span>
+                     <span class="ocrx_word" title="bbox 862 3206 921 3255;x_wconf 95">dem</span>
+                     <span class="ocrx_word" title="bbox 937 3205 1009 3255;x_wconf 78">Sitze</span>
+                     <span class="ocrx_word" title="bbox 1021 3205 1050 3254;x_wconf 61">in</span>
+                     <span class="ocrx_word" title="bbox 1063 3204 1210 3254;x_wconf 61">Nürnberg</span>
+                     <span class="ocrx_word" title="bbox 1223 3203 1306 3253;x_wconf 28">gänz</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 170 3253 1307 3308">
+                     <span class="ocrx_word" title="bbox 170 3261 217 3308;x_wconf 95">lich</span>
+                     <span class="ocrx_word" title="bbox 231 3259 365 3307;x_wconf 28">geſondert</span>
+                     <span class="ocrx_word" title="bbox 376 3259 431 3306;x_wconf 61">von</span>
+                     <span class="ocrx_word" title="bbox 445 3258 525 3306;x_wconf 0">dieſer</span>
+                     <span class="ocrx_word" title="bbox 536 3257 735 3305;x_wconf 28">fortzubeſtehen</span>
+                     <span class="ocrx_word" title="bbox 748 3257 797 3304;x_wconf 78">hat</span>
+                     <span class="ocrx_word" title="bbox 810 3256 865 3304;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 879 3256 937 3303;x_wconf 95">dem</span>
+                     <span class="ocrx_word" title="bbox 945 3255 1131 3303;x_wconf 28">Miniſterium</span>
+                     <span class="ocrx_word" title="bbox 1145 3254 1192 3301;x_wconf 95">des</span>
+                     <span class="ocrx_word" title="bbox 1200 3253 1307 3301;x_wconf 78">Innern</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 169 3309 422 3350">
+                     <span class="ocrx_word" title="bbox 169 3310 369 3350;x_wconf 78">untergeordnet</span>
+                     <span class="ocrx_word" title="bbox 382 3309 422 3348;x_wconf 0">iſt.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 210 3349 1308 3404">
+                     <span class="ocrx_word" title="bbox 210 3356 265 3404;x_wconf 78">Die</span>
+                     <span class="ocrx_word" title="bbox 278 3354 594 3404;x_wconf 78">General-Verwaltung</span>
+                     <span class="ocrx_word" title="bbox 607 3354 652 3402;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 665 3353 825 3402;x_wconf 95">königlichen</span>
+                     <span class="ocrx_word" title="bbox 839 3351 1026 3400;x_wconf 11">Eiſenbahnen</span>
+                     <span class="ocrx_word" title="bbox 1043 3350 1140 3399;x_wconf 0">beſteht</span>
+                     <span class="ocrx_word" title="bbox 1157 3350 1210 3398;x_wconf 61">aus</span>
+                     <span class="ocrx_word" title="bbox 1225 3349 1308 3398;x_wconf 95">einem</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 172 3396 1306 3454">
+                     <span class="ocrx_word" title="bbox 172 3403 337 3454;x_wconf 28">Vorſtande,</span>
+                     <span class="ocrx_word" title="bbox 351 3402 414 3453;x_wconf 61">zwei</span>
+                     <span class="ocrx_word" title="bbox 425 3401 552 3452;x_wconf 61">Räthen,</span>
+                     <span class="ocrx_word" title="bbox 567 3400 668 3451;x_wconf 61">wovon</span>
+                     <span class="ocrx_word" title="bbox 681 3400 752 3450;x_wconf 78">einer</span>
+                     <span class="ocrx_word" title="bbox 764 3400 808 3450;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 822 3398 1034 3449;x_wconf 78">Komptabilität</span>
+                     <span class="ocrx_word" title="bbox 1046 3397 1145 3448;x_wconf 61">kundig</span>
+                     <span class="ocrx_word" title="bbox 1157 3397 1218 3447;x_wconf 0">ſeyn</span>
+                     <span class="ocrx_word" title="bbox 1232 3396 1306 3447;x_wconf 61">muß,</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 172 3445 1306 3503">
+                     <span class="ocrx_word" title="bbox 172 3452 253 3503;x_wconf 78">einem</span>
+                     <span class="ocrx_word" title="bbox 272 3451 525 3502;x_wconf 78">Ober-Ingenieur,</span>
+                     <span class="ocrx_word" title="bbox 543 3449 626 3500;x_wconf 78">einem</span>
+                     <span class="ocrx_word" title="bbox 640 3448 912 3500;x_wconf 0">Maſchinenmeiſter,</span>
+                     <span class="ocrx_word" title="bbox 931 3448 982 3498;x_wconf 95">den</span>
+                     <span class="ocrx_word" title="bbox 995 3446 1191 3497;x_wconf 95">erforderlichen</span>
+                     <span class="ocrx_word" title="bbox 1206 3445 1306 3496;x_wconf 45">Kaffe-,</span>
+                  </span>
+               </p>
+            </div>
+            <div class="ocr_block" title="bbox 1346 1598 2503 3499">
+               <p class="ocr_par" title="bbox 1346 1598 2503 3499">
+                  <span class="ocr_line" title="bbox 1347 1598 2484 1652">
+                     <span class="ocrx_word" title="bbox 1347 1605 1537 1652;x_wconf 78">Rechnungs-,</span>
+                     <span class="ocrx_word" title="bbox 1559 1604 1701 1651;x_wconf 45">Kanzlei-,</span>
+                     <span class="ocrx_word" title="bbox 1725 1602 1910 1650;x_wconf 28">Regiſtratur-</span>
+                     <span class="ocrx_word" title="bbox 1935 1602 1990 1648;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 2019 1601 2169 1648;x_wconf 28">techniſchen</span>
+                     <span class="ocrx_word" title="bbox 2190 1598 2484 1646;x_wconf 28">Gehülfen-Perſonal</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1347 1647 2490 1700">
+                     <span class="ocrx_word" title="bbox 1347 1654 1407 1700;x_wconf 95">Der</span>
+                     <span class="ocrx_word" title="bbox 1420 1652 1632 1700;x_wconf 11">Geſchäftsgang</span>
+                     <span class="ocrx_word" title="bbox 1646 1652 1678 1698;x_wconf 0">iſt</span>
+                     <span class="ocrx_word" title="bbox 1692 1652 1734 1698;x_wconf 61">bei</span>
+                     <span class="ocrx_word" title="bbox 1747 1651 1790 1697;x_wconf 61">der</span>
+                     <span class="ocrx_word" title="bbox 1804 1651 1825 1697;x_wconf 45">k.</span>
+                     <span class="ocrx_word" title="bbox 1837 1650 2001 1697;x_wconf 0">Eiſenbahn,</span>
+                     <span class="ocrx_word" title="bbox 2016 1649 2117 1696;x_wconf 28">ſoferne</span>
+                     <span class="ocrx_word" title="bbox 2131 1649 2199 1695;x_wconf 78">nicht</span>
+                     <span class="ocrx_word" title="bbox 2212 1648 2257 1694;x_wconf 100">für</span>
+                     <span class="ocrx_word" title="bbox 2269 1647 2408 1694;x_wconf 11">beſondere</span>
+                     <span class="ocrx_word" title="bbox 2415 1647 2490 1693;x_wconf 61">Fälle</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1349 1698 2489 1747">
+                     <span class="ocrx_word" title="bbox 1349 1703 1483 1747;x_wconf 78">kollegiale</span>
+                     <span class="ocrx_word" title="bbox 1497 1702 1680 1746;x_wconf 78">Behandlung</span>
+                     <span class="ocrx_word" title="bbox 1694 1700 1903 1745;x_wconf 11">vorgeſchrieben</span>
+                     <span class="ocrx_word" title="bbox 1917 1700 1965 1743;x_wconf 0">iſt,</span>
+                     <span class="ocrx_word" title="bbox 1982 1699 2203 1743;x_wconf 28">bureaukratiſch,</span>
+                     <span class="ocrx_word" title="bbox 2225 1698 2279 1741;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 2292 1698 2339 1741;x_wconf 78">der</span>
+                     <span class="ocrx_word" title="bbox 2351 1704 2489 1744;x_wconf 0">Vorſtand</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1349 1745 2408 1797">
+                     <span class="ocrx_word" title="bbox 1349 1750 1380 1797;x_wconf 0">iſt</span>
+                     <span class="ocrx_word" title="bbox 1393 1750 1439 1797;x_wconf 61">für</span>
+                     <span class="ocrx_word" title="bbox 1450 1749 1491 1796;x_wconf 95">die</span>
+                     <span class="ocrx_word" title="bbox 1504 1748 1644 1796;x_wconf 11">geſammte</span>
+                     <span class="ocrx_word" title="bbox 1657 1746 1917 1795;x_wconf 28">Geſchäftsführung</span>
+                     <span class="ocrx_word" title="bbox 1930 1746 1976 1793;x_wconf 78">der</span>
+                     <span class="ocrx_word" title="bbox 1989 1745 2170 1793;x_wconf 78">Verwaltung</span>
+                     <span class="ocrx_word" title="bbox 2184 1754 2408 1794;x_wconf 78">verantwortlich.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1388 1794 2832 1846">
+                     <span class="ocrx_word" title="bbox 1388 1800 1443 1846;x_wconf 95">Die</span>
+                     <span class="ocrx_word" title="bbox 1456 1800 1502 1845;x_wconf 61">der</span>
+                     <span class="ocrx_word" title="bbox 1514 1800 1537 1845;x_wconf 45">k.</span>
+                     <span class="ocrx_word" title="bbox 1553 1798 1872 1845;x_wconf 78">General-Verwaltung</span>
+                     <span class="ocrx_word" title="bbox 1892 1795 2127 1842;x_wconf 95">untergeordneten</span>
+                     <span class="ocrx_word" title="bbox 2148 1794 2490 1841;x_wconf 28">Eiſenbahnbetriebs-Be</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1349 1844 2657 1894">
+                     <span class="ocrx_word" title="bbox 1349 1846 1448 1887;x_wconf 78">hörden</span>
+                     <span class="ocrx_word" title="bbox 1467 1846 1537 1886;x_wconf 11">ſind:</span>
+                     <span class="ocrx_word" title="bbox 1560 1844 1818 1886;x_wconf 11">Eiſenbahnämter,</span>
+                     <span class="ocrx_word" title="bbox 1843 1845 2228 1894;x_wconf 45">Eiſenbahn-Verwaltungen</span>
+                     <span class="ocrx_word" title="bbox 2248 1845 2302 1891;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 2323 1844 2490 1891;x_wconf 0">Eiſenbahn</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1350 1890 2589 1940">
+                     <span class="ocrx_word" title="bbox 1350 1896 1552 1940;x_wconf 78">Erpedizionen.</span>
+                     <span class="ocrx_word" title="bbox 1591 1895 1638 1938;x_wconf 61">An</span>
+                     <span class="ocrx_word" title="bbox 1656 1894 1785 1938;x_wconf 78">einzelnen</span>
+                     <span class="ocrx_word" title="bbox 1799 1892 2051 1937;x_wconf 78">Verkehrspunkten</span>
+                     <span class="ocrx_word" title="bbox 2065 1892 2114 1935;x_wconf 78">auf</span>
+                     <span class="ocrx_word" title="bbox 2124 1892 2183 1935;x_wconf 95">dem</span>
+                     <span class="ocrx_word" title="bbox 2197 1890 2284 1934;x_wconf 78">Lande</span>
+                     <span class="ocrx_word" title="bbox 2298 1901 2378 1940;x_wconf 28">ſollen</span>
+                     <span class="ocrx_word" title="bbox 2393 1900 2491 1939;x_wconf 78">außer</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1349 1940 2554 1990">
+                     <span class="ocrx_word" title="bbox 1349 1947 1406 1988;x_wconf 61">dem</span>
+                     <span class="ocrx_word" title="bbox 1420 1946 1540 1988;x_wconf 78">einfache,</span>
+                     <span class="ocrx_word" title="bbox 1556 1945 1610 1987;x_wconf 61">von</span>
+                     <span class="ocrx_word" title="bbox 1623 1945 1671 1986;x_wconf 95">den</span>
+                     <span class="ocrx_word" title="bbox 1686 1945 1729 1986;x_wconf 78">am</span>
+                     <span class="ocrx_word" title="bbox 1745 1944 1816 1985;x_wconf 78">Orte</span>
+                     <span class="ocrx_word" title="bbox 1830 1943 1955 1985;x_wconf 11">poſtirten</span>
+                     <span class="ocrx_word" title="bbox 1970 1943 2032 1984;x_wconf 95">oder</span>
+                     <span class="ocrx_word" title="bbox 2045 1941 2198 1983;x_wconf 61">erponirten</span>
+                     <span class="ocrx_word" title="bbox 2208 1940 2373 1982;x_wconf 78">Individuen</span>
+                     <span class="ocrx_word" title="bbox 2387 1958 2418 1990;x_wconf 78">zu</span>
+                     <span class="ocrx_word" title="bbox 2432 1958 2493 1990;x_wconf 95">ver</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1350 1986 2493 2041">
+                     <span class="ocrx_word" title="bbox 1350 1993 1455 2041;x_wconf 11">ſehende</span>
+                     <span class="ocrx_word" title="bbox 1468 1992 1675 2040;x_wconf 45">Anhalteſtellen</span>
+                     <span class="ocrx_word" title="bbox 1690 1991 1807 2039;x_wconf 95">errichtet</span>
+                     <span class="ocrx_word" title="bbox 1820 1990 1935 2038;x_wconf 78">werden.</span>
+                     <span class="ocrx_word" title="bbox 1970 1989 2163 2037;x_wconf 61">Gegenwärtig</span>
+                     <span class="ocrx_word" title="bbox 2179 1988 2233 2036;x_wconf 0">ſind</span>
+                     <span class="ocrx_word" title="bbox 2248 1988 2289 2035;x_wconf 95">die</span>
+                     <span class="ocrx_word" title="bbox 2302 1988 2359 2035;x_wconf 95">dem</span>
+                     <span class="ocrx_word" title="bbox 2374 1986 2493 2034;x_wconf 78">Verkehr</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1350 2035 2494 2088">
+                     <span class="ocrx_word" title="bbox 1350 2040 1491 2088;x_wconf 61">eröffneten</span>
+                     <span class="ocrx_word" title="bbox 1504 2039 1696 2087;x_wconf 28">Bahnſtrecken</span>
+                     <span class="ocrx_word" title="bbox 1717 2039 1746 2086;x_wconf 95">in</span>
+                     <span class="ocrx_word" title="bbox 1766 2038 1825 2085;x_wconf 95">vier</span>
+                     <span class="ocrx_word" title="bbox 1837 2037 2026 2085;x_wconf 61">Bahnämter,</span>
+                     <span class="ocrx_word" title="bbox 2047 2036 2103 2083;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 2119 2036 2193 2083;x_wconf 61">zwar</span>
+                     <span class="ocrx_word" title="bbox 2210 2035 2262 2082;x_wconf 78">auf</span>
+                     <span class="ocrx_word" title="bbox 2271 2044 2394 2086;x_wconf 95">folgende</span>
+                     <span class="ocrx_word" title="bbox 2407 2043 2494 2085;x_wconf 0">Weiſe</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1351 2090 1511 2130">
+                     <span class="ocrx_word" title="bbox 1351 2090 1511 2130;x_wconf 78">eingetheilt.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1721 2136 2121 2183">
+                     <span class="ocrx_word" title="bbox 1721 2138 1745 2183;x_wconf 78">I.</span>
+                     <span class="ocrx_word" title="bbox 1771 2137 1912 2182;x_wconf 61">Bahnamt</span>
+                     <span class="ocrx_word" title="bbox 1926 2136 2121 2181;x_wconf 78">Augsburg.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1390 2180 2495 2236">
+                     <span class="ocrx_word" title="bbox 1390 2186 1547 2236;x_wconf 0">Demſelben</span>
+                     <span class="ocrx_word" title="bbox 1568 2185 1624 2235;x_wconf 0">ſind</span>
+                     <span class="ocrx_word" title="bbox 1641 2184 1859 2234;x_wconf 95">untergeordnet:</span>
+                     <span class="ocrx_word" title="bbox 1886 2183 1927 2232;x_wconf 78">die</span>
+                     <span class="ocrx_word" title="bbox 1946 2181 2201 2232;x_wconf 78">Bahnverwaltung</span>
+                     <span class="ocrx_word" title="bbox 2214 2180 2425 2230;x_wconf 45">Donauwörth,</span>
+                     <span class="ocrx_word" title="bbox 2453 2180 2495 2229;x_wconf 100">die</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1351 2229 2486 2286">
+                     <span class="ocrx_word" title="bbox 1351 2235 1620 2286;x_wconf 78">Bahnerpedizionen</span>
+                     <span class="ocrx_word" title="bbox 1627 2234 1853 2284;x_wconf 78">Althegnenberg,</span>
+                     <span class="ocrx_word" title="bbox 1865 2233 2034 2283;x_wconf 11">Gerſthofen,</span>
+                     <span class="ocrx_word" title="bbox 2044 2231 2169 2281;x_wconf 95">Mering,</span>
+                     <span class="ocrx_word" title="bbox 2180 2231 2341 2281;x_wconf 95">Meitingen,</span>
+                     <span class="ocrx_word" title="bbox 2356 2229 2486 2279;x_wconf 78">Stierhof</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1722 2283 2120 2329">
+                     <span class="ocrx_word" title="bbox 1722 2285 1759 2329;x_wconf 78">II.</span>
+                     <span class="ocrx_word" title="bbox 1788 2284 1931 2328;x_wconf 61">Bahnamt</span>
+                     <span class="ocrx_word" title="bbox 1944 2283 2120 2327;x_wconf 78">Bamberg.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1390 2325 2599 2383">
+                     <span class="ocrx_word" title="bbox 1390 2332 1549 2383;x_wconf 0">Demſelben</span>
+                     <span class="ocrx_word" title="bbox 1562 2331 1619 2382;x_wconf 0">ſind</span>
+                     <span class="ocrx_word" title="bbox 1633 2330 1847 2381;x_wconf 78">untergeordnet:</span>
+                     <span class="ocrx_word" title="bbox 1862 2329 1905 2380;x_wconf 78">die</span>
+                     <span class="ocrx_word" title="bbox 1912 2327 2176 2379;x_wconf 78">Bahnerpedizionen</span>
+                     <span class="ocrx_word" title="bbox 2183 2327 2318 2378;x_wconf 0">Hirſchaid</span>
+                     <span class="ocrx_word" title="bbox 2327 2326 2382 2377;x_wconf 61">und</span>
+                     <span class="ocrx_word" title="bbox 2391 2325 2495 2376;x_wconf 78">Vorch</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1352 2376 2494 2431">
+                     <span class="ocrx_word" title="bbox 1352 2383 1420 2431;x_wconf 78">heim</span>
+                     <span class="ocrx_word" title="bbox 1440 2381 1645 2430;x_wconf 61">(vorbehältlich</span>
+                     <span class="ocrx_word" title="bbox 1665 2381 1711 2429;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 1724 2380 1890 2429;x_wconf 0">Zuweiſung</span>
+                     <span class="ocrx_word" title="bbox 1908 2379 1954 2427;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 1972 2379 2023 2427;x_wconf 61">neu</span>
+                     <span class="ocrx_word" title="bbox 2033 2378 2066 2427;x_wconf 61">zu</span>
+                     <span class="ocrx_word" title="bbox 2081 2377 2249 2426;x_wconf 78">eröffnenden</span>
+                     <span class="ocrx_word" title="bbox 2262 2376 2436 2425;x_wconf 11">Bahnſtrecke</span>
+                     <span class="ocrx_word" title="bbox 2449 2376 2494 2424;x_wconf 78">bis</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1352 2431 1532 2470">
+                     <span class="ocrx_word" title="bbox 1352 2431 1532 2470;x_wconf 78">Lichtenfels.)</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1719 2477 2122 2522">
+                     <span class="ocrx_word" title="bbox 1719 2479 1768 2522;x_wconf 95">III.</span>
+                     <span class="ocrx_word" title="bbox 1798 2478 1941 2521;x_wconf 61">Bahnamt</span>
+                     <span class="ocrx_word" title="bbox 1954 2477 2122 2520;x_wconf 78">München.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1391 2524 2574 2573">
+                     <span class="ocrx_word" title="bbox 1391 2527 1548 2570;x_wconf 0">Demſelben</span>
+                     <span class="ocrx_word" title="bbox 1563 2526 1619 2569;x_wconf 0">ſind</span>
+                     <span class="ocrx_word" title="bbox 1632 2525 1852 2568;x_wconf 95">untergeordnet:</span>
+                     <span class="ocrx_word" title="bbox 1875 2524 1914 2567;x_wconf 78">die</span>
+                     <span class="ocrx_word" title="bbox 1928 2526 2196 2573;x_wconf 78">Bahnerpedizionen</span>
+                     <span class="ocrx_word" title="bbox 2214 2525 2396 2571;x_wconf 11">Lochhauſen,</span>
+                     <span class="ocrx_word" title="bbox 2416 2524 2495 2570;x_wconf 100">Mai</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1353 2574 1953 2620">
+                     <span class="ocrx_word" title="bbox 1353 2578 1425 2620;x_wconf 0">ſach,</span>
+                     <span class="ocrx_word" title="bbox 1441 2576 1623 2619;x_wconf 61">Nannhofen,</span>
+                     <span class="ocrx_word" title="bbox 1638 2575 1756 2618;x_wconf 78">Olching</span>
+                     <span class="ocrx_word" title="bbox 1769 2575 1825 2617;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 1838 2574 1953 2617;x_wconf 0">Paſing.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1713 2623 2137 2669">
+                     <span class="ocrx_word" title="bbox 1713 2625 1760 2669;x_wconf 78">IV.</span>
+                     <span class="ocrx_word" title="bbox 1790 2624 1935 2668;x_wconf 61">Bahnamt</span>
+                     <span class="ocrx_word" title="bbox 1947 2623 2137 2667;x_wconf 61">Nürnberg.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1393 2667 2594 2722">
+                     <span class="ocrx_word" title="bbox 1393 2673 1549 2722;x_wconf 0">Demſelben</span>
+                     <span class="ocrx_word" title="bbox 1563 2672 1619 2721;x_wconf 0">ſind</span>
+                     <span class="ocrx_word" title="bbox 1632 2671 1852 2720;x_wconf 78">untergeordnet:</span>
+                     <span class="ocrx_word" title="bbox 1866 2670 1907 2719;x_wconf 78">die</span>
+                     <span class="ocrx_word" title="bbox 1920 2668 2176 2718;x_wconf 61">Bahnverwaltung</span>
+                     <span class="ocrx_word" title="bbox 2186 2668 2336 2717;x_wconf 95">Erlangen,</span>
+                     <span class="ocrx_word" title="bbox 2351 2667 2391 2715;x_wconf 100">die</span>
+                     <span class="ocrx_word" title="bbox 2398 2677 2496 2716;x_wconf 78">Bahn</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1355 2718 2097 2768">
+                     <span class="ocrx_word" title="bbox 1355 2722 1551 2768;x_wconf 78">Erpedizionen</span>
+                     <span class="ocrx_word" title="bbox 1564 2721 1746 2767;x_wconf 61">Baiersdorf,</span>
+                     <span class="ocrx_word" title="bbox 1762 2719 1920 2765;x_wconf 78">Eltersdorf</span>
+                     <span class="ocrx_word" title="bbox 1930 2719 1985 2764;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 1999 2718 2097 2764;x_wconf 61">Fürth.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1394 2766 2498 2816">
+                     <span class="ocrx_word" title="bbox 1394 2770 1449 2812;x_wconf 95">Die</span>
+                     <span class="ocrx_word" title="bbox 1461 2768 1729 2811;x_wconf 0">Perſonalbeſetzung</span>
+                     <span class="ocrx_word" title="bbox 1743 2768 1789 2809;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 1802 2768 2304 2816;x_wconf 78">General-Verwaltungsmitglieder,</span>
+                     <span class="ocrx_word" title="bbox 2327 2767 2405 2813;x_wconf 0">ſowie</span>
+                     <span class="ocrx_word" title="bbox 2418 2766 2498 2812;x_wconf 0">dieſer</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1354 2813 2495 2866">
+                     <span class="ocrx_word" title="bbox 1354 2818 1410 2866;x_wconf 78">vier</span>
+                     <span class="ocrx_word" title="bbox 1422 2817 1594 2866;x_wconf 28">Bahnämter</span>
+                     <span class="ocrx_word" title="bbox 1612 2816 1644 2864;x_wconf 0">iſt</span>
+                     <span class="ocrx_word" title="bbox 1664 2816 1714 2864;x_wconf 61">wie</span>
+                     <span class="ocrx_word" title="bbox 1734 2815 1815 2864;x_wconf 78">folgt.</span>
+                     <span class="ocrx_word" title="bbox 1845 2813 2079 2863;x_wconf 95">Generaldirektor</span>
+                     <span class="ocrx_word" title="bbox 2097 2813 2131 2861;x_wconf 0">iſt</span>
+                     <span class="ocrx_word" title="bbox 2150 2822 2238 2865;x_wconf 78">Franz</span>
+                     <span class="ocrx_word" title="bbox 2259 2821 2360 2864;x_wconf 0">Joſeph</span>
+                     <span class="ocrx_word" title="bbox 2374 2820 2495 2863;x_wconf 28">Dürig.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1355 2863 2668 2913">
+                     <span class="ocrx_word" title="bbox 1355 2867 1482 2913;x_wconf 0">Derſelbe</span>
+                     <span class="ocrx_word" title="bbox 1501 2867 1550 2912;x_wconf 61">hat</span>
+                     <span class="ocrx_word" title="bbox 1566 2866 1655 2912;x_wconf 61">jedoch</span>
+                     <span class="ocrx_word" title="bbox 1673 2866 1717 2911;x_wconf 61">bis</span>
+                     <span class="ocrx_word" title="bbox 1733 2865 1781 2911;x_wconf 78">auf</span>
+                     <span class="ocrx_word" title="bbox 1794 2864 1898 2910;x_wconf 95">weitere</span>
+                     <span class="ocrx_word" title="bbox 1910 2863 2076 2909;x_wconf 11">allerhöchſte</span>
+                     <span class="ocrx_word" title="bbox 2091 2870 2255 2913;x_wconf 61">Verfügung</span>
+                     <span class="ocrx_word" title="bbox 2271 2870 2315 2912;x_wconf 61">als</span>
+                     <span class="ocrx_word" title="bbox 2330 2869 2499 2912;x_wconf 11">adminiſtra</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1357 2912 2496 2963">
+                     <span class="ocrx_word" title="bbox 1357 2917 1424 2959;x_wconf 95">tiver</span>
+                     <span class="ocrx_word" title="bbox 1437 2915 1575 2958;x_wconf 11">Vorſtand</span>
+                     <span class="ocrx_word" title="bbox 1589 2915 1634 2957;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 1641 2913 2045 2957;x_wconf 0">Eiſenbahnbau-Kommiſſion</span>
+                     <span class="ocrx_word" title="bbox 2059 2912 2087 2954;x_wconf 61">in</span>
+                     <span class="ocrx_word" title="bbox 2102 2919 2249 2963;x_wconf 45">Nürnberg</span>
+                     <span class="ocrx_word" title="bbox 2261 2919 2295 2962;x_wconf 78">zu</span>
+                     <span class="ocrx_word" title="bbox 2308 2918 2496 2962;x_wconf 78">funkzioniren.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1357 2958 2584 3013">
+                     <span class="ocrx_word" title="bbox 1357 2966 1411 3013;x_wconf 100">Die</span>
+                     <span class="ocrx_word" title="bbox 1424 2965 1535 3013;x_wconf 78">Leitung</span>
+                     <span class="ocrx_word" title="bbox 1549 2965 1594 3012;x_wconf 95">der</span>
+                     <span class="ocrx_word" title="bbox 1607 2964 1707 3011;x_wconf 61">ganzen</span>
+                     <span class="ocrx_word" title="bbox 1721 2963 1904 3011;x_wconf 78">Verwaltung</span>
+                     <span class="ocrx_word" title="bbox 1918 2962 1950 3009;x_wconf 0">iſt</span>
+                     <span class="ocrx_word" title="bbox 1963 2961 2144 3009;x_wconf 61">gegenwärtig</span>
+                     <span class="ocrx_word" title="bbox 2158 2961 2186 3008;x_wconf 61">in</span>
+                     <span class="ocrx_word" title="bbox 2202 2960 2242 3007;x_wconf 78">die</span>
+                     <span class="ocrx_word" title="bbox 2249 2959 2343 3007;x_wconf 78">Hände</span>
+                     <span class="ocrx_word" title="bbox 2357 2959 2404 3006;x_wconf 95">des</span>
+                     <span class="ocrx_word" title="bbox 2412 2958 2498 3006;x_wconf 95">Kam</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1356 3007 2628 3063">
+                     <span class="ocrx_word" title="bbox 1356 3014 1491 3063;x_wconf 78">merherrn</span>
+                     <span class="ocrx_word" title="bbox 1504 3013 1605 3062;x_wconf 28">Frhrn.</span>
+                     <span class="ocrx_word" title="bbox 1619 3013 1648 3061;x_wconf 61">v.</span>
+                     <span class="ocrx_word" title="bbox 1663 3012 1764 3061;x_wconf 78">Brück</span>
+                     <span class="ocrx_word" title="bbox 1775 3011 1879 3060;x_wconf 78">gelegt,</span>
+                     <span class="ocrx_word" title="bbox 1900 3010 2062 3059;x_wconf 61">bisherigem</span>
+                     <span class="ocrx_word" title="bbox 2074 3009 2286 3058;x_wconf 28">Oberpoſtrathe</span>
+                     <span class="ocrx_word" title="bbox 2297 3009 2353 3057;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 2368 3007 2498 3056;x_wconf 100">Referen</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1357 3056 2500 3111">
+                     <span class="ocrx_word" title="bbox 1357 3063 1400 3111;x_wconf 95">ten</span>
+                     <span class="ocrx_word" title="bbox 1419 3062 1457 3111;x_wconf 78">im</span>
+                     <span class="ocrx_word" title="bbox 1472 3061 1654 3110;x_wconf 28">Miniſterium</span>
+                     <span class="ocrx_word" title="bbox 1670 3061 1718 3109;x_wconf 95">des</span>
+                     <span class="ocrx_word" title="bbox 1739 3059 1876 3108;x_wconf 45">Aeußern.</span>
+                     <span class="ocrx_word" title="bbox 1913 3059 1979 3107;x_wconf 78">Das</span>
+                     <span class="ocrx_word" title="bbox 1997 3058 2093 3107;x_wconf 61">übrige</span>
+                     <span class="ocrx_word" title="bbox 2111 3057 2246 3106;x_wconf 11">Perſonal</span>
+                     <span class="ocrx_word" title="bbox 2258 3056 2354 3105;x_wconf 0">beſteht</span>
+                     <span class="ocrx_word" title="bbox 2373 3056 2428 3104;x_wconf 78">aus</span>
+                     <span class="ocrx_word" title="bbox 2441 3056 2500 3104;x_wconf 95">dem</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1356 3103 2501 3160">
+                     <span class="ocrx_word" title="bbox 1356 3109 1600 3160;x_wconf 78">TOber-Ingenieur</span>
+                     <span class="ocrx_word" title="bbox 1612 3108 1743 3158;x_wconf 45">Friedrich</span>
+                     <span class="ocrx_word" title="bbox 1763 3107 1945 3157;x_wconf 95">Erdinger,</span>
+                     <span class="ocrx_word" title="bbox 1966 3107 2025 3156;x_wconf 78">dem</span>
+                     <span class="ocrx_word" title="bbox 2039 3105 2293 3156;x_wconf 0">Maſchinenmeiſter</span>
+                     <span class="ocrx_word" title="bbox 2315 3104 2386 3154;x_wconf 61">Karl</span>
+                     <span class="ocrx_word" title="bbox 2399 3103 2501 3153;x_wconf 95">Erter</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1358 3154 2497 3209">
+                     <span class="ocrx_word" title="bbox 1358 3161 1412 3209;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 1426 3160 1476 3209;x_wconf 95">den</span>
+                     <span class="ocrx_word" title="bbox 1494 3159 1587 3208;x_wconf 95">beiden</span>
+                     <span class="ocrx_word" title="bbox 1599 3158 1746 3207;x_wconf 0">Aſſeſſoren</span>
+                     <span class="ocrx_word" title="bbox 1758 3157 1871 3206;x_wconf 61">Adolph</span>
+                     <span class="ocrx_word" title="bbox 1883 3157 2049 3206;x_wconf 95">Nobiling</span>
+                     <span class="ocrx_word" title="bbox 2062 3156 2117 3204;x_wconf 61">und</span>
+                     <span class="ocrx_word" title="bbox 2131 3156 2202 3204;x_wconf 78">Mar</span>
+                     <span class="ocrx_word" title="bbox 2215 3154 2317 3203;x_wconf 0">Joſeph</span>
+                     <span class="ocrx_word" title="bbox 2331 3163 2497 3205;x_wconf 11">Eſcherich.</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1399 3202 2497 3258">
+                     <span class="ocrx_word" title="bbox 1399 3209 1570 3258;x_wconf 61">Bahnamt</span>
+                     <span class="ocrx_word" title="bbox 1581 3207 1774 3257;x_wconf 45">Augsburg.</span>
+                     <span class="ocrx_word" title="bbox 1797 3206 1940 3255;x_wconf 28">Inſpektor</span>
+                     <span class="ocrx_word" title="bbox 1952 3206 2008 3254;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 2021 3205 2173 3254;x_wconf 11">Vorſtand:</span>
+                     <span class="ocrx_word" title="bbox 2186 3204 2342 3253;x_wconf 61">Herrmann</span>
+                     <span class="ocrx_word" title="bbox 2355 3202 2497 3251;x_wconf 45">Köhler;</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1359 3252 2609 3308">
+                     <span class="ocrx_word" title="bbox 1359 3258 1636 3308;x_wconf 0">Bahnamts-Kaſſier</span>
+                     <span class="ocrx_word" title="bbox 1647 3258 1702 3306;x_wconf 78">und</span>
+                     <span class="ocrx_word" title="bbox 1711 3256 2000 3306;x_wconf 61">Bahnhofverwalter:</span>
+                     <span class="ocrx_word" title="bbox 2015 3254 2232 3304;x_wconf 78">Kammerjunker</span>
+                     <span class="ocrx_word" title="bbox 2244 3253 2342 3302;x_wconf 78">Oskar</span>
+                     <span class="ocrx_word" title="bbox 2352 3253 2381 3301;x_wconf 45">v.</span>
+                     <span class="ocrx_word" title="bbox 2389 3252 2499 3301;x_wconf 78">Schel</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1358 3300 2499 3357">
+                     <span class="ocrx_word" title="bbox 1358 3307 1461 3357;x_wconf 78">lerer;</span>
+                     <span class="ocrx_word" title="bbox 1482 3306 1648 3356;x_wconf 61">Ingenieur:</span>
+                     <span class="ocrx_word" title="bbox 1671 3305 1804 3355;x_wconf 78">Friedrich</span>
+                     <span class="ocrx_word" title="bbox 1824 3304 1921 3354;x_wconf 78">Petri</span>
+                     <span class="ocrx_word" title="bbox 1933 3303 2177 3353;x_wconf 61">(funkzionirend);</span>
+                     <span class="ocrx_word" title="bbox 2198 3301 2362 3351;x_wconf 78">Offizialen:</span>
+                     <span class="ocrx_word" title="bbox 2385 3300 2499 3350;x_wconf 95">Johann</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1360 3349 2498 3403">
+                     <span class="ocrx_word" title="bbox 1360 3356 1449 3403;x_wconf 78">Adam</span>
+                     <span class="ocrx_word" title="bbox 1464 3355 1603 3402;x_wconf 78">Schmidt,</span>
+                     <span class="ocrx_word" title="bbox 1617 3354 1713 3401;x_wconf 95">Anton</span>
+                     <span class="ocrx_word" title="bbox 1726 3354 1822 3401;x_wconf 78">Werr,</span>
+                     <span class="ocrx_word" title="bbox 1839 3353 1990 3400;x_wconf 78">Ferdinand</span>
+                     <span class="ocrx_word" title="bbox 2004 3351 2214 3399;x_wconf 28">Kriegelſteiner,</span>
+                     <span class="ocrx_word" title="bbox 2229 3350 2362 3397;x_wconf 78">Melchior</span>
+                     <span class="ocrx_word" title="bbox 2374 3349 2498 3396;x_wconf 95">Collorio</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1360 3399 2496 3451">
+                     <span class="ocrx_word" title="bbox 1360 3406 1415 3451;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 1437 3405 1509 3450;x_wconf 78">Mar</span>
+                     <span class="ocrx_word" title="bbox 1521 3404 1699 3450;x_wconf 95">Haushalter.</span>
+                     <span class="ocrx_word" title="bbox 1739 3402 1859 3448;x_wconf 61">Letzterer</span>
+                     <span class="ocrx_word" title="bbox 1880 3402 1944 3448;x_wconf 0">ſteht</span>
+                     <span class="ocrx_word" title="bbox 1964 3401 2181 3447;x_wconf 28">funkzionsweiſe</span>
+                     <span class="ocrx_word" title="bbox 2201 3400 2244 3445;x_wconf 78">der</span>
+                     <span class="ocrx_word" title="bbox 2265 3399 2447 3445;x_wconf 95">Verwaltung</span>
+                     <span class="ocrx_word" title="bbox 2467 3399 2496 3444;x_wconf 95">in</span>
+                  </span>
+                  <span class="ocr_line" title="bbox 1359 3447 2375 3499">
+                     <span class="ocrx_word" title="bbox 1359 3453 1553 3499;x_wconf 45">Donauwörth</span>
+                     <span class="ocrx_word" title="bbox 1565 3452 1621 3498;x_wconf 95">und</span>
+                     <span class="ocrx_word" title="bbox 1636 3451 1759 3497;x_wconf 95">Collorio</span>
+                     <span class="ocrx_word" title="bbox 1772 3451 1846 3496;x_wconf 78">jener</span>
+                     <span class="ocrx_word" title="bbox 1858 3451 1886 3496;x_wconf 61">in</span>
+                     <span class="ocrx_word" title="bbox 1902 3449 2079 3495;x_wconf 11">Oberhauſen</span>
+                     <span class="ocrx_word" title="bbox 2092 3449 2137 3494;x_wconf 78">als</span>
+                     <span class="ocrx_word" title="bbox 2150 3448 2304 3494;x_wconf 95">Verwalter</span>
+                     <span class="ocrx_word" title="bbox 2316 3447 2375 3493;x_wconf 78">vor.</span>
+                  </span>
+               </p>
+            </div>
+         </div>
+      </div>
+  </body>
+</html>
+
