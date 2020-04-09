@@ -96,8 +96,10 @@ public class AltoTest extends SolrTestCaseJ4 {
         "(//arr[@name='pages']/lst/str[@name='id'])[2]/text()='PAGE2'",
         "(//arr[@name='pages']/lst/int[@name='width'])[2]/text()='2092'",
         "(//arr[@name='pages']/lst/int[@name='height'])[2]/text()='3850'",
-        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='PAGE1'",
-        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='PAGE2'",
+        "(//arr[@name='regions']/lst/str[@name='page'])[1]='PAGE1'",
+        "(//arr[@name='regions']/lst/str[@name='page'])[2]='PAGE2'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='regionIdx'])[1]='0'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='regionIdx'])[2]='1'",
         "count(//arr[@name='regions']/lst)=2");
   }
 

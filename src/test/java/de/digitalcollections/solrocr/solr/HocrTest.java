@@ -21,6 +21,8 @@ public class HocrTest extends SolrTestCaseJ4 {
     Path ocrPath = Paths.get("src/test/resources/data/hocr.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
     assertU(adoc("ocr_text", String.format("%s[3034454:3067549]", ocrPath.toString()), "id", "84"));
+    Path multiColPath = Paths.get("src/test/resources/data/multicolumn.hocr");
+    assertU(adoc("ocr_text", multiColPath.toString(),  "id", "96"));
     assertU(commit());
   }
 
@@ -128,7 +130,10 @@ public class HocrTest extends SolrTestCaseJ4 {
   @Test
   public void testAccidentalMerge() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Robinson");
-    assertQ(req, "count(//arr[@name='highlights']/arr)=2");
+    assertQ(
+        req,
+        "count(//arr[@name='regions']/lst)=1",
+        "count(//arr[@name='highlights']/arr)=2");
   }
 
   @Test
@@ -142,8 +147,10 @@ public class HocrTest extends SolrTestCaseJ4 {
         "(//arr[@name='pages']/lst/int[@name='width'])[1]/text()='1600'",
         "(//arr[@name='pages']/lst/int[@name='height'])[1]/text()='2389'",
         "(//arr[@name='pages']/lst/str[@name='id'])[2]/text()='page_32'",
-        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='page_31'",
-        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='page_32'",
+        "(//arr[@name='regions']/lst/str[@name='page'])[1]='page_31'",
+        "(//arr[@name='regions']/lst/str[@name='page'])[2]='page_32'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='regionIdx'])[1]='0'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='regionIdx'])[2]='1'",
         "count(//arr[@name='regions']/lst)=2");
   }
 
@@ -170,7 +177,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "Vögelchen");
     assertQ(
         req,
-        "count(//arr[@name='regions']/lst)=2",
+        "count(//arr[@name='regions']/lst)=4",
         "contains(//lst[@name='84']//arr[@name='snippets']/lst/str[@name='text']/text(), '<em>Vögelchen</em>')");
   }
 
@@ -184,5 +191,18 @@ public class HocrTest extends SolrTestCaseJ4 {
         "//bool[@name='partialOcrHighlights']='true'",
         "count(//lst[@name='ocrHighlighting']/lst)=2",
         "count(//arr[@name='snippets'])=0");
+  }
+
+  @Test
+  public void testMultiColumnSnippet() {
+    SolrQueryRequest req = xmlQ("q", "\"kaffe rechnungs\"");
+    assertQ(
+        req,
+        "count(//lst[@name='ocrHighlighting']//arr[@name='snippets'])=1",
+        "count(//arr[@name='snippets']/lst)=1",
+        "count(//arr[@name='snippets']/lst/arr[@name='regions']/lst)=2",
+        "count(//arr[@name='snippets']/lst/arr[@name='highlights']/arr)=1",
+        "(//int[@name='regionIdx'])[1]=0",
+        "(//int[@name='regionIdx'])[2]=1");
   }
 }

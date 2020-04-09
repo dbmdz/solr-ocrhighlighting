@@ -2,18 +2,19 @@ package de.digitalcollections.solrocr.formats.mini;
 
 import com.google.common.base.Strings;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
-import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.iter.TagBreakIterator;
 import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.model.OcrPage;
-import de.digitalcollections.solrocr.iter.TagBreakIterator;
+import de.digitalcollections.solrocr.model.OcrSnippet;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.search.uhighlight.Passage;
 
@@ -69,31 +70,30 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   }
 
   @Override
-  protected void addHighlightsToSnippet(List<List<OcrBox>> hlBoxes, OcrSnippet snippet) {
+  protected void addHighlightsToSnippet(List<List<OcrBox>> hlSpans, OcrSnippet snippet) {
+    // No scaling necessary with absolute highlights since we don't modify the coordinates
     if (this.absoluteHighlights) {
-      super.addHighlightsToSnippet(hlBoxes, snippet);
+      super.addHighlightsToSnippet(hlSpans, snippet);
       return;
     }
 
-    // Handle relative coordinates
-    OcrBox snip = snippet.getSnippetRegions().get(0);
-    float xOffset = snip.getUlx();
-    float yOffset = snip.getUly();
-    float snipWidth = snip.getLrx() - xOffset;
-    float snipHeight = snip.getLry() - yOffset;
-    hlBoxes.stream()
-        .map(cs -> cs.stream().map(
-            b -> new OcrBox(
-                b.getText(),
-                b.getPageId(),
-              truncateFloat((b.getUlx() - xOffset) / snipWidth),
-              truncateFloat((b.getUly() - yOffset) / snipHeight),
-              truncateFloat((b.getLrx() - xOffset) / snipWidth),
-              truncateFloat((b.getLry() - yOffset) / snipHeight),
-                b.isHighlight()))
-          .collect(Collectors.toList()))
-        .map(this::mergeBoxes)
-        .forEach(snippet::addHighlightRegion);
+    // Handle relative coordinates, coordinates need scaling
+    hlSpans.stream().flatMap(Collection::stream)
+        .forEach(box -> {
+          Optional<OcrBox> region = snippet.getSnippetRegions().stream().filter(r -> r.contains(box)).findFirst();
+          if (!region.isPresent()) {
+            return;
+          }
+          float xOffset = region.get().getUlx();
+          float yOffset = region.get().getUly();
+          float snipWidth = region.get().getLrx() - xOffset;
+          float snipHeight = region.get().getLry() - yOffset;
+          box.setUlx(truncateFloat((box.getUlx() - xOffset) / snipWidth));
+          box.setLrx(truncateFloat((box.getLrx() - xOffset) / snipWidth));
+          box.setUly(truncateFloat((box.getUly() - yOffset) / snipHeight));
+          box.setLry(truncateFloat((box.getLry() - yOffset) / snipHeight));
+        });
+    hlSpans.forEach(span -> snippet.addHighlightRegion(this.mergeBoxes(span)));
   }
 
   @Override

@@ -10,11 +10,11 @@ import java.io.StringReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -146,35 +146,52 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
 
   /** Parse an {@link OcrSnippet} from an OCR fragment. */
   protected OcrSnippet parseFragment(String ocrFragment, OcrPage page) {
-    List<List<OcrBox>> hlBoxes = new ArrayList<>();
     TreeMap<Integer, OcrPage> pages = this.parsePages(ocrFragment);
     List<OcrBox> allBoxes = this.parseWords(ocrFragment, pages, page.id);
     if (allBoxes.isEmpty()) {
       return null;
     }
 
-    Map<String, List<OcrBox>> grouped = allBoxes.stream().collect(Collectors.groupingBy(
-        OcrBox::getPageId, LinkedHashMap::new, Collectors.toList()));
+    // Grouped by columns
+    List<List<OcrBox>> byColumns = new ArrayList<>();
+    List<OcrBox> currentCol = new ArrayList<>();
+    OcrBox prevBox = null;
+    for (OcrBox box : allBoxes) {
+      // Stupid heuristic: If the next box is at least the height of the current box further closer to the  top,
+      // we're on a new column.
+      boolean newColumn =
+          prevBox != null
+              && ((box.getUly() + prevBox.getHeight()) < prevBox.getUly()
+                  || (!box.getPageId().equals(prevBox.getPageId())));
+      if (newColumn) {
+        byColumns.add(currentCol);
+        currentCol = new ArrayList<>();
+      }
+      currentCol.add(box);
+      prevBox = box;
+    }
+    byColumns.add(currentCol);
 
     // Get highlighted spans
-    List<OcrBox> currentHl = null;
+    List<List<OcrBox>> hlSpans = new ArrayList<>();
+    List<OcrBox> currentSpan = null;
     for (OcrBox wordBox : allBoxes) {
       if (wordBox.isHighlight()) {
-        if (currentHl == null) {
-          currentHl = new ArrayList<>();
+        if (currentSpan == null) {
+          currentSpan = new ArrayList<>();
         }
-        currentHl.add(wordBox);
-      } else if (currentHl != null) {
-        hlBoxes.add(currentHl);
-        currentHl = null;
+        currentSpan.add(wordBox);
+      } else if (currentSpan != null) {
+        hlSpans.add(currentSpan);
+        currentSpan = null;
       }
     }
-    if (currentHl != null) {
-      hlBoxes.add(currentHl);
+    if (currentSpan != null) {
+      hlSpans.add(currentSpan);
     }
 
-    List<OcrBox> snippetRegions = grouped.entrySet().stream()
-        .map(e -> determineSnippetRegion(e.getValue(), e.getKey()))
+    List<OcrBox> snippetRegions = byColumns.stream()
+        .map(this::determineSnippetRegion)
         .collect(Collectors.toList());
     Set<String> snippetPageIds = snippetRegions.stream()
         .map(OcrBox::getPageId).collect(Collectors.toSet());
@@ -187,18 +204,18 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         .collect(Collectors.toList());
 
     OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), snippetPages, snippetRegions);
-    this.addHighlightsToSnippet(hlBoxes, snip);
+    this.addHighlightsToSnippet(hlSpans, snip);
     return snip;
   }
 
-  private OcrBox determineSnippetRegion(List<OcrBox> wordBoxes, String pageId) {
+  private OcrBox determineSnippetRegion(List<OcrBox> wordBoxes) {
     float snipUlx = wordBoxes.stream().map(OcrBox::getUlx).min(Float::compareTo).get();
     float snipUly = wordBoxes.stream().map(OcrBox::getUly).min(Float::compareTo).get();
     float snipLrx = wordBoxes.stream().map(OcrBox::getLrx).max(Float::compareTo).get();
     float snipLry = wordBoxes.stream().map(OcrBox::getLry).max(Float::compareTo).get();
+    String pageId = wordBoxes.get(0).getPageId();
     return new OcrBox(null, pageId, snipUlx, snipUly, snipLrx, snipLry, false);
   }
-
 
   /** Parse word boxes from an OCR fragment. */
   protected abstract List<OcrBox> parseWords(String ocrFragment, TreeMap<Integer, OcrPage> pages, String startPage);
@@ -210,18 +227,26 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
    */
   protected abstract TreeMap<Integer, OcrPage> parsePages(String ocrFragment);
 
-  protected void addHighlightsToSnippet(List<List<OcrBox>> hlBoxes, OcrSnippet snippet) {
-    for (OcrBox region : snippet.getSnippetRegions()) {
-      final float xOffset = this.absoluteHighlights ? 0 : region.getUlx();
-      final float yOffset = this.absoluteHighlights ? 0 : region.getUly();
-      hlBoxes.stream()
-          .map(bs -> bs.stream()
-              .filter(b -> b.getPageId().equals(region.getPageId()))
-              .map(b -> new OcrBox(b.getText(), b.getPageId(), b.getUlx() - xOffset, b.getUly() - yOffset,
-                                   b.getLrx() - xOffset, b.getLry() - yOffset, b.isHighlight()))
-              .collect(Collectors.toList()))
-          .forEach(bs -> snippet.addHighlightRegion(this.mergeBoxes(bs)));
-    }
+  protected void addHighlightsToSnippet(List<List<OcrBox>> hlSpans, OcrSnippet snippet) {
+    hlSpans.stream().flatMap(Collection::stream)
+        .forEach(box -> {
+          Optional<OcrBox> region = snippet.getSnippetRegions().stream().filter(r -> r.contains(box)).findFirst();
+          if (!region.isPresent()) {
+            return;
+          }
+          if (!this.absoluteHighlights) {
+            float xOffset = region.get().getUlx();
+            float yOffset = region.get().getUly();
+            box.setUlx(box.getUlx() - xOffset);
+            box.setLrx(box.getLrx() - xOffset);
+            box.setUly(box.getUly() - yOffset);
+            box.setLry(box.getLry() - yOffset);
+          }
+          // Clear the page id to keep the response slim, the user can determine it from the associated region
+          box.setPageId(null);
+          box.setRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
+        });
+    hlSpans.forEach(span -> snippet.addHighlightRegion(this.mergeBoxes(span)));
   }
 
 

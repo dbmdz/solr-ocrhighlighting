@@ -248,12 +248,6 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testCornerHit() throws Exception {
-    SolrQueryRequest req = xmlQ("q", "Anerkennungsfrage");
-    assertQ(req, "//arr[@name='highlights']/arr/lst/int[@name='lry']='1'");
-  }
-
-  @Test
   public void testMultiPageSnippet() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"london nachrichten\"~5", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
     assertQ(

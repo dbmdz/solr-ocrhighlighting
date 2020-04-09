@@ -27,7 +27,11 @@ highlighted OCR fields to their highlighting snippets:
     "ident": {
       "ocr_text": {
         "numTotal": 4,
-        "snippets": [
+        "snippets": [/* see below */]
+      }
+    }
+  }
+}
 ```
 
 The `numTotal` key will specify how many highlighting snippets were found in the document for the query.
@@ -51,8 +55,9 @@ The objects contained unter the `snippets` key are structured like this:
   ],
   "highlights":[
     [{ "text": "Mason and Jeremiah", "ulx": 675, "uly": 110, "lrx": 1036, "lry": 145,
-       "page": "page_380"},
-     { "text": "Dixon,", "ulx": 1, "uly": 167, "lrx": 119, "lry": 204, "page": "page_380"}]
+       "page": "page_380", "regionIdx":  0},
+     { "text": "Dixon,", "ulx": 1, "uly": 167, "lrx": 119, "lry": 204, "page": "page_380",
+       "regionIdx": 0 }]
   ]
 }
 ```
@@ -69,7 +74,8 @@ The objects contained unter the `snippets` key are structured like this:
 - `highlights` contains a list of regions that contain the actual matches for the query as well as the `text` that
   matched the query and the page the match occured on. **Note that the coordinates are relative to the containing
   region, not the page** (this can be changed with the `hl.ocr.absoluteHighlights` parameter). To find the
-  corresponding region for a match, use the `page` value.
+  corresponding region for a match, use the `regionIdx` value, which refers to the index in the `regions` array that
+  the surrounding region is located at.
 
 ## Generation of Snippet Regions
 
@@ -90,12 +96,13 @@ It then proceeds to the next match, which happens to be located on the next line
 the previous match's context, it will be **merged** into the previous snippet and the snippet will be updated.
 In the example, the snippet would grow by two lines (since the context is two line blocks below the last match).
 
-However, the plugin will not build snippets beyond the limits of certain blocks. You wouldn't want a region that
-spans two adjacent columns. The **limit block** can be configured with the `hl.ocr.limitBlock` parameter and defaults to
-`block` (which is format-dependent, but usually refers to a group of multiple paragraphs). If, during context building,
-a block is encountered that is of this type (or an even higher level), the context building will be stopped.
-In the example, the context of the snippet is only one line below the last match, since this is the last line in the
-containing `block`.
+However, the plugin will not expand the context beyond the limits of certain blocks. In our example, we decided that
+we don't want contexts to cross **block** elements. This **limit block** can be configured with the `hl.ocr.limitBlock`
+parameter and defaults to `block` (which is format-dependent, but usually refers to a group of one or more paragraphs
+). If, during context building, a block is encountered that is of this type (or an even higher level), the context
+building will be stopped. In the example, the context of the snippet is only one line below the last match, since
+this is the last line in the containing `block`. **Note that you will still occasionally get snippets that span multiple
+blocks**, in the case when you searched for a phrase and the phrase match crosses multiple blocks.
 
 ## Available highlighting parameters
 
@@ -135,9 +142,8 @@ Additionally, the plugin allows you to customize various OCR-specific parameters
     Defaults to `2`.
 
 `hl.ocr.limitBlock`
-:   Set the block type that passages may not exceed. Valid values are `none` `word`, `line`,
-    `paragraph`, `block` or `page`. This value defaults to `block`, which means that **snippets crossing page boundaries
-    are disabled by default**. Set the value to `none` if you want to enable this feature.
+:   Set the block type that the passage context may not exceed. Valid values are `none` `word`, `line`,
+    `paragraph`, `block` or `page`. This value defaults to `block`.
 
 `hl.ocr.pageId`:
 :   Only show passages from the page with this identifier. Useful in combination with a `fq` for a specific document

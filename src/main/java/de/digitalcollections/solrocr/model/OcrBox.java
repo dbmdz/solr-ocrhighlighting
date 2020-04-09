@@ -17,6 +17,7 @@ public class OcrBox implements Comparable<OcrBox> {
   private float lrx;
   private float lry;
   private boolean isHighlight;
+  private Integer regionIdx;
 
 
   public OcrBox(String text, String pageId, float ulx, float uly, float lrx, float lry, boolean isHighlight) {
@@ -48,6 +49,9 @@ public class OcrBox implements Comparable<OcrBox> {
     }
     if (this.getPageId() != null) {
       snipRegion.add("page", this.getPageId());
+    }
+    if (this.getRegionIdx() != null) {
+      snipRegion.add("regionIdx", this.getRegionIdx());
     }
     return snipRegion;
   }
@@ -88,6 +92,14 @@ public class OcrBox implements Comparable<OcrBox> {
     return lry;
   }
 
+  public float getWidth() {
+    return lrx - ulx;
+  }
+
+  public float getHeight() {
+    return lry - uly;
+  }
+
   public boolean isHighlight() {
     return isHighlight;
   }
@@ -118,5 +130,21 @@ public class OcrBox implements Comparable<OcrBox> {
 
   public void setHighlight(boolean highlight) {
     isHighlight = highlight;
+  }
+
+  public Integer getRegionIdx() {
+    return regionIdx;
+  }
+
+  public void setRegionIdx(int regionIdx) {
+    this.regionIdx = regionIdx;
+  }
+
+  public boolean contains(OcrBox other) {
+    return
+        other.ulx >= this.ulx
+        && other.uly >= this.uly
+        && other.lrx <= this.lrx
+        && other.lry <= this.lry;
   }
 }
