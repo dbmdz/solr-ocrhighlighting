@@ -3,8 +3,8 @@ To enable highlighting, make sure you set `hl=true` in you query. Additionally, 
 you want to have highlighted in the `hl.ocr.fl` parameter.
 
 !!! caution "Highlighting Non-OCR Fields"
-    One unfortunate side-effect of the way the plugin works is that you need to pass non-OCR fields to be highlighted
-    **explicitely** via the `hl.fl` parameter. By default, Solr falls back on highlighting all stored fields if the
+    One unfortunate side effect of the way the plugin works is that you need to pass non-OCR fields to be highlighted
+    **explicitly** via the `hl.fl` parameter. By default, Solr falls back on highlighting all stored fields if the
     parameter is not present, which no longer works if this plugin is used.
 
 ## Response Format
@@ -38,7 +38,7 @@ The `numTotal` key will specify how many highlighting snippets were found in the
 How many of these are actually contained in the response under the `snippets` key depends on the value
 for the `hl.snippets` parameter, which defaults to `1`.
 
-The objects contained unter the `snippets` key are structured like this:
+The objects contained under the `snippets` key are structured like this:
 ```json
 {
   "text": "to those parts, subject to unreasonable claims from the pro­prietor "
@@ -72,14 +72,14 @@ The objects contained unter the `snippets` key are structured like this:
   The object includes coordinates for all four corners it is defined by, as well as the identifier of the `page` the
   region is located on.
 - `highlights` contains a list of regions that contain the actual matches for the query as well as the `text` that
-  matched the query and the page the match occured on. **Note that the coordinates are relative to the containing
+  matched the query and the page the match occurred on. **Note that the coordinates are relative to the containing
   region, not the page** (this can be changed with the `hl.ocr.absoluteHighlights` parameter). To find the
   corresponding region for a match, use the `regionIdx` value, which refers to the index in the `regions` array that
   the surrounding region is located at.
 
 ## Generation of Snippet Regions
 
-To determine how to build regions from from a set of matches, the plugin takes into account the structure of the OCR
+To determine how to build regions from a set of matches, the plugin takes into account the structure of the OCR
 document surrounding each match. Consider the following page from a document, with two matches on two adjacent
 lines.
 
@@ -124,7 +124,7 @@ Of special interest for purposes of OCR highlighting are these:
 
 `hl.weightMatches`
 :   Uses a new and improved highlighting algorithm that is much more precise than the old approach.
-    For example, with this set to `true`, results for a a phrase query `"foo bar baz"` will actually be
+    For example, with this set to `true`, results for a phrase query `"foo bar baz"` will actually be
     highlighted as `<em>foo bar baz</em>` and not as `<em>foo</em> <em>bar</em> <em>baz</em>`. Defaults to
     `off` in Solr versions < 8.0, `on` for all versions > 8.0.
 

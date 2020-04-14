@@ -12,7 +12,7 @@ block types to these general types:
 - **Word**: *required*
 
 These block types can be used in the [`hl.ocr.limitBlock` and `hl.ocr.contextBlock`
-query parameters](query.md#params) to control how snippets are generated.
+query parameters](query.md#available-highlighting-parameters) to control how the plugin generates snippets.
 
 ## hOCR
 
@@ -50,9 +50,9 @@ query parameters](query.md#params) to control how snippets are generated.
 ## MiniOCR
 
 This plugin also includes support for a custom non-standard OCR format that we dubbed *MiniOCR*.
-This format is intended for use cases where reusing the existing OCR files is not possible or
-practical. In these cases, minimizing the storage requirements for the derived OCR files is important,
-which is why we defined this minimalistic format.
+You should use this format when reusing the existing OCR files is not possible or practical. In these cases,
+minimizing the storage requirements for the derived OCR files is important, which is why we defined this
+minimalistic format.
 
 A basic example looks like this:
 

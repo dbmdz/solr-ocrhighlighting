@@ -20,7 +20,7 @@ both the `solrconfig.xml` and the `schema.xml` file in your core's `conf` direct
 
 In your core's `solrconfig.xml, you need to:
 
-1. Instruct the core to load the OCR highlighting plugin so it can find the classes
+1. Instruct the core to load the OCR highlighting plugin, so it can find the classes
    needed to perform OCR indexing and highlighting.
 2. Define a search component that will perform the OCR highlighting at query time
 3. Add the search component to your request handlers that will trigger the highlighting.
@@ -49,7 +49,7 @@ In your core's `solrconfig.xml, you need to:
     search component you defined above. This example uses the standard /select handler.
 
     CAUTION: Make sure that the OCR highlight component is listed **before** the standard
-    highlighting component, i.e. explicitely like in this example or with `first-components`
+    highlighting component, i.e. explicitly like in this example or with `first-components`
   -->
   <requestHandler name="/select" class="solr.SearchHandler">
       <arr name="components">

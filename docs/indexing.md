@@ -12,8 +12,8 @@ the (again, potentially very large) contents themselves in the index.
 
 !!! note "Performance"
     When using external files for highlighting, the performance depends almost exclusively on
-    how fast the underlying storage is able to perform random I/O. This is why **using flash storage
-    for the documents is highly recommended**.
+    how fast the underlying storage is able to perform random I/O. This is why **we highly recommend
+    using flash storage for the documents**.
     
     Another option to increase highlighting performance is
     to **switch from UTF8 to ASCII** (with XML-escaped Unicode codepoints) for the encoding of the OCR
@@ -21,12 +21,12 @@ the (again, potentially very large) contents themselves in the index.
     account. To signal to the plugin that a given source path is encoded in ASCII, include the `{ascii}`
     string after the path, e.g. `/mnt/data/ocrdoc.xml{ascii}[31337:41337]`.
 
-How the source pointers are structured depends on how your actual OCR files on disk map to documents in the Solr
+The structure of the source pointers depends on how your actual OCR files on disk map to documents in the Solr
 index.
 
 !!! caution "Encoding"
     The files pointed at by the source pointers **need to be UTF-8 or ASCII encoded**. Other encodings will lead
-    to unexpected errors and weird behaviour, so make sure that the files are in the correct encoding before you
+    to unexpected errors and weird behaviour, so make sure the files are in the correct encoding before you
     index them.
 
 ## One file per Solr document (`1:1`)
@@ -97,7 +97,7 @@ POST http://solrhost:8983/solr/corename/update
 ]
 ```
 
-As before, multiple file paths are concatenated with the `+` character. The source regions for each file are
+As before, we concateneate multiple file paths with the `+` character. The source regions for each file are
 listed as **comma-separated byte-regions** inside of square brackets.
 
 The format of the regions is inspired by [Python's slicing syntax](https://docs.python.org/3/reference/expressions.html#slicings) and can take these forms:

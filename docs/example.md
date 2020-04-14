@@ -7,9 +7,8 @@ The BNL dataset consists of 2712 newspaper issues in the ALTO format and all
 pages as high resolution TIF images.
 
 The example ships with a search interface that allows querying the OCRed texts and displays
-the matching passages as highlighted image and text snippets. Also included
-is a small IIIF-Viewer that allows viewing the documents and searching for
-text within them.
+the matching passages as highlighted image and text snippets. We also include a small IIIF-Viewer
+that allows viewing the documents and searching for text within them.
 
 ## Online version
 
@@ -25,7 +24,7 @@ To run the example setup yourself, you will need:
 
 - Docker and `docker-compose`
 - Python 3
-- ~15GiB of free storage
+- ~15 GiB of free storage
 
 ## Running the example
 

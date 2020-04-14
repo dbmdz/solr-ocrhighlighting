@@ -3,8 +3,8 @@
 This is a major release with a focus on compatibility and performance.
 
 - **Fixes compatibility with Solr/Lucene 8.4 and 7.6**. We now also have an integration test suite that checks for
- compatibility with all Solr versions >= 7.5 on every change, so compatibility breakage is kept to a minimum in the
-  future.
+ compatibility with all Solr versions >= 7.5 on every change, so compatibility breakage should be kept to a minimum in
+ the future.
 
 **New parameters:**
 - **Add new `pages` key to snippet response with page dimensions**. This can be helpful if you need to calculate
