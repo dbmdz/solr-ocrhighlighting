@@ -177,7 +177,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "Vögelchen");
     assertQ(
         req,
-        "count(//arr[@name='regions']/lst)=4",
+        "count(//arr[@name='regions']/lst)=2",
         "contains(//lst[@name='84']//arr[@name='snippets']/lst/str[@name='text']/text(), '<em>Vögelchen</em>')");
   }
 

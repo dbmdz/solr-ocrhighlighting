@@ -23,6 +23,13 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "43"));
     ocrPath = Paths.get("src/test/resources/data/alto_float.xml");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "44"));
+    String multiColumnPointer =
+        "src/test/resources/data/alto_columns/alto1.xml[179626:179968,179973:180491,180496:180820,"
+            + "180825:181162,181167:191088,191093:214687,214692:261719,261724:267933,267938:310387,"
+            + "310392:352814]+src/test/resources/data/alto_columns/alto2.xml[1997:8611,8616:13294,13299:15243,15248:50042,"
+            + "50047:53793,53798:73482,73487:86667,86672:94241,94246:99808,99813:103087,103092:115141,115146:116775,"
+            + "116780:122549,122554:149762,149767:192789,192794:193502]";
+    assertU(adoc("ocr_text", multiColumnPointer, "id", "96"));
     assertU(commit());
   }
 
@@ -118,5 +125,27 @@ public class AltoTest extends SolrTestCaseJ4 {
             "count(//arr[@name='highlights']/arr/lst)=2",
             "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='elle mur-'",
             "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='mura'");
+  }
+
+  @Test
+  public void testMultipleColumns() {
+    SolrQueryRequest req = xmlQ("q", "\"Hans  Bockel\"", "hl.weightMatches", "true");
+    // We had a bug that resulted in multiple regions here, this assert just tests for that
+    assertQ(
+        req,
+        "count(//arr[@name='regions']/lst)=1"
+    );
+    // Phrase spanning multiple columns
+    req = xmlQ("q", "\"moineau qui possède\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "count(//arr[@name='regions']/lst)=2",
+        "count(//arr[@name='highlights']/arr)=1",
+        "count(//arr[@name='highlights']/arr/lst)=2",
+        "//arr[@name='highlights']/arr/lst[1]/int[@name='regionIdx']/text()='0'",
+        "//arr[@name='highlights']/arr/lst[1]/str[@name='text']/text()='moineau'",
+        "//arr[@name='highlights']/arr/lst[2]/int[@name='regionIdx']/text()='1'",
+        "//arr[@name='highlights']/arr/lst[2]/str[@name='text']/text()='qui possède'"
+    );
   }
 }
