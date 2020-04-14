@@ -27,7 +27,7 @@ HOCR_SNIPS = [
                     "lrx": 611,
                     "lry": 187,
                     "text": "Francisco Pizarro de Panama",
-                    "page": "page_205",
+                    "regionIdx": 0,
                 }
             ]
         ],
@@ -43,7 +43,9 @@ ALTO_SNIPS = [
     {
         "text": "— Ce n'est rien, faisait Lisbeth ; c'est la charrette de <em>Hans Bockel</em> qui passe, ou bien c'est la mère Dreyfus qui s'en va maintenant à la veillée chez les Brêmer.",
         "pages": [{"height": 4790, "id": "P2", "width": 3140}],
-        "regions": [{"ulx": 1621, "uly": 3710, "lrx": 2294, "lry": 3847, "page": "P2"}],
+        "regions": [
+            {"ulx": 1621, "uly": 3710, "lrx": 2294, "lry": 3847, "page": "P2"}
+        ],
         "highlights": [
             [
                 {
@@ -52,7 +54,7 @@ ALTO_SNIPS = [
                     "lrx": 423,
                     "lry": 67,
                     "text": "Hans Bockel",
-                    "page": "P2",
+                    "regionIdx": 0,
                 }
             ]
         ],
