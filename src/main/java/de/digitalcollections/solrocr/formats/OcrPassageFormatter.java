@@ -245,9 +245,9 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
           }
           // Clear the page id to keep the response slim, the user can determine it from the associated region
           box.setPageId(null);
-          box.setRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
+          box.setParentRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
         });
-    hlSpans.forEach(span -> snippet.addHighlightRegion(this.mergeBoxes(span)));
+    hlSpans.forEach(span -> snippet.addHighlightSpan(this.mergeBoxes(span)));
   }
 
 

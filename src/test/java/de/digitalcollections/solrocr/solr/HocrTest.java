@@ -99,7 +99,7 @@ public class HocrTest extends SolrTestCaseJ4 {
         "//arr[@name='pages']/lst/str[@name='id']/text()='page_109'",
         "//arr[@name='pages']/lst/int[@name='width']/text()='1600'",
         "//arr[@name='pages']/lst/int[@name='height']/text()='2389'",
-        "//lst[@name='ocrHighlighting']//str[@name='page']/text()='page_109'");
+        "//lst[@name='ocrHighlighting']//int[@name='pageIdx']/text()='0'");
   }
 
   @Test
@@ -147,10 +147,10 @@ public class HocrTest extends SolrTestCaseJ4 {
         "(//arr[@name='pages']/lst/int[@name='width'])[1]/text()='1600'",
         "(//arr[@name='pages']/lst/int[@name='height'])[1]/text()='2389'",
         "(//arr[@name='pages']/lst/str[@name='id'])[2]/text()='page_32'",
-        "(//arr[@name='regions']/lst/str[@name='page'])[1]='page_31'",
-        "(//arr[@name='regions']/lst/str[@name='page'])[2]='page_32'",
-        "(//arr[@name='highlights']/arr/lst/int[@name='regionIdx'])[1]='0'",
-        "(//arr[@name='highlights']/arr/lst/int[@name='regionIdx'])[2]='1'",
+        "(//arr[@name='regions']/lst/int[@name='pageIdx'])[1]='0'",
+        "(//arr[@name='regions']/lst/int[@name='pageIdx'])[2]='1'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='parentRegionIdx'])[1]='0'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='parentRegionIdx'])[2]='1'",
         "count(//arr[@name='regions']/lst)=2");
   }
 
@@ -202,7 +202,7 @@ public class HocrTest extends SolrTestCaseJ4 {
         "count(//arr[@name='snippets']/lst)=1",
         "count(//arr[@name='snippets']/lst/arr[@name='regions']/lst)=2",
         "count(//arr[@name='snippets']/lst/arr[@name='highlights']/arr)=1",
-        "(//int[@name='regionIdx'])[1]=0",
-        "(//int[@name='regionIdx'])[2]=1");
+        "(//int[@name='parentRegionIdx'])[1]=0",
+        "(//int[@name='parentRegionIdx'])[2]=1");
   }
 }

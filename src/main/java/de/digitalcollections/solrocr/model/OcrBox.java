@@ -1,9 +1,11 @@
 package de.digitalcollections.solrocr.model;
 
 import java.util.Comparator;
+import java.util.List;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class OcrBox implements Comparable<OcrBox> {
   private final Comparator<OcrBox> comparator = Comparator
       .comparing(OcrBox::getPageId)
@@ -17,7 +19,7 @@ public class OcrBox implements Comparable<OcrBox> {
   private float lrx;
   private float lry;
   private boolean isHighlight;
-  private Integer regionIdx;
+  private Integer parentRegionIdx;
 
 
   public OcrBox(String text, String pageId, float ulx, float uly, float lrx, float lry, boolean isHighlight) {
@@ -47,19 +49,31 @@ public class OcrBox implements Comparable<OcrBox> {
     if (this.getText() != null) {
       snipRegion.add("text", this.getText());
     }
-    if (this.getPageId() != null) {
-      snipRegion.add("page", this.getPageId());
+    if (this.getParentRegionIdx() != null) {
+      snipRegion.add("parentRegionIdx", this.getParentRegionIdx());
     }
-    if (this.getRegionIdx() != null) {
-      snipRegion.add("regionIdx", this.getRegionIdx());
+    return snipRegion;
+  }
+
+  public NamedList toNamedList(List<OcrPage> pages) {
+    SimpleOrderedMap snipRegion = (SimpleOrderedMap) this.toNamedList();
+    if (this.getPageId() != null) {
+      snipRegion.remove("pageId");
+      for (int i=0; i < pages.size(); i++) {
+        OcrPage p = pages.get(i);
+        if (p.id.equals(this.getPageId())) {
+          snipRegion.add("pageIdx", i);
+        }
+      }
     }
     return snipRegion;
   }
 
   @Override
   public String toString() {
-    return String.format("OcrBox{text='%s', page='%s', ulx=%s, uly=%s, lrx=%s, lry=%s}",
-                         getText(), getPageId(), getUlx(), getUly(), getLrx(), getLry());
+    return String.format(
+        "OcrBox{text='%s', pageId='%s', regionIdx=%d, ulx=%s, uly=%s, lrx=%s, lry=%s}",
+        getText(), getPageId(), getParentRegionIdx(), getUlx(), getUly(), getLrx(), getLry());
   }
 
 
@@ -132,12 +146,12 @@ public class OcrBox implements Comparable<OcrBox> {
     isHighlight = highlight;
   }
 
-  public Integer getRegionIdx() {
-    return regionIdx;
+  public Integer getParentRegionIdx() {
+    return parentRegionIdx;
   }
 
-  public void setRegionIdx(int regionIdx) {
-    this.regionIdx = regionIdx;
+  public void setParentRegionIdx(int parentRegionIdx) {
+    this.parentRegionIdx = parentRegionIdx;
   }
 
   public boolean contains(OcrBox other) {

@@ -103,10 +103,10 @@ public class AltoTest extends SolrTestCaseJ4 {
         "(//arr[@name='pages']/lst/str[@name='id'])[2]/text()='PAGE2'",
         "(//arr[@name='pages']/lst/int[@name='width'])[2]/text()='2092'",
         "(//arr[@name='pages']/lst/int[@name='height'])[2]/text()='3850'",
-        "(//arr[@name='regions']/lst/str[@name='page'])[1]='PAGE1'",
-        "(//arr[@name='regions']/lst/str[@name='page'])[2]='PAGE2'",
-        "(//arr[@name='highlights']/arr/lst/int[@name='regionIdx'])[1]='0'",
-        "(//arr[@name='highlights']/arr/lst/int[@name='regionIdx'])[2]='1'",
+        "(//arr[@name='regions']/lst/int[@name='pageIdx'])[1]='0'",
+        "(//arr[@name='regions']/lst/int[@name='pageIdx'])[2]='1'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='parentRegionIdx'])[1]='0'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='parentRegionIdx'])[2]='1'",
         "count(//arr[@name='regions']/lst)=2");
   }
 
@@ -142,9 +142,9 @@ public class AltoTest extends SolrTestCaseJ4 {
         "count(//arr[@name='regions']/lst)=2",
         "count(//arr[@name='highlights']/arr)=1",
         "count(//arr[@name='highlights']/arr/lst)=2",
-        "//arr[@name='highlights']/arr/lst[1]/int[@name='regionIdx']/text()='0'",
+        "//arr[@name='highlights']/arr/lst[1]/int[@name='parentRegionIdx']/text()='0'",
         "//arr[@name='highlights']/arr/lst[1]/str[@name='text']/text()='moineau'",
-        "//arr[@name='highlights']/arr/lst[2]/int[@name='regionIdx']/text()='1'",
+        "//arr[@name='highlights']/arr/lst[2]/int[@name='parentRegionIdx']/text()='1'",
         "//arr[@name='highlights']/arr/lst[2]/str[@name='text']/text()='qui possède'"
     );
   }

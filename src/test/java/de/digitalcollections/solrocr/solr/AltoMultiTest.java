@@ -73,7 +73,7 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         "(//arr[@name='pages']/lst/str[@name='id'])[1]/text()='P1'",
         "(//arr[@name='pages']/lst/int[@name='width'])[1]/text()='3170'",
         "(//arr[@name='pages']/lst/int[@name='height'])[1]/text()='4890'",
-        "(//str[@name='page'])[1]/text()='P1'",
+        "(//int[@name='pageIdx'])[1]/text()='0'",
         "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='Embranchement de <em>Bettembourg</em> à Esch s/A.'",
         "(//arr[@name='snippets']/lst/str[@name='text'])[2]/text()='Retour à Luxembourg pour les deux embranchements Départ de <em>Bettembourg</em>: 6h. 50 du soir. |'",
         "(//arr[@name='snippets']/lst/str[@name='text'])[3]/text()='Embranchement de <em>Bettembourg</em> à Ottange.'");
@@ -88,7 +88,7 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         "//arr[@name='pages']/lst/str[@name='id']/text()='P4'",
         "//arr[@name='pages']/lst/int[@name='width']/text()='3170'",
         "//arr[@name='pages']/lst/int[@name='height']/text()='4890'",
-        "(//str[@name='page'])[1]/text()='P4'",
+        "(//int[@name='pageIdx'])[1]/text()='0'",
         "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='burcien zu diirfcn. On écrit de Saint-Pétersbourg, en date du 18 novembre, au <em>Moniteur universel</em>:'");
   }
 
@@ -105,8 +105,8 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         "(//arr[@name='pages']/lst/str[@name='id'])[2]/text()='P3'",
         "(//arr[@name='pages']/lst/int[@name='width'])[2]/text()='3170'",
         "(//arr[@name='pages']/lst/int[@name='height'])[2]/text()='4890'",
-        "(//arr[@name='regions']/lst/str[@name='page'])[1]/text()='P2'",
-        "(//arr[@name='regions']/lst/str[@name='page'])[2]/text()='P3'",
+        "(//arr[@name='regions']/lst/int[@name='pageIdx'])[1]/text()='0'",
+        "(//arr[@name='regions']/lst/int[@name='pageIdx'])[2]/text()='1'",
         "//arr[@name='snippets']/lst/str[@name='text']/text()='Vcschllisse motivirt hat. wird gcwisi nirgends mchr gcwurdigt und tiaukbarer anerkannt, alS hier in unscrcm Landc; abcr auch <em>nirgendS H bas Bediirfnisi</em> nach ciucr cndlichen That des Bundcs dringender alS hier. Die bishcrige Veschliïssc dcs Blindes, welche die Erfullung'");
   }
 

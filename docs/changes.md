@@ -6,9 +6,15 @@ This is a major release with a focus on compatibility and performance.
  compatibility with all Solr versions >= 7.5 on every change, so compatibility breakage should be kept to a minimum in
  the future.
 
-**New parameters:**
+**Breaking API changes:**
 - **Add new `pages` key to snippet response with page dimensions**. This can be helpful if you need to calculate
   the snippet coordinates relative to the page image dimensions.
+- **Replace `page` key on regions and highlights with `pageIdx`**. That is, instead of a string with the
+  corresponding page identifier, we have a numerical index into the `pages` array of the snippett. This reduces
+  the redundancy introduced by the new `pages` parameter at the cost of having to do some pointer chasing in clients.
+- **Add new `parentRegionIdx` key on highlights.** This is a numerical index into the `regions` array and allows for
+  multi-column/multi-page highlighting, where a single highlighting span can be composed of regions on multiple
+  disjunct parts of the page or even multiple pages.
 
 **Format changes:**
 - hocr: Add support for retrieving page identifier from `x_source` an `ppageno` properties
