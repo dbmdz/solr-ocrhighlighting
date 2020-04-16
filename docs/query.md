@@ -48,16 +48,16 @@ The objects contained under the `snippets` key are structured like this:
           "Good Hope, where they",
   "score": 5555104.5,
   "pages": [
-    { "id":  "page_380", "width":  1436, "height":  2427 } 
+    { "id": "page_380", "width": 1436, "height": 2427 }
   ],
   "regions": [
-    { "ulx": 196, "uly": 1703, "lrx": 1232, "lry": 1968, "page": "page_380" }
+    { "ulx": 196, "uly": 1703, "lrx": 1232, "lry": 1968, "pageIdx": 0 }
   ],
   "highlights":[
     [{ "text": "Mason and Jeremiah", "ulx": 675, "uly": 110, "lrx": 1036, "lry": 145,
-       "page": "page_380", "regionIdx":  0},
-     { "text": "Dixon,", "ulx": 1, "uly": 167, "lrx": 119, "lry": 204, "page": "page_380",
-       "regionIdx": 0 }]
+       "parentRegionIdx": 0},
+     { "text": "Dixon,", "ulx": 1, "uly": 167, "lrx": 119, "lry": 204,
+       "parentRegionIdx": 0 }]
   ]
 }
 ```

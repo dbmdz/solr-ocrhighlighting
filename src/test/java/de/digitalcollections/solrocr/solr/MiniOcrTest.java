@@ -243,8 +243,8 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   public void testFilterByPage() throws Exception {
     SolrQueryRequest req = xmlQ("q", "München", "hl.ocr.pageId", "26", "fq", "id:31337");
     assertQ(req,
-        "count(//str[@name='page' and text() != '26'])=0",
-          "count(//str[@name='page' and text() = '26'])=2");
+        "count(//int[@name='pageIdx' and text() != '0'])=0",
+          "count(//int[@name='pageIdx' and text() = '0'])=1");
   }
 
   @Test
@@ -258,9 +258,9 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
         "(//arr[@name='pages']/lst/int[@name='width'])[1]='2000'",
         "(//arr[@name='pages']/lst/str[@name='id'])[2]='10'",
         "(//arr[@name='pages']/lst/int[@name='width'])[2]='1500'",
-        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[1]='9'",
-        "(//arr[@name='highlights']/arr/lst/str[@name='page'])[2]='10'",
-        "(//arr[@name='regions']/lst/str[@name='page'])[1]='9'",
-        "(//arr[@name='regions']/lst/str[@name='page'])[2]='10'");
+        "(//arr[@name='highlights']/arr/lst/int[@name='parentRegionIdx'])[1]='0'",
+        "(//arr[@name='highlights']/arr/lst/int[@name='parentRegionIdx'])[2]='1'",
+        "(//arr[@name='regions']/lst/int[@name='pageIdx'])[1]='0'",
+        "(//arr[@name='regions']/lst/int[@name='pageIdx'])[2]='1'");
   }
 }

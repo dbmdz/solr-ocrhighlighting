@@ -17,7 +17,7 @@ HOCR_SNIPS = [
         "text": "rait par les bénéfices aux frais de l'expédition.Ce fut au mois de juin 1525 que partit <em>Francisco Pizarro de Panama</em> avec un navire et cent-vingt hommes.Nous le laisserons un instant pour revenir",
         "pages": [{"height": 2393, "id": "page_205", "width": 1476}],
         "regions": [
-            {"ulx": 170, "uly": 446, "lrx": 1124, "lry": 796, "page": "page_205"}
+            {"ulx": 170, "uly": 446, "lrx": 1124, "lry": 796, "pageIdx": 0}
         ],
         "highlights": [
             [
@@ -27,7 +27,7 @@ HOCR_SNIPS = [
                     "lrx": 611,
                     "lry": 187,
                     "text": "Francisco Pizarro de Panama",
-                    "regionIdx": 0,
+                    "parentRegionIdx": 0,
                 }
             ]
         ],
@@ -44,7 +44,7 @@ ALTO_SNIPS = [
         "text": "— Ce n'est rien, faisait Lisbeth ; c'est la charrette de <em>Hans Bockel</em> qui passe, ou bien c'est la mère Dreyfus qui s'en va maintenant à la veillée chez les Brêmer.",
         "pages": [{"height": 4790, "id": "P2", "width": 3140}],
         "regions": [
-            {"ulx": 1621, "uly": 3710, "lrx": 2294, "lry": 3847, "page": "P2"}
+            {"ulx": 1621, "uly": 3710, "lrx": 2294, "lry": 3847, "pageIdx": 0}
         ],
         "highlights": [
             [
@@ -54,7 +54,7 @@ ALTO_SNIPS = [
                     "lrx": 423,
                     "lry": 67,
                     "text": "Hans Bockel",
-                    "regionIdx": 0,
+                    "parentRegionIdx": 0,
                 }
             ]
         ],

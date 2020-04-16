@@ -11,7 +11,7 @@ public class OcrSnippet {
   private final String text;
   private final List<OcrPage> pages;
   private final List<OcrBox> snippetRegions;
-  private final List<OcrBox[]> highlightRegions;
+  private final List<OcrBox[]> highlightSpans;
   private float score;
 
   /**
@@ -24,17 +24,17 @@ public class OcrSnippet {
     this.text = text;
     this.pages = pages;
     this.snippetRegions = snippetRegions;
-    this.highlightRegions = new ArrayList<>();
+    this.highlightSpans = new ArrayList<>();
   }
 
-  /** Add a new highlighted region in the snippet.
+  /** Add a new highlighted span in the snippet.
    *
-   * <strong>Note that the region should be relative to the snippet region!</strong>
+   * <strong>Note that the span regions should be relative to the snippet region!</strong>
    *
-   * @param region Location of the highlighted region <strong>relative to the snippet region</strong>.
+   * @param span Locations of the highlighted span <strong>relative to the snippet region</strong>.
    */
-  public void addHighlightRegion(List<OcrBox> region) {
-    this.highlightRegions.add(region.toArray(new OcrBox[0]));
+  public void addHighlightSpan(List<OcrBox> span) {
+    this.highlightSpans.add(span.toArray(new OcrBox[0]));
   }
 
   /** Get the plaintext version of the highlighted page text with highlighting tags */
@@ -52,8 +52,8 @@ public class OcrSnippet {
    *
    * <strong>The highlighted regions are relative to the snippet region, not to the page.</strong>
    */
-  public List<OcrBox[]> getHighlightRegions() {
-    return highlightRegions;
+  public List<OcrBox[]> getHighlightSpans() {
+    return highlightSpans;
   }
 
   /** Get the score of the passage, compared to all other passages in the document */
@@ -76,11 +76,11 @@ public class OcrSnippet {
         .map(OcrPage::toNamedList).toArray(NamedList[]::new);
     m.add("pages", pageEntries);
     NamedList[] snips = this.snippetRegions.stream()
-        .map(OcrBox::toNamedList).toArray(NamedList[]::new);
+        .map(b -> b.toNamedList(pages)).toArray(NamedList[]::new);
     m.add("regions", snips);
-    if (this.getHighlightRegions() != null) {
+    if (this.getHighlightSpans() != null) {
       List<NamedList[]> highlights = new ArrayList<>();
-      for (OcrBox[] region : this.getHighlightRegions()) {
+      for (OcrBox[] region : this.getHighlightSpans()) {
         NamedList[] regionBoxes = Arrays.stream(region)
             .map(OcrBox::toNamedList).toArray(NamedList[]::new);
         highlights.add(regionBoxes);

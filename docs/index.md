@@ -13,17 +13,18 @@ and its position on the page at query time:
           "settled by Charles <em>Mason and Jeremiah Dixon</em>, upon their "
           "return from an observation of the tran­sit of Venus, at the Cape of "
           "Good Hope, where they",
-  "score":5555104.5,
+  "score": 5555104.5,
   "pages": [
-    { "id":  "page_380", "width":  1436, "height":  2427 } 
+    { "id": "page_380", "width":  1436, "height":  2427 }
   ],
-  "regions":[
-    { "ulx":196, "uly":1703, "lrx":1232, "lry":1968, "page":"page_380" }
+  "regions": [
+    { "ulx": 196, "uly": 1703, "lrx": 1232, "lry": 1968, "pageIdx": 0 }
   ],
   "highlights":[
-    [{ "text":"Mason and Jeremiah", "ulx":675, "uly":110, "lrx":1036, "lry":145,
-       "page":"page_380"},
-     { "text":"Dixon,", "ulx":1, "uly":167, "lrx":119, "lry":204, "page":"page_380"}]
+    [{ "text": "Mason and Jeremiah", "ulx": 675, "uly": 110, "lrx": 1036, "lry": 145,
+       "parentRegionIdx": 0},
+     { "text": "Dixon,", "ulx": 1, "uly": 167, "lrx": 119, "lry": 204,
+       "parentRegionIdx": 0 }]
   ]
 }
 ```

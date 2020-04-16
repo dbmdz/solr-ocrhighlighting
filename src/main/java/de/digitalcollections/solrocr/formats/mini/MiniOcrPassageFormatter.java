@@ -92,8 +92,9 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
           box.setLrx(truncateFloat((box.getLrx() - xOffset) / snipWidth));
           box.setUly(truncateFloat((box.getUly() - yOffset) / snipHeight));
           box.setLry(truncateFloat((box.getLry() - yOffset) / snipHeight));
+          box.setParentRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
         });
-    hlSpans.forEach(span -> snippet.addHighlightRegion(this.mergeBoxes(span)));
+    hlSpans.forEach(span -> snippet.addHighlightSpan(this.mergeBoxes(span)));
   }
 
   @Override

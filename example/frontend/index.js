@@ -1,3 +1,4 @@
+import "preact/debug";
 import './style';
 import { Component } from 'preact';
 import TextField from 'preact-material-components/TextField';
@@ -78,13 +79,12 @@ class SnippetView extends Component {
   render() {
     const { docId, query, getImageUrl, snippet, manifestUri} = this.props;
     const { text, highlights } = snippet;
-    let pageIdx = 0;
-    const page = snippet.regions[0].page;
-    const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${page}&q=${query}`;
+    const page = snippet.pages[snippet.regions[0].pageIdx];
+    const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${page.id}&q=${query}`;
     return (
       <div class="snippet-display">
         <a href={viewerUrl} target="_blank" title="Open page in viewer">
-          <img ref={i => this.img = i} src={getImageUrl(snippet.regions[0])} />
+          <img ref={i => this.img = i} src={getImageUrl(snippet.regions[0], page)} />
         </a>
         {this.state.renderedImage && highlights.flatMap(
           hls => hls.map(hl =>
@@ -119,9 +119,9 @@ class SnippetView extends Component {
 }
 
 class NewspaperResultDocument extends Component {
-  getImageUrl(region, width) {
+  getImageUrl(region, page, width) {
     const issueId = this.props.doc.issue_id;
-    const pageNo = region.page.substring(1).padStart(5, '0');
+    const pageNo = page.id.substring(1).padStart(5, '0');
     const x = parseInt(BNL_10MM_TO_PIX_FACTOR * region.ulx);
     const y = parseInt(BNL_10MM_TO_PIX_FACTOR * region.uly);
     const w = parseInt(BNL_10MM_TO_PIX_FACTOR * (region.lrx - region.ulx));
@@ -135,7 +135,7 @@ class NewspaperResultDocument extends Component {
     const { hl, ocr_hl, query } = this.props;
     const doc = highlightDocument(this.props.doc, hl);
     const manifestUri = `${APP_BASE}/iiif/presentation/bnl:${doc.issue_id}/manifest`;
-    const pageIdx = parseInt(ocr_hl.snippets[0].regions[0].page.substring(1)) - 1;
+    const pageIdx = parseInt(ocr_hl.snippets[0].pages[ocr_hl.snippets[0].regions[0].pageIdx].id.substring(1)) - 1;
     const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${pageIdx}&q=${query}`;
     return (
       <div class="result-document">
@@ -173,9 +173,9 @@ class NewspaperResultDocument extends Component {
 
 
 class GoogleResultDocument extends Component {
-  getImageUrl(region, width) {
+  getImageUrl(region, page, width) {
     const volId = this.props.doc.id;
-    const pageId = String(parseInt(region.page.split("_")[1]) - 1).padStart(4, "0");
+    const pageId = String(parseInt(page.id.split("_")[1]) - 1).padStart(4, "0");
     const regionStr = `${region.ulx},${region.uly},${region.lrx - region.ulx},${region.lry - region.uly}`;
     const widthStr = width ? `${width},` : "full";
     return `${IMAGE_API_BASE}/gbooks:${volId}_${pageId}/${regionStr}/${widthStr}/0/default.jpg`;
