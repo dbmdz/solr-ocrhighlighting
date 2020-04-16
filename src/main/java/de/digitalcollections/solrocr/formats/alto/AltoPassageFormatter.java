@@ -144,6 +144,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       int w = (int) Double.parseDouble(attribs.get("WIDTH"));
       int h = (int) Double.parseDouble(attribs.get("HEIGHT"));
       String subsType = attribs.get("SUBS_TYPE");
+
       String text = StringEscapeUtils.unescapeXml(attribs.get("CONTENT"));
       if ("HypPart1".equals(subsType)) {
         text += "-";
@@ -151,8 +152,8 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       if (text.contains(START_HL) || attribs.getOrDefault("SUBS_CONTENT", "").contains(START_HL)) {
         inHighlight = true;
       }
-      wordBoxes.add(new OcrBox(text.replace(START_HL, "")
-                                   .replace(END_HL, ""),
+      wordBoxes.add(new OcrBox(text.replace(START_HL, startHlTag)
+                                   .replace(END_HL, endHlTag),
                                pageId,  x, y, x + w, y + h, inHighlight));
 
       if (inHighlight && subsType != null) {

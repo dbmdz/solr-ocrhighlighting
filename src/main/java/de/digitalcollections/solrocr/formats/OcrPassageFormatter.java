@@ -177,7 +177,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     List<List<OcrBox>> hlSpans = new ArrayList<>();
     List<OcrBox> currentSpan = null;
     for (OcrBox wordBox : allBoxes) {
-      if (wordBox.isHighlight()) {
+      if (wordBox.isInHighlight()) {
         if (currentSpan == null) {
           currentSpan = new ArrayList<>();
         }
@@ -191,6 +191,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       hlSpans.add(currentSpan);
     }
 
+    String highlightedText = getTextFromXml(ocrFragment);
     List<OcrBox> snippetRegions = byColumns.stream()
         .map(this::determineSnippetRegion)
         .collect(Collectors.toList());
@@ -204,7 +205,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         .distinct()
         .collect(Collectors.toList());
 
-    OcrSnippet snip = new OcrSnippet(getTextFromXml(ocrFragment), snippetPages, snippetRegions);
+    OcrSnippet snip = new OcrSnippet(highlightedText, snippetPages, snippetRegions);
     this.addHighlightsToSnippet(hlSpans, snip);
     return snip;
   }
@@ -215,7 +216,18 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     float snipLrx = wordBoxes.stream().map(OcrBox::getLrx).max(Float::compareTo).get();
     float snipLry = wordBoxes.stream().map(OcrBox::getLry).max(Float::compareTo).get();
     String pageId = wordBoxes.get(0).getPageId();
-    return new OcrBox(null, pageId, snipUlx, snipUly, snipLrx, snipLry, false);
+
+    String regionText = wordBoxes.stream().map(OcrBox::getText).collect(Collectors.joining(" "));
+    OcrBox firstBox = wordBoxes.get(0);
+    OcrBox lastBox = wordBoxes.get(wordBoxes.size() -1);
+    if (firstBox.isInHighlight() && !firstBox.getText().contains(startHlTag)) {
+      regionText = startHlTag + regionText;
+    }
+    if (lastBox.isInHighlight() && !lastBox.getText().contains(endHlTag)) {
+      regionText = regionText + endHlTag;
+    }
+
+    return new OcrBox(regionText, pageId, snipUlx, snipUly, snipLrx, snipLry, false);
   }
 
   /** Parse word boxes from an OCR fragment. */
@@ -246,6 +258,8 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
           // Clear the page id to keep the response slim, the user can determine it from the associated region
           box.setPageId(null);
           box.setParentRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
+          // Remove the highlighting tags from the text
+          box.setText(box.getText().replaceAll(startHlTag, "").replaceAll(endHlTag, ""));
         });
     hlSpans.forEach(span -> snippet.addHighlightSpan(this.mergeBoxes(span)));
   }
