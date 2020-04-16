@@ -133,13 +133,16 @@ public class AltoTest extends SolrTestCaseJ4 {
     // We had a bug that resulted in multiple regions here, this assert just tests for that
     assertQ(
         req,
-        "count(//arr[@name='regions']/lst)=1"
+        "count(//arr[@name='regions']/lst)=1",
+        "contains(//arr[@name='regions']/lst/str[@name='text']/text(), 'charrette de <em>Hans Bockel</em> qui passe,')"
     );
     // Phrase spanning multiple columns
     req = xmlQ("q", "\"moineau qui possède\"", "hl.weightMatches", "true");
     assertQ(
         req,
         "count(//arr[@name='regions']/lst)=2",
+        "contains(//arr[@name='regions']/lst[1]/str[@name='text']/text(), 'histoire du <em>moineau</em>')",
+        "contains(//arr[@name='regions']/lst[2]/str[@name='text'], '<em>qui possède</em> deux fois')",
         "count(//arr[@name='highlights']/arr)=1",
         "count(//arr[@name='highlights']/arr/lst)=2",
         "//arr[@name='highlights']/arr/lst[1]/int[@name='parentRegionIdx']/text()='0'",

@@ -93,6 +93,8 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
           box.setUly(truncateFloat((box.getUly() - yOffset) / snipHeight));
           box.setLry(truncateFloat((box.getLry() - yOffset) / snipHeight));
           box.setParentRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
+          // Remove the highlighting tags from the text
+          box.setText(box.getText().replaceAll(startHlTag, "").replaceAll(endHlTag, ""));
         });
     hlSpans.forEach(span -> snippet.addHighlightSpan(this.mergeBoxes(span)));
   }
@@ -115,8 +117,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       if (text.contains(startHlTag)) {
         inHighlight = true;
       }
-      wordBoxes.add(new OcrBox(text.replace(startHlTag, "").replace(endHlTag, ""),
-                               pageId, x, y, x + width, y + height, inHighlight));
+      wordBoxes.add(new OcrBox(text, pageId, x, y, x + width, y + height, inHighlight));
       boolean endOfHl = (
           text.contains(endHlTag)
           || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(), ocrFragment.length()))

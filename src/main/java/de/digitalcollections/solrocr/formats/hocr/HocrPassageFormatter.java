@@ -101,8 +101,7 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
       if (text.contains(startHlTag)) {
         inHighlight = true;
       }
-      wordBoxes.add(new OcrBox(text.replace(startHlTag, "").replace(endHlTag, ""),
-                               pageId, x0, y0, x1, y1, inHighlight));
+      wordBoxes.add(new OcrBox(text, pageId, x0, y0, x1, y1, inHighlight));
       boolean endOfHl = (
           text.contains(endHlTag)
           || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(), ocrFragment.length()))

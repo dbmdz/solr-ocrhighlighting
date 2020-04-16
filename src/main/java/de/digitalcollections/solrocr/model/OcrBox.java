@@ -12,24 +12,25 @@ public class OcrBox implements Comparable<OcrBox> {
       .thenComparingDouble(OcrBox::getUly)
       .thenComparingDouble(OcrBox::getUlx);
 
-  private String pageId;
   private String text;
+  private String pageId;
   private float ulx;
   private float uly;
   private float lrx;
   private float lry;
-  private boolean isHighlight;
+  private boolean inHighlight;
   private Integer parentRegionIdx;
 
 
-  public OcrBox(String text, String pageId, float ulx, float uly, float lrx, float lry, boolean isHighlight) {
+  public OcrBox(String text, String pageId, float ulx, float uly, float lrx, float lry,
+                boolean inHighlight) {
     this.text = text;
     this.pageId = pageId;
     this.ulx = ulx;
     this.uly = uly;
     this.lrx = lrx;
     this.lry = lry;
-    this.isHighlight = isHighlight;
+    this.inHighlight = inHighlight;
   }
 
   private void addDimension(SimpleOrderedMap map, String name, float val) {
@@ -114,8 +115,8 @@ public class OcrBox implements Comparable<OcrBox> {
     return lry - uly;
   }
 
-  public boolean isHighlight() {
-    return isHighlight;
+  public boolean isInHighlight() {
+    return inHighlight;
   }
 
   public void setText(String text) {
@@ -142,8 +143,8 @@ public class OcrBox implements Comparable<OcrBox> {
     this.lry = lry;
   }
 
-  public void setHighlight(boolean highlight) {
-    isHighlight = highlight;
+  public void setInHighlight(boolean inHighlight) {
+    this.inHighlight = inHighlight;
   }
 
   public Integer getParentRegionIdx() {

@@ -75,14 +75,15 @@ public class OcrSnippet {
     NamedList[] pageEntries = this.pages.stream()
         .map(OcrPage::toNamedList).toArray(NamedList[]::new);
     m.add("pages", pageEntries);
-    NamedList[] snips = this.snippetRegions.stream()
+    NamedList[] regions = this.snippetRegions.stream()
         .map(b -> b.toNamedList(pages)).toArray(NamedList[]::new);
-    m.add("regions", snips);
+    m.add("regions", regions);
     if (this.getHighlightSpans() != null) {
       List<NamedList[]> highlights = new ArrayList<>();
       for (OcrBox[] region : this.getHighlightSpans()) {
         NamedList[] regionBoxes = Arrays.stream(region)
-            .map(OcrBox::toNamedList).toArray(NamedList[]::new);
+            .map(OcrBox::toNamedList)
+            .toArray(NamedList[]::new);
         highlights.add(regionBoxes);
       }
       m.add("highlights", highlights);

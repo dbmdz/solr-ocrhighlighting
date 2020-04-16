@@ -202,6 +202,12 @@ public class HocrTest extends SolrTestCaseJ4 {
         "count(//arr[@name='snippets']/lst)=1",
         "count(//arr[@name='snippets']/lst/arr[@name='regions']/lst)=2",
         "count(//arr[@name='snippets']/lst/arr[@name='highlights']/arr)=1",
+        "//arr[@name='regions']/lst[1]/str[@name='text']='Die General-Verwaltung der königlichen Eiſenbahnen "
+            + "beſteht aus einem Vorſtande, zwei Räthen, wovon einer der Komptabilität kundig ſeyn muß, einem "
+            + "Ober-Ingenieur, einem Maſchinenmeiſter, den erforderlichen <em>Kaffe</em>-,'",
+        "//arr[@name='regions']/lst[2]/str[@name='text']='<em>Rechnungs</em>-, Kanzlei-, Regiſtratur- und techniſchen "
+            + "Gehülfen-Perſonal Der Geſchäftsgang iſt bei der k. Eiſenbahn, ſoferne nicht für beſondere Fälle "
+            + "kollegiale Behandlung vorgeſchrieben iſt, bureaukratiſch, und der Vorſtand'",
         "(//int[@name='parentRegionIdx'])[1]=0",
         "(//int[@name='parentRegionIdx'])[2]=1");
   }
