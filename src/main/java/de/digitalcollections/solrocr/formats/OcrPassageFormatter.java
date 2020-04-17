@@ -156,20 +156,23 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     List<List<OcrBox>> byColumns = new ArrayList<>();
     List<OcrBox> currentCol = new ArrayList<>();
     OcrBox prevBox = null;
+    String pageId = null;
     for (OcrBox box : allBoxes) {
       // Stupid, haphazard heuristic for column detection: If the next box is at least the height of the current box
       // times five higher on the page, we're on a new column. Or if the page changes.
       // FIXME: This cleary needs some more thought put into it
-      boolean newColumn =
-          prevBox != null
-              && ((box.getUly() + prevBox.getHeight() * 5) < prevBox.getUly()
-                  || (!box.getPageId().equals(prevBox.getPageId())));
-      if (newColumn) {
+      boolean newColumn = prevBox != null && (box.getUly() + prevBox.getHeight() * 5) < prevBox.getUly();
+      boolean newPage = pageId != null && !box.getPageId().equals(pageId);
+      if (newColumn || newPage) {
         byColumns.add(currentCol);
         currentCol = new ArrayList<>();
       }
       currentCol.add(box);
-      prevBox = box;
+      // Skip very low-height boxes since they throw off the heuristic, we still track page changes, though!
+      if (box.getHeight() > 5) {
+        prevBox = box;
+      }
+      pageId = box.getPageId();
     }
     byColumns.add(currentCol);
 
