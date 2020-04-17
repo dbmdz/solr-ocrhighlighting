@@ -28,14 +28,14 @@ var PARAMS = {
 };
 var BNL_10MM_TO_PIX_FACTOR = 300 / 254;
 var IMAGE_API_BASE = 'https://ocrhl.jbaiter.de/iiif/image/v2'
-//if (typeof window !== 'undefined') {
-//  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
-//} else {
-//  var APP_BASE = 'http://localhost:8181';  // TODO: Read from environment?
-//}
-var APP_BASE = 'http://localhost:8181';
+if (typeof window !== 'undefined') {
+  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
+} else {
+  var APP_BASE = 'http://localhost:8181';  // TODO: Read from environment?
+}
 
 
+// Largely a 1:1 port of https://github.com/ZeeCoder/use-resize-observer (MIT-licensed) to Preact
 function useResizeObserver({ ref, onResize }) {
   const defaultRef = useRef(null);
 
