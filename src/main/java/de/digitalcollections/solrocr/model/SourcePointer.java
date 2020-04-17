@@ -1,13 +1,13 @@
 package de.digitalcollections.solrocr.model;
 
 import com.google.common.collect.ImmutableList;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -83,7 +83,9 @@ public class SourcePointer {
     List<FileSource> fileSources = Arrays.stream(pointer.split("\\+"))
         .map(ptr -> {
           Matcher m = POINTER_PAT.matcher(ptr);
-          m.find();
+          if (!m.find()) {
+            throw new RuntimeException("Could not parse source pointer from '" + ptr + "', cannot index document.");
+          }
           Path sourcePath = Paths.get(m.group("path"));
           List<Region> regions = ImmutableList.of();
           if (m.group("regions") != null) {
@@ -94,10 +96,14 @@ public class SourcePointer {
           }
           try {
             return new FileSource(sourcePath, regions, m.group("isAscii") != null);
+          } catch (FileNotFoundException e) {
+            throw new RuntimeException(
+                "Could not locate file at '" + sourcePath.toString() + "', cannot index document.");
           } catch (IOException e) {
-            return null;
+            throw new RuntimeException(
+                "Could not read file at '" + sourcePath.toString() + "', cannot index document.");
           }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }).collect(Collectors.toList());
     if (fileSources.isEmpty()) {
       return null;
     } else {

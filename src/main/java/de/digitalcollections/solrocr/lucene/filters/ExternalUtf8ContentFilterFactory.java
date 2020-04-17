@@ -40,6 +40,10 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       // Read the input fully to obtain the source pointer
       String ptrStr = IOUtils.toString(input);
       SourcePointer pointer = SourcePointer.parse(ptrStr);
+      if (pointer == null) {
+        throw new RuntimeException(String.format(
+            "Could not parse source pointer from field, check the format (value was: '%s')!", ptrStr));
+      }
       pointer.sources.forEach(this::validateSource);
 
       // Regions contained in source pointers are defined by byte offsets.
