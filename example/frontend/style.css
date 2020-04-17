@@ -61,7 +61,6 @@ main p {
 }
 
 .snippet-display {
-	position: relative;
 	box-shadow: 1px 2px 8px;
     border-radius: 8px;
 }
@@ -69,6 +68,10 @@ main p {
 .snippet-display img {
 	max-width: 100%;
 	border-radius: 8px;
+}
+
+.region-display {
+	position: relative;
 }
 
 .metadata {

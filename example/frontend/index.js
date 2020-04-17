@@ -1,6 +1,8 @@
 import "preact/debug";
 import './style';
+import ResizeObserver from 'resize-observer-polyfill'
 import { Component } from 'preact';
+import { useState, useRef, useEffect, useMemo } from 'preact/hooks';
 import TextField from 'preact-material-components/TextField';
 import LinearProgress from 'preact-material-components/LinearProgress';
 import Typography from 'preact-material-components/Typography';
@@ -26,10 +28,55 @@ var PARAMS = {
 };
 var BNL_10MM_TO_PIX_FACTOR = 300 / 254;
 var IMAGE_API_BASE = 'https://ocrhl.jbaiter.de/iiif/image/v2'
-if (typeof window !== 'undefined') {
-  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
-} else {
-  var APP_BASE = 'http://localhost:8181';  // TODO: Read from environment?
+//if (typeof window !== 'undefined') {
+//  var APP_BASE = `${window.location.protocol || 'http:'}//${window.location.host}`;
+//} else {
+//  var APP_BASE = 'http://localhost:8181';  // TODO: Read from environment?
+//}
+var APP_BASE = 'http://localhost:8181';
+
+
+function useResizeObserver({ ref, onResize }) {
+  const defaultRef = useRef(null);
+
+  if (!ref) {
+    ref = defaultRef
+  }
+  const [size, setSize] = useState({ width: undefined, height: undefined })
+  const previous = useRef({ width: undefined, height: undefined })
+  
+  useEffect(() => {
+    if ((typeof ref !== "object" || ref === null || !(ref.current instanceof Element))) {
+      return
+    }
+
+    const element = ref.current;
+    const observer = new ResizeObserver((entries) => {
+      if (!Array.isArray(entries) || !entries.length) {
+        return
+      }
+
+      const entry = entries[0]
+      const newWidth = Math.round(entry.contentRect.width);
+      const newHeight = Math.round(entry.contentRect.height);
+      if (previous.current.width !== newWidth || previous.current.height !== newHeight) {
+        const newSize = { width: newWidth, height: newHeight }
+        if (onResize) {
+          onResize(newSize)
+        } else {
+          previous.current.width = newWidth
+          previous.current.height = newHeight
+          setSize(newSize)
+        }
+      }
+    })
+    observer.observe(element)
+    return () => observer.unobserve(element)
+  }, [ref, onResize])
+
+  return useMemo(
+    () => ({ ref, width: size.width, height: size.height }),
+    [ref, size ? size.width :null, size ? size.height : null ]);
 }
 
 function highlightDocument(doc, highlights) {
@@ -54,68 +101,65 @@ function highlightFieldValue(val, highlights) {
   return out;
 }
 
-// TODO: Add support for snippets with regions from multiple pages
-class SnippetView extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      renderedImage: undefined,
-    }
-  }
 
-  getHighlightStyle(hlInfo, hue) {
-    const regionWidth = this.props.snippet.regions[0].lrx - this.props.snippet.regions[0].ulx;
-    const scaleFactor = this.state.renderedImage.width / regionWidth;
-    return {
-      position: "absolute",
-      left: `${(scaleFactor * hlInfo.ulx) + this.state.renderedImage.x - 2}px`,
-      top: `${(scaleFactor * hlInfo.uly) + this.state.renderedImage.y - 2}px`,
-      width: `${scaleFactor * (hlInfo.lrx - hlInfo.ulx)}px`,
-      height: `${scaleFactor * (hlInfo.lry - hlInfo.uly)}px`,
-      backgroundColor: `hsla(${hue}, 100%, 50%, 50%)`
-    };
-  }
+const HighlightDisplay = ({ scaleFactor, highlight }) => {
+  const left = scaleFactor * highlight.ulx
+  const top = scaleFactor * highlight.uly
+  const width = scaleFactor * (highlight.lrx - highlight.ulx)
+  const height = scaleFactor * (highlight.lry - highlight.uly)
 
-  render() {
-    const { docId, query, getImageUrl, snippet, manifestUri} = this.props;
-    const { text, highlights } = snippet;
-    const page = snippet.pages[snippet.regions[0].pageIdx];
-    const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${page.id}&q=${query}`;
-    return (
-      <div class="snippet-display">
+  const style = {
+    position: 'absolute',
+    left: `${left}px`,
+    top: `${top}px`,
+    width: `${width}px`,
+    height: `${height}px`,
+    backgroundColor: `hsla(50, 100%, 50%, 50%)`,
+  }
+  return <div style={style} title={highlight.text} />
+}
+
+const RegionDisplay = ({ manifestUri, page, region, highlights, query, getImageUrl }) => {
+  const [scaleFactor, setScaleFactor] = useState(undefined);
+  const { ref } = useResizeObserver({
+    onResize: ({ width }) => setScaleFactor(width / (region.lrx - region.ulx))
+  })
+
+  const viewerUrl = `/viewer/?manifest=${manifestUri}&cv=${page.id}&q=${query}`;
+  return (
+    <div class="region-display">
+      <div class="region-img-container">
         <a href={viewerUrl} target="_blank" title="Open page in viewer">
-          <img ref={i => this.img = i} src={getImageUrl(snippet.regions[0], page)} />
+          <img ref={ref} alt={region.text} src={getImageUrl(region, page)} />
         </a>
-        {this.state.renderedImage && highlights.flatMap(
-          hls => hls.map(hl =>
-            <div class="highlight-box" title={hl.text} style={this.getHighlightStyle(hl, 50)} />))}
-        <p className="highlightable" dangerouslySetInnerHTML={{ __html: text }} />
+        {scaleFactor &&
+          highlights.map(hl => (
+            <HighlightDisplay
+              scaleFactor={scaleFactor}
+              highlight={hl}
+              key={`${hl.text}-${hl.x}`}
+            />
+          ))}
       </div>
-    );
-  }
+    </div>
+  )
+}
 
-  updateDimensions() {
-    if (!this.img) {
-      return;
-    }
-    this.setState({
-      renderedImage: {
-        x: this.img.offsetLeft,
-        y: this.img.offsetTop,
-        width: this.img.width,
-        height: this.img.height,
-      }
-    });
-  }
-
-  componentDidMount() {
-    this.img.addEventListener("load", this.updateDimensions.bind(this));
-    this.img.addEventListener("resize", this.updateDimensions.bind(this));
-  }
-
-  componentWillUnmount() {
-    this.img.removeEventListener("resize", this.updateDimensions.bind(this));
-  }
+const SnippetDisplay = ({ snippet, docId, manifestUri, query, getImageUrl }) => {
+  return (
+    <div class="snippet-display">
+      {snippet.regions.map((region, idx) => {
+        const page = snippet.pages[region.pageIdx]
+        const highlights = snippet.highlights
+          .flatMap(hl => hl)
+          .filter(hl => hl.parentRegionIdx === idx)
+        return <RegionDisplay
+          key={`region-${docId}-${idx}`} getImageUrl={getImageUrl}
+          manifestUri={manifestUri} page={page} region={region}
+          highlights={highlights} query={query} />
+      })}
+    </div>
+  )
 }
 
 class NewspaperResultDocument extends Component {
@@ -162,7 +206,7 @@ class NewspaperResultDocument extends Component {
             <li><strong>Published </strong> {doc.date}</li>
           </ul>
           {ocr_hl && ocr_hl.snippets.map(snip => (
-            <SnippetView
+            <SnippetDisplay
               snippet={snip} docId={doc.issue_id} query={query}
               manifestUri={manifestUri}
               getImageUrl={this.getImageUrl.bind(this)} />))}
@@ -208,7 +252,7 @@ class GoogleResultDocument extends Component {
           </ul>
           {ocr_hl &&
            ocr_hl.snippets.map(snip => (
-             <SnippetView
+             <SnippetDisplay
                snippet={snip} docId={doc.id} query={query}
                manifestUri={manifestUri}
                getImageUrl={this.getImageUrl.bind(this)} />))}
