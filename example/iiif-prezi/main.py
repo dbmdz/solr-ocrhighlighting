@@ -81,19 +81,22 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query, is_bnl):
     doc['within']['total'] = hlresp['numTotal']
     doc['within']['ignored'] = ignored_fields
     for snip in hlresp['snippets']:
-        for idx, hl in enumerate(snip['highlights']):
-            text = snip['text']
-            hl_text = HL_PAT.findall(text)[idx]
+        text = snip['text']
+        hl_textmatches = list(HL_PAT.finditer(text))
+        for idx, hlspan in enumerate(snip['highlights']):
+            hl_match = hl_textmatches[idx]
             try:
-                before = text[:text.index('<em>')]
-                after = text[text.index('</em>') + len('</em>'):]
-                text = text.replace('<em>', '').replace('</em>', '')
+                before = text[:hl_match.start()].replace('<em>', '').replace('</em>', '')
+                after = text[hl_match.end():].replace('<em>', '').replace('</em>', '')
             except ValueError:
                 before = after = None
+            hl_text = hl_match.group(1)
             anno_ids = []
-            for hlbox in hl:
-                x = snip['regions'][0]['ulx'] + hlbox['ulx']
-                y = snip['regions'][0]['uly'] + hlbox['uly']
+            for hlbox in hlspan:
+                region = snip['regions'][hlbox['parentRegionIdx']]
+                page = snip['pages'][region['pageIdx']]['id']
+                x = region['ulx'] + hlbox['ulx']
+                y = region['uly'] + hlbox['uly']
                 w = hlbox['lrx'] - hlbox['ulx']
                 h = hlbox['lry'] - hlbox['uly']
                 if is_bnl:
@@ -111,7 +114,7 @@ def make_contentsearch_response(hlresp, ignored_fields, vol_id, query, is_bnl):
                         "@type": "cnt:ContentAsText",
                         "chars": hlbox['text'] 
                     },
-                    "on": f'{protocol}://{location}{app_path}/{vol_id}/canvas/{snip["regions"][0]["page"]}#xywh={x},{y},{w},{h}'}
+                    "on": f'{protocol}://{location}{app_path}/{vol_id}/canvas/{page}#xywh={x},{y},{w},{h}'}
                 doc['resources'].append(anno)
             doc['hits'].append({
                 '@type': 'search:Hit',
