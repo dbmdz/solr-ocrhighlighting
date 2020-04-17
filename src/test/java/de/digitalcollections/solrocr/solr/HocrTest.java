@@ -211,4 +211,10 @@ public class HocrTest extends SolrTestCaseJ4 {
         "(//int[@name='parentRegionIdx'])[1]=0",
         "(//int[@name='parentRegionIdx'])[2]=1");
   }
+
+  @Test
+  public void testPassageContextMerge() {
+    SolrQueryRequest req = xmlQ("q", "haribo");
+    assertQ(req, "count(//arr[@name='snippets']/lst)=1");
+  }
 }

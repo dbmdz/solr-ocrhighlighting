@@ -123,8 +123,12 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         limitReached = true;
         continue;
       }
+      // advance breakIterator
+      int passageStart = Math.max(breakIter.preceding(start + 1), 0);
+      int passageEnd = Math.min(breakIter.following(end), contentLength);
+
       // See if this term should be part of a new passage.
-      if (start >= passage.getEndOffset()) {
+      if (passageStart >= passage.getEndOffset()) {
         if (passage.getStartOffset() >= 0) {
           numTotal++;
         }
@@ -133,12 +137,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         if (start >= contentLength) {
           break;
         }
-        // advance breakIterator
-        passage.setStartOffset(Math.max(breakIter.preceding(start + 1), 0));
-        passage.setEndOffset(Math.min(breakIter.following(end), contentLength));
-      } else {
-        passage.setEndOffset(Math.min(breakIter.following(end), contentLength));
+        passage.setStartOffset(passageStart);
       }
+      passage.setEndOffset(passageEnd);
       // Add this term to the passage.
       BytesRef term = off.getTerm();// a reference; safe to refer to
       assert term != null;
