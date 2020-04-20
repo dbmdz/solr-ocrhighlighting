@@ -70,7 +70,8 @@ main p {
 	border-radius: 8px;
 }
 
-.region-display {
+.region-img-container {
+	display: inline-block;
 	position: relative;
 }
 
