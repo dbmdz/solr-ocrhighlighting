@@ -2,6 +2,7 @@ package de.digitalcollections.solrocr.model;
 
 import java.util.Comparator;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
@@ -157,7 +158,8 @@ public class OcrBox implements Comparable<OcrBox> {
 
   public boolean contains(OcrBox other) {
     return
-        other.ulx >= this.ulx
+        StringUtils.equals(other.pageId, this.pageId)
+        && other.ulx >= this.ulx
         && other.uly >= this.uly
         && other.lrx <= this.lrx
         && other.lry <= this.lry;
