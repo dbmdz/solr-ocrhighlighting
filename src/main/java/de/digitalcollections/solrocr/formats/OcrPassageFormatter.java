@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.search.uhighlight.Passage;
@@ -258,8 +259,6 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
             box.setUly(box.getUly() - yOffset);
             box.setLry(box.getLry() - yOffset);
           }
-          // Clear the page id to keep the response slim, the user can determine it from the associated region
-          box.setPageId(null);
           box.setParentRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
           // Remove the highlighting tags from the text
           box.setText(box.getText().replaceAll(startHlTag, "").replaceAll(endHlTag, ""));
@@ -283,7 +282,9 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       // We consider a box on a new line if its vertical distance from the current box is close to the line height
       float lineHeight = curBox.getLry() - curBox.getUly();
       float yDiff = Math.abs(nextBox.getUly() - curBox.getUly());
-      if (yDiff > (0.75 * lineHeight)) {
+      boolean newLine = yDiff > (0.75 * lineHeight);
+      boolean newPage = !StringUtils.equals(nextBox.getPageId(), curBox.getPageId());
+      if (newLine || newPage) {
         curBox.setText(curText.toString());
         out.add(curBox);
         curBox = nextBox;
@@ -303,6 +304,8 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       }
     }
     curBox.setText(curText.toString());
+    // Clear the page id to keep the response slim, the user can determine it from the associated region
+    curBox.setPageId(null);
     out.add(curBox);
     return out;
   }
