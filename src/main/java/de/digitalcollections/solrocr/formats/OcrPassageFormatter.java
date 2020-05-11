@@ -198,6 +198,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     String highlightedText = getTextFromXml(ocrFragment);
     List<OcrBox> snippetRegions = byColumns.stream()
         .map(this::determineSnippetRegion)
+        .filter(r -> !r.getText().isEmpty() && !r.getText().trim().isEmpty())
         .collect(Collectors.toList());
     Set<String> snippetPageIds = snippetRegions.stream()
         .map(OcrBox::getPageId).collect(Collectors.toSet());
