@@ -1,4 +1,4 @@
-## 0.4.0 (tbd.)
+## 0.4.0 (2020-05-11)
 
 This is a major release with a focus on compatibility and performance.
 
