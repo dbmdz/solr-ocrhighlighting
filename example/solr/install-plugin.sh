@@ -17,9 +17,10 @@ else
     # Get the URL and filename for the latest release
     echo "Installing plugin from latest GitHub release"
     release_desc="$(curl -sS "$RELEASE_URL")"
-    fname="$(echo "$release_desc" |/tmp/jq -r ".assets[0].name")"
+    asset="$(echo "$release_desc" |/tmp/jq -r '.assets |map(select(.name|test("solr-ocrhighlighting-([0-9.]+)\\.jar")))|.[0]')"
+    fname="$(echo "$asset" |/tmp/jq -r '.name')"
     if [ ! -f "$PLUGIN_LIB_DIR"/"$fname" ]; then
-        url="$(echo "$release_desc" |/tmp/jq -r ".assets[0].browser_download_url")"
+        url="$(echo "$asset" |/tmp/jq -r ".browser_download_url")"
         wget -q "$url" -P "$PLUGIN_LIB_DIR"
     fi
 fi
