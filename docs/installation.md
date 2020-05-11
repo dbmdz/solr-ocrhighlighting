@@ -49,7 +49,7 @@ In your core's `solrconfig.xml, you need to:
     search component you defined above. This example uses the standard /select handler.
 
     CAUTION: Make sure that the OCR highlight component is listed **before** the standard
-    highlighting component, i.e. explicitly like in this example or with `first-components`
+    highlighting component, but **after** the query component.
   -->
   <requestHandler name="/select" class="solr.SearchHandler">
       <arr name="components">
