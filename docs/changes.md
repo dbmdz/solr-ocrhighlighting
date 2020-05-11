@@ -33,6 +33,7 @@ This is a major release with a focus on compatibility and performance.
 - Log warnings during source pointer parsing
 - Filter out empty files during indexing
 - Add new documentation section on performance tuning
+- Empty regions or regions with only whitespace are no longer included in the output
 
 ## 0.3.1 (2019-07-26)
 
