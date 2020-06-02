@@ -1,3 +1,6 @@
+## 0.4.1 (2020-06-02)
+This is a patch release with a fix for excessive memory usage during indexing.
+
 ## 0.4.0 (2020-05-11)
 
 This is a major release with a focus on compatibility and performance.
