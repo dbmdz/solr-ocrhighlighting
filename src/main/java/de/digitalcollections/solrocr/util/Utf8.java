@@ -17,13 +17,14 @@
 
 package de.digitalcollections.solrocr.util;
 
-import com.google.common.annotations.Beta;
-import com.google.common.annotations.GwtCompatible;
-import com.google.common.base.Charsets;
-
 import static com.google.common.base.Preconditions.checkPositionIndexes;
 import static java.lang.Character.MAX_SURROGATE;
 import static java.lang.Character.MIN_SURROGATE;
+
+import com.google.common.annotations.Beta;
+import com.google.common.annotations.GwtCompatible;
+import com.google.common.base.Charsets;
+import java.nio.ByteBuffer;
 
 /**
  * Low-level, high-performance utility methods related to the {@linkplain Charsets#UTF_8 UTF-8}
@@ -103,18 +104,18 @@ public final class Utf8 {
     return utf8Length;
   }
 
-  public static int decodedLength(byte[] buf) {
-    int utf8Length = buf.length;
+  public static int decodedLength(ByteBuffer buf) {
+    int utf8Length = buf.remaining();
     int charLength = utf8Length;
     int i = 0;
 
     // Optimized for pure ASCII, no length difference
-    while (i < utf8Length && (buf[i] & 0xFF) < 0x80) {
+    while (i < utf8Length && (buf.get(i) & 0xFF) < 0x80) {
       i++;
     }
 
     while (i < utf8Length) {
-      int hiBits = ((buf[i] & 0xFF) >> 4) & 0xF;
+      int hiBits = ((buf.get(i) & 0xFF) >> 4) & 0xF;
       switch (hiBits) {
         case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
           // U+0000 to U+0080 are 1 byte UTF-8 and 1 char, so no changes neccessary
@@ -136,7 +137,10 @@ public final class Utf8 {
           i += 4;
           break;
         default:
-          throw new RuntimeException("Illegal UTF8 starting byte.");
+          // This means technically that we're dealing with an illegal starting byte, but since
+          // this method is supposed to handle truncated UTF-8 as well, we just silently ignore it
+          // and increment the counter until we're on a legal UTF-8 starting byte again.
+          i++;
       }
     }
     return charLength;

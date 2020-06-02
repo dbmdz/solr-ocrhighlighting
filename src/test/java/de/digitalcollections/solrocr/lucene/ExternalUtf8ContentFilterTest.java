@@ -1,16 +1,19 @@
 package de.digitalcollections.solrocr.lucene;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.ImmutableList;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilter;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
-import de.digitalcollections.solrocr.reader.MultiFileReader;
 import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.reader.MultiFileReader;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,8 +25,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.lucene.analysis.CharFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExternalUtf8ContentFilterTest {
   private ExternalUtf8ContentFilterFactory fac;
@@ -47,7 +48,7 @@ public class ExternalUtf8ContentFilterTest {
          + "z\uF485մټҘ»\uDB02\uDD15Ȧ\uDBAD\uDE69ԕа뿇1ꈂ\uD9A9\uDDEC\uD9E4\uDC11\uDA47\uDD1A᳦誳\uD8A9"
          + "\uDCF8k8ㅋݏ\uDB74\uDEE1杽ܷ\uDAA1\uDC4ELꢾ냃H";
     byte[] utf8Bytes = randomUnicode.getBytes(StandardCharsets.UTF_8);
-    assertThat(Utf8.decodedLength(utf8Bytes)).isEqualTo(randomUnicode.length());
+    assertThat(Utf8.decodedLength(ByteBuffer.wrap(utf8Bytes))).isEqualTo(randomUnicode.length());
   }
 
   @Test

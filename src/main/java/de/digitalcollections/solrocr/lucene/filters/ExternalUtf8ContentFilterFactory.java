@@ -83,9 +83,25 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     }
   }
 
+  private static long getUtf8DecodedLength(FileChannel fChan, ByteBuffer buf, long numBytes) throws IOException {
+    long numRead = 0;
+    long decodedLength = 0;
+    while (numRead < numBytes) {
+      if (buf.remaining() > (numBytes - numRead)) {
+        buf.limit((int) (numBytes - numRead));
+      }
+      numRead += fChan.read(buf);
+      buf.flip();
+      decodedLength += Utf8.decodedLength(buf);
+      buf.clear();
+    }
+    return decodedLength;
+  }
+
   private void toCharOffsets(SourcePointer ptr) throws IOException {
     int byteOffset = 0;
     int charOffset = 0;
+    ByteBuffer buf = ByteBuffer.allocateDirect(1024 * 1024 /* 1 MiB */);
     // TODO: Use a queue for the file sources so we don't have to read until the end of the last file every time
     // TODO: Think about building the UTF8 -> UTF16 offset map right here if the mapping part should become a
     //       bottle neck
@@ -115,19 +131,16 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
           if (byteOffset != region.start) {
             // Read the data between the current offset and the start of the region
             int len = region.start - byteOffset;
-            byte[] dst = new byte[len];
-            byteOffset += fChan.read(ByteBuffer.wrap(dst));
-            // Determine how many `char`s are in the data
-            charOffset += Utf8.decodedLength(dst);
+            charOffset += getUtf8DecodedLength(fChan, buf, len);
+            byteOffset += len;
           }
 
           int regionSize = region.end - region.start;
           region.start = charOffset;
           region.startOffset = byteOffset;
           // Read region, determine character offsett of region end
-          byte[] dst = new byte[regionSize];
-          byteOffset += fChan.read(ByteBuffer.wrap(dst));
-          charOffset += Utf8.decodedLength(dst);
+          charOffset += getUtf8DecodedLength(fChan, buf, regionSize);
+          byteOffset += regionSize;
           region.end = charOffset;
         }
         // Determine character offset of the end of the file
@@ -135,9 +148,8 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
           byteOffset += fSize;
         } else if (byteOffset != baseOffset + fSize) {
           int len = (baseOffset + fSize) - byteOffset;
-          byte[] dst = new byte[len];
-          byteOffset += fChan.read(ByteBuffer.wrap(dst));
-          charOffset += Utf8.decodedLength(dst);
+          charOffset += getUtf8DecodedLength(fChan, buf, len);
+          byteOffset += len;
         }
       }
     }
