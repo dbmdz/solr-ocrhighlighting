@@ -2,12 +2,14 @@ package de.digitalcollections.solrocr.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
 /** A structured representation of a highlighted OCR snippet. */
-public class OcrSnippet {
+public class OcrSnippet implements Comparable<OcrSnippet> {
+  private static final Comparator<OcrSnippet> COMPARATOR = Comparator.comparing(OcrSnippet::getScore);
   private final String text;
   private final List<OcrPage> pages;
   private final List<OcrBox> snippetRegions;
@@ -89,5 +91,10 @@ public class OcrSnippet {
       m.add("highlights", highlights);
     }
     return m;
+  }
+
+  @Override
+  public int compareTo(OcrSnippet other) {
+    return COMPARATOR.compare(this, other);
   }
 }

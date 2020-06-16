@@ -217,4 +217,14 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "haribo");
     assertQ(req, "count(//arr[@name='snippets']/lst)=1");
   }
+
+  @Test
+  public void testPassageSorting() {
+    String firstSnip = "auf und ſchob <em>Fenia</em> ſo eilig er konnte hinein. Denn vom untern Sto>werk wurden "
+        + "Stimmen laut, und einer der Tatarenkellner geleitete fremde Herrſchaften hinauf.";
+    SolrQueryRequest req = xmlQ("q", "fenia", "hl.snippets", "1");
+    assertQ(req, String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
+    req = xmlQ("q", "fenia", "hl.snippets", "100");
+    assertQ(req, String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
+  }
 }
