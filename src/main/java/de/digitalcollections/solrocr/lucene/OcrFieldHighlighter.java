@@ -7,6 +7,7 @@ import de.digitalcollections.solrocr.util.PageCacheWarmer;
 import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +64,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
 
     if (passages.length > 0) {
-      return formatter.format(passages, content);
+      OcrSnippet[] snippets = formatter.format(passages, content);
+      Arrays.sort(snippets, Collections.reverseOrder());
+      return snippets;
     } else {
       return null;
     }
