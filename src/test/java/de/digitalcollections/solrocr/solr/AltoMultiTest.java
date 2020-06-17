@@ -70,13 +70,13 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         req,
         "count(//arr[@name='snippets']/lst)=3",
         "count(//arr[@name='pages'][1]/lst)=3",
-        "(//arr[@name='pages']/lst/str[@name='id'])[1]/text()='P1'",
-        "(//arr[@name='pages']/lst/int[@name='width'])[1]/text()='3170'",
-        "(//arr[@name='pages']/lst/int[@name='height'])[1]/text()='4890'",
+        "(//arr[@name='pages']/lst/str[@name='id'])[2]/text()='P1'",
+        "(//arr[@name='pages']/lst/int[@name='width'])[2]/text()='3170'",
+        "(//arr[@name='pages']/lst/int[@name='height'])[2]/text()='4890'",
         "(//int[@name='pageIdx'])[1]/text()='0'",
-        "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='Embranchement de <em>Bettembourg</em> à Esch s/A.'",
-        "(//arr[@name='snippets']/lst/str[@name='text'])[2]/text()='Retour à Luxembourg pour les deux embranchements Départ de <em>Bettembourg</em>: 6h. 50 du soir. |'",
-        "(//arr[@name='snippets']/lst/str[@name='text'])[3]/text()='Embranchement de <em>Bettembourg</em> à Ottange.'");
+        "(//arr[@name='snippets']/lst/str[@name='text'])[2]/text()='Embranchement de <em>Bettembourg</em> à Esch s/A.'",
+        "(//arr[@name='snippets']/lst/str[@name='text'])[3]/text()='Retour à Luxembourg pour les deux embranchements Départ de <em>Bettembourg</em>: 6h. 50 du soir. |'",
+        "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='Embranchement de <em>Bettembourg</em> à Ottange.'");
   }
 
   @Test
