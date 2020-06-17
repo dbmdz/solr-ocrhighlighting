@@ -124,7 +124,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   public void testLimitBlockHonored() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Japan", "hl.ocr.absoluteHighlights", "true");
     assertQ(req,
-            "(//arr[@name='snippets']/lst/str[@name='text']/text())[3]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of<em>Japan</em>'");
+            "(//arr[@name='snippets']/lst/str[@name='text']/text())[1]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of<em>Japan</em>'");
   }
 
   @Test
