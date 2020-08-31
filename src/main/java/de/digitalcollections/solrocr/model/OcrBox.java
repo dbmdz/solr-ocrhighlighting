@@ -21,6 +21,8 @@ public class OcrBox implements Comparable<OcrBox> {
   private float lry;
   private boolean inHighlight;
   private Integer parentRegionIdx;
+  private String dehyphenatedForm;
+  private Boolean hyphenStart;
 
 
   public OcrBox(String text, String pageId, float ulx, float uly, float lrx, float lry,
@@ -120,6 +122,18 @@ public class OcrBox implements Comparable<OcrBox> {
     return inHighlight;
   }
 
+  public boolean isHyphenated() {
+    return hyphenStart != null;
+  }
+
+  public String getDehyphenatedForm() {
+    return dehyphenatedForm;
+  }
+
+  public Boolean getHyphenStart() {
+    return hyphenStart;
+  }
+
   public void setText(String text) {
     this.text = text;
   }
@@ -146,6 +160,11 @@ public class OcrBox implements Comparable<OcrBox> {
 
   public void setInHighlight(boolean inHighlight) {
     this.inHighlight = inHighlight;
+  }
+
+  public void setHyphenInfo(boolean hyphenStart, String dehyphenated) {
+    this.hyphenStart = hyphenStart;
+    this.dehyphenatedForm = dehyphenated;
   }
 
   public Integer getParentRegionIdx() {

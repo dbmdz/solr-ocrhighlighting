@@ -146,15 +146,22 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       String subsType = attribs.get("SUBS_TYPE");
 
       String text = StringEscapeUtils.unescapeXml(attribs.get("CONTENT"));
-      if ("HypPart1".equals(subsType)) {
+      Boolean hyphenStart = subsType == null ? null : "HypPart1".equals(subsType);
+      if (hyphenStart != null && hyphenStart) {
         text += "-";
       }
       if (text.contains(START_HL) || attribs.getOrDefault("SUBS_CONTENT", "").contains(START_HL)) {
         inHighlight = true;
       }
-      wordBoxes.add(new OcrBox(text.replace(START_HL, startHlTag)
-                                   .replace(END_HL, endHlTag),
-                               pageId,  x, y, x + w, y + h, inHighlight));
+      OcrBox ocrBox = new OcrBox(text.replace(START_HL, startHlTag)
+          .replace(END_HL, endHlTag),
+          pageId, x, y, x + w, y + h, inHighlight);
+      if (hyphenStart != null) {
+        String dehyphenated =
+            attribs.get("SUBS_CONTENT").replace(START_HL, startHlTag).replace(END_HL, endHlTag);
+        ocrBox.setHyphenInfo(hyphenStart, dehyphenated);
+      }
+      wordBoxes.add(ocrBox);
 
       if (inHighlight && subsType != null) {
         if (subsType.equals("HypPart1") && attribs.get("SUBS_CONTENT").contains(END_HL)) {

@@ -151,4 +151,14 @@ public class AltoTest extends SolrTestCaseJ4 {
         "//arr[@name='highlights']/arr/lst[2]/str[@name='text']/text()='qui possède'"
     );
   }
+
+  @Test
+  public void testDehyphenation() {
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"au bureau en qualité\"");
+    assertQ(
+        req,
+        "count(//arr[@name='regions'])=1",
+        "contains(//arr[@name='snippets']/lst/str[@name='text'], '<em>qualité</em>')",
+        "contains(//arr[@name='regions']/lst/str[@name='text'], '<em>qualité</em>')");
+  }
 }

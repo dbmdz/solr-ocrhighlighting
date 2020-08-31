@@ -222,9 +222,12 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     float snipLry = wordBoxes.stream().map(OcrBox::getLry).max(Float::compareTo).get();
     String pageId = wordBoxes.get(0).getPageId();
 
-    String regionText = wordBoxes.stream().map(OcrBox::getText).collect(Collectors.joining(" "));
+    String regionText = wordBoxes.stream()
+        .filter(box -> !box.isHyphenated() || box.getHyphenStart())
+        .map(box ->   box.isHyphenated() ? box.getDehyphenatedForm() : box.getText())
+        .collect(Collectors.joining(" "));
     OcrBox firstBox = wordBoxes.get(0);
-    OcrBox lastBox = wordBoxes.get(wordBoxes.size() -1);
+    OcrBox lastBox = wordBoxes.get(wordBoxes.size() - 1);
     if (firstBox.isInHighlight() && !firstBox.getText().contains(startHlTag)) {
       regionText = startHlTag + regionText;
     }
