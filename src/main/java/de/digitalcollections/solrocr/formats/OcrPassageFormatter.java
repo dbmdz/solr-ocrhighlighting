@@ -196,16 +196,23 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     List<OcrBox> currentSpan = null;
     for (OcrBox wordBox : allBoxes) {
       if (wordBox.isInHighlight()) {
-        if (currentSpan == null) {
+        boolean isInNewSpan = (
+            currentSpan == null
+            || currentSpan.isEmpty()
+            || !wordBox.getHighlightSpan().equals(currentSpan.get(0).getHighlightSpan()));
+        if (isInNewSpan) {
+          if (currentSpan != null && !currentSpan.isEmpty()) {
+            hlSpans.add(currentSpan);
+          }
           currentSpan = new ArrayList<>();
         }
         currentSpan.add(wordBox);
-      } else if (currentSpan != null) {
+      } else if (currentSpan != null && !currentSpan.isEmpty()) {
         hlSpans.add(currentSpan);
         currentSpan = null;
       }
     }
-    if (currentSpan != null) {
+    if (currentSpan != null && !currentSpan.isEmpty()) {
       hlSpans.add(currentSpan);
     }
 
@@ -246,7 +253,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
       regionText = regionText + endHlTag;
     }
 
-    return new OcrBox(regionText, pageId, snipUlx, snipUly, snipLrx, snipLry, false);
+    return new OcrBox(regionText, pageId, snipUlx, snipUly, snipLrx, snipLry, null);
   }
 
   /** Parse word boxes from an OCR fragment. */

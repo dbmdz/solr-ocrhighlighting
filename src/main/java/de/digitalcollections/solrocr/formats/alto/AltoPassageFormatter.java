@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.text.StringEscapeUtils;
@@ -172,7 +173,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         .replaceAll(endHlTag, END_HL);
     List<OcrBox> wordBoxes = new ArrayList<>();
     Matcher m = wordPat.matcher(ocrFragment);
-    boolean inHighlight = false;
+    UUID currentHighlight = null;
     boolean highlightHyphenEnd = false;
     while (m.find()) {
       String pageId = startPage;
@@ -191,23 +192,23 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         text += "-";
       }
       if (text.contains(START_HL) || attribs.getOrDefault("SUBS_CONTENT", "").contains(START_HL)) {
-        inHighlight = true;
+        currentHighlight = UUID.randomUUID();
       }
       wordBoxes.add(new OcrBox(text.replace(START_HL, startHlTag)
                                    .replace(END_HL, endHlTag),
-                               pageId,  x, y, x + w, y + h, inHighlight));
+                               pageId,  x, y, x + w, y + h, currentHighlight));
 
-      if (inHighlight && subsType != null) {
+      if (currentHighlight != null && subsType != null) {
         if (subsType.equals("HypPart1") && attribs.get("SUBS_CONTENT").contains(END_HL)) {
           highlightHyphenEnd = true;
         } else if (highlightHyphenEnd){
           highlightHyphenEnd = false;
-          inHighlight = false;
+          currentHighlight = null;
         }
       } else if (text.contains(END_HL)) {
-        inHighlight = false;
+        currentHighlight = null;
       } else if (ocrFragment.substring(m.end(), Math.min(m.end() + END_HL.length(), ocrFragment.length())).equals(END_HL)) {
-        inHighlight = false;
+        currentHighlight = null;
       }
     }
     return wordBoxes;
