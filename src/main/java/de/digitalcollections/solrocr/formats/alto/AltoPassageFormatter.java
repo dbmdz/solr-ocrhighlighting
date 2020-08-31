@@ -2,9 +2,9 @@ package de.digitalcollections.solrocr.formats.alto;
 
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.iter.TagBreakIterator;
 import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.model.OcrPage;
-import de.digitalcollections.solrocr.iter.TagBreakIterator;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.lucene.search.uhighlight.Passage;
 
 public class AltoPassageFormatter extends OcrPassageFormatter {
 
@@ -25,8 +26,8 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
 
   private final TagBreakIterator pageIter = new TagBreakIterator("Page");
 
-  protected AltoPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
-    super(startHlTag, endHlTag, absoluteHighlights);
+  protected AltoPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans) {
+    super(startHlTag, endHlTag, absoluteHighlights, alignSpans);
   }
 
   private Map<String, String> parseAttribs(String attribStr) {
@@ -120,6 +121,46 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         .trim()
         .replaceAll(START_HL, startHlTag)
         .replaceAll(END_HL, endHlTag);
+  }
+
+  @Override
+  protected String getHighlightedFragment(Passage passage, IterableCharSequence content) {
+    StringBuilder sb = new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
+    int extraChars = 0;
+    if (passage.getNumMatches() > 0) {
+      List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
+      for (PassageMatch match : matches) {
+        String preMatchContent = content.subSequence(passage.getStartOffset(), match.start).toString();
+        int matchStart = preMatchContent.length();
+        if (alignSpans) {
+          matchStart = preMatchContent.lastIndexOf("CONTENT=") + 9;
+        }
+        sb.insert(matchStart + extraChars, startHlTag);
+        extraChars += startHlTag.length();
+        int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
+        String matchText = sb.substring(extraChars + matchStart, extraChars + matchEnd);
+        if (matchText.trim().endsWith(">")) {
+          // Set the end of the match to the position before the last inner closing tag inside of the match.
+          Matcher m = LAST_INNER_TAG_PAT.matcher(matchText);
+          int idx = -1;
+          while (m.find()) {
+            idx = m.start() + 1;
+          }
+          if (idx > -1) {
+            matchEnd -= (matchText.length() - idx);
+          }
+        }
+        matchEnd = Math.min(matchEnd + extraChars, sb.length());
+        if (alignSpans && matchEnd != sb.length()) {
+          String postMatchContent = content.subSequence(
+              passage.getStartOffset() + matchEnd, passage.getEndOffset()).toString();
+          matchEnd += (postMatchContent.indexOf('"'));
+        }
+        sb.insert(matchEnd, endHlTag);
+        extraChars += endHlTag.length();
+      }
+    }
+    return sb.toString();
   }
 
   @Override

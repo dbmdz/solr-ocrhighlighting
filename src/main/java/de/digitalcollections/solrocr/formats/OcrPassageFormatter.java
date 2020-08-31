@@ -34,23 +34,25 @@ import org.slf4j.LoggerFactory;
  * Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances.
  */
 public abstract class OcrPassageFormatter extends PassageFormatter {
-  private static final Pattern LAST_INNER_TAG_PAT = Pattern.compile("[a-zA-Z0-9]</");
-  private static final Pattern TITLE_PAT = Pattern.compile("<title>.*?</title>");
+  protected static final Pattern LAST_INNER_TAG_PAT = Pattern.compile("[a-zA-Z0-9]</");
+  protected static final Pattern TITLE_PAT = Pattern.compile("<title>.*?</title>");
 
   private static final Logger logger = LoggerFactory.getLogger(OcrPassageFormatter.class);
   protected final String startHlTag;
   protected final String endHlTag;
   protected final boolean absoluteHighlights;
+  protected final boolean alignSpans;
 
 
-  protected OcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
+  protected OcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans) {
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;
     this.absoluteHighlights = absoluteHighlights;
+    this.alignSpans = alignSpans;
   }
 
   /** Merge overlapping matches. **/
-  private List<PassageMatch> mergeMatches(int numMatches, int[] matchStarts, int[] matchEnds) {
+  protected List<PassageMatch> mergeMatches(int numMatches, int[] matchStarts, int[] matchEnds) {
     Deque<PassageMatch> sortedMatches = IntStream.range(0, numMatches)
         .mapToObj(idx -> new PassageMatch(matchStarts[idx], matchEnds[idx]))
         .collect(Collectors.toCollection(ArrayDeque::new));
@@ -91,13 +93,17 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     return snippets;
   }
 
-  private OcrSnippet format(Passage passage, IterableCharSequence content) {
+  protected String getHighlightedFragment(Passage passage, IterableCharSequence content) {
     StringBuilder sb = new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
     int extraChars = 0;
     if (passage.getNumMatches() > 0) {
       List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
       for (PassageMatch match : matches) {
-        int matchStart = content.subSequence(passage.getStartOffset(), match.start).toString().length();
+        String preMatchContent = content.subSequence(passage.getStartOffset(), match.start).toString();
+        int matchStart = preMatchContent.length();
+        if (alignSpans) {
+          matchStart = preMatchContent.lastIndexOf(">") + 1;
+        }
         sb.insert(extraChars + matchStart, startHlTag);
         extraChars += startHlTag.length();
         int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
@@ -113,11 +119,19 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
             matchEnd -= (matchText.length() - idx);
           }
         }
+        if (alignSpans) {
+          String postMatchContent = sb.substring(matchEnd + extraChars, sb.length());
+          matchEnd += postMatchContent.indexOf("</");
+        }
         sb.insert(Math.min(extraChars + matchEnd, sb.length()), endHlTag);
         extraChars += endHlTag.length();
       }
     }
-    String xmlFragment = sb.toString();
+    return sb.toString();
+  }
+
+  private OcrSnippet format(Passage passage, IterableCharSequence content) {
+    String xmlFragment = getHighlightedFragment(passage, content);
     OcrPage page = determineStartPage(xmlFragment, passage.getStartOffset(), content);
     OcrSnippet snip = parseFragment(xmlFragment, page);
     if (snip != null) {
@@ -327,7 +341,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     return Arrays.stream(snips).map(OcrSnippet::getText).toArray(String[]::new);
   }
 
-  private static class PassageMatch {
+  protected static class PassageMatch {
     public int start;
     public int end;
 
