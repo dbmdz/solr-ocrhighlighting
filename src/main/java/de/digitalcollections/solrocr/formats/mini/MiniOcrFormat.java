@@ -33,8 +33,8 @@ public class MiniOcrFormat implements OcrFormat {
 
   @Override
   public OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag,
-                                                 boolean absoluteHighlights) {
-    return new MiniOcrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights);
+                                                 boolean absoluteHighlights, boolean alignSpans) {
+    return new MiniOcrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights, alignSpans);
   }
 
   @Override

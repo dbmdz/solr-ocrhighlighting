@@ -151,4 +151,18 @@ public class AltoTest extends SolrTestCaseJ4 {
         "//arr[@name='highlights']/arr/lst[2]/str[@name='text']/text()='qui possède'"
     );
   }
+
+  @Test
+  public void testAlignSpans() {
+    String regionUnaligned = "Les seuls députés qui aient voté pour l'instruction primaire, gratuite et obligatoire, "
+      + "combattue par M. de Parieu, vice-<em>président</em> du conseil d'Etat, sont MM. Belmont et Carnet,"
+      + " Chevandier de Valdrôme. Favre";
+    String regionAligned = "Les seuls députés qui aient voté pour l'instruction primaire, gratuite et obligatoire, "
+        + "combattue par M. de Parieu, <em>vice-président</em> du conseil d'Etat, sont MM. Belmont et Carnet,"
+        + " Chevandier de Valdrôme. Favre";
+    SolrQueryRequest req = xmlQ("q", "ocr_text:président");
+    assertQ(req, "(//arr[@name='regions'])[3]/lst/str[@name='text']/text()=\"" + regionUnaligned + "\"");
+    req = xmlQ("q", "ocr_text:président", "hl.ocr.alignSpans", "true");
+    assertQ(req, "(//arr[@name='regions'])[3]/lst/str[@name='text']/text()=\"" + regionAligned + "\"");
+  }
 }

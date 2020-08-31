@@ -40,8 +40,8 @@ public class HocrFormat implements OcrFormat {
 
   @Override
   public OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag,
-                                                 boolean absoluteHighlights) {
-    return new HocrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights);
+                                                 boolean absoluteHighlights, boolean alignSpans) {
+    return new HocrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights, alignSpans);
   }
 
   @Override

@@ -27,8 +27,8 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   private final String startHlTag;
   private final String endHlTag;
 
-  public HocrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
-    super(startHlTag, endHlTag, absoluteHighlights);
+  public HocrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans) {
+    super(startHlTag, endHlTag, absoluteHighlights, alignSpans);
     this.pageIter = new HocrClassBreakIterator("ocr_page");
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;

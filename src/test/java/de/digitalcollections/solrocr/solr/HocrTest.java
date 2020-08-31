@@ -227,4 +227,20 @@ public class HocrTest extends SolrTestCaseJ4 {
     req = xmlQ("q", "fenia", "hl.snippets", "100");
     assertQ(req, String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
   }
+
+  @Test
+  public void testAlignSpans() {
+    String unalignedText = "in die erſte Jugend, die nicht wiederkam. Lou <em>Andreas</em>-Salomet, Fenitſchka. 12";
+    String alignedText = "in die erſte Jugend, die nicht wiederkam. Lou <em>Andreas-Salomet,</em> Fenitſchka. 12";
+    SolrQueryRequest req = xmlQ("q", "Andreas", "hl.ocr.pageId", "page_181");
+    assertQ(
+        req,
+        "//arr[@name='snippets']/lst/str[@name='text']/text()='" + unalignedText + "'",
+        "//arr[@name='regions']/lst/str[@name='text']/text()='" + unalignedText + "'");
+    req = xmlQ("q", "Andreas", "hl.ocr.pageId", "page_181", "hl.ocr.alignSpans", "true");
+    assertQ(
+        req,
+        "//arr[@name='snippets']/lst/str[@name='text']/text()='" + alignedText + "'",
+        "//arr[@name='regions']/lst/str[@name='text']/text()='" + alignedText + "'");
+  }
 }

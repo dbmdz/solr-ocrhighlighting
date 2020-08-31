@@ -145,6 +145,11 @@ Additionally, the plugin allows you to customize various OCR-specific parameters
 :   Set the block type that the passage context may not exceed. Valid values are `none` `word`, `line`,
     `paragraph`, `block` or `page`. This value defaults to `block`.
 
+`hl.ocr.alignSpans`
+:   Ensure that the spans in the highlighted text match the text of the highlighted image parts exactly.
+    By default (`false`), text spans will be more precise than image spans, since they can be defined at the
+    character-level, while image spans can only be as precise as the word boundaries in the OCR.
+
 `hl.ocr.pageId`:
 :   Only show passages from the page with this identifier. Useful in combination with a `fq` for a specific document
     if you want to implement a "Search on this page" feature (e.g. for the

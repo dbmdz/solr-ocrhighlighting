@@ -26,8 +26,8 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
 
   private final TagBreakIterator pageIter = new TagBreakIterator("p");
 
-  public MiniOcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
-    super(startHlTag, endHlTag, absoluteHighlights);
+  public MiniOcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans) {
+    super(startHlTag, endHlTag, absoluteHighlights, alignSpans);
   }
 
   @Override

@@ -286,7 +286,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
           OcrPassageFormatter formatter = ocrFormat.getPassageFormatter(
               params.get(HighlightParams.TAG_PRE, "<em>"),
               params.get(HighlightParams.TAG_POST, "</em>"),
-              params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false));
+              params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false),
+              params.getBool(OcrHighlightParams.ALIGN_SPANS, false));
           int snippetLimit = Math.max(
               maxPassages[fieldIdx],
               params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
