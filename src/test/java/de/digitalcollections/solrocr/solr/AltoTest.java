@@ -165,4 +165,10 @@ public class AltoTest extends SolrTestCaseJ4 {
     req = xmlQ("q", "ocr_text:président", "hl.ocr.alignSpans", "true");
     assertQ(req, "(//arr[@name='regions'])[3]/lst/str[@name='text']/text()=\"" + regionAligned + "\"");
   }
+
+  @Test
+  public void testOverzealousMerging() {
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"au bureau en qualité\"");
+    assertQ(req, "count(//arr[@name='highlights']/arr)=4");
+  }
 }
