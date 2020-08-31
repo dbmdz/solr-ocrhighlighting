@@ -3,7 +3,7 @@ set -e
 SOLR_HOST="${SOLR_HOST:-localhost}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SOLR7_VERSIONS="7.6 7.5"
-SOLR8_VERSIONS="8.5 8.4 8.3 8.2 8.1"
+SOLR8_VERSIONS="8.6 8.5 8.4 8.3 8.2 8.1"
 
 wait_for_solr() {
     while [[ "$(curl -s -o /dev/null http://$SOLR_HOST:31337/solr/ocr/select -w '%{http_code}')" != "200" ]]; do
