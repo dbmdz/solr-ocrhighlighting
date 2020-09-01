@@ -24,6 +24,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
   private final static Pattern pagePat = Pattern.compile("<Page ?(?<attribs>.+?)/?>");
   private final static Pattern wordPat = Pattern.compile("<String ?(?<attribs>.+?)/?>");
   private final static Pattern attribPat = Pattern.compile("(?<key>[A-Z_]+?)=\"(?<val>.+?)\"");
+  private final static Pattern postContentPat = Pattern.compile("[\"']\\s*(\\w|/?>)");
 
   private final TagBreakIterator pageIter = new TagBreakIterator("Page");
 
@@ -153,9 +154,12 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         }
         matchEnd = Math.min(matchEnd + extraChars, sb.length());
         if (alignSpans && matchEnd != sb.length()) {
-          String postMatchContent = content.subSequence(
-              passage.getStartOffset() + matchEnd, passage.getEndOffset()).toString();
-          matchEnd += (postMatchContent.indexOf('"'));
+          CharSequence postMatchContent = content.subSequence(
+              passage.getStartOffset() + matchEnd, passage.getEndOffset());
+          Matcher m = postContentPat.matcher(postMatchContent);
+          if (m.find()) {
+            matchEnd += m.start();
+          }
         }
         sb.insert(matchEnd, endHlTag);
         extraChars += endHlTag.length();
