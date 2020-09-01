@@ -122,11 +122,12 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
             matchEnd -= (matchText.length() - idx);
           }
         }
-        if (alignSpans) {
-          String postMatchContent = sb.substring(matchEnd + extraChars, sb.length());
+        matchEnd = Math.min(matchEnd + extraChars, sb.length());
+        if (alignSpans && matchEnd != sb.length()) {
+          String postMatchContent = sb.substring(matchEnd, sb.length());
           matchEnd += postMatchContent.indexOf("</");
         }
-        sb.insert(Math.min(extraChars + matchEnd, sb.length()), endHlTag);
+        sb.insert(matchEnd, endHlTag);
         extraChars += endHlTag.length();
       }
     }
