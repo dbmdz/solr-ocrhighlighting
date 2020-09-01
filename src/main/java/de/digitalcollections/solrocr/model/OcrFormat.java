@@ -23,8 +23,12 @@ public interface OcrFormat {
    * @param postHighlightTag the tag to put in the snippet text after a highlighted region, e.g. &lt;/em&gt;
    * @param absoluteHighlights whether the coordinates for highlights should be absolute, i.e. relative to the page
    *                           and not the containing snippet
+   * @param alignSpans whether the spans in the text and image should match precisely. If false, the text spans will
+   *                   be more precise than the image "spans", since the latter are restricted to the granularity of
+   *                   the OCR document.
    */
-  OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag, boolean absoluteHighlights);
+  OcrPassageFormatter getPassageFormatter(
+      String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans);
 
   Reader filter(Reader input);
 

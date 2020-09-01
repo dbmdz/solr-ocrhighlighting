@@ -2,6 +2,7 @@ package de.digitalcollections.solrocr.model;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -19,21 +20,21 @@ public class OcrBox implements Comparable<OcrBox> {
   private float uly;
   private float lrx;
   private float lry;
-  private boolean inHighlight;
+  private UUID highlightSpan;
   private Integer parentRegionIdx;
   private String dehyphenatedForm;
   private Boolean hyphenStart;
 
 
   public OcrBox(String text, String pageId, float ulx, float uly, float lrx, float lry,
-                boolean inHighlight) {
+                UUID highlightSpan) {
     this.text = text;
     this.pageId = pageId;
     this.ulx = ulx;
     this.uly = uly;
     this.lrx = lrx;
     this.lry = lry;
-    this.inHighlight = inHighlight;
+    this.highlightSpan = highlightSpan;
   }
 
   private void addDimension(SimpleOrderedMap map, String name, float val) {
@@ -118,8 +119,12 @@ public class OcrBox implements Comparable<OcrBox> {
     return lry - uly;
   }
 
+  public UUID getHighlightSpan() {
+    return highlightSpan;
+  }
+
   public boolean isInHighlight() {
-    return inHighlight;
+    return highlightSpan != null;
   }
 
   public boolean isHyphenated() {
@@ -158,8 +163,8 @@ public class OcrBox implements Comparable<OcrBox> {
     this.lry = lry;
   }
 
-  public void setInHighlight(boolean inHighlight) {
-    this.inHighlight = inHighlight;
+  public void setHighlightSpan(UUID highlightId) {
+    this.highlightSpan = highlightId;
   }
 
   public void setHyphenInfo(boolean hyphenStart, String dehyphenated) {

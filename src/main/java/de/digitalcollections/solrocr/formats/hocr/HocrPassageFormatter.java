@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -27,8 +28,8 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   private final String startHlTag;
   private final String endHlTag;
 
-  public HocrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
-    super(startHlTag, endHlTag, absoluteHighlights);
+  public HocrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans) {
+    super(startHlTag, endHlTag, absoluteHighlights, alignSpans);
     this.pageIter = new HocrClassBreakIterator("ocr_page");
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;
@@ -87,7 +88,7 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
   protected List<OcrBox> parseWords(String ocrFragment, TreeMap<Integer, OcrPage> pages, String startPage) {
     List<OcrBox> wordBoxes = new ArrayList<>();
     Matcher m = wordPat.matcher(ocrFragment);
-    boolean inHighlight = false;
+    UUID currentHighlight = null;
     while (m.find()) {
       String pageId = startPage;
       if (pages.floorKey(m.start()) != null) {
@@ -99,15 +100,15 @@ public class HocrPassageFormatter extends OcrPassageFormatter {
       int y1 = Integer.parseInt(m.group("lry"));
       String text = StringEscapeUtils.unescapeXml(m.group("text"));
       if (text.contains(startHlTag)) {
-        inHighlight = true;
+        currentHighlight = UUID.randomUUID();
       }
-      wordBoxes.add(new OcrBox(text, pageId, x0, y0, x1, y1, inHighlight));
+      wordBoxes.add(new OcrBox(text, pageId, x0, y0, x1, y1, currentHighlight));
       boolean endOfHl = (
           text.contains(endHlTag)
           || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(), ocrFragment.length()))
               .equals(endHlTag));
       if (endOfHl) {
-        inHighlight = false;
+        currentHighlight = null;
       }
     }
     return wordBoxes;

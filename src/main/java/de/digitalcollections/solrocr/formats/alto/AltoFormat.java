@@ -29,8 +29,8 @@ public class AltoFormat implements OcrFormat {
 
   @Override
   public OcrPassageFormatter getPassageFormatter(String prehHighlightTag, String postHighlightTag,
-                                                 boolean absoluteHighlights) {
-    return new AltoPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights);
+                                                 boolean absoluteHighlights, boolean alignSpans) {
+    return new AltoPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights, alignSpans);
   }
 
   @Override

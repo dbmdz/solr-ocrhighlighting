@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.text.StringEscapeUtils;
@@ -26,8 +27,8 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
 
   private final TagBreakIterator pageIter = new TagBreakIterator("p");
 
-  public MiniOcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
-    super(startHlTag, endHlTag, absoluteHighlights);
+  public MiniOcrPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans) {
+    super(startHlTag, endHlTag, absoluteHighlights, alignSpans);
   }
 
   @Override
@@ -102,7 +103,7 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
   @Override
   protected List<OcrBox> parseWords(String ocrFragment, TreeMap<Integer, OcrPage> pages, String startPage) {
     List<OcrBox> wordBoxes = new ArrayList<>();
-    boolean inHighlight = false;
+    UUID currentHighlight = null;
     Matcher m = wordPat.matcher(ocrFragment);
     while (m.find()) {
       String pageId = startPage;
@@ -115,15 +116,15 @@ public class MiniOcrPassageFormatter extends OcrPassageFormatter {
       float height = Float.parseFloat(m.group("h"));
       String text = StringEscapeUtils.unescapeXml(m.group("text"));
       if (text.contains(startHlTag)) {
-        inHighlight = true;
+        currentHighlight = UUID.randomUUID();
       }
-      wordBoxes.add(new OcrBox(text, pageId, x, y, x + width, y + height, inHighlight));
+      wordBoxes.add(new OcrBox(text, pageId, x, y, x + width, y + height, currentHighlight));
       boolean endOfHl = (
           text.contains(endHlTag)
           || ocrFragment.substring(m.end(), Math.min(m.end() + endHlTag.length(), ocrFragment.length()))
               .equals(endHlTag));
       if (endOfHl) {
-        inHighlight = false;
+        currentHighlight = null;
       }
     }
     return wordBoxes;

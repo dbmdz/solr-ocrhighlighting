@@ -2,18 +2,20 @@ package de.digitalcollections.solrocr.formats.alto;
 
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.iter.TagBreakIterator;
 import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.model.OcrPage;
-import de.digitalcollections.solrocr.iter.TagBreakIterator;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.lucene.search.uhighlight.Passage;
 
 public class AltoPassageFormatter extends OcrPassageFormatter {
 
@@ -22,11 +24,12 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
   private final static Pattern pagePat = Pattern.compile("<Page ?(?<attribs>.+?)/?>");
   private final static Pattern wordPat = Pattern.compile("<String ?(?<attribs>.+?)/?>");
   private final static Pattern attribPat = Pattern.compile("(?<key>[A-Z_]+?)=\"(?<val>.+?)\"");
+  private final static Pattern postContentPat = Pattern.compile("[\"']\\s*(\\w|/?>)");
 
   private final TagBreakIterator pageIter = new TagBreakIterator("Page");
 
-  protected AltoPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights) {
-    super(startHlTag, endHlTag, absoluteHighlights);
+  protected AltoPassageFormatter(String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans) {
+    super(startHlTag, endHlTag, absoluteHighlights, alignSpans);
   }
 
   private Map<String, String> parseAttribs(String attribStr) {
@@ -123,6 +126,40 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
   }
 
   @Override
+  protected String getHighlightedFragment(Passage passage, IterableCharSequence content) {
+    StringBuilder sb = new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
+    int extraChars = 0;
+    if (passage.getNumMatches() > 0) {
+      List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
+      for (PassageMatch match : matches) {
+        // Can't just do match.start - passage.getStartOffset(), since both offsets are relative to **UTF-8 bytes**, but
+        // we need **UTF-16 codepoint** offsets in the code.
+        String preMatchContent = content.subSequence(passage.getStartOffset(), match.start).toString();
+        int matchStart = preMatchContent.length();
+        if (alignSpans) {
+          matchStart = preMatchContent.lastIndexOf("CONTENT=") + 9;
+        }
+        sb.insert(matchStart + extraChars, startHlTag);
+        extraChars += startHlTag.length();
+        // Again, can't just do match.end - passage.getStartOffset(), since we need char offsets (see above).
+        int matchEnd = Math.min(
+            content.subSequence(passage.getStartOffset(), match.end).toString().length() + extraChars,
+            sb.length());
+        if (alignSpans && matchEnd != sb.length()) {
+          String postMatchContent = sb.substring(matchEnd, sb.length());
+          Matcher m = postContentPat.matcher(postMatchContent);
+          if (m.find()) {
+            matchEnd += m.start();
+          }
+        }
+        sb.insert(matchEnd, endHlTag);
+        extraChars += endHlTag.length();
+      }
+    }
+    return sb.toString();
+  }
+
+  @Override
   protected List<OcrBox> parseWords(String ocrFragment, TreeMap<Integer, OcrPage> pages, String startPage) {
     // NOTE: We have to replace the original start/end highlight tags with non-XML placeholders so we don't break
     //       our rudimentary XML "parsing" to get to the attributes
@@ -131,7 +168,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         .replaceAll(endHlTag, END_HL);
     List<OcrBox> wordBoxes = new ArrayList<>();
     Matcher m = wordPat.matcher(ocrFragment);
-    boolean inHighlight = false;
+    UUID currentHighlight = null;
     boolean highlightHyphenEnd = false;
     while (m.find()) {
       String pageId = startPage;
@@ -151,11 +188,11 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         text += "-";
       }
       if (text.contains(START_HL) || attribs.getOrDefault("SUBS_CONTENT", "").contains(START_HL)) {
-        inHighlight = true;
+        currentHighlight = UUID.randomUUID();
       }
-      OcrBox ocrBox = new OcrBox(text.replace(START_HL, startHlTag)
-          .replace(END_HL, endHlTag),
-          pageId, x, y, x + w, y + h, inHighlight);
+      OcrBox ocrBox = new OcrBox(
+          text.replace(START_HL, startHlTag).replace(END_HL, endHlTag),
+          pageId, x, y, x + w, y + h, currentHighlight);
       if (hyphenStart != null) {
         String dehyphenated =
             attribs.get("SUBS_CONTENT").replace(START_HL, startHlTag).replace(END_HL, endHlTag);
@@ -163,17 +200,17 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
       }
       wordBoxes.add(ocrBox);
 
-      if (inHighlight && subsType != null) {
+      if (currentHighlight != null && subsType != null) {
         if (subsType.equals("HypPart1") && attribs.get("SUBS_CONTENT").contains(END_HL)) {
           highlightHyphenEnd = true;
         } else if (highlightHyphenEnd){
           highlightHyphenEnd = false;
-          inHighlight = false;
+          currentHighlight = null;
         }
       } else if (text.contains(END_HL)) {
-        inHighlight = false;
+        currentHighlight = null;
       } else if (ocrFragment.substring(m.end(), Math.min(m.end() + END_HL.length(), ocrFragment.length())).equals(END_HL)) {
-        inHighlight = false;
+        currentHighlight = null;
       }
     }
     return wordBoxes;

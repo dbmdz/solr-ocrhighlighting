@@ -195,7 +195,7 @@ public class HocrTest extends SolrTestCaseJ4 {
 
   @Test
   public void testMultiColumnSnippet() {
-    SolrQueryRequest req = xmlQ("q", "\"kaffe rechnungs\"");
+    SolrQueryRequest req = xmlQ("q", "\"kaffe rechnungs\"", "hl.weightMatches", "true");
     assertQ(
         req,
         "count(//lst[@name='ocrHighlighting']//arr[@name='snippets'])=1",
@@ -204,7 +204,7 @@ public class HocrTest extends SolrTestCaseJ4 {
         "count(//arr[@name='snippets']/lst/arr[@name='highlights']/arr)=1",
         "//arr[@name='regions']/lst[1]/str[@name='text']='Die General-Verwaltung der königlichen Eiſenbahnen "
             + "beſteht aus einem Vorſtande, zwei Räthen, wovon einer der Komptabilität kundig ſeyn muß, einem "
-            + "Ober-Ingenieur, einem Maſchinenmeiſter, den erforderlichen <em>Kaffe</em>-,'",
+            + "Ober-Ingenieur, einem Maſchinenmeiſter, den erforderlichen <em>Kaffe-,</em>'",
         "//arr[@name='regions']/lst[2]/str[@name='text']='<em>Rechnungs</em>-, Kanzlei-, Regiſtratur- und techniſchen "
             + "Gehülfen-Perſonal Der Geſchäftsgang iſt bei der k. Eiſenbahn, ſoferne nicht für beſondere Fälle "
             + "kollegiale Behandlung vorgeſchrieben iſt, bureaukratiſch, und der Vorſtand'",
@@ -226,5 +226,21 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertQ(req, String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
     req = xmlQ("q", "fenia", "hl.snippets", "100");
     assertQ(req, String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
+  }
+
+  @Test
+  public void testAlignSpans() {
+    String unalignedText = "in die erſte Jugend, die nicht wiederkam. Lou <em>Andreas</em>-Salomet, Fenitſchka. 12";
+    String alignedText = "in die erſte Jugend, die nicht wiederkam. Lou <em>Andreas-Salomet,</em> Fenitſchka. 12";
+    SolrQueryRequest req = xmlQ("q", "Andreas", "hl.ocr.pageId", "page_181");
+    assertQ(
+        req,
+        "//arr[@name='snippets']/lst/str[@name='text']/text()='" + unalignedText + "'",
+        "//arr[@name='regions']/lst/str[@name='text']/text()='" + unalignedText + "'");
+    req = xmlQ("q", "Andreas", "hl.ocr.pageId", "page_181", "hl.ocr.alignSpans", "true");
+    assertQ(
+        req,
+        "//arr[@name='snippets']/lst/str[@name='text']/text()='" + alignedText + "'",
+        "//arr[@name='regions']/lst/str[@name='text']/text()='" + alignedText + "'");
   }
 }
