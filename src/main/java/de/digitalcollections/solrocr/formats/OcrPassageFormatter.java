@@ -99,6 +99,8 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
     if (passage.getNumMatches() > 0) {
       List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
       for (PassageMatch match : matches) {
+        // Can't just do match.start - passage.getStartOffset(), since both offsets are relative to **UTF-8 bytes**, but
+        // we need **UTF-16 codepoint** offsets in the code.
         String preMatchContent = content.subSequence(passage.getStartOffset(), match.start).toString();
         int matchStart = preMatchContent.length();
         if (alignSpans) {
@@ -106,6 +108,7 @@ public abstract class OcrPassageFormatter extends PassageFormatter {
         }
         sb.insert(extraChars + matchStart, startHlTag);
         extraChars += startHlTag.length();
+        // Again, can't just do match.end - passage.getStartOffset(), since we need char offsets (see above).
         int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
         String matchText = sb.substring(extraChars + matchStart, extraChars + matchEnd);
         if (matchText.trim().endsWith(">")) {

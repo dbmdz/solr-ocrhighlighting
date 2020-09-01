@@ -132,6 +132,8 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     if (passage.getNumMatches() > 0) {
       List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
       for (PassageMatch match : matches) {
+        // Can't just do match.start - passage.getStartOffset(), since both offsets are relative to **UTF-8 bytes**, but
+        // we need **UTF-16 codepoint** offsets in the code.
         String preMatchContent = content.subSequence(passage.getStartOffset(), match.start).toString();
         int matchStart = preMatchContent.length();
         if (alignSpans) {
@@ -139,20 +141,10 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         }
         sb.insert(matchStart + extraChars, startHlTag);
         extraChars += startHlTag.length();
-        int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
-        String matchText = sb.substring(extraChars + matchStart, extraChars + matchEnd);
-        if (matchText.trim().endsWith(">")) {
-          // Set the end of the match to the position before the last inner closing tag inside of the match.
-          Matcher m = LAST_INNER_TAG_PAT.matcher(matchText);
-          int idx = -1;
-          while (m.find()) {
-            idx = m.start() + 1;
-          }
-          if (idx > -1) {
-            matchEnd -= (matchText.length() - idx);
-          }
-        }
-        matchEnd = Math.min(matchEnd + extraChars, sb.length());
+        // Again, can't just do match.end - passage.getStartOffset(), since we need char offsets (see above).
+        int matchEnd = Math.min(
+            content.subSequence(passage.getStartOffset(), match.end).toString().length() + extraChars,
+            sb.length());
         if (alignSpans && matchEnd != sb.length()) {
           String postMatchContent = sb.substring(matchEnd, sb.length());
           Matcher m = postContentPat.matcher(postMatchContent);
