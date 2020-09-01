@@ -154,8 +154,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
         }
         matchEnd = Math.min(matchEnd + extraChars, sb.length());
         if (alignSpans && matchEnd != sb.length()) {
-          CharSequence postMatchContent = content.subSequence(
-              passage.getStartOffset() + matchEnd, passage.getEndOffset());
+          String postMatchContent = sb.substring(matchEnd, sb.length());
           Matcher m = postContentPat.matcher(postMatchContent);
           if (m.find()) {
             matchEnd += m.start();
