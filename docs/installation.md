@@ -1,6 +1,6 @@
 ## Requirements
 - Some familiarity with configuring Solr
-- Solr >= 7.x
+- Solr >= 7.5
 - OCR documents need to be in [hOCR](formats.md#hocr), [ALTO](formats.md#alto)
   or [MiniOCR](formats.md#miniocr) formats, with at least page-, and word-level
   segmentation
