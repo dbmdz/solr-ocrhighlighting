@@ -18,6 +18,14 @@ public class HocrTest extends SolrTestCaseJ4 {
     //initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "hocr");
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "general");
 
+    assertU(adoc(
+        "some_text",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor "
+        + "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
+        + "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute "
+        + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
+        + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
+        + "deserunt mollit anim id est laborum.", "id", "1337"));
     Path ocrPath = Paths.get("src/test/resources/data/hocr.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
     assertU(adoc("ocr_text", String.format("%s[3034454:3067549]", ocrPath.toString()), "id", "84"));
@@ -242,5 +250,23 @@ public class HocrTest extends SolrTestCaseJ4 {
         req,
         "//arr[@name='snippets']/lst/str[@name='text']/text()='" + alignedText + "'",
         "//arr[@name='regions']/lst/str[@name='text']/text()='" + alignedText + "'");
+  }
+
+  @Test
+  public void testRegularHighlighting() {
+    SolrQueryRequest req = req(
+        "q", "\"occaecat cupidatat\"", "hl.fl", "some_text", "df", "some_text", "hl", "true");
+    assertQ(req, "count(//lst[@name='highlighting']//arr[@name='some_text'])=1");
+    assertQ(req, "count(//lst[@name='ocrHighlighting']//arr[@name='snippets'])=0");
+  }
+
+  @Test
+  public void testCombinedHighlighting() {
+    SolrQueryRequest req = xmlQ(
+        "q", "\"occaecat cupidatat\" Salomet", "hl.fl", "some_text", "defType", "edismax",
+        "qf", "some_text ocr_text");
+    assertQ(req, "count(//lst[@name='highlighting']//arr[@name='some_text'])=1");
+    assertQ(req, "count(//lst[@name='ocrHighlighting']//arr[@name='snippets'])=1");
+
   }
 }
