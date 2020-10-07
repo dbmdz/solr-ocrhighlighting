@@ -73,7 +73,7 @@ public class OcrHighlightComponent extends org.apache.solr.handler.component.Hig
       }
 
       if( highlightQuery != null ) {
-        NamedList ocrHighlights = ocrHighlighter.doHighlighting(
+        NamedList<?> ocrHighlights = ocrHighlighter.doHighlighting(
             rb.getResults().docList,
             highlightQuery,
             req, defaultHighlightFields, rb.rsp.getResponseHeader().asShallowMap());
@@ -97,8 +97,12 @@ public class OcrHighlightComponent extends org.apache.solr.handler.component.Hig
 
   @Override
   public void finishStage(ResponseBuilder rb) {
-    super.finishStage(rb);
-    if (rb.doHighlights && rb.stage == ResponseBuilder.STAGE_GET_FIELDS) {
+    boolean setOcrHighlights =
+        rb.doHighlights
+        && !rb.req.getParams().get(OcrHighlightParams.OCR_FIELDS, "").isEmpty()
+        && rb.stage == ResponseBuilder.STAGE_GET_FIELDS;
+    if (setOcrHighlights) {
+      super.finishStage(rb);
       for (ShardRequest sreq : rb.finished) {
         if ((sreq.purpose & ShardRequest.PURPOSE_GET_HIGHLIGHTS) == 0) continue;
         for (ShardResponse srsp : sreq.responses) {
@@ -107,7 +111,7 @@ public class OcrHighlightComponent extends org.apache.solr.handler.component.Hig
             // this should only happen when using shards.tolerant=true
             continue;
           }
-          NamedList<Object> rspHeader = (NamedList<Object>) srsp.getSolrResponse().getResponse().get("responseHeader");
+          NamedList<?> rspHeader = (NamedList<?>) srsp.getSolrResponse().getResponse().get("responseHeader");
           Boolean partialHls = (Boolean) rspHeader.get(OcrHighlighter.PARTIAL_OCR_HIGHLIGHTS);
           if (partialHls != null && partialHls) {
             rb.rsp.getResponseHeader().add(OcrHighlighter.PARTIAL_OCR_HIGHLIGHTS, true);

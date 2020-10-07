@@ -2,8 +2,10 @@ package de.digitalcollections.solrocr.solr;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import org.apache.solr.BaseDistributedSearchTestCase;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.util.NamedList;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -78,6 +80,32 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
         "fl", "id,score");
     assertEquals(1, resp.getResults().getNumFound());
     assertEquals(true, resp.getHeader().getBooleanArg("partialOcrHighlights"));
+  }
+
+  @Test
+  public void testRegularHighlightingWorks() throws Exception {
+    QueryResponse resp = query("q", "\"commodo consequat\"", "hl", "true", "hl.fl", "some_text", "hl.weightMatches",
+        "true", "df", "some_text", "fl", "id,score");
+    assertEquals(1, resp.getResults().getNumFound());
+    List<String> hls = resp.getHighlighting().get("1337").get("some_text");
+    assertEquals(hls.size(), 1);
+    assertEquals(hls.get(0), " aliquip ex ea <em>commodo</em> <em>consequat</em>. Duis aute irure dolor in "
+        + "reprehenderit in voluptate velit esse cillum");
+  }
+
+  @Test
+  public void testCombinedHighlightingWoriks() throws Exception {
+    QueryResponse resp = query(
+        "q", "\"commodo consequat\" svadag", "hl", "true", "hl.fl", "some_text", "defType", "edismax",
+        "hl.weightMatches", "true", "qf", "some_text ocr_text", "fl", "id,score", "hl.ocr.fl", "ocr_text");
+    assertEquals(2, resp.getResults().getNumFound());
+    List<String> hls = resp.getHighlighting().get("1337").get("some_text");
+    assertEquals(hls.size(), 1);
+    assertEquals(hls.get(0), " aliquip ex ea <em>commodo</em> <em>consequat</em>. Duis aute irure dolor in "
+        + "reprehenderit in voluptate velit esse cillum");
+    NamedList<?> ocrHls = (NamedList<?>) resp.getResponse().get("ocrHighlighting");
+    assertEquals(2, ocrHls.size());
+    assertEquals(1, ((NamedList<?>) ocrHls.get("31337")).size());
   }
 
 }
