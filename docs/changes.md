@@ -1,3 +1,25 @@
+## 0.5.0 (2020-10-07)
+No breaking changes this time around, but a few essential bugfixes, more stability and a new feature.
+
+**API changes:**
+- **Snippets are now sorted by their descending score/relevancy.** Previously the order was non-deterministic, which
+  broke the use case for dynamically fetching more snippets.
+- **Add a new boolean `hl.ocr.alignSpans` parameter to align text and image spans.** This new option (disabled by
+  default) ensures that the spans in text and image match, i.e. it forces the `<em>...</em>` in the highlighted text
+  to correspond to actual OCR word boundaries.
+
+**Bugfixes:**
+- **Fix regular highlighting in distributed setup.** Regular, non-OCR highlighting was broken in previous versions due
+  to a bad check in the shard response collection phase if users only requested regular highlighting, but not for OCR
+  fields
+- **Highlight spans are now always consistent with the spans designated in text.** Due to a bug, it would sometimes
+  happen that the number of spans was inconsistent between the two.
+- **Fix de-hyphenation in ALTO region texts.** Previously only the complete snippet text would be de-hyphenated, but not
+  the individual regions.
+- **Fix post-match content detection in ALTO.** A bug in this part of the code resulted in crashes when highlighting
+  certain ALTO documents.
+
+
 ## 0.4.1 (2020-06-02)
 This is a patch release with a fix for excessive memory usage during indexing.
 
