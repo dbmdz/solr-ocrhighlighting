@@ -155,7 +155,14 @@
         <artifactId>maven-shade-plugin</artifactId>
         <version>${version.maven-shade-plugin}</version>
         <configuration>
+          <minimizeJar>true</minimizeJar>
           <filters>
+            <filter>
+              <artifact>com.fasterxml:aalto-xml</artifact>
+              <includes>
+                <include>**</include>
+              </includes>
+            </filter>
             <filter>
               <artifact>*:*</artifact>
               <excludes>
@@ -165,7 +172,6 @@
               </excludes>
             </filter>
           </filters>
-          <minimizeJar>true</minimizeJar>
           <artifactSet>
             <includes>
               <include>de.digitalcollections:solr-ocr-plugin</include>
