@@ -132,6 +132,7 @@ public class AltoPassageFormatter extends OcrPassageFormatter {
     if (passage.getNumMatches() > 0) {
       List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
       for (PassageMatch match : matches) {
+        // FIXME: Wit the new StaX-based input filter, the
         // Can't just do match.start - passage.getStartOffset(), since both offsets are relative to **UTF-8 bytes**, but
         // we need **UTF-16 codepoint** offsets in the code.
         String preMatchContent = content.subSequence(passage.getStartOffset(), match.start).toString();
