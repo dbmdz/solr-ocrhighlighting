@@ -15,12 +15,16 @@ public class AltoCharFilterFactoryTest {
   final Path altoPath = Paths.get("src/test/resources/data/alto.xml");
   final Path hyphenPath = Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml");
   final AltoCharFilterFactory fac = new AltoCharFilterFactory();
+  final AltoStaxFilterFactory staxFac = new AltoStaxFilterFactory();
 
   @Test
   public void stripsDescription() throws IOException {
     Reader reader = fac.create(new InputStreamReader(new FileInputStream(altoPath.toFile())));
     String s = IOUtils.toString(reader);
     assertThat(s).doesNotContain("ABBYY");
+    Reader staxReader = staxFac.create(new InputStreamReader(new FileInputStream(altoPath.toFile())));
+    String staxS = IOUtils.toString(staxReader);
+    assertThat(staxS).doesNotContain("ABBYY");
   }
 
   @Test
@@ -38,6 +42,5 @@ public class AltoCharFilterFactoryTest {
     String s = IOUtils.toString(reader).replaceAll("\\s+", " ");
     assertThat(s).contains("avec lequel elle murmura :");
     assertThat(s).contains("mon vieil ami, faux espoir !");
-
   }
 }

@@ -30,6 +30,8 @@ public class AltoTest extends SolrTestCaseJ4 {
             + "50047:53793,53798:73482,73487:86667,86672:94241,94246:99808,99813:103087,103092:115141,115146:116775,"
             + "116780:122549,122554:149762,149767:192789,192794:193502]";
     assertU(adoc("ocr_text", multiColumnPointer, "id", "96"));
+    ocrPath = Paths.get("src/test/resources/data/alto_nospace.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47"));
     assertU(commit());
   }
 
@@ -182,5 +184,17 @@ public class AltoTest extends SolrTestCaseJ4 {
   public void testOverzealousMerging() {
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"au bureau en qualité\"");
     assertQ(req, "count(//arr[@name='highlights']/arr)=4");
+  }
+
+  public void testConsistentSpaceHandling() {
+    String text = "Die Zahl derer, welche jene Schreckens: zeit mit Augen ſahen, in welcher <em>Zittau</em>"
+        + ", <em>im</em> Gefolge des ſiebenjährigen Krieges, den 23. Juli 1757, auf die "
+        + "ſchre>li<ſte Art zerſtört ward, kann zwar nur noch klein";
+    SolrQueryRequest req = xmlQ("q", "ocr_text:(zittau+OR+im)");
+    assertQ(
+        req,
+        "//arr[@name='snippets']/lst/str[@name='text']/text()=\"" + text + "\"",
+        "//arr[@name='regions']/lst/str[@name='text']/text()=\"" + text + "\""
+    );
   }
 }

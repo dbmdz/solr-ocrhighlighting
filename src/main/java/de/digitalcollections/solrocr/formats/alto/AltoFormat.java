@@ -12,7 +12,8 @@ import java.util.Map;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 
 public class AltoFormat implements OcrFormat {
-  private static final CharFilterFactory filterFactory = new AltoCharFilterFactory();
+  //private static final CharFilterFactory filterFactory = new AltoCharFilterFactory();
+  private static final CharFilterFactory filterFactory = new AltoStaxFilterFactory();
   private static final Map<OcrBlock, String> blockTagMapping = ImmutableMap.of(
       OcrBlock.PAGE, "Page",
       //OcrBlock.SECTION, "",
