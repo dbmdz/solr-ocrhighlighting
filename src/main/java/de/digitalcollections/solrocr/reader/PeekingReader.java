@@ -12,8 +12,8 @@ public class PeekingReader extends BaseCharFilter {
     super(in);
     char[] peekBuf = new char[peekSize];
     try {
-      this.input.read(peekBuf, 0, peekSize);
-      this.peek = new String(peekBuf);
+      int numRead = this.input.read(peekBuf, 0, peekSize);
+      this.peek = new String(peekBuf, 0, numRead);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -23,10 +23,9 @@ public class PeekingReader extends BaseCharFilter {
   public int read(char[] cbuf, int off, int len) throws IOException {
     int numRead = 0;
     if (peekOffset < peek.length()) {
-      for (int i=0; i < peek.length() - peekOffset && i < len; i++) {
-        cbuf[off + i] = peek.charAt(peekOffset + i);
-        numRead++;
-      }
+      int restLen = Math.min(peek.length() - peekOffset, cbuf.length - off);
+      System.arraycopy(peek.toCharArray(), peekOffset, cbuf, off, restLen);
+      numRead += restLen;
       off += numRead;
       peekOffset += numRead;
     }
