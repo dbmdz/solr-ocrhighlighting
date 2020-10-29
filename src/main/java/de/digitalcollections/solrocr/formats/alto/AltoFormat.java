@@ -1,19 +1,16 @@
 package de.digitalcollections.solrocr.formats.alto;
 
 import com.google.common.collect.ImmutableMap;
-import de.digitalcollections.solrocr.model.OcrBlock;
-import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.iter.ContextBreakIterator;
 import de.digitalcollections.solrocr.iter.TagBreakIterator;
+import de.digitalcollections.solrocr.model.OcrBlock;
+import de.digitalcollections.solrocr.model.OcrFormat;
 import java.io.Reader;
 import java.text.BreakIterator;
 import java.util.Map;
-import org.apache.lucene.analysis.util.CharFilterFactory;
 
 public class AltoFormat implements OcrFormat {
-  //private static final CharFilterFactory filterFactory = new AltoCharFilterFactory();
-  private static final CharFilterFactory filterFactory = new AltoStaxFilterFactory();
   private static final Map<OcrBlock, String> blockTagMapping = ImmutableMap.of(
       OcrBlock.PAGE, "Page",
       //OcrBlock.SECTION, "",
@@ -36,7 +33,7 @@ public class AltoFormat implements OcrFormat {
 
   @Override
   public Reader filter(Reader input) {
-    return filterFactory.create(input);
+    return new AltoCharFilter(input);
   }
 
   @Override
