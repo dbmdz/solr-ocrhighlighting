@@ -49,7 +49,6 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.aalto-xml>1.2.1</version.aalto-xml>
     <version.assertj>3.17.2</version.assertj>
     <version.assertj-json>1.2.0</version.assertj-json>
     <version.byteseek>2.0.3</version.byteseek>
@@ -77,11 +76,6 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <version>${version.solr}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml</groupId>
-      <artifactId>aalto-xml</artifactId>
-      <version>${version.aalto-xml}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -158,12 +152,6 @@
           <minimizeJar>true</minimizeJar>
           <filters>
             <filter>
-              <artifact>com.fasterxml:aalto-xml</artifact>
-              <includes>
-                <include>**</include>
-              </includes>
-            </filter>
-            <filter>
               <artifact>*:*</artifact>
               <excludes>
                 <exclude>META-INF/*.SF</exclude>
@@ -176,7 +164,6 @@
             <includes>
               <include>de.digitalcollections:solr-ocr-plugin</include>
               <include>org.apache.commons:commons-text</include>
-              <include>com.fasterxml:aalto-xml</include>
             </includes>
           </artifactSet>
         </configuration>
