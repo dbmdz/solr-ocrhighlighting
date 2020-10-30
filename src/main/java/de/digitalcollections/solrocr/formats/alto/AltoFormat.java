@@ -6,6 +6,7 @@ import de.digitalcollections.solrocr.iter.ContextBreakIterator;
 import de.digitalcollections.solrocr.iter.TagBreakIterator;
 import de.digitalcollections.solrocr.model.OcrBlock;
 import de.digitalcollections.solrocr.model.OcrFormat;
+import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.text.BreakIterator;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class AltoFormat implements OcrFormat {
   }
 
   @Override
-  public Reader filter(Reader input) {
+  public Reader filter(PeekingReader input) {
     return new AltoCharFilter(input);
   }
 

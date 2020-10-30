@@ -15,8 +15,10 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
  * to convert the input OCR to plaintext.
  */
 public class OcrCharFilterFactory extends CharFilterFactory {
-  private static int BUF_SIZE = 2048;
-  private static ImmutableSet<OcrFormat> FORMATS = ImmutableSet.of(
+  private static final int BEGIN_BUF_SIZE = 2048;
+  private static final int CTX_BUF_SIZE = 16384;
+
+  private static final ImmutableSet<OcrFormat> FORMATS = ImmutableSet.of(
       new HocrFormat(),
       new AltoFormat(),
       new MiniOcrFormat());
@@ -28,7 +30,7 @@ public class OcrCharFilterFactory extends CharFilterFactory {
 
   @Override
   public Reader create(Reader input) {
-    PeekingReader peeker = new PeekingReader(input, BUF_SIZE);
+    PeekingReader peeker = new PeekingReader(input, BEGIN_BUF_SIZE, CTX_BUF_SIZE);
     OcrFormat fmt = FORMATS.stream()
         .filter(f -> f.hasFormat(peeker.peekBeginning()))
         .findFirst()

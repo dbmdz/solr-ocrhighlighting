@@ -1,6 +1,7 @@
 package de.digitalcollections.solrocr.model;
 
 import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
+import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.text.BreakIterator;
 
@@ -30,7 +31,7 @@ public interface OcrFormat {
   OcrPassageFormatter getPassageFormatter(
       String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans);
 
-  Reader filter(Reader input);
+  Reader filter(PeekingReader input);
 
   /**
    * Check if the string chunk contains data formatted according to the implementing format.
