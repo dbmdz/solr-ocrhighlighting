@@ -2,11 +2,12 @@ package de.digitalcollections.solrocr.formats.hocr;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
+import de.digitalcollections.solrocr.iter.ContextBreakIterator;
+import de.digitalcollections.solrocr.lucene.filters.DehyphenatingHtmlCharFilterFactory;
 import de.digitalcollections.solrocr.model.OcrBlock;
 import de.digitalcollections.solrocr.model.OcrFormat;
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
-import de.digitalcollections.solrocr.lucene.filters.DehyphenatingHtmlCharFilterFactory;
-import de.digitalcollections.solrocr.iter.ContextBreakIterator;
+import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.text.BreakIterator;
 import java.util.Collection;
@@ -45,7 +46,7 @@ public class HocrFormat implements OcrFormat {
   }
 
   @Override
-  public Reader filter(Reader input) {
+  public Reader filter(PeekingReader input) {
     Reader filtered = baseFilterFactory.create(input);
     return new PatternReplaceCharFilter(TITLE_PAT, "", filtered);
   }

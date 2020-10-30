@@ -16,7 +16,7 @@ class PeekingReaderTest {
   public void testEquivalence() throws IOException {
     Path sourcePath = Paths.get("src/test/resources/data/alto.xml");
     FileReader baseReader = new FileReader(sourcePath.toFile());
-    PeekingReader peekingReader = new PeekingReader(new FileReader(sourcePath.toFile()), 2048);
+    PeekingReader peekingReader = new PeekingReader(new FileReader(sourcePath.toFile()), 2048, 16384);
     String fromBase = IOUtils.toString(baseReader);
     String fromPeek = IOUtils.toString(peekingReader);
     assertThat(fromPeek).isEqualTo(fromBase);

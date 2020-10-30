@@ -3,12 +3,15 @@ package de.digitalcollections.solrocr.formats.alto;
 import com.ctc.wstx.api.WstxInputProperties;
 import com.ctc.wstx.exc.WstxEOFException;
 import com.ctc.wstx.stax.WstxInputFactory;
+import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.lang.invoke.MethodHandles;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 import org.codehaus.stax2.XMLStreamReader2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * StAX-based character filter to extract text from ALTO documents while keeping track of the
@@ -19,17 +22,23 @@ import org.codehaus.stax2.XMLStreamReader2;
  * dependency.
  */
 public class AltoCharFilter extends BaseCharFilter {
-
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final WstxInputFactory xmlInputFactory = new WstxInputFactory();
 
+  private final PeekingReader peekingReader;
   private final XMLStreamReader2 xmlReader;
   private boolean finished = false;
   private int outputOffset = 0;
   private char[] curWord = null;
   private int curWordIdx = -1;
 
-  public AltoCharFilter(Reader in) {
+  public AltoCharFilter(PeekingReader in) {
     super(in);
+    // Buffers smaller than 8192 chars caused problems during testing, so warn users
+    if (in.getMaxBackContextSize() < 8192) {
+      log.warn("Back-Context size of input peeking reader is smaller than 8192 chars, might lead to problems!");
+    }
+    this.peekingReader = in;
     // Our input can be multiple concatenated documents, or also individual chunks from one or more
     // documents. With this parsing mode we can treat them as sequential START_ELEMENT events and
     // just ignore the fact that they're technically different documents.
@@ -125,52 +134,22 @@ public class AltoCharFilter extends BaseCharFilter {
   /**
    * Get the character offset of the value for the given attribute in the reader.
    *
-   * <ul>
-   *   <li>Assumes the XMLStreamReader is on a START_ELEMENT event.</li>
-   *   <li>Assumes the XML element is using minimal whitespace and is situated on a single line.</li>
-   * </ul>
+   * <strong>Assumes the XMLStreamReader is on a START_ELEMENT event.</strong>
    */
   private long getAttributeValueOffset(String targetAttrib) {
+    if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT) {
+      throw new IllegalStateException("XMLStreamReader must be on a START_ELEMENT event.");
+    }
     long idx = xmlReader.getLocationInfo().getStartingCharOffset();
-
-    // Element opening with optional namespace prefix
-    idx += 1; // '<'
-    String prefix = xmlReader.getPrefix();
-    if (prefix != null && prefix.length() > 0) {
-      idx += prefix.length();
-      idx += 1; // ':'
+    long contextIdx = idx - peekingReader.getBackContextStartOffset();
+    String backContext = peekingReader.peekBackContext();
+    String elementText = backContext
+        .substring((int) contextIdx, backContext.indexOf(">", (int) contextIdx) + 1)
+        .replace("\\s", " ");  // Normalize whitespace
+    int attribIdx = elementText.indexOf(" " + targetAttrib + "=");
+    if (attribIdx < 0) {
+      return -1;
     }
-    idx += xmlReader.getLocalName().length(); // 'tagname'
-
-    // Optional namespace declarations
-    int numNamespaces = xmlReader.getNamespaceCount();
-    if (numNamespaces > 0) {
-      for (int i = 0; i < numNamespaces; ++i) {
-        idx += 7; // ' xmlns:'
-        idx += xmlReader.getNamespacePrefix(i).length();
-        idx += 2; // '="'
-        idx += xmlReader.getNamespaceURI().length();
-        idx += 1; // '"'
-      }
-    }
-
-    // Attributes
-    int numAttrs = xmlReader.getAttributeCount();
-    if (numAttrs > 0) {
-      for (int i = 0; i < numAttrs; ++i) {
-        idx += 1; // ' '
-        String attribName = xmlReader.getAttributeName(i).toString();
-        idx += attribName.length();
-        idx += 2; // '="'
-        if (targetAttrib.equals(attribName)) {
-          return idx;
-        }
-        idx += xmlReader.getAttributeValue(i).length();
-        idx += 1; // '"'
-      }
-    }
-
-    // Attibute not found
-    return -1;
+    return  idx + attribIdx + targetAttrib.length() + 3;
   }
 }
