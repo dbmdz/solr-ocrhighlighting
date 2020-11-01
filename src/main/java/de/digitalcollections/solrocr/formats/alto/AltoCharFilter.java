@@ -51,7 +51,7 @@ public class AltoCharFilter extends BaseCharFilter {
     }
   }
 
-  /** Have completely finished reading from the underlying reader and our last buffered word? */
+  /** Have we completely finished reading from the underlying reader and our last buffered word? */
   private boolean isFinished() {
     return finished && curWordIdx == curWord.length;
   }
