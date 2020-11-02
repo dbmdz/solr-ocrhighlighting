@@ -111,6 +111,16 @@ public class PeekingReader extends BaseCharFilter {
     return new String(backContext, 0, this.backContextSize);
   }
 
+  /** Get the actual back context buffer, without incurring a string copy */
+  public char[] peekBackContextBuffer() {
+    return backContext;
+  }
+
+  /** Get the number of characters currently in the back context buffer */
+  public int getBackContextSize() {
+    return backContextSize;
+  }
+
   /** Get the start offset of the back context in the input reader. */
   public long getBackContextStartOffset() {
     return Math.max(0, this.inputOffset - this.backContext.length);
