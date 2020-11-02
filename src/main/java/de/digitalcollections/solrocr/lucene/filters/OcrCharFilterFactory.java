@@ -15,8 +15,12 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
  * to convert the input OCR to plaintext.
  */
 public class OcrCharFilterFactory extends CharFilterFactory {
+  public static final String ALTERNATIVE_MARKER = "\u2060\u2060";
+
   private static final int BEGIN_BUF_SIZE = 2048;
   private static final int CTX_BUF_SIZE = 16384;
+
+  private final boolean expandAlternatives;
 
   private static final ImmutableSet<OcrFormat> FORMATS = ImmutableSet.of(
       new HocrFormat(),
@@ -26,6 +30,7 @@ public class OcrCharFilterFactory extends CharFilterFactory {
   public OcrCharFilterFactory(Map<String, String> args) {
     // We don't take any args at the moment
     super(args);
+    this.expandAlternatives = "true".equals(args.get("expandAlternatives"));
   }
 
   @Override
@@ -36,7 +41,7 @@ public class OcrCharFilterFactory extends CharFilterFactory {
         .findFirst()
         .orElseThrow(() -> new RuntimeException(
             "Could not determine OCR format from chunk: " + peeker.peekBeginning()));
-    Reader formatFilter = fmt.filter(peeker);
+    Reader formatFilter = fmt.filter(peeker, expandAlternatives);
     if (formatFilter == null) {
       return peeker;
     } else {

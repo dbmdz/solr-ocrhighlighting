@@ -4,12 +4,14 @@ import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.text.BreakIterator;
+import org.apache.lucene.analysis.CharFilter;
+import org.apache.lucene.search.uhighlight.PassageFormatter;
 
 /**
  * Provides access to format-specific {@link BreakIterator} and {@link OcrPassageFormatter} instances.
  */
 public interface OcrFormat {
-  /** Get a BreakIterator that splits the content according to the break parameters
+  /** Get a {@link BreakIterator} that splits the content according to the break parameters
    *
    * @param breakBlock the type of {@link OcrBlock} that the input document is split on to build passages
    * @param limitBlock the type of {@link OcrBlock} that a passage may not cross
@@ -18,7 +20,7 @@ public interface OcrFormat {
   BreakIterator getBreakIterator(OcrBlock breakBlock, OcrBlock limitBlock, int contextSize);
 
   /**
-   * Get a PassageFormatter that builds OCR snippets from passages
+   * Get a {@link PassageFormatter} that builds OCR snippets from passages
    *
    * @param prehHighlightTag the tag to put in the snippet text before a highlighted region, e.g. &lt;em&gt;
    * @param postHighlightTag the tag to put in the snippet text after a highlighted region, e.g. &lt;/em&gt;
@@ -31,7 +33,15 @@ public interface OcrFormat {
   OcrPassageFormatter getPassageFormatter(
       String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans);
 
-  Reader filter(PeekingReader input);
+  /** Get a {@link CharFilter} implementation for the OCR format that outputs plaintext.
+   *
+   * If the filter supports outputting alternatives, it must output the alternatives
+   *
+   * @param input Input reader for OCR markup
+   * @param expandAlternatives whether outputting alternatives from the OCR markup is desired.
+   * @return a {@link CharFilter} implementation that outputs plaintext from the OCR.
+   */
+  Reader filter(PeekingReader input, boolean expandAlternatives);
 
   /**
    * Check if the string chunk contains data formatted according to the implementing format.

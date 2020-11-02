@@ -32,6 +32,8 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", multiColumnPointer, "id", "96"));
     ocrPath = Paths.get("src/test/resources/data/alto_nospace.xml");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47"));
+    ocrPath = Paths.get("src/test/resources/data/chronicling_america.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "72"));
     assertU(commit());
   }
 
@@ -196,5 +198,14 @@ public class AltoTest extends SolrTestCaseJ4 {
         "//arr[@name='snippets']/lst/str[@name='text']/text()=\"" + text + "\"",
         "//arr[@name='regions']/lst/str[@name='text']/text()=\"" + text + "\""
     );
+  }
+
+  public void testAlternatives() {
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"YoB Greene pUlcohased\"");
+    assertQ(req, "count(//arr[@name='snippets'])='1'");
+    req = xmlQ("q", "ocr_text:\"OB Greene purchased\"");
+    assertQ(req, "count(//arr[@name='snippets'])='1'");
+    req = xmlQ("q", "ocr_text:\"YoB Greene purchased\"");
+    assertQ(req, "count(//arr[@name='snippets'])='1'");
   }
 }

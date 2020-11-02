@@ -33,8 +33,8 @@ public class AltoFormat implements OcrFormat {
   }
 
   @Override
-  public Reader filter(PeekingReader input) {
-    return new AltoCharFilter(input);
+  public Reader filter(PeekingReader input, boolean expandAlternatives) {
+    return new AltoCharFilter(input, expandAlternatives);
   }
 
   @Override

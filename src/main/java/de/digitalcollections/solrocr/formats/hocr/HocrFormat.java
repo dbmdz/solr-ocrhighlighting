@@ -46,7 +46,7 @@ public class HocrFormat implements OcrFormat {
   }
 
   @Override
-  public Reader filter(PeekingReader input) {
+  public Reader filter(PeekingReader input, boolean expandAlternatives) {
     Reader filtered = baseFilterFactory.create(input);
     return new PatternReplaceCharFilter(TITLE_PAT, "", filtered);
   }

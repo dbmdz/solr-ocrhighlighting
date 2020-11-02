@@ -3,9 +3,12 @@ package de.digitalcollections.solrocr.formats.alto;
 import com.ctc.wstx.api.WstxInputProperties;
 import com.ctc.wstx.exc.WstxEOFException;
 import com.ctc.wstx.stax.WstxInputFactory;
+import de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
@@ -27,12 +30,14 @@ public class AltoCharFilter extends BaseCharFilter {
 
   private final PeekingReader peekingReader;
   private final XMLStreamReader2 xmlReader;
+  private final boolean expandAlternatives;
+
   private boolean finished = false;
   private int outputOffset = 0;
   private char[] curWord = null;
   private int curWordIdx = -1;
 
-  public AltoCharFilter(PeekingReader in) {
+  public AltoCharFilter(PeekingReader in, boolean expandAlternatives) {
     super(in);
     // Buffers smaller than 8192 chars caused problems during testing, so warn users
     if (in.getMaxBackContextSize() < 8192) {
@@ -49,6 +54,7 @@ public class AltoCharFilter extends BaseCharFilter {
     } catch (XMLStreamException e) {
       throw new RuntimeException(e);
     }
+    this.expandAlternatives = expandAlternatives;
   }
 
   /** Have we completely finished reading from the underlying reader and our last buffered word? */
@@ -89,9 +95,27 @@ public class AltoCharFilter extends BaseCharFilter {
       // Read the content into the buffer
       int contentIdx = xmlReader.getAttributeIndex("", contentAttrib);
       String txt = xmlReader.getAttributeValue(contentIdx);
+
+      if (expandAlternatives) {
+        List<String> alternatives = new ArrayList<>();
+        alternatives.add(txt);
+        while (xmlReader.hasNext() && xmlReader.next() != XMLStreamConstants.END_ELEMENT) {
+          if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT
+              || !"ALTERNATIVE".equals(xmlReader.getLocalName())) {
+            continue;
+          }
+          alternatives.add(xmlReader.getElementText());
+        }
+        if (alternatives.size() > 1) {
+          txt = String.join(OcrCharFilterFactory.ALTERNATIVE_MARKER, alternatives);
+        }
+      }
+
+      // Add trailing space if it's not encoded in the content itself
       if (!txt.endsWith(" ")) {
         txt += " ";
       }
+
       curWord = txt.toCharArray();
       curWordIdx = 0;
       return;

@@ -1,7 +1,7 @@
 version: '2'
 services:
   solr:
-    image: solr:8.5
+    image: solr:8.6
     ports:
       - "1044:1044"  # Debugging port
       - "8983:8983"  # Solr admin interface
@@ -11,10 +11,16 @@ services:
       - index-data:/var/solr/data
       - ./data:/data
       - ../target:/build
+      - /opt/async-profiler:/opt/async-profiler
     environment:
       - ENABLE_REMOTE_JMX_OPTS=true
       - SOLR_HEAP=4g
       - ADDITIONAL_CMD_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:1044
+    # Needed for async profiler
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_ADMIN
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate

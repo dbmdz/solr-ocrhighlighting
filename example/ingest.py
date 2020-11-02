@@ -5,7 +5,7 @@ import re
 import sys
 import tarfile
 import xml.etree.ElementTree as etree
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib import request
 
@@ -124,7 +124,8 @@ def bnl_get_article_pointer(path_regions):
     return '+'.join(pointer_parts)
 
 
-def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
+def bnl_extract_article_docs(issue_id, mets_path, alto_basedir):
+    mets_tree = etree.parse(str(mets_path))
     article_elems = mets_tree.findall(
         ".//mets:structMap[@TYPE='LOGICAL']//mets:div[@TYPE='ARTICLE']",
         namespaces=NSMAP)
@@ -137,6 +138,7 @@ def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
         e.attrib['ID']: next(iter(e)).attrib['{http://www.w3.org/1999/xlink}href'][9:]
         for e in mets_tree.findall('.//mets:fileGrp[@USE="Text"]/mets:file',
                                    namespaces=NSMAP)}
+    out = []
     for elem in article_elems:
         meta_id = elem.attrib['DMDID']
         path_regions = [
@@ -149,7 +151,7 @@ def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
             namespaces=NSMAP)
         issue_date = mets_tree.findtext('.//mods:dateIssued', namespaces=NSMAP)
         article_no = meta_id.replace("MODSMD_ARTICLE", "")
-        yield {
+        out.append({
             'id': '{}-{}'.format(issue_id, article_no),
             'source': 'bnl_lunion',
             'issue_id': issue_id,
@@ -158,7 +160,8 @@ def bnl_extract_article_docs(issue_id, mets_tree, alto_basedir):
             'newspaper_part': newspaper_part,
             'ocr_text': bnl_get_article_pointer(path_regions),
             **bnl_get_metadata(mods_meta),
-        }
+        })
+    return out
 
 
 def bnl_are_volumes_missing(base_path):
@@ -198,14 +201,19 @@ def bnl_load_documents(base_path):
                 vol_id, etree.parse(str(mets_path)),
                 vol_path / 'text')
     else:
-        for issue_dir in base_path.iterdir():
-            if not issue_dir.is_dir() or not issue_dir.name.startswith('15'):
-                continue
-            mets_path = next(iter(issue_dir.glob("*-mets.xml")))
-            vol_id = issue_dir.name.replace("newspaper_lunion_", "")
-            yield from bnl_extract_article_docs(
-                vol_id, etree.parse(str(mets_path)),
-                issue_dir / 'text')
+        with ProcessPoolExecutor(max_workers=4) as pool:
+            futs = []
+            for issue_dir in base_path.iterdir():
+                if not issue_dir.is_dir() or not issue_dir.name.startswith('15'):
+                    continue
+                mets_path = next(iter(issue_dir.glob("*-mets.xml")))
+                vol_id = issue_dir.name.replace("newspaper_lunion_", "")
+                futs.append(pool.submit(bnl_extract_article_docs, vol_id, mets_path, issue_dir / 'text'))
+            for fut in as_completed(futs):
+                yield from fut.result()
+                #yield from bnl_extract_article_docs(
+                #    vol_id, etree.parse(str(mets_path)),
+                #    issue_dir / 'text')
 
 
 def index_documents(docs):
@@ -231,20 +239,22 @@ def generate_batches(it, chunk_size):
 
 if __name__ == '__main__':
     with ProcessPoolExecutor(max_workers=8) as pool:
+        with open('./bnl_docs.json', 'r') as fp:
+            docs = json.load(fp)
         print("Indexing BNL/L'Union articles")
         futs = []
-        bnl_iter = bnl_load_documents(Path(LUNION_PATH))
-        for idx, batch in enumerate(generate_batches(bnl_iter, 100)):
+        #bnl_iter = bnl_load_documents(Path(LUNION_PATH))
+        for idx, batch in enumerate(generate_batches(docs, 1000)):
             futs.append(pool.submit(index_documents, batch))
-            print("\r{:05}/{}".format((idx+1)*100, LUNION_NUM_ARTICLES), end='')
+            print("\r{:05}/{}".format((idx+1)*1000, LUNION_NUM_ARTICLES), end='')
         for fut in as_completed(futs):
             fut.result()
-        print("\nIndexing Google 1000 Books volumes")
-        futs = []
-        gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
-        for idx, batch in enumerate(generate_batches(gbooks_iter, 4)):
-            futs.append(pool.submit(index_documents, batch))
-            print("\r{:04}/{}".format((idx+1)*4, GOOGLE1000_NUM_VOLUMES), end='')
-        for fut in as_completed(futs):
-            fut.result()
+        #print("\nIndexing Google 1000 Books volumes")
+        #futs = []
+        #gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
+        #for idx, batch in enumerate(generate_batches(gbooks_iter, 4)):
+        #    futs.append(pool.submit(index_documents, batch))
+        #    print("\r{:04}/{}".format((idx+1)*4, GOOGLE1000_NUM_VOLUMES), end='')
+        #for fut in as_completed(futs):
+        #    fut.result()
     print("\n")

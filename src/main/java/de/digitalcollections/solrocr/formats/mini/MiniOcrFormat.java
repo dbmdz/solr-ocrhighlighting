@@ -39,7 +39,7 @@ public class MiniOcrFormat implements OcrFormat {
   }
 
   @Override
-  public Reader filter(PeekingReader input) {
+  public Reader filter(PeekingReader input, boolean expandAlternatives) {
     return filterFactory.create(input);
   }
 
