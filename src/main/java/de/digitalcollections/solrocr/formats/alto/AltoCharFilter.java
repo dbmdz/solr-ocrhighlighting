@@ -140,16 +140,33 @@ public class AltoCharFilter extends BaseCharFilter {
     if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT) {
       throw new IllegalStateException("XMLStreamReader must be on a START_ELEMENT event.");
     }
-    long idx = xmlReader.getLocationInfo().getStartingCharOffset();
-    long contextIdx = idx - peekingReader.getBackContextStartOffset();
-    String backContext = peekingReader.peekBackContext();
-    String elementText = backContext
-        .substring((int) contextIdx, backContext.indexOf(">", (int) contextIdx) + 1)
-        .replace("\\s", " ");  // Normalize whitespace
-    int attribIdx = elementText.indexOf(" " + targetAttrib + "=");
-    if (attribIdx < 0) {
-      return -1;
+    char[] backContextBuffer = peekingReader.peekBackContextBuffer();
+    int contextLen = peekingReader.getBackContextSize();
+
+    // Place the back-context pointer on the start of the element
+    int contextIdx = Math.toIntExact(
+        xmlReader.getLocationInfo().getStartingCharOffset()
+            - peekingReader.getBackContextStartOffset());
+
+    // Look for the attribute in the back context, starting from the start of
+    // the element. Done with character buffers since it's *way* *way* faster than
+    // creating a String from the buffer and calling `.indexOf`.
+    // Way faster as in doesn't even show up in the sampling profiler anymore.
+    char[] needle = (" " + targetAttrib + "=").toCharArray();
+    int needleIdx = 0;
+    while (needleIdx < needle.length && contextIdx < contextLen) {
+      if (backContextBuffer[contextIdx] == needle[needleIdx]) {
+        needleIdx++;
+      } else {
+        needleIdx = 0;
+      }
+      contextIdx++;
     }
-    return  idx + attribIdx + targetAttrib.length() + 3;
+
+    if (needleIdx == needle.length) {
+      // Append 1 to the index to account for the single- or double-quote after the `=`
+      return  peekingReader.getBackContextStartOffset() + contextIdx + 1;
+    }
+    return -1;
   }
 }
