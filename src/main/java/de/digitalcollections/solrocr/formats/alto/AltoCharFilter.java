@@ -5,6 +5,7 @@ import com.ctc.wstx.exc.WstxEOFException;
 import com.ctc.wstx.stax.WstxInputFactory;
 import de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory;
 import de.digitalcollections.solrocr.reader.PeekingReader;
+import de.digitalcollections.solrocr.util.CharBufUtils;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -177,19 +178,11 @@ public class AltoCharFilter extends BaseCharFilter {
     // creating a String from the buffer and calling `.indexOf`.
     // Way faster as in doesn't even show up in the sampling profiler anymore.
     char[] needle = (" " + targetAttrib + "=").toCharArray();
-    int needleIdx = 0;
-    while (needleIdx < needle.length && contextIdx < contextLen) {
-      if (backContextBuffer[contextIdx] == needle[needleIdx]) {
-        needleIdx++;
-      } else {
-        needleIdx = 0;
-      }
-      contextIdx++;
-    }
+    int needleIdx = CharBufUtils.indexOf(backContextBuffer, contextIdx, contextLen, needle);
 
-    if (needleIdx == needle.length) {
+    if (needleIdx >= 0) {
       // Append 1 to the index to account for the single- or double-quote after the `=`
-      return  peekingReader.getBackContextStartOffset() + contextIdx + 1;
+      return  peekingReader.getBackContextStartOffset() + needleIdx + needle.length + 1;
     }
     return -1;
   }

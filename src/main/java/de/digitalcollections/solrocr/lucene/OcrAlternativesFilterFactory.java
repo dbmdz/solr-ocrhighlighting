@@ -84,7 +84,7 @@ public class OcrAlternativesFilterFactory extends TokenFilterFactory {
 
         // Check if the current token has any alternatives
         nextAlternativeIdx = CharBufUtils.indexOf(
-            ALTERNATIVE_MARKER, 0, termAtt.buffer(), termAtt.length());
+            termAtt.buffer(), 0, termAtt.length(), ALTERNATIVE_MARKER);
         if (nextAlternativeIdx < 0) {
           return true;
         }
@@ -102,7 +102,7 @@ public class OcrAlternativesFilterFactory extends TokenFilterFactory {
         // Restore all attributes for the token so the alternative has the same attributes, except for the characters
         this.restoreState(this.state);
         nextAlternativeIdx = CharBufUtils.indexOf(
-            ALTERNATIVE_MARKER, this.curPos, this.curTermBuffer, curTermLength);
+            this.curTermBuffer, this.curPos, curTermLength, ALTERNATIVE_MARKER);
       }
       // Change the term attribute to contain the current alternative
       int end = nextAlternativeIdx >= 0 ? nextAlternativeIdx : curTermLength;
