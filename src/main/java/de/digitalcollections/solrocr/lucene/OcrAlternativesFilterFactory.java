@@ -17,12 +17,10 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  *
  * <p><strong>You cannot use the {@link org.apache.lucene.analysis.standard.ClassicTokenizer} with this filter</strong>,
  * since it splits tokens on the U+2060 (Word Joiner) codepoint, contrary to Unicode rules. Please use one of the newer,
- * unicode-compliant tokenizers like {@link org.apache.lucene.analysis.standard.StandardTokenizer}
+ * unicode-compliant tokenizers like {@link org.apache.lucene.analysis.standard.StandardTokenizer}.
  *
- * <p><strong>Make sure that the chosen tokenizer does not split words on the U+2090 (Word Joiner) codepoint, this filter
- * uses it to detect alternatives for a given token.</strong> This is the case for almost all built-in tokenizers of
- * Lucene/Solr (except for the {@link org.apache.lucene.analysis.standard.ClassicTokenizer}, see above, so this warning
- * is primarily targeted at users with custom tokenizers.
+ * <p><strong>When using a custom tokenizer, make sure that it also does not split words on the U+2090 (Word Joiner)
+ * codepoint, this filter uses it to detect alternatives for a given token.</strong>
  *
  * <pre class="prettyprint">
  * &lt;fieldType name="text_ocr" class="solr.TextField"&gt;

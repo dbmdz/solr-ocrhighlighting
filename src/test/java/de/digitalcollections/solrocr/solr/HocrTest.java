@@ -28,7 +28,7 @@ public class HocrTest extends SolrTestCaseJ4 {
         + "deserunt mollit anim id est laborum.", "id", "1337"));
     Path ocrPath = Paths.get("src/test/resources/data/hocr.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
-    assertU(adoc("ocr_text", String.format("%s[3034454:3067549]", ocrPath.toString()), "id", "84"));
+    assertU(adoc("ocr_text", String.format("%s[3033380:3066395]", ocrPath.toString()), "id", "84"));
     Path multiColPath = Paths.get("src/test/resources/data/multicolumn.hocr");
     assertU(adoc("ocr_text", multiColPath.toString(),  "id", "96"));
     assertU(commit());
@@ -132,6 +132,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   public void testLimitBlockHonored() throws Exception {
     SolrQueryRequest req = xmlQ("q", "Japan", "hl.ocr.absoluteHighlights", "true");
     assertQ(req,
+            "//int[@name='numTotal']/text()='6'",
             "(//arr[@name='snippets']/lst/str[@name='text']/text())[1]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of<em>Japan</em>'");
   }
 
@@ -267,6 +268,13 @@ public class HocrTest extends SolrTestCaseJ4 {
         "qf", "some_text ocr_text");
     assertQ(req, "count(//lst[@name='highlighting']//arr[@name='some_text'])=1");
     assertQ(req, "count(//lst[@name='ocrHighlighting']//arr[@name='snippets'])=1");
+  }
 
+  @Test
+  public void testAlternatives() {
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"nathanael brush\"");
+    assertQ(req, "count(//arr[@name='snippets'])='1'");
+    req = xmlQ("q", "ocr_text:\"natlianiel brush\"");
+    assertQ(req, "count(//arr[@name='snippets'])='1'");
   }
 }

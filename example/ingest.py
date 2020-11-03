@@ -239,22 +239,20 @@ def generate_batches(it, chunk_size):
 
 if __name__ == '__main__':
     with ProcessPoolExecutor(max_workers=8) as pool:
-        with open('./bnl_docs.json', 'r') as fp:
-            docs = json.load(fp)
         print("Indexing BNL/L'Union articles")
         futs = []
-        #bnl_iter = bnl_load_documents(Path(LUNION_PATH))
-        for idx, batch in enumerate(generate_batches(docs, 1000)):
+        bnl_iter = bnl_load_documents(Path(LUNION_PATH))
+        for idx, batch in enumerate(generate_batches(bnl_iter, 1000)):
             futs.append(pool.submit(index_documents, batch))
             print("\r{:05}/{}".format((idx+1)*1000, LUNION_NUM_ARTICLES), end='')
         for fut in as_completed(futs):
             fut.result()
-        #print("\nIndexing Google 1000 Books volumes")
-        #futs = []
-        #gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
-        #for idx, batch in enumerate(generate_batches(gbooks_iter, 4)):
-        #    futs.append(pool.submit(index_documents, batch))
-        #    print("\r{:04}/{}".format((idx+1)*4, GOOGLE1000_NUM_VOLUMES), end='')
-        #for fut in as_completed(futs):
-        #    fut.result()
+        print("\nIndexing Google 1000 Books volumes")
+        futs = []
+        gbooks_iter = gbooks_load_documents(Path(GOOGLE1000_PATH))
+        for idx, batch in enumerate(generate_batches(gbooks_iter, 4)):
+            futs.append(pool.submit(index_documents, batch))
+            print("\r{:04}/{}".format((idx+1)*4, GOOGLE1000_NUM_VOLUMES), end='')
+        for fut in as_completed(futs):
+            fut.result()
     print("\n")

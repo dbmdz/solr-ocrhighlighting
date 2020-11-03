@@ -28,7 +28,6 @@ public class OcrCharFilterFactory extends CharFilterFactory {
       new MiniOcrFormat());
 
   public OcrCharFilterFactory(Map<String, String> args) {
-    // We don't take any args at the moment
     super(args);
     this.expandAlternatives = "true".equals(args.get("expandAlternatives"));
   }
