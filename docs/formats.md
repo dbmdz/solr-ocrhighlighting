@@ -58,7 +58,7 @@ A basic example looks like this:
 
 ```xml
 <ocr>
-  <p id="page_identifier">
+  <p xml:id="page_identifier">
     <b>
       <l><w x="50 50 100 100">A</w> <w x="150 50 100 100">Line</w></l>
     </b>
@@ -73,6 +73,6 @@ A basic example looks like this:
 | Word      | `<w/>`       | needs to have `box` attribute with `{x} {y} {width} {height}`. <br>Values can be integers or floats between 0 and 1 |
 | Line      | `<l/>`       |                                  |
 | Block     | `<b/>`       |                                  |
-| Page      | `<p/>`       | needs to have an `id` attribute with a page identifier. Optionally can have a `wh` attribute with the `{width} {height}` values for the page |
+| Page      | `<p/>`       | needs to have an `xml:id` attribute with a page identifier. Optionally can have a `wh` attribute with the `{width} {height}` values for the page |
 | Section   | *not mapped* |                                  |
 | Paragraph | *not mapped* |                                  |
