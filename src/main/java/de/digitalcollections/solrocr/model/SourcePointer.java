@@ -69,6 +69,9 @@ public class SourcePointer {
   public List<FileSource> sources;
 
   public static boolean isPointer(String pointer) {
+    if (pointer.startsWith("<")) {
+      return false;
+    }
     return Arrays.stream(pointer.split("\\+"))
         .allMatch(p -> {
           Matcher m = POINTER_PAT.matcher(p);
