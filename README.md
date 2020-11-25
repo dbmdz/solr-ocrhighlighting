@@ -17,6 +17,13 @@ values. This means that all options and query types supported by the
 works transparently with non-OCR fields and just lets the default
 implementation handle those.
 
+Additionally to improved highlighting for OCR, the plugin is able to index
+alternative readings listed in the markup. For example, if you OCR file
+has the alternatives `christmas` and `christrias` for the token
+`clistrias` in the span `presents on clistrias eve`, users would be able
+to search for `"presents christmas"` and `"presents clistrias"` and would
+get the correct match in bose cases, both with full highlighting.
+
 The plugin **works with all Solr versions >= 7.5**.
 
 ## Features

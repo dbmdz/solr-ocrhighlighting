@@ -24,8 +24,8 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
   private final FileChannel chan;
   private final MappedByteBuffer buf;
   private final int numBytes;
-  private final Charset charset;
   private final SourcePointer ptr;
+  private final Charset charset;
 
   private int current;
 
@@ -118,7 +118,27 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
     byte[] buf = new byte[end - start];
     this.buf.position(start);
     this.buf.get(buf);
-    return new String(buf, StandardCharsets.UTF_8);
+    return new String(buf, charset);
+  }
+
+  public CharSequence subSequence(int start, int end, boolean forceAscii) {
+    if (!forceAscii) {
+      return subSequence(start, end);
+    }
+    if (start < 0 || end < 0 || end > this.numBytes || end < start) {
+      throw new IndexOutOfBoundsException();
+    }
+    byte[] buf = new byte[end - start];
+    this.buf.position(start);
+    this.buf.get(buf);
+
+    // Faster pure-ASCII decoding, just treat everything as ASCII, a good chunk faster than
+    // `new String(buf, StandardCharsets.US_ASCII)`, which has a few sanity checks.
+    char[] out = new char[buf.length];
+    for (int i=0; i < buf.length; i++) {
+      out[i] = (char) buf[i];
+    }
+    return new String(out);
   }
 
   @Override

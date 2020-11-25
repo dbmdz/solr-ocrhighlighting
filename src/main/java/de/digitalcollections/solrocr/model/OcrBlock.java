@@ -7,5 +7,5 @@ public enum OcrBlock {
   SECTION,
   PARAGRAPH,
   LINE,
-  WORD;
+  WORD
 }

@@ -28,7 +28,7 @@ public class HocrTest extends SolrTestCaseJ4 {
         + "deserunt mollit anim id est laborum.", "id", "1337"));
     Path ocrPath = Paths.get("src/test/resources/data/hocr.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
-    assertU(adoc("ocr_text", String.format("%s[3033380:3066395]", ocrPath.toString()), "id", "84"));
+    assertU(adoc("ocr_text", String.format("%s[3001845:3065626]", ocrPath.toString()), "id", "84"));
     Path multiColPath = Paths.get("src/test/resources/data/multicolumn.hocr");
     assertU(adoc("ocr_text", multiColPath.toString(),  "id", "96"));
     assertU(commit());
@@ -95,7 +95,7 @@ public class HocrTest extends SolrTestCaseJ4 {
             + "bei dieſer Erinnerung'");
     req = xmlQ("q", "\"Volfslieder heller von den Lippen\"", "hl.weightMatches", "true");
     assertQ(req,
-            "count(//lst[@name='ocrHighlighting']/lst)=1");
+            "count(//lst[@name='ocrHighlighting']/lst)=2");
   }
 
     @Test
@@ -169,9 +169,9 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertQ(req,
             "count(//arr[@name='regions']/lst)=1",
             "//str[@name='text'][1]/text()=\"Witches are reported (amongst many other hellish observations, whereby "
-            + "they obh'ge them\u00ADselves to Satan) to say the <em>Lord's prayer</em> back\u00ADwards. "
+            + "they obh'ge themselves to Satan) to say the <em>Lord's prayer</em> backwards. "
             + "Are there not many, who, though they do not. pronounce the syllables of the <em>Lord's "
-            + "prayer</em> retrograde (their discretion will not suf\u00ADfer them to be betrayed to such a "
+            + "prayer</em> retrograde (their discretion will not suffer them to be betrayed to such a "
             + "nonsense sin), yet they transpose it in effect, desiring their\"");
   }
 

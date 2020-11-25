@@ -63,7 +63,7 @@ public class HocrClassBreakIterator extends BreakIterator {
         }
       }
       if (this.text.next() == CharacterIterator.DONE) {
-        this.current = this.text.getIndex();;
+        this.current = this.text.getIndex();
         return this.current;
       }
     }
@@ -83,7 +83,7 @@ public class HocrClassBreakIterator extends BreakIterator {
 
   @Override
   public int previous() {
-    String fullTag = "";
+    String fullTag;
     String hocrClass = "";
     StringBuilder sb = null;
     while(!breakClasses.contains(hocrClass)) {

@@ -1,19 +1,7 @@
 package de.digitalcollections.solrocr.formats.alto;
 
-import de.digitalcollections.solrocr.reader.PeekingReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.io.IOUtils;
-import org.apache.lucene.analysis.CharFilter;
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AltoCharFilterTest {
   final Path altoPath = Paths.get("src/test/resources/data/alto.xml");
@@ -21,6 +9,7 @@ public class AltoCharFilterTest {
   final Path decimalEscapedPath = Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00002.xml");
   final Path alternativePath = Paths.get("src/test/resources/data/chronicling_america.xml");
 
+  /*
   private static CharFilter makeFilter(Path xmlPath, boolean expandAlternatives)
       throws FileNotFoundException {
     return new AltoCharFilter(
@@ -86,4 +75,17 @@ public class AltoCharFilterTest {
     int srcIdx = source.indexOf("T&lt;lffadel&gt;l&gt;velse.");
     assertThat(filter.correctOffset(parsedIdx)).isEqualTo(srcIdx);
   }
+
+  @Test
+  public void measureRegexParser() throws IOException {
+    Passage passage = new Passage();
+    passage.setStartOffset(0);
+    passage.setEndOffset(875750);
+    AltoPassageFormatter formatter = new AltoPassageFormatter(
+        "<em>", "</em>", false, false);
+    Path p = Paths.get("src/test/resources/data/chronicling_america.xml");
+    List<OcrBox> words = formatter.parseWords(new String(Files.readAllBytes(p), StandardCharsets.UTF_8), null, null);
+    assertThat(words).hasSize(12);
+  }
+  */
 }

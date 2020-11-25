@@ -6,7 +6,7 @@ import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
 /* Identifier and size of a given OCR page */
-public class OcrPage {
+public class OcrPage implements Comparable<OcrPage> {
   public final String id;
   public final Dimension dimensions;
 
@@ -25,5 +25,24 @@ public class OcrPage {
       nl.add("height", dimensions.height);
     }
     return nl;
+  }
+
+  @Override
+  public int compareTo(OcrPage o) {
+    return this.id.compareTo(o.id);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    OcrPage ocrPage = (OcrPage) o;
+    return id.equals(ocrPage.id) &&
+        Objects.equals(dimensions, ocrPage.dimensions);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, dimensions);
   }
 }

@@ -1,10 +1,10 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
 import com.google.common.collect.ImmutableSet;
+import de.digitalcollections.solrocr.formats.miniocr.MiniOcrFormat;
 import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.formats.alto.AltoFormat;
 import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
-import de.digitalcollections.solrocr.formats.mini.MiniOcrFormat;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.util.Map;
@@ -34,7 +34,8 @@ public class OcrCharFilterFactory extends CharFilterFactory {
 
   @Override
   public Reader create(Reader input) {
-    PeekingReader peeker = new PeekingReader(input, BEGIN_BUF_SIZE, CTX_BUF_SIZE);
+    PeekingReader peeker = new PeekingReader(
+       new SanitizingXmlFilter(input), BEGIN_BUF_SIZE, CTX_BUF_SIZE);
     OcrFormat fmt = FORMATS.stream()
         .filter(f -> f.hasFormat(peeker.peekBeginning()))
         .findFirst()

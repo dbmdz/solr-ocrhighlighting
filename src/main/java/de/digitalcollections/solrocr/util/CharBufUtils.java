@@ -28,13 +28,4 @@ public class CharBufUtils {
     }
     return -1;
   }
-
-  public static boolean isWhitespace(char[] buf, int from, int len) {
-    for (int i=from; i < from + len; i++) {
-      if (!Character.isWhitespace(buf[i])) {
-        return false;
-      }
-    }
-    return true;
-  }
 }

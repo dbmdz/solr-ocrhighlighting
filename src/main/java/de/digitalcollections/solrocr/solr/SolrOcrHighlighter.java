@@ -85,7 +85,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     String[] fields = req.getParams().getParams(OcrHighlightParams.OCR_FIELDS);
 
     if (fields != null && fields.length > 0) {
-      Set<String> expandedFields = new LinkedHashSet<String>();
+      Set<String> expandedFields = new LinkedHashSet<>();
       Collection<String> storedHighlightFieldNames = req.getSearcher().getDocFetcher().getStoredHighlightFieldNames();
       for (String field : fields) {
         expandWildcardsInHighlightFields(
@@ -110,7 +110,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     for (String field : fields) {
       if (field.contains("*")) {
         // create a Java regular expression from the wildcard string
-        String fieldRegex = field.replaceAll("\\*", ".*");
+        String fieldRegex = field.replace("\\*", ".*");
         for (String storedFieldName : storedHighlightFieldNames) {
           if (storedFieldName.matches(fieldRegex)) {
             expandedFields.add(storedFieldName);

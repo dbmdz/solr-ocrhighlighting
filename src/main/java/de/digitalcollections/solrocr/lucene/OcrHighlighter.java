@@ -1,13 +1,13 @@
 package de.digitalcollections.solrocr.lucene;
 
 import com.google.common.collect.ImmutableSet;
+import de.digitalcollections.solrocr.formats.miniocr.MiniOcrFormat;
+import de.digitalcollections.solrocr.iter.ContextBreakIterator;
 import de.digitalcollections.solrocr.model.OcrBlock;
 import de.digitalcollections.solrocr.model.OcrFormat;
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.formats.alto.AltoFormat;
 import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
-import de.digitalcollections.solrocr.formats.mini.MiniOcrFormat;
 import de.digitalcollections.solrocr.solr.OcrHighlightParams;
 import de.digitalcollections.solrocr.iter.ExitingIterCharSeq;
 import de.digitalcollections.solrocr.iter.FileBytesCharIterator;
@@ -87,7 +87,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private static final Constructor<UHComponents> hlComponentsConstructorLegacy;
   private static final Method offsetSourceGetterLegacy;
   private static final Method extractAutomataLegacyMethod;
-  public static Function<Query, Collection<Query>> nopRewriteFn = q -> null;
 
   static {
     try {
@@ -279,10 +278,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
           assert resultByDocIn[docInIndex] == null;
           OcrFormat ocrFormat = getFormat(content);
           String limitBlock = params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase();
-          BreakIterator breakIter = ocrFormat.getBreakIterator(
-              OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()),
-              limitBlock.equals("NONE") ? null : OcrBlock.valueOf(limitBlock),
-              params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
+          BreakIterator contexIter = ocrFormat.getBreakIterator(
+              OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()));
+          BreakIterator limitIter = limitBlock.equals("NONE") ? null : ocrFormat.getBreakIterator(OcrBlock.valueOf(limitBlock));
+          BreakIterator breakIter = new ContextBreakIterator(
+              contexIter, limitIter, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
           OcrPassageFormatter formatter = ocrFormat.getPassageFormatter(
               params.get(HighlightParams.TAG_PRE, "<em>"),
               params.get(HighlightParams.TAG_POST, "</em>"),
@@ -393,7 +393,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return fieldValues;
   }
 
-  private OcrFormat getFormat(IterableCharSequence content) throws IOException {
+  private OcrFormat getFormat(IterableCharSequence content) {
     // Sample the first 4k characters to determine the format
     String sampleChunk = content.subSequence(0, Math.min(4096, content.length())).toString();
     return FORMATS.stream()
@@ -574,7 +574,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       }
 
       @Override
-      public int nextDoc() throws IOException {
+      public int nextDoc() {
         idx++;
         return docID();
       }

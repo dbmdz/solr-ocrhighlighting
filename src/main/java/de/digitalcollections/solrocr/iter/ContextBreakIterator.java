@@ -48,7 +48,7 @@ public class ContextBreakIterator extends BreakIterator {
     for (int i=0; i < context * 2 + 1; i++) {
       if (baseIter.next() >= limit) {
         return limit;
-      };
+      }
     }
     return baseIter.current();
   }
@@ -62,7 +62,7 @@ public class ContextBreakIterator extends BreakIterator {
     for (int i=0; i < context * 2 + 1; i++) {
       if (baseIter.previous() <= limit) {
         return limit;
-      };
+      }
     }
     return baseIter.current();
   }

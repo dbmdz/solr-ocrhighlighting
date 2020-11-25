@@ -1,6 +1,5 @@
 package de.digitalcollections.solrocr.lucene;
 
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
 import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import de.digitalcollections.solrocr.util.PageCacheWarmer;
@@ -109,8 +108,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         throw new IllegalArgumentException("field '" + field + "' was indexed without offsets, cannot highlight");
       }
       if (pageId != null) {
-        String passagePageId = formatter.determineStartPage(
-            null, start, (IterableCharSequence) breakIter.getText()).id;
+        String passagePageId = formatter.determineStartPage(start, (IterableCharSequence) breakIter.getText()).id;
         if (!passagePageId.equals(pageId)) {
           continue;
         }

@@ -118,7 +118,7 @@ public class AltoTest extends SolrTestCaseJ4 {
   public void testHyphenationResolved() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"faux espoir\"", "hl.weightMatches", "true");
     assertQ(req,
-            "//str[@name='text'][1]/text()=\"— <em>Faux espoir</em>, mon vieil ami, <em>faux espoir</em> ! Je n'ai jamais même vu un seul des anciens compagnons de ses plaisirs. Lui\"",
+            "//str[@name='text'][1]/text()=\"— <em>Faux espoir</em>, mon vieil ami, <em>faux espoir</em> ! Je n'ai jamais même vu un seul des anciens compagnons de ses plaisirs. Luimême\"",
             "count(//arr[@name='highlights']/arr/lst)=3",
             "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='Faux espoir,'",
             "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='faux es-'",
@@ -189,10 +189,12 @@ public class AltoTest extends SolrTestCaseJ4 {
   }
 
   public void testConsistentSpaceHandling() {
-    String text = "Die Zahl derer, welche jene Schreckens: zeit mit Augen ſahen, in welcher <em>Zittau</em>"
-        + ", <em>im</em> Gefolge des ſiebenjährigen Krieges, den 23. Juli 1757, auf die "
+    String text = "Die Zahl derer, welche jene Schreckens: zeit <em>mit Augen ſahen, in welcher Zittau</em>"
+        + ", <em>im Gefolge</em> des ſiebenjährigen Krieges, den 23. Juli 1757, auf die "
         + "ſchre>li<ſte Art zerſtört ward, kann zwar nur noch klein";
-    SolrQueryRequest req = xmlQ("q", "ocr_text:(zittau+OR+im)");
+    SolrQueryRequest req = xmlQ(
+        "q", "ocr_text:\"mit Augen ſahen, in welcher Zittau\" OR ocr_text:\"im Gefolge\"",
+        "hl.weightMatches", "true");
     assertQ(
         req,
         "//arr[@name='snippets']/lst/str[@name='text']/text()=\"" + text + "\"",

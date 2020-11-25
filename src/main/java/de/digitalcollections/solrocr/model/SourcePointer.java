@@ -56,9 +56,7 @@ public class SourcePointer {
 
     @Override
     public String toString() {
-      final StringBuffer sb = new StringBuffer("Region{");
-      sb.append(start).append(":").append(end).append("}");
-      return sb.toString();
+      return "Region{" + start + ":" + end + "}";
     }
   }
 

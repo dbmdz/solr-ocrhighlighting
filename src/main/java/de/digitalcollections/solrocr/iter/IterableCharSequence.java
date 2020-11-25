@@ -27,6 +27,13 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
 
   SourcePointer getPointer();
 
+  @Override
+  default CharSequence subSequence(int start, int end) {
+    return this.subSequence(start, end, false);
+  }
+
+  CharSequence subSequence(int start, int end, boolean forceAscii);
+
   static IterableCharSequence fromString(String string) {
     return new IterableStringCharSequence(string);
   }
@@ -43,7 +50,6 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
     private IterableStringCharSequence(String s, StringCharacterIterator it) {
       this.s = s;
       this.it = it;
-
     }
 
     @Override
@@ -57,7 +63,7 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
     }
 
     @Override
-    public CharSequence subSequence(int beginIndex, int endIndex) {
+    public CharSequence subSequence(int beginIndex, int endIndex, boolean forceAscii) {
       return s.subSequence(beginIndex, endIndex);
     }
 

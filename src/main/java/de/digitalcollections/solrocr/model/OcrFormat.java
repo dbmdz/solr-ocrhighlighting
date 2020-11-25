@@ -1,9 +1,13 @@
 package de.digitalcollections.solrocr.model;
 
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
+import com.google.common.collect.Sets;
+import de.digitalcollections.solrocr.formats.OcrParser;
+import de.digitalcollections.solrocr.lucene.OcrPassageFormatter;
+import de.digitalcollections.solrocr.lucene.filters.OcrCharFilter;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.text.BreakIterator;
+import java.util.Set;
 import org.apache.lucene.analysis.CharFilter;
 import org.apache.lucene.search.uhighlight.PassageFormatter;
 
@@ -11,13 +15,31 @@ import org.apache.lucene.search.uhighlight.PassageFormatter;
  * Provides access to format-specific {@link BreakIterator} and {@link OcrPassageFormatter} instances.
  */
 public interface OcrFormat {
-  /** Get a {@link BreakIterator} that splits the content according to the break parameters
+  /** Get a {@link BreakIterator} that splits the content on a given block type.
    *
-   * @param breakBlock the type of {@link OcrBlock} that the input document is split on to build passages
-   * @param limitBlock the type of {@link OcrBlock} that a passage may not cross
-   * @param contextSize the number of break blocks in a context that forms a highlighting passage
+   * @param blockType the type of {@link OcrBlock} that the input document is split on
+   * @return the {@link BreakIterator} instance
    * */
-  BreakIterator getBreakIterator(OcrBlock breakBlock, OcrBlock limitBlock, int contextSize);
+  BreakIterator getBreakIterator(OcrBlock blockType);
+
+  /** Get the parser for the format.
+   *
+   * @param input the input reader to parse {@link OcrBox}es from
+   * @param features Desired features for the parsers
+   * @return a parser instance configured with the requested parsing features
+   */
+  OcrParser getParser(Reader input, OcrParser.ParsingFeature... features);
+
+  /** Parse an {@link OcrPage} from a string fragment of the page markup.
+   *
+   * <p>Implementers are safe to assume that {@code pageFragment} begins with the opening tag of
+   * a page, as determined by the format's {@link OcrFormat#getBreakIterator(OcrBlock)} output
+   * for the {@link OcrBlock#PAGE} block type.
+   *
+   * @param pageFragment The beginning of a page's markup, i.e. a String starting with {@code <$pageElem}
+   * @return the parsed {@link OcrPage}
+   */
+  OcrPage parsePageFragment(String pageFragment);
 
   /**
    * Get a {@link PassageFormatter} that builds OCR snippets from passages
@@ -30,8 +52,10 @@ public interface OcrFormat {
    *                   be more precise than the image "spans", since the latter are restricted to the granularity of
    *                   the OCR document.
    */
-  OcrPassageFormatter getPassageFormatter(
-      String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans);
+  default OcrPassageFormatter getPassageFormatter(
+      String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans) {
+    return new OcrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights, alignSpans, this);
+  }
 
   /** Get a {@link CharFilter} implementation for the OCR format that outputs plaintext.
    *
@@ -41,7 +65,15 @@ public interface OcrFormat {
    * @param expandAlternatives whether outputting alternatives from the OCR markup is desired.
    * @return a {@link CharFilter} implementation that outputs plaintext from the OCR.
    */
-  Reader filter(PeekingReader input, boolean expandAlternatives);
+  default Reader filter(PeekingReader input, boolean expandAlternatives) {
+    Set<OcrParser.ParsingFeature> features = Sets.newHashSet(
+        OcrParser.ParsingFeature.TEXT, OcrParser.ParsingFeature.OFFSETS);
+    if (expandAlternatives) {
+      features.add(OcrParser.ParsingFeature.ALTERNATIVES);
+    }
+    return new OcrCharFilter(
+        getParser(input, features.toArray(new OcrParser.ParsingFeature[]{})));
+  }
 
   /**
    * Check if the string chunk contains data formatted according to the implementing format.
@@ -50,4 +82,8 @@ public interface OcrFormat {
    * @return whether the chunk is formatted according to the implementing format.
    */
   boolean hasFormat(String ocrChunk);
+
+  int getLastContentStartIdx(String content);
+
+  int getFirstContentEndIdx(String content);
 }
