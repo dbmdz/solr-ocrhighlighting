@@ -80,6 +80,9 @@ public class TagBreakIterator extends BreakIterator {
         return start + idx;
       }
       end = start + overlap;
+      if (start == 0) {
+        break;
+      }
       start = Math.max(0, start - blockSize);
     }
     return this.text.getBeginIndex();

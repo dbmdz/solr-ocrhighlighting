@@ -66,4 +66,18 @@ class HocrClassBreakIteratorTest {
     assertThat(StringUtils.countMatches(tag, "ocrx_word")).isEqualTo(1);
     assertThat(tag).contains("omnia.");
   }
+
+  @Test
+  void previousFirst() throws IOException {
+    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
+    HocrClassBreakIterator it = new HocrClassBreakIterator("ocrx_word");
+    it.setText(seq);
+    seq.setIndex(1464);
+    it.previous();
+    int end = it.previous();
+    int start = it.previous();
+    String tag = seq.subSequence(start, end).toString();
+    assertThat(tag).startsWith("<?xml");
+    assertThat(StringUtils.countMatches(tag, "ocrx_word")).isEqualTo(1);
+  }
 }
