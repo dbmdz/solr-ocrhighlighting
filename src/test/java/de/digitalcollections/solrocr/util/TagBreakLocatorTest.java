@@ -1,9 +1,11 @@
 package de.digitalcollections.solrocr.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.ImmutableSet;
 import de.digitalcollections.solrocr.iter.FileBytesCharIterator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
-import de.digitalcollections.solrocr.iter.TagBreakIterator;
+import de.digitalcollections.solrocr.iter.TagBreakLocator;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -14,9 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class TagBreakIteratorTest {
+class TagBreakLocatorTest {
 
   private static final Path utf8Path = Paths.get("src/test/resources/data/miniocr.xml");
 
@@ -28,10 +28,9 @@ class TagBreakIteratorTest {
   @Test
   void firstNext() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakIterator it = new TagBreakIterator("w");
-    it.setText(seq);
-    int start = it.next();
-    int end = it.next();
+    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    int start = it.following(0);
+    int end = it.following(start);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
@@ -41,11 +40,9 @@ class TagBreakIteratorTest {
   @Test
   void next() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakIterator it = new TagBreakIterator("w");
-    it.setText(seq);
-    seq.setIndex(8267);
-    int start = it.next();
-    int end = it.next();
+    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    int start = it.following(8267);
+    int end = it.following(start);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
@@ -56,10 +53,9 @@ class TagBreakIteratorTest {
   @Test
   void lastPrevious() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakIterator it = new TagBreakIterator("w");
-    it.setText(seq);
-    int end = it.last();
-    int start = it.previous();
+    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    int end = seq.length() - 1;
+    int start = it.preceding(seq.length() - 1);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
@@ -70,11 +66,9 @@ class TagBreakIteratorTest {
   @Test
   void previous() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakIterator it = new TagBreakIterator("w");
-    it.setText(seq);
+    TagBreakLocator it = new TagBreakLocator(seq, "w");
     int end = 2872135;
-    seq.setIndex(end);
-    int start = it.previous();
+    int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
@@ -85,14 +79,12 @@ class TagBreakIteratorTest {
   @Test
   void previousFirst() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakIterator it = new TagBreakIterator("w");
-    it.setText(seq);
-    seq.setIndex(293);
-    it.previous();
-    it.previous();
-    it.previous();
-    int end = it.previous();
-    int start = it.previous();
+    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    int idx = it.preceding(293);
+    idx = it.preceding(idx);
+    idx = it.preceding(idx);
+    int end = it.preceding(idx);
+    int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<?xml");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(0);

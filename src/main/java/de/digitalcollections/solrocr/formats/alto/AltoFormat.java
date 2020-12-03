@@ -2,13 +2,14 @@ package de.digitalcollections.solrocr.formats.alto;
 
 import com.google.common.collect.ImmutableMap;
 import de.digitalcollections.solrocr.formats.OcrParser;
-import de.digitalcollections.solrocr.iter.TagBreakIterator;
+import de.digitalcollections.solrocr.iter.BreakLocator;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.iter.TagBreakLocator;
 import de.digitalcollections.solrocr.model.OcrBlock;
 import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrPage;
 import java.awt.Dimension;
 import java.io.Reader;
-import java.text.BreakIterator;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 
@@ -21,9 +22,11 @@ public class AltoFormat implements OcrFormat {
       OcrBlock.WORD, "String");
 
   @Override
-  public BreakIterator getBreakIterator(OcrBlock blockType) {
-    String breakTag = blockTagMapping.get(blockType);
-    return new TagBreakIterator(breakTag);
+  public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
+    // NOTE: The ALTO hierarchy we support is pretty rigid, i.e. Page > TextBlock > TextLine > String
+    //       is a given, hence we only grab t he lowest-hierarchy block and call it a day
+    String breakTag = blockTagMapping.get(blockTypes[0]);
+    return new TagBreakLocator(text, breakTag);
   }
 
   @Override

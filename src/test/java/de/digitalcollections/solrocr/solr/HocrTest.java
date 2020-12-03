@@ -1,10 +1,12 @@
 package de.digitalcollections.solrocr.solr;
 
 import com.google.common.collect.ImmutableMap;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
@@ -31,6 +33,12 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", String.format("%s[3001845:3065626]", ocrPath.toString()), "id", "84"));
     Path multiColPath = Paths.get("src/test/resources/data/multicolumn.hocr");
     assertU(adoc("ocr_text", multiColPath.toString(),  "id", "96"));
+    String ptr = Files.walk(Paths.get("src/test/resources/data/chronicling_hocr"), 1)
+        .sorted()
+        .filter(Files::isRegularFile)
+        .map(Path::toString)
+        .collect(Collectors.joining("+"));
+    assertU(adoc("ocr_text", ptr,  "id", "758"));
     assertU(commit());
   }
 
@@ -130,7 +138,7 @@ public class HocrTest extends SolrTestCaseJ4 {
 
   @Test
   public void testLimitBlockHonored() throws Exception {
-    SolrQueryRequest req = xmlQ("q", "Japan", "hl.ocr.absoluteHighlights", "true");
+    SolrQueryRequest req = xmlQ("q", "Japan", "hl.ocr.absoluteHighlights", "true", "fq", "id:42");
     assertQ(req,
             "//int[@name='numTotal']/text()='6'",
             "(//arr[@name='snippets']/lst/str[@name='text']/text())[1]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of<em>Japan</em>'");
@@ -267,14 +275,19 @@ public class HocrTest extends SolrTestCaseJ4 {
         "q", "\"occaecat cupidatat\" Salomet", "hl.fl", "some_text", "defType", "edismax",
         "qf", "some_text ocr_text");
     assertQ(req, "count(//lst[@name='highlighting']//arr[@name='some_text'])=1");
-    assertQ(req, "count(//lst[@name='ocrHighlighting']//arr[@name='snippets'])=1");
+    assertQ(req, "count(//lst[@name='ocrHighlighting']//arr[@name='snippets']/lst)=1");
   }
 
   @Test
   public void testAlternatives() {
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"nathanael brush\"");
-    assertQ(req, "count(//arr[@name='snippets'])='1'");
+    assertQ(req, "count(//arr[@name='snippets']/lst)='1'");
     req = xmlQ("q", "ocr_text:\"natlianiel brush\"");
-    assertQ(req, "count(//arr[@name='snippets'])='1'");
+    assertQ(req, "count(//arr[@name='snippets']/lst)='1'");
+  }
+
+  public void testChronicling() {
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"arkansas state\"", "hl.weightMatches", "true");
+    assertQ(req, "count(//arr[@name='snippets']/lst)='8'");
   }
 }

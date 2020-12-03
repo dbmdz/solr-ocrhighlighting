@@ -2,13 +2,14 @@ package de.digitalcollections.solrocr.formats.miniocr;
 
 import com.google.common.collect.ImmutableMap;
 import de.digitalcollections.solrocr.formats.OcrParser;
-import de.digitalcollections.solrocr.iter.TagBreakIterator;
+import de.digitalcollections.solrocr.iter.BreakLocator;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.iter.TagBreakLocator;
 import de.digitalcollections.solrocr.model.OcrBlock;
 import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrPage;
 import java.awt.Dimension;
 import java.io.Reader;
-import java.text.BreakIterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,9 +26,12 @@ public class MiniOcrFormat implements OcrFormat {
       OcrBlock.WORD, "w");
 
   @Override
-  public BreakIterator getBreakIterator(OcrBlock blockType) {
-    String breakTag = blockTagMapping.get(blockType);
-    return new TagBreakIterator(breakTag);
+  public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
+    // FIXME: MiniOCR currently presupposes that the desired  block type exists, i.e. if you say
+    //        "break on paragraph", we're just assuming that there are actually paragraphs in the OCR.
+    //        If they're not, therer will not be a break.
+    String breakTag = blockTagMapping.get(blockTypes[0]);
+    return new TagBreakLocator(text, breakTag);
   }
 
   @Override

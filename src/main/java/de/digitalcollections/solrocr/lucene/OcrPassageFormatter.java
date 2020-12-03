@@ -1,6 +1,10 @@
 package de.digitalcollections.solrocr.lucene;
 
+import static de.digitalcollections.solrocr.formats.OcrParser.END_HL;
+import static de.digitalcollections.solrocr.formats.OcrParser.START_HL;
+
 import de.digitalcollections.solrocr.formats.OcrParser;
+import de.digitalcollections.solrocr.iter.BreakLocator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import de.digitalcollections.solrocr.lucene.filters.SanitizingXmlFilter;
 import de.digitalcollections.solrocr.model.OcrBlock;
@@ -9,7 +13,6 @@ import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrPage;
 import de.digitalcollections.solrocr.model.OcrSnippet;
 import java.io.StringReader;
-import java.text.BreakIterator;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +33,6 @@ import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.digitalcollections.solrocr.formats.OcrParser.END_HL;
-import static de.digitalcollections.solrocr.formats.OcrParser.START_HL;
-
 /**
  * Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances.
  */
@@ -42,7 +42,6 @@ public class OcrPassageFormatter extends PassageFormatter {
   private static final Logger logger = LoggerFactory.getLogger(OcrPassageFormatter.class);
 
   private final OcrFormat format;
-  private final BreakIterator pageBreakIter;
   protected final String startHlTag;
   protected final String endHlTag;
   protected final boolean absoluteHighlights;
@@ -56,7 +55,6 @@ public class OcrPassageFormatter extends PassageFormatter {
     this.absoluteHighlights = absoluteHighlights;
     this.alignSpans = alignSpans;
     this.format = format;
-    this.pageBreakIter = format.getBreakIterator(OcrBlock.PAGE);
   }
 
   /** Merge overlapping matches. **/
@@ -156,8 +154,13 @@ public class OcrPassageFormatter extends PassageFormatter {
 
   /** Determine the page an OCR fragment resides on. */
   OcrPage determineStartPage(int startOffset, IterableCharSequence content) {
-    pageBreakIter.setText(content);
-    int pageOffset = pageBreakIter.preceding(startOffset);
+    BreakLocator pageBreakLocator = this.format.getBreakLocator(content, OcrBlock.PAGE);
+    int pageOffset = pageBreakLocator.preceding(startOffset);
+    if (pageOffset == BreakLocator.DONE) {
+      // This means the page is, if present, part of the passage, and will be determined during
+      // parsing anyway
+      return null;
+    }
     String pageFragment = content.subSequence(
         pageOffset, Math.min(pageOffset + 512, content.length())).toString();
     return this.format.parsePageFragment(pageFragment);
@@ -236,7 +239,9 @@ public class OcrPassageFormatter extends PassageFormatter {
         .map(b -> b.getPage().id)
         .collect(Collectors.toSet());
     List<OcrPage> allPages = new ArrayList<>();
-    allPages.add(page);
+    if (page != null) {
+      allPages.add(page);
+    }
     allPages.addAll(pages);
     List<OcrPage> snippetPages = allPages.stream()
         .filter(p -> snippetPageIds.contains(p.id))

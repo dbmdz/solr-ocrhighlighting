@@ -73,9 +73,11 @@ public class HocrParser extends OcrParser {
     if (isHyphenated) {
       box.setTrailingChars(null);
       hyphenEnd = this.readNext(xmlReader, features);
-      String dehyphenated = box.getText() + hyphenEnd.getText();
-      box.setHyphenInfo(true, dehyphenated);
-      hyphenEnd.setHyphenInfo(false, dehyphenated);
+      if (hyphenEnd != null) {
+        String dehyphenated = box.getText() + hyphenEnd.getText();
+        box.setHyphenInfo(true, dehyphenated);
+        hyphenEnd.setHyphenInfo(false, dehyphenated);
+      }
     }
 
     return box;

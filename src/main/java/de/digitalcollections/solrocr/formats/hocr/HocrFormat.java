@@ -1,19 +1,24 @@
 package de.digitalcollections.solrocr.formats.hocr;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import de.digitalcollections.solrocr.formats.OcrParser;
+import de.digitalcollections.solrocr.iter.BreakLocator;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import de.digitalcollections.solrocr.model.OcrBlock;
 import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrPage;
 import java.awt.Dimension;
 import java.io.Reader;
-import java.text.BreakIterator;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
@@ -31,10 +36,16 @@ public class HocrFormat implements OcrFormat {
       .put(OcrBlock.LINE, ImmutableSet.of("ocr_line", "ocrx_line"))
       .put(OcrBlock.WORD, ImmutableSet.of("ocrx_word"))
       .build();
+  private static final List<String> blockHierarchy = ImmutableList.of(
+      "ocrx_word", "ocrx_line", "ocr_line", "ocr_par", "ocrx_block", "ocr_carea", "ocr_chapter",
+      "ocr_section", "ocr_subsection", "ocr_subsubsection", "ocr_page");
 
   @Override
-  public BreakIterator getBreakIterator(OcrBlock blockType) {
-    return new HocrClassBreakIterator(blockClassMapping.get(blockType));
+  public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
+    List<String> breakClasses = Arrays.stream(blockTypes)
+          .flatMap(b -> blockClassMapping.get(b).stream())
+          .collect(Collectors.toList());
+    return new HocrClassBreakLocator(text, breakClasses);
   }
 
   @Override

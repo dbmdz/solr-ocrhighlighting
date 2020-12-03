@@ -1,5 +1,7 @@
 package de.digitalcollections.solrocr.formats.hocr;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.digitalcollections.solrocr.iter.FileBytesCharIterator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import java.io.IOException;
@@ -9,18 +11,15 @@ import java.nio.file.Paths;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class HocrClassBreakIteratorTest {
+class HocrClassBreakLocatorTest {
   private static final Path utf8Path = Paths.get("src/test/resources/data/hocr.html");
 
   @Test
   void firstNext() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakIterator it = new HocrClassBreakIterator("ocrx_word");
-    it.setText(seq);
-    int start = it.next();
-    int end = it.next();
+    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    int start = it.following(0);
+    int end = it.following(start);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<span class='ocrx_word'");
     assertThat(StringUtils.countMatches(tag, "ocrx_word")).isEqualTo(1);
@@ -29,11 +28,9 @@ class HocrClassBreakIteratorTest {
   @Test
   void next() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakIterator it = new HocrClassBreakIterator("ocrx_word");
-    it.setText(seq);
-    seq.setIndex(671024);
-    int start = it.next();
-    int end = it.next();
+    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    int start = it.following(671024);
+    int end = it.following(start);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<span class='ocrx_word'");
     assertThat(StringUtils.countMatches(tag, "ocrx_word")).isEqualTo(1);
@@ -43,11 +40,9 @@ class HocrClassBreakIteratorTest {
   @Test
   void previous() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakIterator it = new HocrClassBreakIterator("ocrx_word");
-    it.setText(seq);
-    seq.setIndex(671287);
-    int end = it.previous();
-    int start = it.previous();
+    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    int end = it.preceding(671287);
+    int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<span class='ocrx_word'");
     assertThat(StringUtils.countMatches(tag, "ocrx_word")).isEqualTo(1);
@@ -57,10 +52,9 @@ class HocrClassBreakIteratorTest {
   @Test
   void previousLast() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakIterator it = new HocrClassBreakIterator("ocrx_word");
-    it.setText(seq);
-    int end = it.last();
-    int start = it.previous();
+    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    int end = seq.length();
+    int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<span class=\"ocrx_word\"");
     assertThat(StringUtils.countMatches(tag, "ocrx_word")).isEqualTo(1);
@@ -70,12 +64,11 @@ class HocrClassBreakIteratorTest {
   @Test
   void previousFirst() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakIterator it = new HocrClassBreakIterator("ocrx_word");
-    it.setText(seq);
+    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
     seq.setIndex(1464);
-    it.previous();
-    int end = it.previous();
-    int start = it.previous();
+    int idx = it.preceding(1464);
+    int end = it.preceding(idx);
+    int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<?xml");
     assertThat(StringUtils.countMatches(tag, "ocrx_word")).isEqualTo(1);

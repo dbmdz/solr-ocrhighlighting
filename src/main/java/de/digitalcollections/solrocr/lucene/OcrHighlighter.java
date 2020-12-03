@@ -1,28 +1,28 @@
 package de.digitalcollections.solrocr.lucene;
 
 import com.google.common.collect.ImmutableSet;
-import de.digitalcollections.solrocr.formats.miniocr.MiniOcrFormat;
-import de.digitalcollections.solrocr.iter.ContextBreakIterator;
-import de.digitalcollections.solrocr.model.OcrBlock;
-import de.digitalcollections.solrocr.model.OcrFormat;
-import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.formats.alto.AltoFormat;
 import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
-import de.digitalcollections.solrocr.solr.OcrHighlightParams;
+import de.digitalcollections.solrocr.formats.miniocr.MiniOcrFormat;
+import de.digitalcollections.solrocr.iter.BreakLocator;
+import de.digitalcollections.solrocr.iter.ContextBreakLocator;
 import de.digitalcollections.solrocr.iter.ExitingIterCharSeq;
 import de.digitalcollections.solrocr.iter.FileBytesCharIterator;
-import de.digitalcollections.solrocr.util.HighlightTimeout;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import de.digitalcollections.solrocr.iter.MultiFileBytesCharIterator;
+import de.digitalcollections.solrocr.model.OcrBlock;
+import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrHighlightResult;
-import de.digitalcollections.solrocr.util.PageCacheWarmer;
+import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.solr.OcrHighlightParams;
+import de.digitalcollections.solrocr.util.HighlightTimeout;
+import de.digitalcollections.solrocr.util.PageCacheWarmer;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -277,12 +277,20 @@ public class OcrHighlighter extends UnifiedHighlighter {
           int docInIndex = docInIndexes[docIdx];//original input order
           assert resultByDocIn[docInIndex] == null;
           OcrFormat ocrFormat = getFormat(content);
-          String limitBlock = params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase();
-          BreakIterator contexIter = ocrFormat.getBreakIterator(
-              OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()));
-          BreakIterator limitIter = limitBlock.equals("NONE") ? null : ocrFormat.getBreakIterator(OcrBlock.valueOf(limitBlock));
-          BreakIterator breakIter = new ContextBreakIterator(
-              contexIter, limitIter, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
+          String limitBlockParam = params.get(OcrHighlightParams.LIMIT_BLOCK, "block");
+          OcrBlock[] limitBlocks = null;
+          if (!limitBlockParam.equalsIgnoreCase("NONE")) {
+            limitBlocks = OcrBlock.getHierarchyFrom(
+                OcrBlock.valueOf(limitBlockParam.toUpperCase())).toArray(new OcrBlock[0]);
+          }
+          OcrBlock contextBlock = OcrBlock.valueOf(
+              params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase());
+          BreakLocator contextLocator = ocrFormat.getBreakLocator(content, contextBlock);
+          BreakLocator limitLocator = limitBlocks == null
+              ? null
+              : ocrFormat.getBreakLocator(content, limitBlocks);
+          BreakLocator breakLocator = new ContextBreakLocator(
+              contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
           OcrPassageFormatter formatter = ocrFormat.getPassageFormatter(
               params.get(HighlightParams.TAG_PRE, "<em>"),
               params.get(HighlightParams.TAG_POST, "</em>"),
@@ -293,7 +301,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
               params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
           try {
             resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
-                leafReader, docId, breakIter, formatter, content,
+                leafReader, docId, breakLocator, formatter, content,
                 params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
           } catch (ExitingIterCharSeq.ExitingIterCharSeqException | ExitableDirectoryReader.ExitingReaderException e) {
             log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);

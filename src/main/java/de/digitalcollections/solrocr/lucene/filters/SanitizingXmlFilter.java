@@ -22,6 +22,7 @@ public class SanitizingXmlFilter extends BaseCharFilter {
   private int carryOverIdx = -1;
   private char[] tail = null;
   private int tailIdx = -1;
+  private boolean hasDocType = false;
 
   public SanitizingXmlFilter(Reader in) {
     super(in);
@@ -77,9 +78,24 @@ public class SanitizingXmlFilter extends BaseCharFilter {
         break;
       }
       idx = endElem + 1;
-      if (cbuf[startElem + 1] == '?' || cbuf[startElem + 1] == '!') {
+      if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-')) {
+        // XML Declaration or comment, nothing to do
         continue;
       }
+
+
+      // Strip out duplicate doctype declarations, these break the multidoc parsing mode in Woodstox
+      if (cbuf[startElem  + 1] == '!' && (cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd')) {
+        if (hasDocType) {
+          for (int i = startElem; i <= endElem; i++) {
+            cbuf[i] = ' ';
+          }
+        } else {
+          hasDocType = true;
+        }
+        continue;
+      }
+
       int startTag = cbuf[startElem + 1] == '/' ? startElem + 2 : startElem + 1;
       int endTag = ArrayUtils.indexOf(cbuf, ' ', startTag);
       if (endTag > endElem || endTag < 0) {

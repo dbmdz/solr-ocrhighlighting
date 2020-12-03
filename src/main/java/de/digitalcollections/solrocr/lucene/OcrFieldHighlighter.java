@@ -1,10 +1,10 @@
 package de.digitalcollections.solrocr.lucene;
 
-import de.digitalcollections.solrocr.model.OcrSnippet;
+import de.digitalcollections.solrocr.iter.BreakLocator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.util.PageCacheWarmer;
 import java.io.IOException;
-import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,7 +37,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    * Largely copied from {@link FieldHighlighter#highlightFieldForDoc(LeafReader, int, String)}, modified to support
    * an {@link IterableCharSequence} as content and dynamically setting the break iterator and the formatter.
    */
-  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, BreakIterator breakIterator,
+  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, BreakLocator breakLocator,
                                            OcrPassageFormatter formatter, IterableCharSequence content, String pageId,
                                            int snippetLimit)
       throws IOException {
@@ -49,11 +49,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       return null; // nothing to do
     }
 
-    breakIterator.setText(content);
-
     Passage[] passages;
     try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
-      passages = highlightOffsetsEnums(offsetsEnums, docId, breakIterator, formatter, pageId, snippetLimit);
+      passages = highlightOffsetsEnums(offsetsEnums, docId, breakLocator, formatter, pageId, snippetLimit);
     }
 
     // Format the resulting Passages.
@@ -76,9 +74,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
   }
 
   protected Passage[] highlightOffsetsEnums(
-      OffsetsEnum off, int docId, BreakIterator breakIter, OcrPassageFormatter formatter, String pageId,
+      OffsetsEnum off, int docId, BreakLocator breakLocator, OcrPassageFormatter formatter, String pageId,
       int snippetLimit) throws IOException {
-    final int contentLength = breakIter.getText().getEndIndex();
+    final int contentLength = breakLocator.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
     }
@@ -108,7 +106,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         throw new IllegalArgumentException("field '" + field + "' was indexed without offsets, cannot highlight");
       }
       if (pageId != null) {
-        String passagePageId = formatter.determineStartPage(start, (IterableCharSequence) breakIter.getText()).id;
+        String passagePageId = formatter.determineStartPage(start, breakLocator.getText()).id;
         if (!passagePageId.equals(pageId)) {
           continue;
         }
@@ -125,8 +123,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         continue;
       }
       // advance breakIterator
-      int passageStart = Math.max(breakIter.preceding(start + 1), 0);
-      int passageEnd = Math.min(breakIter.following(end), contentLength);
+      int passageStart = Math.max(breakLocator.preceding(start + 1), 0);
+      int passageEnd = Math.min(breakLocator.following(end), contentLength);
 
       // See if this term should be part of a new passage.
       if (passageStart >= passage.getEndOffset()) {

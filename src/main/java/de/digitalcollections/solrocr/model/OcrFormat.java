@@ -2,6 +2,8 @@ package de.digitalcollections.solrocr.model;
 
 import com.google.common.collect.Sets;
 import de.digitalcollections.solrocr.formats.OcrParser;
+import de.digitalcollections.solrocr.iter.BreakLocator;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import de.digitalcollections.solrocr.lucene.OcrPassageFormatter;
 import de.digitalcollections.solrocr.lucene.filters.OcrCharFilter;
 import de.digitalcollections.solrocr.reader.PeekingReader;
@@ -15,12 +17,12 @@ import org.apache.lucene.search.uhighlight.PassageFormatter;
  * Provides access to format-specific {@link BreakIterator} and {@link OcrPassageFormatter} instances.
  */
 public interface OcrFormat {
-  /** Get a {@link BreakIterator} that splits the content on a given block type.
+  /** Get a {@link BreakLocator} that splits the content on a given block type.
    *
-   * @param blockType the type of {@link OcrBlock} that the input document is split on
-   * @return the {@link BreakIterator} instance
+   * @param blockTypes the type(s) of {@link OcrBlock} that the input document is split on
+   * @return the {@link BreakLocator} instance
    * */
-  BreakIterator getBreakIterator(OcrBlock blockType);
+  BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes);
 
   /** Get the parser for the format.
    *
@@ -33,8 +35,8 @@ public interface OcrFormat {
   /** Parse an {@link OcrPage} from a string fragment of the page markup.
    *
    * <p>Implementers are safe to assume that {@code pageFragment} begins with the opening tag of
-   * a page, as determined by the format's {@link OcrFormat#getBreakIterator(OcrBlock)} output
-   * for the {@link OcrBlock#PAGE} block type.
+   * a page, as determined by the format's {@link OcrFormat#getBreakLocator(IterableCharSequence, OcrBlock[])}
+   * output for the {@link OcrBlock#PAGE} block type.
    *
    * @param pageFragment The beginning of a page's markup, i.e. a String starting with {@code <$pageElem}
    * @return the parsed {@link OcrPage}
