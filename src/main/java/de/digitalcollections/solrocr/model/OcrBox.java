@@ -19,7 +19,7 @@ public class OcrBox implements Comparable<OcrBox> {
   private int textOffset = -1;
   private final List<String> alternatives = new ArrayList<>();
   private final List<Integer> alternativeOffsets = new ArrayList<>();
-  private String trailingChars;
+  private String trailingChars = "";
   private OcrPage page;
   private float ulx = -1;
   private float uly = -1;

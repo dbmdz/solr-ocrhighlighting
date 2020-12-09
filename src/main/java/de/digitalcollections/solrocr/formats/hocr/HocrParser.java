@@ -185,6 +185,8 @@ public class HocrParser extends OcrParser {
         if ("span".equals(localName) && "ocrx_word".equals(hocrClass)) {
           foundWord = true;
           break;
+        } else if ("div".equals(localName) && "ocr_line".equals(hocrClass) && trailingChars.lastIndexOf(" ") < 0) {
+          trailingChars.append(' ');
         } else if (trackPages && "div".equals(localName) && "ocr_page".equals(hocrClass)) {
           Map<String, String> pageProps = this.parseTitle(
               xmlReader.getAttributeValue("", "title"));
@@ -202,7 +204,7 @@ public class HocrParser extends OcrParser {
           }
           this.currentPage = new OcrPage(pageId, pageDims);
         }
-      } else if (nextEvent == XMLStreamConstants.CHARACTERS) {
+      } else if (nextEvent == XMLStreamConstants.CHARACTERS || nextEvent == XMLStreamConstants.SPACE) {
         String txt = xmlReader.getText();
         boolean isBlank = StringUtils.isBlank(txt);
         if (isBlank && (trailingChars.length() == 0 || trailingChars.lastIndexOf(" ") != (trailingChars.length() - 1))) {

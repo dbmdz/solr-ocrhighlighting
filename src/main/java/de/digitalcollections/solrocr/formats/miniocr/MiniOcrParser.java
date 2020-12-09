@@ -138,6 +138,8 @@ public class MiniOcrParser extends OcrParser {
         if ("w".equals(localName)) {
           foundWord = true;
           break;
+        } else if ("l".equals(localName) && trailingChars.lastIndexOf(" ") < 0) {
+          trailingChars.append(' ');
         } else if (trackPages && "p".equals(localName)) {
           Dimension dims = null;
           String dimStr = xmlReader.getAttributeValue("", "wh");

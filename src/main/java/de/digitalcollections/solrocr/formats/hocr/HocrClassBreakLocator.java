@@ -5,6 +5,7 @@ import de.digitalcollections.solrocr.iter.BaseBreakLocator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 public class HocrClassBreakLocator extends BaseBreakLocator {
   private final static Pattern CLASS_PAT = Pattern.compile("class=['\"](?<class>ocr.+?)['\"]");
@@ -30,7 +31,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
       String block = text.subSequence(start, end, true).toString();
       // Truncate block to last '>' to avoid splitting element openings across blocks
       int lastTagClose = block.lastIndexOf('>');
-      if (lastTagClose > 0) {
+      if (lastTagClose > 0 && !StringUtils.isAllBlank(block.subSequence(lastTagClose, block.length()))) {
         block = block.substring(0, lastTagClose + 1);
         end = start + lastTagClose;
       }
@@ -97,7 +98,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
     while (start >= this.text.getBeginIndex()) {
       String block = text.subSequence(start, end, true).toString();
       int firstTagOpen = block.indexOf('<');
-      if (firstTagOpen > 0) {
+      if (firstTagOpen > 0 && !StringUtils.isBlank(block.subSequence(0, firstTagOpen))) {
         block = block.substring(firstTagOpen);
         start += firstTagOpen;
       }

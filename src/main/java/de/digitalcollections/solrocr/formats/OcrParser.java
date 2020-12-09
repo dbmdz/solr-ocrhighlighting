@@ -66,6 +66,9 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
         .setInputParsingMode(WstxInputProperties.PARSING_MODE_DOCUMENTS);
     xmlInputFactory.getConfig()
         .doSupportDTDs(false);
+    xmlInputFactory.getConfig()
+        .setUndeclaredEntityResolver(
+            (__, ___, ____, namespace) -> "shy".equals(namespace) ? "\u00ad" : null);
     this.xmlReader = (XMLStreamReader2) xmlInputFactory.createXMLStreamReader(this.input);
     this.nextWord = this.readNext(this.xmlReader, this.features);
   }
