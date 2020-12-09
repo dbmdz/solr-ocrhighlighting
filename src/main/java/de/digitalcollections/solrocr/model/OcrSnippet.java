@@ -76,7 +76,9 @@ public class OcrSnippet implements Comparable<OcrSnippet> {
     m.add("score", this.getScore());
     NamedList[] pageEntries = this.pages.stream()
         .map(OcrPage::toNamedList).toArray(NamedList[]::new);
-    m.add("pages", pageEntries);
+    if (pageEntries.length > 0) {
+      m.add("pages", pageEntries);
+    }
     NamedList[] regions = this.snippetRegions.stream()
         .map(b -> b.toNamedList(pages)).toArray(NamedList[]::new);
     m.add("regions", regions);

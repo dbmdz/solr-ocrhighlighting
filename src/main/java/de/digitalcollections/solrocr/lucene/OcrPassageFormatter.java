@@ -1,8 +1,6 @@
 package de.digitalcollections.solrocr.lucene;
 
-import static de.digitalcollections.solrocr.formats.OcrParser.END_HL;
-import static de.digitalcollections.solrocr.formats.OcrParser.START_HL;
-
+import com.google.common.collect.Lists;
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.iter.BreakLocator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
@@ -33,6 +31,9 @@ import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.digitalcollections.solrocr.formats.OcrParser.END_HL;
+import static de.digitalcollections.solrocr.formats.OcrParser.START_HL;
+
 /**
  * Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances.
  */
@@ -46,14 +47,17 @@ public class OcrPassageFormatter extends PassageFormatter {
   protected final String endHlTag;
   protected final boolean absoluteHighlights;
   protected final boolean alignSpans;
+  protected final boolean trackPages;
 
 
   public OcrPassageFormatter(
-      String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans, OcrFormat format) {
+      String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans, boolean trackPages,
+      OcrFormat format) {
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;
     this.absoluteHighlights = absoluteHighlights;
     this.alignSpans = alignSpans;
+    this.trackPages = trackPages;
     this.format = format;
   }
 
@@ -144,8 +148,11 @@ public class OcrPassageFormatter extends PassageFormatter {
 
   private OcrSnippet format(Passage passage, IterableCharSequence content) {
     String xmlFragment = getHighlightedFragment(passage, content);
-    OcrPage page = determineStartPage(passage.getStartOffset(), content);
-    OcrSnippet snip = parseFragment(xmlFragment, page);
+    OcrPage initialPage = null;
+    if (trackPages) {
+      initialPage = determineStartPage(passage.getStartOffset(), content);
+    }
+    OcrSnippet snip = parseFragment(xmlFragment, initialPage);
     if (snip != null) {
       snip.setScore(passage.getScore());
     }
@@ -280,10 +287,15 @@ public class OcrPassageFormatter extends PassageFormatter {
   /** Parse word boxes from an OCR fragment. */
   protected List<OcrBox> parseWords(String ocrFragment, OcrPage startPage) {
     List<OcrBox> words = new ArrayList<>();
+    List<OcrParser.ParsingFeature> parsingFeatures = Lists.newArrayList(
+        OcrParser.ParsingFeature.TEXT,  OcrParser.ParsingFeature.COORDINATES, OcrParser.ParsingFeature.ALTERNATIVES,
+        OcrParser.ParsingFeature.HIGHLIGHTS);
+    if (trackPages) {
+      parsingFeatures.add(OcrParser.ParsingFeature.PAGES);
+    }
     OcrParser parser = format.getParser(
-        new SanitizingXmlFilter(new StringReader(ocrFragment)), OcrParser.ParsingFeature.TEXT,
-        OcrParser.ParsingFeature.COORDINATES, OcrParser.ParsingFeature.ALTERNATIVES,
-        OcrParser.ParsingFeature.HIGHLIGHTS, OcrParser.ParsingFeature.PAGES);
+        new SanitizingXmlFilter(new StringReader(ocrFragment)),
+        parsingFeatures.toArray(new OcrParser.ParsingFeature[0]));
     boolean onStartPage = true;
     for (OcrBox box : parser) {
       if (onStartPage && box.getPage() == null) {

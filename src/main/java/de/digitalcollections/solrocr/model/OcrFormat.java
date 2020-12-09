@@ -55,8 +55,8 @@ public interface OcrFormat {
    *                   the OCR document.
    */
   default OcrPassageFormatter getPassageFormatter(
-      String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans) {
-    return new OcrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights, alignSpans, this);
+      String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans, boolean trackPages) {
+    return new OcrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights, alignSpans, trackPages, this);
   }
 
   /** Get a {@link CharFilter} implementation for the OCR format that outputs plaintext.
