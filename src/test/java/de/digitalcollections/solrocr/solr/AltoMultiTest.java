@@ -89,7 +89,7 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         "//arr[@name='pages']/lst/int[@name='width']/text()='3170'",
         "//arr[@name='pages']/lst/int[@name='height']/text()='4890'",
         "(//int[@name='pageIdx'])[1]/text()='0'",
-        "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='zu diirfcn. On écrit de Saint-Pétersbourg, en date du 18 novembre, au <em>Moniteur universel</em>:'");
+        "(//arr[@name='snippets']/lst/str[@name='text'])[1]/text()='burcien zu diirfcn. On écrit de Saint-Pétersbourg, en date du 18 novembre, au <em>Moniteur universel</em>:'");
   }
 
   @Test

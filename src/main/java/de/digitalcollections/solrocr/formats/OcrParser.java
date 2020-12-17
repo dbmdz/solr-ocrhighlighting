@@ -6,6 +6,7 @@ import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -136,12 +137,15 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
       throws XMLStreamException;
 
 
-  public static String boxesToString(Iterable<OcrBox> boxes) {
+  public static String boxesToString(Collection<OcrBox> boxes) {
     StringBuilder sb = new StringBuilder();
-    boxes.forEach(b -> {
+    int idx = 0;
+    for (OcrBox b : boxes) {
       if (b.isHyphenated()) {
-        if (b.isHyphenStart()) {
+        if (b.isHyphenStart() && idx != boxes.size() - 1) {
           sb.append(b.getDehyphenatedForm());
+        } else if (idx == 0 || idx == boxes.size() - 1) {
+          sb.append(b.getText());
         }
       } else {
         sb.append(b.getText());
@@ -149,7 +153,8 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
       if (b.getTrailingChars() != null) {
         sb.append(b.getTrailingChars());
       }
-    });
+      idx += 1;
+    }
     return sb.toString().trim();
   }
 }
