@@ -279,10 +279,7 @@ public class OcrPassageFormatter extends PassageFormatter {
       lastWord.setHyphenInfo(true, lastWord.getText());
     }
 
-    String regionText = wordBoxes.stream()
-        .filter(box -> !box.isHyphenated() || box.isHyphenStart())
-        .map(box -> box.isHyphenated() ? box.getDehyphenatedForm() : box.getText())
-        .collect(Collectors.joining(" "));
+    String regionText = OcrParser.boxesToString(wordBoxes);
     OcrBox firstBox = wordBoxes.get(0);
     OcrBox lastBox = wordBoxes.get(wordBoxes.size() - 1);
     if (firstBox.isInHighlight() && !firstBox.getText().contains(START_HL)) {

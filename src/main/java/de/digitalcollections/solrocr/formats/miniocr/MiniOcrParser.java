@@ -72,6 +72,8 @@ public class MiniOcrParser extends OcrParser {
       isHyphenated = true;
       String boxText = box.getText();
       box.setText(boxText.substring(0, boxText.length() - 1));
+      // Preliminary hyphenation info, dehyphenated form not yet available
+      box.setHyphenInfo(true, null);
     } else if (trailingChars.startsWith("\u00ad")) {
       isHyphenated = true;
     }

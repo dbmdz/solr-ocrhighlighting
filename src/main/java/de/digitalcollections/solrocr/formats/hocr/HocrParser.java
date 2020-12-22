@@ -67,6 +67,8 @@ public class HocrParser extends OcrParser {
       isHyphenated = true;
       String boxText = box.getText();
       box.setText(boxText.substring(0, boxText.length() - 1));
+      // Preliminary hyphenation info, no dehyphenated form available yet
+      box.setHyphenInfo(true, null);
     } else if (trailingChars.startsWith("\u00ad")) {
       isHyphenated = true;
     }

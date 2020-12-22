@@ -144,8 +144,23 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
       if (b.isHyphenated()) {
         if (b.isHyphenStart() && idx != boxes.size() - 1) {
           sb.append(b.getDehyphenatedForm());
-        } else if (idx == 0 || idx == boxes.size() - 1) {
+        } else if (idx == 0) {
           sb.append(b.getText());
+        } else if (idx == boxes.size() - 1) {
+          if (b.isHyphenStart()) {
+            // If the string ends in the middle of a hyphenated word, we want to see the hyphen
+            String text = b.getText().trim();
+            if (!text.endsWith("-")) {
+              text += "-";
+            }
+            sb.append(text);
+            b.setTrailingChars(null);
+          } else {
+            sb.append(b.getText());
+          }
+        }
+        if (idx == boxes.size() - 1 && !b.isHyphenStart() && !(b.getText().endsWith("-") || b.getTrailingChars().contains("-"))) {
+          sb.append("-");
         }
       } else {
         sb.append(b.getText());
