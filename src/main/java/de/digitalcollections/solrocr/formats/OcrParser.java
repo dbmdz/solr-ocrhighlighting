@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -104,6 +105,14 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     return out;
   }
 
+  /** "Peek" at the next word from the parse without advancing the parse to the word after it
+   *  (i.e. calling this does not influence the result of the `next()` call **/
+  public Optional<OcrBox> peek() {
+    if (!hasNext()) {
+      return Optional.empty();
+    }
+    return Optional.of(this.nextWord);
+  }
 
   protected UUID trackHighlightSpan(String text, OcrBox box) {
     // TODO: Dehyphenation is tricky:

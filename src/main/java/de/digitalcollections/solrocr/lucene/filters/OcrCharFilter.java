@@ -21,20 +21,25 @@ public class OcrCharFilter extends BaseCharFilter {
     while (this.curWord == null && this.parser.hasNext()) {
       OcrBox nextWord = this.parser.next();
 
-      if (nextWord.isHyphenated()) {
+      // For hyphenated words where both the hyphen start and the end word are next to each
+      // other, we only index the dehyphenated content and the trailing chars of the hyphen end.
+      boolean wordIsCompleteHyphenation = (
+          nextWord.isHyphenated()
+          && this.parser.peek().filter(b -> b.isHyphenated() && !b.isHyphenStart()).isPresent());
+      if (wordIsCompleteHyphenation) {
         String text = nextWord.getDehyphenatedForm();
+        Integer offset = nextWord.getDehyphenatedOffset();
+        if (offset == null) {
+          offset = nextWord.getTextOffset();
+        }
         OcrBox hyphenEnd = this.parser.next();
         if (hyphenEnd.getTrailingChars() != null) {
           text += hyphenEnd.getTrailingChars();
         }
         this.curWord = text.toCharArray();
         this.curWordIdx = 0;
-        if (nextWord.getDehyphenatedOffset() != null) {
-          this.addOffCorrectMap(outputOffset, nextWord.getDehyphenatedOffset() - outputOffset);
-        } else {
-          this.addOffCorrectMap(outputOffset, nextWord.getTextOffset() - outputOffset);
-        }
-        continue;
+        this.addOffCorrectMap(outputOffset, offset - outputOffset);
+        break;
       }
 
       this.addOffCorrectMap(outputOffset, nextWord.getTextOffset() - outputOffset);
