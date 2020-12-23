@@ -118,7 +118,7 @@ public class AltoTest extends SolrTestCaseJ4 {
   public void testHyphenationResolved() throws Exception {
     SolrQueryRequest req = xmlQ("q", "\"faux espoir\"", "hl.weightMatches", "true");
     assertQ(req,
-            "//str[@name='text'][1]/text()=\"— <em>Faux espoir</em>, mon vieil ami, <em>faux espoir</em> ! Je n'ai jamais même vu un seul des anciens compagnons de ses plaisirs. Lui-\"",
+            "//str[@name='text'][1]/text()=\"— <em>Faux espoir</em>, mon vieil ami, <em>faux espoir</em> ! Je n'ai jamais même vu un seul des anciens compagnons de ses plaisirs. Luimême avait renoncé à toute autre société\"",
             "count(//arr[@name='highlights']/arr/lst)=3",
             "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='Faux espoir,'",
             "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='faux es-'",

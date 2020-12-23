@@ -63,10 +63,10 @@ public class HocrParser extends OcrParser {
     }
 
     boolean isHyphenated = false;
-    if (box.getText().endsWith("\u00ad")) {
+    if (box.getText().replace(END_HL, "").endsWith("\u00ad")) {
       isHyphenated = true;
       String boxText = box.getText();
-      box.setText(boxText.substring(0, boxText.length() - 1));
+      box.setText(boxText.replace("\u00ad", ""));
       // Preliminary hyphenation info, no dehyphenated form available yet
       box.setHyphenInfo(true, null);
     } else if (trailingChars.startsWith("\u00ad")) {
@@ -130,6 +130,10 @@ public class HocrParser extends OcrParser {
         box.setText(txt);
         if (withOffsets) {
           box.setTextOffset(txtOffset);
+        }
+        if (txt != null && txt.replace(END_HL, "").endsWith("\u00ad")) {
+          // Preliminary hyphenation info
+          box.setHyphenInfo(true, null);
         }
         // Make sure we don't overwrite highlight spans tracked from alternatives
         if (withHighlights && box.getHighlightSpan() == null) {

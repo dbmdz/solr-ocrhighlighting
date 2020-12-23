@@ -26,7 +26,7 @@ public class OcrCharFilterTest {
     OcrCharFilter filter = (OcrCharFilter) ocrFac.create(filterFac.create(new StringReader(p.toString())));
     String doc = IOUtils.toString(filter);
     assertThat(doc).contains("Luimême avait renoncé à toute autre société que la mienne.");
-    assertThat(filter.correctOffset(doc.indexOf("Luimême avait renoncé"))).isEqualTo(46884);
+    assertThat(filter.correctOffset(doc.indexOf("Luimême avait renoncé"))).isEqualTo(46844);
   }
 
   @Test

@@ -15,6 +15,8 @@ public class AltoParser extends OcrParser {
   private boolean noMoreWords;
   private OcrPage currentPage;
   private boolean hasExplicitSpaces = false;
+  private OcrBox hyphenEnd = null;
+  private boolean inHyphenation = false;
 
   public AltoParser(Reader reader, ParsingFeature... features) throws XMLStreamException {
     super(reader, features);
@@ -23,6 +25,11 @@ public class AltoParser extends OcrParser {
   @Override
   protected OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
       throws XMLStreamException {
+    if (hyphenEnd != null) {
+      OcrBox out = this.hyphenEnd;
+      this.hyphenEnd = null;
+      return out;
+    }
     if (noMoreWords) {
       return null;
     }
@@ -46,11 +53,15 @@ public class AltoParser extends OcrParser {
       box.setText(text);
       if (hyphenStart != null) {
         String dehyphenated = xmlReader.getAttributeValue("", "SUBS_CONTENT");
-        box.setHyphenInfo(hyphenStart, dehyphenated);
-        if (features.contains(ParsingFeature.HIGHLIGHTS) && box.getHighlightSpan() == null) {
-          box.setHighlightSpan(this.trackHighlightSpan(dehyphenated, box));
+        if (text.contains(START_HL)) {
+          dehyphenated = START_HL + dehyphenated;
         }
-      } else if (features.contains(ParsingFeature.HIGHLIGHTS) && box.getHighlightSpan() == null) {
+        if (text.contains(END_HL)) {
+          dehyphenated += END_HL;
+        }
+        box.setHyphenInfo(hyphenStart, dehyphenated);
+      }
+      if (features.contains(ParsingFeature.HIGHLIGHTS) && box.getHighlightSpan() == null) {
         box.setHighlightSpan(this.trackHighlightSpan(text, box));
       }
       if (features.contains(ParsingFeature.OFFSETS)) {
@@ -112,8 +123,29 @@ public class AltoParser extends OcrParser {
 
     // Trailing spaces, if encoded explicitly
     int numSpaces = this.seekToNextWord(xmlReader, features.contains(ParsingFeature.PAGES));
-    if ((!hasExplicitSpaces || numSpaces > 0)  && !box.isHyphenStart()) {
+    if ((!hasExplicitSpaces || numSpaces > 0)) {
       box.setTrailingChars(" ");
+    }
+
+    if (box.isHyphenStart()) {
+      if (this.inHyphenation) {
+        // Two subsequent hyphen starts, broken/invalid data, but we try to deal with it anyway
+        // by not looking for a hyphen end for every subsequent hyphen start
+        return box;
+      }
+      this.inHyphenation = true;
+      this.hyphenEnd = this.readNext(xmlReader, features);
+      if (this.hyphenEnd != null && this.hyphenEnd.isHyphenated() && !this.hyphenEnd.isHyphenStart()) {
+        if (box.getText().contains(START_HL)) {
+          hyphenEnd.setHyphenInfo(false, START_HL + hyphenEnd.getDehyphenatedForm());
+        }
+        if (hyphenEnd.getText().contains(END_HL)) {
+          box.setHyphenInfo(true, box.getDehyphenatedForm() + END_HL);
+        }
+        // Full hyphenation, no whitespace between start and end
+        box.setTrailingChars("");
+      }
+      this.inHyphenation = false;
     }
 
     return box;

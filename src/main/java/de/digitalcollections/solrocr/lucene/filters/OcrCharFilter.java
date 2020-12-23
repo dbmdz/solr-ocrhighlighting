@@ -28,17 +28,17 @@ public class OcrCharFilter extends BaseCharFilter {
           && this.parser.peek().filter(b -> b.isHyphenated() && !b.isHyphenStart()).isPresent());
       if (wordIsCompleteHyphenation) {
         String text = nextWord.getDehyphenatedForm();
-        Integer offset = nextWord.getDehyphenatedOffset();
-        if (offset == null) {
-          offset = nextWord.getTextOffset();
-        }
+        int endOutputOffset = outputOffset + text.length();
+        int offset = nextWord.getTextOffset();
         OcrBox hyphenEnd = this.parser.next();
+        int endOffset = hyphenEnd.getTextOffset() + hyphenEnd.getText().length();
         if (hyphenEnd.getTrailingChars() != null) {
           text += hyphenEnd.getTrailingChars();
         }
         this.curWord = text.toCharArray();
         this.curWordIdx = 0;
         this.addOffCorrectMap(outputOffset, offset - outputOffset);
+        this.addOffCorrectMap(endOutputOffset, endOffset - endOutputOffset);
         break;
       }
 

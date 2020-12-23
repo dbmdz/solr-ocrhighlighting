@@ -267,18 +267,6 @@ public class OcrPassageFormatter extends PassageFormatter {
     float snipLry = wordBoxes.stream().map(OcrBox::getLry).max(Float::compareTo).get();
     OcrPage page = wordBoxes.get(0).getPage();
 
-    // Trick the text extraction step by modifying a starting isolated hyphen end
-    // to be a hyphen start so its text ends up in the output
-    OcrBox firstWord = wordBoxes.get(0);
-    if (firstWord.isHyphenated() && !firstWord.isHyphenStart()) {
-      firstWord.setHyphenInfo(true, firstWord.getText());
-    }
-    // Same for an isolated hyphen start at the end
-    OcrBox lastWord = wordBoxes.get(wordBoxes.size() - 1);
-    if (lastWord.isHyphenated() && lastWord.isHyphenStart()) {
-      lastWord.setHyphenInfo(true, lastWord.getText());
-    }
-
     String regionText = OcrParser.boxesToString(wordBoxes);
     OcrBox firstBox = wordBoxes.get(0);
     OcrBox lastBox = wordBoxes.get(wordBoxes.size() - 1);

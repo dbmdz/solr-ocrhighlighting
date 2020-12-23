@@ -6,9 +6,9 @@ import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
@@ -115,10 +115,6 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
   }
 
   protected UUID trackHighlightSpan(String text, OcrBox box) {
-    // TODO: Dehyphenation is tricky:
-    //  - We track the offset of the hyphen's first part
-    //  - As a consequence, only the first part will include the hyphen end
-    //  - But we want the second part to remain in the highlight span as well and only finish it after it has passed
     if (this.currentHighlightSpan == null && text.contains(OcrParser.START_HL)) {
       this.currentHighlightSpan = UUID.randomUUID();
     }
@@ -145,31 +141,30 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
   protected abstract OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
       throws XMLStreamException;
 
-
-  public static String boxesToString(Collection<OcrBox> boxes) {
+  public static String boxesToString(List<OcrBox> boxes) {
     StringBuilder sb = new StringBuilder();
     int idx = 0;
-    for (OcrBox b : boxes) {
-      if (b.isHyphenated()) {
-        if (b.isHyphenStart() && idx != boxes.size() - 1) {
-          sb.append(b.getDehyphenatedForm());
-        } else if (idx == 0) {
-          sb.append(b.getText());
-        } else if (idx == boxes.size() - 1) {
-          if (b.isHyphenStart()) {
-            // If the string ends in the middle of a hyphenated word, we want to see the hyphen
-            String text = b.getText().trim();
-            if (!text.endsWith("-")) {
-              text += "-";
-            }
-            sb.append(text);
-            b.setTrailingChars(null);
-          } else {
-            sb.append(b.getText());
+    Iterator<OcrBox> it = boxes.iterator();
+    while (it.hasNext()) {
+      OcrBox b = it.next();
+      if (b.isHyphenated() && b.isHyphenStart()) {
+        boolean wordIsCompleteHyphenation = (
+            idx < boxes.size() - 1
+            && boxes.get(idx + 1).isHyphenated() && !boxes.get(idx + 1).isHyphenStart());
+        if (wordIsCompleteHyphenation) {
+          // Both parts of the hyphenation are present, put the dehyphenated form in the text
+          OcrBox next = it.next();
+          sb.append(next.getDehyphenatedForm());
+          b.setTrailingChars(next.getTrailingChars());
+          idx += 1;
+        } else {
+          // An isolated hyphen start without its corresponding ending, denote the hyphenation
+          // explicitly
+          String text = b.getText().trim();
+          if (!text.endsWith("-")) {
+            text += "-";
           }
-        }
-        if (idx == boxes.size() - 1 && !b.isHyphenStart() && !(b.getText().endsWith("-") || b.getTrailingChars().contains("-"))) {
-          sb.append("-");
+          sb.append(text);
         }
       } else {
         sb.append(b.getText());
