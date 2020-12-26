@@ -109,8 +109,8 @@ public class HocrParser extends OcrParser {
   private void parseText(
       XMLStreamReader2 xmlReader, OcrBox box, boolean withHighlights, boolean withOffsets,
       boolean withAlternatives) throws XMLStreamException {
-    String txt = null;
-    int txtOffset = -1;
+    String txt = "";
+    int txtOffset = Math.toIntExact(xmlReader.getLocationInfo().getStartingCharOffset());
     boolean inAlternatives = false;
     while (xmlReader.hasNext()) {
       int nextEvent = xmlReader.next();
