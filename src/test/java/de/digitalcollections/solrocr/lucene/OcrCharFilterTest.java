@@ -34,7 +34,7 @@ public class OcrCharFilterTest {
     Path p = Paths.get("src/test/resources/data/hocr.html");
     OcrCharFilter filter = (OcrCharFilter) ocrFac.create(filterFac.create(new StringReader(p.toString())));
     String doc = IOUtils.toString(filter);
-    assertThat(doc).contains("3 Natlianiel\u2060\u2060Nathanael Brush");
+    assertThat(doc).contains("3 Natlianiel\u2060\u20605385371⁠⁠Nathanael Brush");
     assertThat(filter.correctOffset(doc.indexOf("Natlianiel"))).isEqualTo(5385345);
     assertThat(filter.correctOffset(doc.indexOf("Nathanael Brush"))).isEqualTo(5385371);
     assertThat(doc).contains("before God's kingdom come, preferring temporal benefits before heavenly blessings");
@@ -48,10 +48,11 @@ public class OcrCharFilterTest {
     OcrCharFilter filter = (OcrCharFilter) ocrFac.create(filterFac.create(new StringReader(p.toString())));
     String doc = IOUtils.toString(filter);
     assertThat(doc).contains(
-        "Mr YoB\u2060\u2060OB Greene purchased\u2060\u2060purebased\u2060\u2060pUlcohased\u2060\u2060purebred of Ben");
+        "Mr YoB\u2060\u206029100⁠⁠OB Greene purchased\u2060\u206029489\u2060\u2060purebased"
+            + "\u2060\u206029525\u2060\u2060pUlcohased\u2060\u206029562\u2060\u2060purebred of Ben");
     assertThat(filter.correctOffset(doc.indexOf("Mr YoB"))).isEqualTo(28909);
     assertThat(filter.correctOffset(doc.indexOf("OB Greene"))).isEqualTo(29100);
-    assertThat(filter.correctOffset(doc.indexOf("purebased⁠⁠pUlcohased"))).isEqualTo(29489);
+    assertThat(filter.correctOffset(doc.indexOf("purebased⁠⁠29525⁠⁠pUlcohased"))).isEqualTo(29489);
     assertThat(filter.correctOffset(doc.indexOf("of Ben"))).isEqualTo(29729);
   }
 
@@ -61,5 +62,18 @@ public class OcrCharFilterTest {
     OcrCharFilter filter = (OcrCharFilter) ocrFac.create(filterFac.create(new StringReader(p.toString())));
     String doc = IOUtils.toString(filter);
     assertThat(doc).contains("mit Augen ſahen, in welcher Zittau");
+  }
+
+  @Test
+  public void testDefectiveHyphenationWithAlternatives() throws IOException {
+    Path p = Paths.get("src/test/resources/data/chronicling_america.xml");
+    OcrCharFilter filter = (OcrCharFilter) ocrFac.create(filterFac.create(new StringReader(p.toString())));
+    String doc = IOUtils.toString(filter);
+    assertThat(doc)
+        .contains("considera-"
+            + "\u2060\u206048819\u2060\u2060consielert"
+            + "\u2060\u206048856\u2060\u2060consider"
+            + "\u2060\u206048891\u2060\u2060consulter");
+
   }
 }

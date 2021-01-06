@@ -96,7 +96,9 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     }
     OcrBox out = this.nextWord;
     try {
-      this.nextWord = readNext(xmlReader, features);
+      do {
+        this.nextWord = readNext(xmlReader, features);
+      } while (hasNext() && this.nextWord == null);
     } catch (XMLStreamException e) {
       throw new RuntimeException(
           "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on " +
@@ -165,6 +167,15 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
             text += "-";
           }
           sb.append(text);
+        }
+      } else if (!b.getAlternatives().isEmpty()) {
+        Optional<String> alternativeWithHighlight = b.getAlternatives().stream()
+            .filter(a -> a.contains(START_HL) || a.contains(END_HL))
+            .findFirst();
+        if (alternativeWithHighlight.isPresent()) {
+          sb.append(alternativeWithHighlight.get());
+        } else {
+          sb.append(b.getText());
         }
       } else {
         sb.append(b.getText());

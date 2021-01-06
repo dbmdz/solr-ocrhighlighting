@@ -1,12 +1,17 @@
 package de.digitalcollections.solrocr.lucene;
 
+import de.digitalcollections.solrocr.lucene.filters.OcrCharFilter;
 import de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory;
 import de.digitalcollections.solrocr.util.CharBufUtils;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
@@ -52,6 +57,13 @@ public class OcrAlternativesFilterFactory extends TokenFilterFactory {
 
     private final CharTermAttribute termAtt = this.addAttribute(CharTermAttribute.class);
     private final PositionIncrementAttribute posIncAtt = this.addAttribute(PositionIncrementAttribute.class);
+    private final OffsetAttribute offsetAtt = this.addAttribute(OffsetAttribute.class);
+
+    /** The currently active input OcrCharFilter instance.
+     *
+     * Used to check whether a given token is part of a multi-term alternative and should be ignored.
+     */
+    private OcrCharFilter inputFilter = null;
 
     /** Recorded token state, largely re-used for every alternative */
     private State state = null;
@@ -71,22 +83,59 @@ public class OcrAlternativesFilterFactory extends TokenFilterFactory {
       super(input);
     }
 
+    private OcrCharFilter getInputCharFilter(TokenStream input) {
+      if (!(input instanceof Tokenizer)) {
+        return null;
+      }
+      Tokenizer tok = (Tokenizer) input;
+      try {
+        return (OcrCharFilter) FieldUtils.readField(tok, "input", true);
+      } catch (ClassCastException|ReflectiveOperationException e) {
+        return null;
+      }
+    }
+
+    @Override
+    public void reset() throws IOException {
+      super.reset();
+      this.inputFilter = getInputCharFilter(input);
+      if (inputFilter == null) {
+        throw new RuntimeException(
+            "An OcrAlternativesFilterFactory must immediately follow a TokenizerFactory that has a OcrCharFilterFactory "
+            + "as its direct input. Check your schema!");
+      }
+    }
+
     @Override
     public final boolean incrementToken() throws IOException {
-      // Initialize variable to hold the offset of the next alternative in the term buffer
+      // Initialize variable to hold the index of the next alternative in the term buffer
       int nextAlternativeIdx = -1;
+      boolean partial = false;
       if (curTermBuffer == null) {
-        if (!this.input.incrementToken()) {
-          return false;
+        while (true) {
+          if (!this.input.incrementToken()) {
+            return false;
+          }
+          // Check if the new token has alternatives and is complete
+          int start = offsetAtt.startOffset();
+          Optional<OcrCharFilter.TokenWithAlternatives> tokOpt = inputFilter.getTokenWithAlternatives(start);
+          if (!tokOpt.isPresent()) {
+            // No alternatives, nothing to do
+            return true;
+          }
+          OcrCharFilter.TokenWithAlternatives tok = tokOpt.get();
+          partial = (start - tok.defaultFormStart) > 0;
+          if (start >= tok.defaultFormEnd) {
+            // Part of ocr token with alternatives, but not part of the beginning
+            // -> OCR token unit got split, ignore this token
+            continue;
+          }
+          break;
         }
-
-        // Check if the current token has any alternatives
         nextAlternativeIdx = CharBufUtils.indexOf(
             termAtt.buffer(), 0, termAtt.length(), ALTERNATIVE_MARKER);
-        if (nextAlternativeIdx < 0) {
-          return true;
-        }
-        // Record the state so we can access it during `incrementToken`
+
+        // Record the state so we can access it during `incrementToken` for the alternatives
         this.state = this.captureState();
 
         // Set the initial token state
@@ -95,22 +144,38 @@ public class OcrAlternativesFilterFactory extends TokenFilterFactory {
         this.curPos = 0;
       }
 
-      // This will only be smaller than zero if we're on a token's second form/first alternative
-      if (nextAlternativeIdx < 0) {
+      int newOffset = -1;
+      boolean isInitialForm = (curPos == 0);
+      if (!isInitialForm) {
         // Restore all attributes for the token so the alternative has the same attributes, except for the characters
         this.restoreState(this.state);
+        int closingIdx = CharBufUtils.indexOf(
+            this.curTermBuffer, this.curPos, this.curTermLength, ALTERNATIVE_MARKER);
+        String offsetStr = new String(this.curTermBuffer, curPos, (closingIdx - curPos));
+        newOffset = Integer.parseInt(offsetStr);
+        curPos = closingIdx + ALTERNATIVE_MARKER.length;
         nextAlternativeIdx = CharBufUtils.indexOf(
-            this.curTermBuffer, this.curPos, curTermLength, ALTERNATIVE_MARKER);
+            termAtt.buffer(), curPos, this.curTermLength, ALTERNATIVE_MARKER);
       }
       // Change the term attribute to contain the current alternative
       int end = nextAlternativeIdx >= 0 ? nextAlternativeIdx : curTermLength;
       this.termAtt.copyBuffer(this.curTermBuffer, curPos, end - curPos);
+      if (newOffset >= 0) {
+        // Update the term offsets so they point at the alternative in the input
+        this.offsetAtt.setOffset(newOffset, newOffset + (end - curPos));
+      } else if (isInitialForm && nextAlternativeIdx > 0) {
+        this.offsetAtt.setOffset(
+            // Update the end offset of the initial term so it points at the end of the term and not at the end
+            // of the last alternative
+            this.offsetAtt.startOffset(),
+            this.offsetAtt.startOffset() + (nextAlternativeIdx - curPos));
+      }
 
-      if (curPos > 0) {
+      if (!isInitialForm) {
         // Every alternative is at the same position as the original token
         this.posIncAtt.setPositionIncrement(0);
       }
-      if (end == curTermLength) {
+      if (end == curTermLength || partial) {
         // We're done with this token's alternatives, reset term state
         this.curTermBuffer = null;
         this.curTermLength = -1;

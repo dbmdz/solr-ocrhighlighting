@@ -4,6 +4,8 @@ import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
 import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.model.OcrPage;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -139,4 +141,15 @@ public class HocrParserTest {
     List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
     assertThat(boxes).isNotEmpty();
   }
+
+  @Test
+  public void testSpaceAtLineEnd() throws FileNotFoundException, XMLStreamException {
+    HocrParser parser = new HocrParser(
+        new FileReader(Paths.get("src/test/resources/data/space_after.html").toFile()),
+        OcrParser.ParsingFeature.TEXT);
+    List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
+    assertThat(boxes.stream().filter(b -> !b.isHyphenStart()))
+        .allMatch(b -> b.getTrailingChars().contains(" "));
+  }
+
 }

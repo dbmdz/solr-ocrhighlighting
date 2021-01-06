@@ -227,7 +227,9 @@ public class OcrBox implements Comparable<OcrBox> {
 
   public void addAlternative(String alternative, Integer offset) {
     this.alternatives.add(alternative);
-    this.alternativeOffsets.add(offset);
+    if (offset != null) {
+      this.alternativeOffsets.add(offset);
+    }
   }
 
   public void setTrailingChars(String trailingChars) {
@@ -270,7 +272,7 @@ public class OcrBox implements Comparable<OcrBox> {
     this.highlightSpan = highlightId;
   }
 
-  public void setHyphenInfo(boolean hyphenStart, String dehyphenated) {
+  public void setHyphenInfo(Boolean hyphenStart, String dehyphenated) {
     this.hyphenStart = hyphenStart;
     this.dehyphenatedForm = dehyphenated;
   }

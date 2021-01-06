@@ -210,4 +210,47 @@ public class AltoTest extends SolrTestCaseJ4 {
     req = xmlQ("q", "ocr_text:\"YoB Greene purchased\"");
     assertQ(req, "count(//arr[@name='snippets'])='1'");
   }
+
+  public void testHyphenText() {
+    Path ocrPath = Paths.get("src/test/resources/data/alto_hyphen.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"able letter indeed it did mr\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "//arr[@name='snippets']/lst/str[@name='text']/text()='fronts him. Tilden and Mis Letter. \" An <em>able letter indeed. It did Mr</em>. Tilden great credit. I read it carefully several times. Ne ; I havent read the Cin-'",
+       "//arr[@name='regions']/lst/str[@name='text']/text()='fronts him. Tilden and Mis Letter. \" An <em>able letter indeed. It did Mr</em>. Tilden great credit. I read it carefully several times. Ne ; I havent read the Cin-'");
+  }
+
+  public void testWackyHyphenation() {
+    Path ocrPath = Paths.get("src/test/resources/data/alternatives_bug.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    ocrPath = Paths.get("src/test/resources/data/alternatives_bug.html");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47372"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"about\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')",
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]//arr[@name='regions']/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')",
+        "contains(((//lst[@name='47372']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')",
+        "contains(((//lst[@name='47372']//arr[@name='snippets'])[1]//arr[@name='regions']/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')"
+    );
+  }
+
+  public void testNoMatch() {
+    Path ocrPath = Paths.get("src/test/resources/data/nomatch.html");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"warfare is not checked governors and\"", "hl.weightMatches", "true");
+    assertQ(req, "count(//arr[@name='snippets'])=1");
+  }
+
+  public void testMissingClosing() {
+    Path ocrPath = Paths.get("src/test/resources/data/missing_closing.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"as to details\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[2]/text(), '<em>details,</em>')");
+  }
 }

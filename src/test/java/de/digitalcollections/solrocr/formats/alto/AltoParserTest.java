@@ -4,6 +4,8 @@ import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
 import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.model.OcrPage;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
@@ -135,5 +138,27 @@ public class AltoParserTest {
     String ptr = Paths.get("src/test/resources/data/alto_nospace.xml").toAbsolutePath().toString();
     List<OcrBox> boxes = new AltoParser(filterFac.create(new StringReader(ptr))).stream().collect(Collectors.toList());
     assertThat(boxes).isNotEmpty();
+  }
+
+
+  @Test
+  public void testSpaceAtLineEnd() throws FileNotFoundException, XMLStreamException {
+    AltoParser parser = new AltoParser(
+        new FileReader(Paths.get("src/test/resources/data/space_after.xml").toFile()),
+        OcrParser.ParsingFeature.TEXT);
+    List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
+    assertThat(boxes.stream().limit(boxes.size() - 1).filter(b -> !b.isHyphenStart()))
+        .allMatch(b -> b.getTrailingChars().contains(" "));
+  }
+
+
+  @Test
+  public void testConsequtiveHyphens() throws FileNotFoundException, XMLStreamException {
+    AltoParser parser = new AltoParser(
+        new FileReader(Paths.get("src/test/resources/data/hyphenconseq.xml").toFile()),
+        OcrParser.ParsingFeature.TEXT);
+    List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
+    assertThat(boxes.stream().filter(b -> b.getText().equals("li-")).findFirst().map(OcrBox::getTrailingChars)).isEqualTo(Optional.of(""));
+    assertThat(OcrParser.boxesToString(boxes)).contains("li-li-li-conse");
   }
 }

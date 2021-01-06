@@ -1,12 +1,19 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.model.OcrBox;
 import java.util.List;
+import java.util.Optional;
+import org.apache.lucene.analysis.CharFilter;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 
+@SuppressWarnings("UnstableApiUsage")
 public class OcrCharFilter extends BaseCharFilter {
   private final OcrParser parser;
+  protected final RangeMap<Integer, TokenWithAlternatives> alternativeMap = TreeRangeMap.create();
 
   private char[] curWord;
   private int curWordIdx = -1;
@@ -20,6 +27,9 @@ public class OcrCharFilter extends BaseCharFilter {
   private void readNextWord() {
     while (this.curWord == null && this.parser.hasNext()) {
       OcrBox nextWord = this.parser.next();
+      if (nextWord.getText() == null) {
+        continue;
+      }
 
       // For hyphenated words where both the hyphen start and the end word are next to each
       // other, we only index the dehyphenated content and the trailing chars of the hyphen end.
@@ -28,10 +38,10 @@ public class OcrCharFilter extends BaseCharFilter {
           && this.parser.peek().filter(b -> b.isHyphenated() && !b.isHyphenStart()).isPresent());
       if (wordIsCompleteHyphenation) {
         String text = nextWord.getDehyphenatedForm();
-        int endOutputOffset = outputOffset + text.length();
         int offset = nextWord.getTextOffset();
+        int endOutputOffset = outputOffset + nextWord.getText().length();
         OcrBox hyphenEnd = this.parser.next();
-        int endOffset = hyphenEnd.getTextOffset() + hyphenEnd.getText().length();
+        int endOffset = hyphenEnd.getTextOffset();
         if (hyphenEnd.getTrailingChars() != null) {
           text += hyphenEnd.getTrailingChars();
         }
@@ -49,13 +59,29 @@ public class OcrCharFilter extends BaseCharFilter {
         List<String> alts = nextWord.getAlternatives();
         int wordIdx = text.length();
         for (int i=0; i < alts.size(); i++) {
+          // Every alternative is preceded a sequence of `<marker><offset><marker>`. The markers are sequences of
+          // unicode `WORD JOINER` characters that prevent tokenizers from separating alternatives and their offsets
+          // from each other so they can be accessed as a single unit downstream in the `OcrAlternativesFilter`.
           text.append(OcrCharFilterFactory.ALTERNATIVE_MARKER);
-          wordIdx += OcrCharFilterFactory.ALTERNATIVE_MARKER.length();
+          int offset; if (this.input instanceof CharFilter) {
+            offset = ((CharFilter) this.input).correctOffset(nextWord.getAlternativeOffsets().get(i));
+          } else {
+            offset = nextWord.getAlternativeOffsets().get(i);
+          }
+          text.append(offset);
+          text.append(OcrCharFilterFactory.ALTERNATIVE_MARKER);
+          int markerLen = OcrCharFilterFactory.ALTERNATIVE_MARKER.length() * 2 + Integer.toString(offset).length();
+          wordIdx += markerLen;
           int outOff = this.outputOffset + wordIdx;
           this.addOffCorrectMap(outOff, nextWord.getAlternativeOffsets().get(i) - outOff);
           text.append(alts.get(i));
           wordIdx += alts.get(i).length();
         }
+        alternativeMap.put(
+            Range.closedOpen(this.correctOffset(outputOffset), this.correctOffset(outputOffset + wordIdx)),
+            new TokenWithAlternatives(
+                this.correctOffset(outputOffset), this.correctOffset(outputOffset + text.length()),
+                1 + alts.size()));
       }
       if (nextWord.getTrailingChars() != null) {
         text.append(nextWord.getTrailingChars());
@@ -87,5 +113,26 @@ public class OcrCharFilter extends BaseCharFilter {
       }
     }
     return numRead;
+  }
+
+  public Optional<TokenWithAlternatives> getTokenWithAlternatives(int inputOffset) {
+    return Optional.ofNullable(this.alternativeMap.get(inputOffset));
+  }
+
+  public static class TokenWithAlternatives {
+    public final int defaultFormStart;
+    public final int defaultFormEnd;
+    public final int numForms;
+
+    public TokenWithAlternatives(int defaultFormStart, int defaultFormEnd, int numForms) {
+      this.defaultFormStart = defaultFormStart;
+      this.defaultFormEnd = defaultFormEnd;
+      this.numForms = numForms;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("TokenWithAlternatives{%d@[%d:%d[}", numForms, defaultFormStart, defaultFormEnd);
+    }
   }
 }

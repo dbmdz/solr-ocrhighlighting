@@ -63,7 +63,7 @@ public class HocrParser extends OcrParser {
     }
 
     boolean isHyphenated = false;
-    if (box.getText().replace(END_HL, "").endsWith("\u00ad")) {
+    if (box.getText() != null && box.getText().replace(END_HL, "").endsWith("\u00ad")) {
       isHyphenated = true;
       String boxText = box.getText();
       box.setText(boxText.replace("\u00ad", ""));
@@ -79,9 +79,21 @@ public class HocrParser extends OcrParser {
         String dehyphenated = box.getText() + hyphenEnd.getText();
         box.setHyphenInfo(true, dehyphenated);
         hyphenEnd.setHyphenInfo(false, dehyphenated);
+      } else {
+        // No hyphen end, strip hyphenation info
+        box.setHyphenInfo(null, null);
       }
     }
 
+    // Boxes without text or coordinates (if either is requested with a feature flag) are ignored since they break
+    // things downstream
+    boolean ignoreBox =
+        (features.contains(ParsingFeature.TEXT) && (box.getText() == null || box.getText().isEmpty()))
+            || (features.contains(ParsingFeature.COORDINATES)
+            && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
+    if (ignoreBox) {
+      return null;
+    }
     return box;
   }
 
@@ -109,8 +121,8 @@ public class HocrParser extends OcrParser {
   private void parseText(
       XMLStreamReader2 xmlReader, OcrBox box, boolean withHighlights, boolean withOffsets,
       boolean withAlternatives) throws XMLStreamException {
-    String txt = "";
-    int txtOffset = Math.toIntExact(xmlReader.getLocationInfo().getStartingCharOffset());
+    String txt = null;
+    int txtOffset = -1;
     boolean inAlternatives = false;
     while (xmlReader.hasNext()) {
       int nextEvent = xmlReader.next();
