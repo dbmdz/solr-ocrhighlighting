@@ -263,4 +263,12 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
         "(//arr[@name='regions']/lst/int[@name='pageIdx'])[1]='0'",
         "(//arr[@name='regions']/lst/int[@name='pageIdx'])[2]='1'");
   }
+
+  public void testMissingEndHyphen() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn90050316_1916_05_13_4_mini.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"assessors in sewer\"", "hl.weightMatches", "true");
+    assertQ(req, "//lst[@name='47371']//arr[@name='snippets']/lst/str[@name='text']/text()=\"Notice of 3Iecting of <em>Assessors in Sewer</em> District No. 1. Notice is hereby given that the undersigned board cf assessors of bene-\"");
+  }
 }

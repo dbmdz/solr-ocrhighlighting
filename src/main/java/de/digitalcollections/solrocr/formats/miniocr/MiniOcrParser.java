@@ -85,7 +85,11 @@ public class MiniOcrParser extends OcrParser {
         box.setHyphenInfo(true, dehyphenated);
         hyphenEnd.setHyphenInfo(false, dehyphenated);
       } else {
-        // No hyphen end, strip hyphenation info
+        // No hyphen end, strip hyphenation info, add trailing hyphen if needed
+        if (!box.getText().endsWith("-")
+            && (box.getTrailingChars() == null || box.getTrailingChars().endsWith("-"))) {
+          box.setTrailingChars("-");
+        }
         box.setHyphenInfo(null, null);
       }
     }
