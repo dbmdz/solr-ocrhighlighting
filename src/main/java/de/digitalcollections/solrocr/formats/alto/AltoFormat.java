@@ -1,6 +1,7 @@
 package de.digitalcollections.solrocr.formats.alto;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Range;
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.iter.BreakLocator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
@@ -11,6 +12,7 @@ import de.digitalcollections.solrocr.model.OcrPage;
 import java.awt.Dimension;
 import java.io.Reader;
 import java.util.Map;
+import java.util.stream.IntStream;
 import javax.xml.stream.XMLStreamException;
 
 public class AltoFormat implements OcrFormat {
@@ -100,5 +102,23 @@ public class AltoFormat implements OcrFormat {
       return singleQuoteIdx;
     }
     return Math.min(singleQuoteIdx, doubleQuoteIdx);
+  }
+
+  @Override
+  public Range<Integer> getContainingWordLimits(String fragment, int position) {
+    int doubleStartIdx = fragment.lastIndexOf("CONTENT=\"", position) + 9;
+    int singleStartIdx = fragment.lastIndexOf("CONTENT='", position) + 9;
+    int altStartIdx = fragment.lastIndexOf("<ALTERNATIVE>", position) + 13;
+    char attribChar;
+    int startIdx = IntStream.of(doubleStartIdx, singleStartIdx, altStartIdx).max().getAsInt();
+    if (startIdx == doubleStartIdx) {
+      attribChar = '"';
+    } else if (startIdx == singleStartIdx) {
+      attribChar = '\'';
+    } else {
+      attribChar = '<';
+    }
+    return Range.closedOpen(
+        startIdx, fragment.indexOf(attribChar, position));
   }
 }

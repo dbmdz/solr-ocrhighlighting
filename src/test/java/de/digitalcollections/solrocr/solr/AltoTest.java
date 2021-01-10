@@ -270,4 +270,29 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'ANUAGK.ratal')");
   }
 
+  public void testHighlightStartInTokenWithEscapes() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn90050306_1920_05_27_1.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"will lie of\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"'<em>lie</em> past\")");
+  }
+
+  public void testHighlightEndInTokenWithEscapes() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn90050316_1920_06_02_1.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ(
+        "q", "ocr_text:\"that the democrats had\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Virginia <em>Democrats \"had</em> set forth')");
+  }
+
+  public void testHighlightEndInTokenWithNamedEscapes() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn83032300_1882_04_06_3.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ(
+        "q", "ocr_text:\"added that nothing\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>Ade About Nothings</em>')");
+  }
 }

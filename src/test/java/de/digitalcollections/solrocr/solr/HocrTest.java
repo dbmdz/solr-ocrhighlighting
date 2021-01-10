@@ -392,4 +392,21 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"greatest of all\"", "hl.weightMatches", "true");
     assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"i!i!iiiitiiiiiiiiiiiiiiiiiiiiiiniiiiiiiFFf/^|SALEiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii^'Hi\")");
   }
+
+  public void testHighlightStartInTokenWithEscapes() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn83032300_1885_01_177_2.html");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"ere what it is\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"1'<em>er what</em>\")");
+  }
+
+  public void testHighlightEndInTokenWithEscapes() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn90050316_1922_12_13_8.html");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ(
+        "q", "ocr_text:\"returns the ee\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"<em>returning Saturday. !>ee</em>\")");
+  }
 }

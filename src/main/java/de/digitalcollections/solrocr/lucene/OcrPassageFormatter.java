@@ -1,6 +1,7 @@
 package de.digitalcollections.solrocr.lucene;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.iter.BreakLocator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
@@ -118,7 +119,9 @@ public class OcrPassageFormatter extends PassageFormatter {
         if (alignSpans) {
           matchStart = format.getLastContentStartIdx(preMatchContent);
         }
-        sb.insert(extraChars + matchStart, START_HL);
+        sb.insert(
+            this.adjustPositionToCharacterEntities(sb.toString(), extraChars + matchStart),
+            START_HL);
         extraChars += START_HL.length();
         // Again, can't just do match.end - passage.getStartOffset(), since we need char offsets (see above).
         int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
@@ -139,11 +142,38 @@ public class OcrPassageFormatter extends PassageFormatter {
           String postMatchContent = sb.substring(matchEnd, sb.length());
           matchEnd += format.getFirstContentEndIdx(postMatchContent);
         }
-        sb.insert(matchEnd, END_HL);
+        sb.insert(this.adjustPositionToCharacterEntities(sb.toString(), matchEnd), END_HL);
         extraChars += END_HL.length();
       }
     }
     return sb.toString();
+  }
+
+  /** Adjust the given position within the OCR fragment to account for XML character entities
+   *  in the OCR word, assumes that the position is within an OCR word.
+   *
+   *  This is necessary since doing this at indexing time would be extremely costly, given that
+   *  it would need to be run for every single word. At highlighting time it only needs to be run
+   *  for words that have a highlighting marker inside, since the difference is otherwise not
+   *  problematic.
+   */
+  private int adjustPositionToCharacterEntities(String fragment, int position) {
+    Range<Integer> wordRange = this.format.getContainingWordLimits(fragment, position);
+    int idx = wordRange.lowerEndpoint();
+    while (idx >= wordRange.lowerEndpoint() && idx < position) {
+      int entStart = fragment.indexOf('&', idx);
+      if (entStart < 0 || entStart >= position || entStart > wordRange.upperEndpoint()) {
+        // No entities opened before position in the word, start doesn't need to be adjusted
+        break;
+      }
+      int entEnd = fragment.indexOf(';', entStart);
+      int entLength = entEnd - entStart;
+      // This assumes that the entity decodes to a codepoint that is only one character wide in UTF16,
+      // which should be the case for >99.9% of terms people search for...
+      position += entLength;
+      idx = entEnd + 1;
+    }
+    return position;
   }
 
   private OcrSnippet format(Passage passage, IterableCharSequence content) {
@@ -441,4 +471,5 @@ public class OcrPassageFormatter extends PassageFormatter {
       return String.format("PassageMatch{start=%d, end=%d}", start, end);
     }
   }
+
 }

@@ -1,5 +1,6 @@
 package de.digitalcollections.solrocr.model;
 
+import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.iter.BreakLocator;
@@ -88,4 +89,14 @@ public interface OcrFormat {
   int getLastContentStartIdx(String content);
 
   int getFirstContentEndIdx(String content);
+
+  /** Get the range of positions contained by the word containing the given position.
+   *
+   * This default implementation is valid for OCR formats that encode word text as character
+   * nodes inside of a containing element (like hOCR and MiniOCR). For other formats, override. **/
+  default Range<Integer> getContainingWordLimits(String fragment, int position) {
+    return Range.closedOpen(
+        fragment.lastIndexOf('>', position) + 1,
+        fragment.indexOf('<', position + 1));
+  }
 }
