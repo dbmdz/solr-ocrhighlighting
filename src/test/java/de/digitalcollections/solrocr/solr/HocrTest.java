@@ -384,4 +384,12 @@ public class HocrTest extends SolrTestCaseJ4 {
     + "llcxtetter't Stomach UltUra, or he vionlilnei se hare looked e hare com-cem-";
     assertQ(req, "//lst[@name='47371']//arr[@name='snippets']/lst/str[@name='text']/text()=\"" + snipText + "\"");
   }
+
+  public void testLongTokenTruncated() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn90050306_1921_02_10-8.html");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"greatest of all\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"i!i!iiiitiiiiiiiiiiiiiiiiiiiiiiniiiiiiiFFf/^|SALEiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii^'Hi\")");
+  }
 }

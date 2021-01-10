@@ -64,6 +64,7 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
           ParsingFeature.CONFIDENCE, ParsingFeature.ALTERNATIVES, ParsingFeature.PAGES};
     }
     this.features.addAll(Arrays.asList(features));
+    xmlInputFactory.getConfig().doCoalesceText(true);
     xmlInputFactory.getConfig()
         .setInputParsingMode(WstxInputProperties.PARSING_MODE_DOCUMENTS);
     xmlInputFactory.getConfig()
