@@ -89,6 +89,12 @@ public class OcrCharFilter extends BaseCharFilter {
             new TokenWithAlternatives(
                 this.correctOffset(outputOffset), this.correctOffset(outputOffset + text.length()),
                 1 + alts.size()));
+        if ((nextWord.isHyphenStart() == null || !nextWord.isHyphenStart())
+            && !nextWord.getTrailingChars().contains(" ")) {
+          // Add a whitespace after boxes with alternatives so the tokenizer doesn't munge
+          // together the last alternative with the following token
+          nextWord.setTrailingChars(nextWord.getTrailingChars() + " ");
+        }
       }
       if (nextWord.getTrailingChars() != null) {
         text.append(nextWord.getTrailingChars());

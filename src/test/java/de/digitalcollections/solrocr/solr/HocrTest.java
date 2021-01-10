@@ -373,4 +373,15 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"irregular manner in\"", "hl.weightMatches", "true");
     assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Ah for her re-')");
   }
+
+  public void testExtraEndHyphen() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn83032300_1887_07_16_3.html");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"you never ill and\"", "hl.weightMatches", "true");
+    String snipText = "Hie recalcitrant organ, of palua beneath Iho right nheuMer blaOe, el dytpepllc aympteRM, "
+    + "conciliation and headache? Of course <em>you never ill</em> J, and of courts the lntlTUlual vrm net using "
+    + "llcxtetter't Stomach UltUra, or he vionlilnei se hare looked e hare com-cem-";
+    assertQ(req, "//lst[@name='47371']//arr[@name='snippets']/lst/str[@name='text']/text()=\"" + snipText + "\"");
+  }
 }

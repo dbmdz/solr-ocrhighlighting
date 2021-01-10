@@ -109,11 +109,6 @@ public class AltoParser extends OcrParser {
           throw new IllegalStateException("An ALTERNATIVE element can only have a text node as its sole child");
         }
       }
-      if ((box.isHyphenStart() == null || !box.isHyphenStart()) && !box.getTrailingChars().contains(" ")) {
-        // Add a whitespace after boxes with alternatives so the tokenizer doesn't munge
-        // together the last alternative with the following token
-        box.setTrailingChars(box.getTrailingChars() + " ");
-      }
     }
 
     if (features.contains(ParsingFeature.PAGES) && this.currentPage != null) {

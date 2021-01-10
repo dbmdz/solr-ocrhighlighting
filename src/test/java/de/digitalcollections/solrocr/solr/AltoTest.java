@@ -253,4 +253,13 @@ public class AltoTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"as to details\"", "hl.weightMatches", "true");
     assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[2]/text(), '<em>details</em>,')");
   }
+
+  public void testExtraWhitespace() {
+    Path ocrPath = Paths.get("src/test/resources/data/sn83045555_1909_12_24_6.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"provo office\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Otnco Upstairs C5V4MainStreet <em>Provo office</em>')");
+  }
+
 }
