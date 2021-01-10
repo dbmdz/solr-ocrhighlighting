@@ -14,7 +14,7 @@ import org.codehaus.stax2.XMLStreamReader2;
 public class AltoParser extends OcrParser {
   private boolean noMoreWords;
   private OcrPage currentPage;
-  private boolean hasExplicitSpaces = false;
+  private Boolean hasExplicitSpaces = null;
   private OcrBox hyphenEnd = null;
   private boolean inHyphenation = false;
 
@@ -25,6 +25,9 @@ public class AltoParser extends OcrParser {
   @Override
   protected OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
       throws XMLStreamException {
+    if (this.hasExplicitSpaces == null) {
+      this.hasExplicitSpaces = this.input.peekBeginning().contains("<SP");
+    }
     if (hyphenEnd != null) {
       OcrBox out = this.hyphenEnd;
       this.hyphenEnd = null;
