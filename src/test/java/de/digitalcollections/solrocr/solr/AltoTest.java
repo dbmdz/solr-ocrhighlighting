@@ -251,6 +251,6 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"as to details\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[2]/text(), '<em>details,</em>')");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[2]/text(), '<em>details</em>,')");
   }
 }

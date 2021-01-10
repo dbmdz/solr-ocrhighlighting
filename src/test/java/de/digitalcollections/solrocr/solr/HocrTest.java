@@ -365,4 +365,12 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"rain bide me jrajz\"", "hl.weightMatches", "true");
     assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '')");
   }
+
+  public void testPartialHyphen() {
+    Path ocrPath = Paths.get("src/test/resources/data/hyphen_partial.html");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"irregular manner in\"", "hl.weightMatches", "true");
+    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Ah for her re-')");
+  }
 }

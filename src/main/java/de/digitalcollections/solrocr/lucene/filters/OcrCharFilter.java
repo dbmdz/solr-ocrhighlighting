@@ -39,7 +39,12 @@ public class OcrCharFilter extends BaseCharFilter {
       if (wordIsCompleteHyphenation) {
         String text = nextWord.getDehyphenatedForm();
         int offset = nextWord.getTextOffset();
-        int endOutputOffset = outputOffset + nextWord.getText().length();
+        int beginLength = nextWord.getText().length();
+        if (nextWord.getText().endsWith("-") && text.indexOf(nextWord.getText()) != 0) {
+          // In the case where the hyphen is part of the word and not an extra char
+          beginLength -= 1;
+        }
+        int endOutputOffset = outputOffset + beginLength;
         OcrBox hyphenEnd = this.parser.next();
         int endOffset = hyphenEnd.getTextOffset();
         if (hyphenEnd.getTrailingChars() != null) {
@@ -47,6 +52,8 @@ public class OcrCharFilter extends BaseCharFilter {
         }
         this.curWord = text.toCharArray();
         this.curWordIdx = 0;
+        // Map the offsets correctly: We output the full dehyphenated form, but the offsets point to the constituting
+        // parts, i.e. the beginning and end text. This only makes a difference for ALTO.
         this.addOffCorrectMap(outputOffset, offset - outputOffset);
         this.addOffCorrectMap(endOutputOffset, endOffset - endOutputOffset);
         break;

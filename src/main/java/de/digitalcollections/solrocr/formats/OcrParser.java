@@ -172,6 +172,7 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
         Optional<String> alternativeWithHighlight = b.getAlternatives().stream()
             .filter(a -> a.contains(START_HL) || a.contains(END_HL))
             .findFirst();
+        // If the highlight is on an alternative, output that alternative instead of the default token
         if (alternativeWithHighlight.isPresent()) {
           sb.append(alternativeWithHighlight.get());
         } else {

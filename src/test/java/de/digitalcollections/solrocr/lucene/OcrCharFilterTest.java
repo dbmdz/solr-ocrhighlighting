@@ -74,6 +74,14 @@ public class OcrCharFilterTest {
             + "\u2060\u206048819\u2060\u2060consielert"
             + "\u2060\u206048856\u2060\u2060consider"
             + "\u2060\u206048891\u2060\u2060consulter");
+  }
 
+  @Test
+  public void testNoExpandAlternatives() throws IOException {
+    Path p = Paths.get("src/test/resources/data/sn83032300_1888_08_30_4.xml");
+    OcrCharFilterFactory fac = new OcrCharFilterFactory(new HashMap<>());
+    OcrCharFilter filter = (OcrCharFilter) fac.create(filterFac.create(new StringReader(p.toString())));
+    String doc = IOUtils.toString(filter);
+    assertThat(doc).contains("Imper-Imper-Imper-senater");
   }
 }

@@ -53,12 +53,6 @@ public class AltoParser extends OcrParser {
       box.setText(text);
       if (hyphenStart != null) {
         String dehyphenated = xmlReader.getAttributeValue("", "SUBS_CONTENT");
-        if (text.contains(START_HL)) {
-          dehyphenated = START_HL + dehyphenated;
-        }
-        if (text.contains(END_HL)) {
-          dehyphenated += END_HL;
-        }
         box.setHyphenInfo(hyphenStart, dehyphenated);
       }
       if (features.contains(ParsingFeature.HIGHLIGHTS) && box.getHighlightSpan() == null) {
@@ -115,6 +109,11 @@ public class AltoParser extends OcrParser {
           throw new IllegalStateException("An ALTERNATIVE element can only have a text node as its sole child");
         }
       }
+      if ((box.isHyphenStart() == null || !box.isHyphenStart()) && !box.getTrailingChars().contains(" ")) {
+        // Add a whitespace after boxes with alternatives so the tokenizer doesn't munge
+        // together the last alternative with the following token
+        box.setTrailingChars(box.getTrailingChars() + " ");
+      }
     }
 
     if (features.contains(ParsingFeature.PAGES) && this.currentPage != null) {
@@ -127,6 +126,7 @@ public class AltoParser extends OcrParser {
       box.setTrailingChars(" ");
     }
 
+    // Hyphenation handling
     if (box.isHyphenStart()) {
       if (this.inHyphenation) {
         // Two subsequent hyphen starts, broken/invalid data, but we try to deal with it anyway
@@ -136,11 +136,30 @@ public class AltoParser extends OcrParser {
       this.inHyphenation = true;
       this.hyphenEnd = this.readNext(xmlReader, features);
       if (this.hyphenEnd != null && this.hyphenEnd.isHyphenated() && !this.hyphenEnd.isHyphenStart()) {
+        // Insert highlighting markers at correct positions in the dehyphenated content
+        // This is assuming that both the end is fully part of the dehyphenated form.
+        boolean modified = false;
+        StringBuilder dehyphenated = new StringBuilder(hyphenEnd.getDehyphenatedForm());
         if (box.getText().contains(START_HL)) {
-          hyphenEnd.setHyphenInfo(false, START_HL + hyphenEnd.getDehyphenatedForm());
+          dehyphenated.insert(box.getText().indexOf(START_HL), START_HL);
+          modified = true;
         }
-        if (hyphenEnd.getText().contains(END_HL)) {
-          box.setHyphenInfo(true, box.getDehyphenatedForm() + END_HL);
+        if (box.getText().contains(END_HL)) {
+          dehyphenated.insert(box.getText().indexOf(END_HL), END_HL);
+          modified = true;
+        }
+        int endIdx = dehyphenated.indexOf(hyphenEnd.getText().replace(END_HL, "").replace(START_HL, ""));
+        if (hyphenEnd.getText().contains(START_HL) && endIdx >= 0) {
+          dehyphenated.insert(endIdx + hyphenEnd.getText().indexOf(START_HL), START_HL);
+          modified = true;
+        }
+        if (hyphenEnd.getText().contains(END_HL) && endIdx >= 0) {
+          dehyphenated.insert(endIdx + hyphenEnd.getText().indexOf(END_HL), END_HL);
+          modified = true;
+        }
+        if (modified) {
+          box.setHyphenInfo(true, dehyphenated.toString());
+          hyphenEnd.setHyphenInfo(false, dehyphenated.toString());
         }
         // Full hyphenation, no whitespace between start and end
         box.setTrailingChars("");
