@@ -2,6 +2,7 @@ package de.digitalcollections.solrocr.formats;
 
 import com.ctc.wstx.api.WstxInputProperties;
 import com.ctc.wstx.stax.WstxInputFactory;
+import com.google.common.collect.ImmutableMap;
 import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
@@ -69,9 +70,15 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
         .setInputParsingMode(WstxInputProperties.PARSING_MODE_DOCUMENTS);
     xmlInputFactory.getConfig()
         .doSupportDTDs(false);
-    xmlInputFactory.getConfig()
-        .setUndeclaredEntityResolver(
-            (__, ___, ____, namespace) -> "shy".equals(namespace) ? "\u00ad" : null);
+    xmlInputFactory.getConfig().setCustomInternalEntities(ImmutableMap.builder()
+        .put("shy", "\u00ad")
+        .put("nbsp", "\u00a0")
+        .put("ensp", "\u2002")
+        .put("emsp", "\u2003")
+        .put("thinsp", "\u2009")
+        .put("zwnj", "\u200c")
+        .put("zwj", "\u200d")
+        .build());
     this.xmlReader = (XMLStreamReader2) xmlInputFactory.createXMLStreamReader(this.input);
     this.nextWord = this.readNext(this.xmlReader, this.features);
   }
