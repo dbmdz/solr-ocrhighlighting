@@ -73,16 +73,30 @@ public class HocrFormat implements OcrFormat {
     if (pageAttribs == null) {
       throw noPageIdExc;
     }
+
     Matcher idMatch = pageIdPat.matcher(pageAttribs);
-    String pageId;
-    if (idMatch.find()) {
-      pageId = Stream.of("id", "source", "pageno")
+    String pageId = null;
+    while (idMatch.find()) {
+      String candidate = Stream.of("id", "source", "pageno")
           .map(idMatch::group)
           .filter(StringUtils::isNotEmpty)
           .findFirst().orElseThrow(() -> noPageIdExc);
-    } else {
+      if (candidate.equals(idMatch.group("id"))) {
+        // A specific id is the ideal case, no need to check for further candidates
+        pageId = candidate;
+        break;
+      } else if (candidate.equals(idMatch.group("source"))) {
+        // A specific source is better than just a page number
+        pageId = candidate;
+      } else if (candidate.equals(idMatch.group("pageno")) && pageId == null) {
+        // Only use a page number if no better candidate was found before
+        pageId = candidate;
+      }
+    }
+    if (pageId == null) {
       throw noPageIdExc;
     }
+
     Dimension pageDims = null;
     Matcher boxMatch = pageBboxPat.matcher(pageAttribs);
     if (boxMatch.find()) {
