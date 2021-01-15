@@ -57,6 +57,9 @@ Example configuration tuned for remote NFS storage mounted with `rsize=65536`:
 Another option to influence the performance of the plugin is to tune some runtime options for highlighting.
 For any of these, refer to the [Querying section](https://dbmdz.github.io/solr-ocrhighlighting/query/) for more details.
 
+- If you're storing documents at the page-level in the index, you can set the `hl.ocr.trackPages` parameter to `false`
+  (default is `true`). This will skip seeking backward in the input from the match position to find the containing
+  page, which can be costly.
 - Tune the number of candidate passages for ranking with `hl.ocr.maxPassages`, which defaults to `100`. Lowering this is
   better for performance, but means that the resulting snippets might not be the most relevant in the document.
 - Change the limit (`hl.ocr.limitBlock`) and/or context block types (`hl.ocr.contextBlock`) to something lower in the

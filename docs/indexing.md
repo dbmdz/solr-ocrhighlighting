@@ -1,8 +1,13 @@
 # Indexing OCR documents
 
-Indexing OCR documents with the plugin is relatively simple: When building the index document, instead of putting
-the actual OCR content into the field, you use a **source pointer**. This pointer will tell the plugin from which
-location to load the OCR content during indexing and highlighting.
+**If you want to store the OCR in the index itself** you can skip this section: Just put the OCR
+content in the field and submit it to Solr for indexing. We recommend using the space-efficient
+[MiniOCR format](./formats.md#miniocr) if you decide to go this way.
+
+Indexing OCR documents without storing the actual content in the index is also relatively simple:
+When building the index document, instead of putting  the actual OCR content into the field, you use
+a **source pointer**. This pointer will tell the plugin from which location to load the OCR content
+during indexing and highlighting.
 
 The advantage of this approach is a *significant* reduction in the amount of memory required for both the client
 and the Solr server, since neither of them has to keep the (potentially very large) OCR document in memory at
@@ -11,7 +16,7 @@ the index size is kept comparatively small, since Solr only needs to store the l
 the (again, potentially very large) contents themselves in the index.
 
 !!! note "Performance"
-    When using external files for highlighting, the performance depends almost exclusively on
+    When using external files for highlighting, the performance depends to a large degree on
     how fast the underlying storage is able to perform random I/O. This is why **we highly recommend
     using flash storage for the documents**.
     

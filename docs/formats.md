@@ -66,6 +66,13 @@ A basic example looks like this:
 </ocr>
 ```
 
+Alternatives for words can be encoded with the `⇿` (`U+21D4`) marker. For example, this is how you would
+encode a word with the default form `clistrias` and two alternatives `christmas` and `christrias`:
+
+```xml
+<w x="50 50 100 100">clistrias⇿christmas⇿christrias</w>
+```
+
 **Block type mapping:**
 
 | Block     | MiniOCR tag  | notes                            |

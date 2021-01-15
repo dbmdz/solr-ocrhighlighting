@@ -75,9 +75,10 @@ In the core's `schema.xml`, you need to:
 2. Define which fields are going to hold the indexed OCR text.
 
 The **field type** for OCR text is usually identical to your regular text field, with the
-difference that there are two extra *character filters* at the beginning of your *index analysis chain*:
-  - `ExternalUtf8ContentFilterFactory` will allow you to index and highlight OCR from external
-    sources on the file system. More on this in the [Indexing chapter](./indexing.md).
+difference that there are one or two extra *character filters* at the beginning of your
+*index analysis chain*:
+  - `ExternalUtf8ContentFilterFactory` will (optionally) allow you to index and highlight OCR from
+    external  sources on the file system. More on this in the [Indexing chapter](./indexing.md).
   - `OcrCharFilterFactory` will retrieve the raw OCR data and extract the plain text that is
     going to pass through the rest of the analysis chain. It will auto-detect the used OCR
     formats, which means that **you can use different OCR formats alongside each other**.

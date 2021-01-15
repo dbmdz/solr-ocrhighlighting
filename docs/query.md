@@ -41,10 +41,10 @@ for the `hl.snippets` parameter, which defaults to `1`.
 The objects contained under the `snippets` key are structured like this:
 ```json
 {
-  "text": "to those parts, subject to unreasonable claims from the pro­prietor "
+  "text": "to those parts, subject to unreasonable claims from the proprietor "
           "of Maryland, until the year 17C2, when the whole controversy was "
           "settled by Charles <em>Mason and Jeremiah Dixon</em>, upon their "
-          "return from an observation of the tran­sit of Venus, at the Cape of "
+          "return from an observation of the transit of Venus, at the Cape of "
           "Good Hope, where they",
   "score": 5555104.5,
   "pages": [
@@ -173,3 +173,9 @@ Additionally, the plugin allows you to customize various OCR-specific parameters
     being highlighted and any other remaining documents will be skipped. The highlighting response will then only
     include snippets from documents that were highlighted before the timeout. The presence of partial results will be
     indicated by the `partialOcrHighlights` key in the `responseHeader`.
+
+`hl.ocr.trackPages`:
+:   When `off` (defaults to `on`), you will not get information the containing page of a given snippet.
+    This can improve highlighting performance, since less of the input file needs to be read and should
+    be disabled when you index your documents at the page-level, i.e. when the identify of the page is
+    encoded elsewhere in the document.
