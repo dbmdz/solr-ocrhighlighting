@@ -23,7 +23,7 @@ import org.apache.lucene.util.BytesRef;
  * A customization of {@link FieldHighlighter} to support OCR fields
  */
 public class OcrFieldHighlighter extends FieldHighlighter {
-  private Map<Integer, Integer> numMatches;
+  private final Map<Integer, Integer> numMatches;
 
   public OcrFieldHighlighter(String field, FieldOffsetStrategy fieldOffsetStrategy,
                              PassageScorer passageScorer, int maxPassages, int maxNoHighlightPassages) {

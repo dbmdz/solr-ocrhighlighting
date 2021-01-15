@@ -119,12 +119,12 @@ public class HocrParserTest {
     assertThat(boxes.get(23).getHighlightSpan()).isEqualTo(hlSpan);
     assertThat(boxes.get(24).getHighlightSpan()).isEqualTo(hlSpan);
     assertThat(boxes.get(25).getHighlightSpan()).isEqualTo(hlSpan);
-    assertThat(boxes.get(26).getHighlightSpan()).isNull();;
+    assertThat(boxes.get(26).getHighlightSpan()).isNull();
     assertThat(boxes).isNotEmpty();
   }
 
   @Test
-  public void testPartialDocument() throws XMLStreamException, IOException {
+  public void testPartialDocument() throws XMLStreamException {
     String fragment = "<span class=\"ocr_line\" title=\"bbox 245 1992 1312 2038\"><span class=\"ocrx_word\" title=\"bbox 245 1996 356 2038\">object</span> <span class=\"ocrx_word\" title=\"bbox 370 2003 426 2026\">too</span> <span class=\"ocrx_word\" title=\"bbox 441 1993 568 2035\">hastily,</span> <span class=\"ocrx_word\" title=\"bbox 584 1993 616 2024\">in</span> <span class=\"ocrx_word\" title=\"bbox 632 1992 778 2024\">addition</span> <span class=\"ocrx_word\" title=\"bbox 795 1998 830 2024\">to</span> <span class=\"ocrx_word\" title=\"bbox 847 1993 901 2025\">the</span> <span class=\"ocrx_word\" title=\"bbox 917 1994 1000 2026\">facts</span> <span class=\"ocrx_word\" title=\"bbox 1016 1993 1146 2038\">already</span> <span class=\"ocrx_word\" title=\"bbox 1162 1997 1268 2028\">stated</span> <span class=\"ocrx_word\" title=\"bbox 1286 1997 1312 2027\">it</span> </span><span class=\"ocr_line\" title=\"bbox 244 2035 1316 2083\"><span class=\"ocrx_word\" title=\"bbox 244 2040 348 2083\">ought</span> <span class=\"ocrx_word\" title=\"bbox 363 2045 396 2070\">to</span> <span class=\"ocrx_word\" title=\"bbox 412 2037 453 2069\">be</span> <span class=\"ocrx_word\" title=\"bbox 468 2036 647 2076\">remarked,</span> <span class=\"ocrx_word\" title=\"bbox 660 2035 731 2069\">that</span> <span class=\"ocrx_word\" title=\"bbox 744 2035 911 2080\">Kunnpfer</span> <span class=\"ocrx_word\" title=\"bbox 924 2037 1087 2071\">describes</span> <span class=\"ocrx_word\" title=\"bbox 1105 2039 1161 2072\">the</span> <span class=\"ocrx_word\" title=\"bbox 1174 2045 1265 2072\">coast</span> <span class=\"ocrx_word\" title=\"bbox 1276 2040 1316 2070\">of</span></span>    \n" +
         "\n" +
         "<p class=\"ocr_par\" title=\"bbox 1206 2083 1314 2125\" style=\"font-size:11pt;font-family:&quot;Times&quot;;font-style:normal\"><span class=\"ocr_line\" title=\"bbox 1206 2083 1314 2125\"><span class=\"ocrx_word\" title=\"bbox 1206 2083 1314 2125\">\uD83D\uDD25Japan\uD83E\uDDEF</span></span></p>\n" +

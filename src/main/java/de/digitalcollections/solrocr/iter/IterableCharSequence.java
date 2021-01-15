@@ -39,8 +39,8 @@ public interface IterableCharSequence extends CharSequence, CharacterIterator {
   }
 
   class IterableStringCharSequence implements IterableCharSequence {
-    private String s;
-    private StringCharacterIterator it;
+    private final String s;
+    private final StringCharacterIterator it;
 
     IterableStringCharSequence(String string) {
       this.s = string;

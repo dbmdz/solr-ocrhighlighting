@@ -4,9 +4,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.lucene.index.QueryTimeout;
 
 public class HighlightTimeout implements QueryTimeout {
-  public static ThreadLocal<Long> timeoutAt = new ThreadLocal<>();
+  public static final ThreadLocal<Long> timeoutAt = new ThreadLocal<>();
 
-  private static HighlightTimeout instance = new HighlightTimeout();
+  private static final HighlightTimeout instance = new HighlightTimeout();
 
   public static HighlightTimeout getInstance() {
     return instance;

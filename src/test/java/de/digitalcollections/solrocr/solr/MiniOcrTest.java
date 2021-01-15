@@ -64,7 +64,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testMixedHighlighting() throws Exception {
+  public void testMixedHighlighting() {
     SolrQueryRequest req = xmlQ("q", "commodo münchen",
                                 "qf", "some_text ocr_text", "df", "some_text",
                                 "hl.fl", "some_text", "hl.ocr.fl", "ocr_text", "hl.weightMatches", "true");
@@ -75,7 +75,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testSingleTerm() throws Exception {
+  public void testSingleTerm() {
     SolrQueryRequest req = xmlQ("q", "München");
     assertQ(req,
           "count(//lst[@name='31337']//arr[@name='pages']/lst)=3",
@@ -95,77 +95,77 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testStoredHighlighting() throws Exception {
+  public void testStoredHighlighting() {
     SolrQueryRequest req = xmlQ("q", "München", "hl.ocr.fl", "ocr_text_stored", "df", "ocr_text_stored");
     assertQ(req,
             "count(//lst[@name='ocrHighlighting']/lst[@name='41337']/lst[@name='ocr_text_stored']/arr/lst)=3");
   }
 
   @Test
-  public void testBooleanQuery() throws Exception {
+  public void testBooleanQuery() {
     SolrQueryRequest req = xmlQ("q", "((München AND Italien) OR Landsherr)");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=10");
   }
 
   @Test
-  public void testBooleanQueryNoMatch() throws Exception {
+  public void testBooleanQueryNoMatch() {
     SolrQueryRequest req = xmlQ("q", "((München AND Rotterdam) OR Mexico)");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=4");
   }
 
   @Test
-  public void testWildcardQuery() throws Exception {
+  public void testWildcardQuery() {
     SolrQueryRequest req = xmlQ("q", "(Mün* OR Magdebur?)");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=10");
   }
 
   @Test
-  public void testWildcardQueryAtTheBeginning() throws Exception {
+  public void testWildcardQueryAtTheBeginning() {
     SolrQueryRequest req = xmlQ("q", "*deburg");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(),'agdeburg')])=10");
   }
 
   @Test
-  public void testWildcardQueryIntheMiddle() throws Exception {
+  public void testWildcardQueryIntheMiddle() {
     SolrQueryRequest req = xmlQ("q", "Mü*hen");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])=3");
   }
 
   @Test
-  public void testWildcardQueryAtTheEnd() throws Exception {
+  public void testWildcardQueryAtTheEnd() {
     SolrQueryRequest req = xmlQ("q", "Münch*");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])=3");
   }
 
   @Test
-  public void testWildcardQueryWithWildcardOnly() throws Exception {
+  public void testWildcardQueryWithWildcardOnly() {
     SolrQueryRequest req = xmlQ("q", "*");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=0");
   }
 
   @Test
-  public void testWildcardQueryWithAsteriskAndNoResults() throws Exception {
+  public void testWildcardQueryWithAsteriskAndNoResults() {
     SolrQueryRequest req = xmlQ("q", "Zzz*");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=0");
   }
 
   @Test
-  public void testWildcardQueryWithNoResults() throws Exception {
+  public void testWildcardQueryWithNoResults() {
     SolrQueryRequest req = xmlQ("q", "Z?z");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=0");
   }
 
   @Test
-  public void testWildcardQueryWithWildcardForUmlautInTheMiddle() throws Exception {
+  public void testWildcardQueryWithWildcardForUmlautInTheMiddle() {
     SolrQueryRequest req = xmlQ("q", "M?nchen");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(),'Münche')])>0",
@@ -173,35 +173,35 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testPhraseQuery() throws Exception {
+  public void testPhraseQuery() {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek\"");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(), '<em>Bayerische</em> <em>Staatsbibliothek</em>')])=1");
   }
 
   @Test
-  public void testPhraseQueryWithNoResults() throws Exception {
+  public void testPhraseQueryWithNoResults() {
     SolrQueryRequest req = xmlQ("q", "\"Münchener Stadtbibliothek\"");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=0");
   }
 
   @Test
-  public void testFuzzyQueryWithSingleTerm() throws Exception {
+  public void testFuzzyQueryWithSingleTerm() {
     SolrQueryRequest req = xmlQ("q", "bayrisch~");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
   }
 
   @Test
-  public void testFuzzyQueryWithSingleTermAndGreaterProximity() throws Exception {
+  public void testFuzzyQueryWithSingleTermAndGreaterProximity() {
     SolrQueryRequest req = xmlQ("q", "baurisch~3");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1");
   }
 
   @Test
-  public void testCombinedFuzzyQuery() throws Exception {
+  public void testCombinedFuzzyQuery() {
     SolrQueryRequest req = xmlQ("q", "Magdepurg~ OR baurisch~3", "hl.snippets", "100");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(),'Bayerisch')])=1",
@@ -209,28 +209,28 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testFuzzyQueryWithNoResults() throws Exception {
+  public void testFuzzyQueryWithNoResults() {
     SolrQueryRequest req = xmlQ("q", "Makdepurk~ OR baurysk~2");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=0");
   }
 
   @Test
-  public void testProximityQueryWithOneHighlighting() throws Exception {
+  public void testProximityQueryWithOneHighlighting() {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische München\"~3");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst/str[@name='text' and contains(text(),'<em>Bayerische</em> Staatsbibliothek <em>München</em>')])=1");
   }
 
   @Test
-  public void testProximityQueryWithTwoHighlightings() throws Exception {
+  public void testProximityQueryWithTwoHighlightings() {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Ausgabe\"~10");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=2");
   }
 
   @Test
-  public void testWeightMatches() throws Exception {
+  public void testWeightMatches() {
     SolrQueryRequest req = xmlQ("q", "\"Bayerische Staatsbibliothek München\"", "hl.weightMatches", "true");
     assertQ(req,
             "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=1",
@@ -240,7 +240,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testFilterByPage() throws Exception {
+  public void testFilterByPage() {
     SolrQueryRequest req = xmlQ("q", "München", "hl.ocr.pageId", "26", "fq", "id:31337");
     assertQ(req,
         "count(//int[@name='pageIdx' and text() != '0'])=0",
@@ -248,7 +248,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testMultiPageSnippet() throws Exception {
+  public void testMultiPageSnippet() {
     SolrQueryRequest req = xmlQ("q", "\"london nachrichten\"~5", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
     assertQ(
         req,

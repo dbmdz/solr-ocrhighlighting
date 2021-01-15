@@ -64,7 +64,7 @@ public class OcrAlternativesFilterTest {
       tokens.add(new String(charAttr.buffer(), 0, charAttr.length()));
       positionIncrements.add(filter.getAttribute(PositionIncrementAttribute.class).getPositionIncrement());
       startOffsets.add(filter.getAttribute(OffsetAttribute.class).startOffset());
-    };
+    }
     filter.end();
     filter.close();
     if (tokenizer instanceof StandardTokenizer || tokenizer instanceof ICUTokenizer) {

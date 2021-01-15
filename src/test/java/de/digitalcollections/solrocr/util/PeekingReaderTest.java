@@ -44,7 +44,7 @@ class PeekingReaderTest {
   }
 
   @Test
-  public void testBug() throws IOException, XMLStreamException {
+  public void testBug() throws XMLStreamException {
     String fragment = "<span class='ocr_line' id='line_17_6' title=\"bbox 185 482 1492 539; baseline 0.003 -15; x_size 52; x_descenders 9; x_ascenders 13\">\n" +
         "      <span class='ocrx_word' id='word_17_32' title='bbox 185 482 312 534; x_wconf 96' lang='deu'>dafür.</span>\n" +
         "      <span class='ocrx_word' id='word_17_33' title='bbox 379 485 450 537; x_wconf 72'>I&lt;</span>\n" +

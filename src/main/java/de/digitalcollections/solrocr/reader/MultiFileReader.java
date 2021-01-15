@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Queue;
 
 public class MultiFileReader extends Reader {
-  private Queue<Path> remainingSources;
+  private final Queue<Path> remainingSources;
   private FileReader currentReader;
 
   public MultiFileReader(List<Path> sourcePaths) throws FileNotFoundException {

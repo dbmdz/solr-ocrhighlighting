@@ -29,7 +29,7 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
   private int currentOutOffset;
 
   private boolean nextIsOffset = false;
-  private Queue<SourcePointer.Region> remainingRegions;
+  private final Queue<SourcePointer.Region> remainingRegions;
   private SourcePointer.Region currentRegion;
 
   public ExternalUtf8ContentFilter(Reader input, List<SourcePointer.Region> regions) throws IOException {

@@ -63,7 +63,7 @@ public class AltoTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testAlto() throws Exception {
+  public void testAlto() {
     SolrQueryRequest req = xmlQ("q", "svadag");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
@@ -74,7 +74,7 @@ public class AltoTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testAltoWithFloat() throws Exception {
+  public void testAltoWithFloat() {
     SolrQueryRequest req = xmlQ("q", "mighty");
     assertQ(req,
             "count(//lst[@name='ocrHighlighting']/lst[@name='44']/lst[@name='ocr_text']/arr/lst)=1",
@@ -83,19 +83,19 @@ public class AltoTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testAccidentalMerge() throws Exception {
+  public void testAccidentalMerge() {
     SolrQueryRequest req = xmlQ("q", "ligesom");
     assertQ(req, "count(//arr[@name='highlights']/arr)=2");
   }
 
   @Test
-  public void testEntityRemoval() throws Exception {
+  public void testEntityRemoval() {
     SolrQueryRequest req = xmlQ("q", "committee");
     assertQ(req, "//str[@name='text'][1]/text()='Permanent <em>Committee</em>'");
   }
 
   @Test
-  public void testMultiPageSnippet() throws Exception {
+  public void testMultiPageSnippet() {
     SolrQueryRequest req = xmlQ("q", "\"jursensen permanent\"", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
     assertQ(
         req,
@@ -115,7 +115,7 @@ public class AltoTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testHyphenationResolved() throws Exception {
+  public void testHyphenationResolved() {
     SolrQueryRequest req = xmlQ("q", "\"faux espoir\"", "hl.weightMatches", "true");
     assertQ(req,
             "//str[@name='text'][1]/text()=\"— <em>Faux espoir</em>, mon vieil ami, <em>faux espoir</em> ! Je n'ai jamais même vu un seul des anciens compagnons de ses plaisirs. Luimême avait renoncé à toute autre société\"",

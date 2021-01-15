@@ -69,7 +69,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testHocr() throws Exception {
+  public void testHocr() {
     SolrQueryRequest req = xmlQ("q", "tamara");
     assertQ(req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=2",
@@ -82,7 +82,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testWeightMatches() throws Exception {
+  public void testWeightMatches() {
     SolrQueryRequest req = xmlQ("q", "\"Verführung Tamaras\"", "hl.weightMatches", "true");
     assertQ(req,
             "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
@@ -94,7 +94,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testSubsectionHighlighting() throws Exception {
+  public void testSubsectionHighlighting() {
     SolrQueryRequest req = xmlQ("q", "\"brütenden Sonnenwärme\"", "hl.weightMatches", "true");
     assertQ(req,
             "count(//lst[@name='ocrHighlighting']/lst)=2",
@@ -108,7 +108,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
     @Test
-  public void testPageNumberAtBeginningOfPage() throws Exception {
+  public void testPageNumberAtBeginningOfPage() {
     SolrQueryRequest req = xmlQ("q", "\"peramentvollere Glänzendere\"", "hl.weightMatches", "true");
     assertQ(
         req,
@@ -120,7 +120,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testOverlappingMatches() throws Exception {
+  public void testOverlappingMatches() {
     SolrQueryRequest req = xmlQ("q", "\"pirate vessel\"~10", "hl.weightMatches", "true",
                                 "hl.ocr.contextSize", "0");
     assertQ(
@@ -130,7 +130,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testAbsoluteHighlightRegions() throws Exception {
+  public void testAbsoluteHighlightRegions() {
     SolrQueryRequest req = xmlQ("q", "Verführung", "hl.ocr.absoluteHighlights", "true");
     assertQ(req,
             "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
@@ -138,7 +138,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testLimitBlockHonored() throws Exception {
+  public void testLimitBlockHonored() {
     SolrQueryRequest req = xmlQ("q", "Japan", "hl.ocr.absoluteHighlights", "true", "fq", "id:42");
     assertQ(req,
             "//int[@name='numTotal']/text()='6'",
@@ -146,7 +146,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testAccidentalMerge() throws Exception {
+  public void testAccidentalMerge() {
     SolrQueryRequest req = xmlQ("q", "Robinson");
     assertQ(
         req,
@@ -155,7 +155,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testMultiPageSnippet() throws Exception {
+  public void testMultiPageSnippet() {
     SolrQueryRequest req = xmlQ("q", "\"max werner hochzeit\"~10", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
     assertQ(
         req,
@@ -173,7 +173,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testMergedRegionExceedsContext() throws Exception {
+  public void testMergedRegionExceedsContext() {
     SolrQueryRequest req = xmlQ("q", "\"lord's prayer\"", "hl.weightMatches", "true");
     assertQ(req,
             "count(//arr[@name='regions']/lst)=1",
@@ -185,13 +185,13 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testHyphenationIsResolved() throws Exception {
+  public void testHyphenationIsResolved() {
     SolrQueryRequest req = xmlQ("q", "\"themselves to Satan\"", "hl.weightMatches", "true");
     assertQ(req, "count(//arr[@name='regions']/lst)=1");
   }
 
   @Test
-  public void testMaskedDocumentIsIndexed() throws Exception {
+  public void testMaskedDocumentIsIndexed() {
     SolrQueryRequest req = xmlQ("q", "Vögelchen");
     assertQ(
         req,
@@ -200,7 +200,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
-  public void testHighlightingTimeout() throws Exception {
+  public void testHighlightingTimeout() {
     // This test can only check for the worst case, since checking for partial results is unlikely to be stable across
     // multiple environments due to timing issues.
     SolrQueryRequest req = xmlQ("q", "Vögelchen", "hl.ocr.timeAllowed", "1");
