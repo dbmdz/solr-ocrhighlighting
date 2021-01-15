@@ -1,5 +1,8 @@
 package de.digitalcollections.solrocr.lucene;
 
+import static de.digitalcollections.solrocr.formats.OcrParser.END_HL;
+import static de.digitalcollections.solrocr.formats.OcrParser.START_HL;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import de.digitalcollections.solrocr.formats.OcrParser;
@@ -31,9 +34,6 @@ import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static de.digitalcollections.solrocr.formats.OcrParser.END_HL;
-import static de.digitalcollections.solrocr.formats.OcrParser.START_HL;
 
 /**
  * Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances.
@@ -428,7 +428,7 @@ public class OcrPassageFormatter extends PassageFormatter {
 
   /** Truncate float to a precision of two digits after the decimal point.
    *
-   * Inteded to keep the plugin response small and tidy.
+   * Intended to keep the plugin response small and tidy.
    */
   private static float truncateFloat(float num) {
     return (float) Math.floor(num * 10000) / 10000;

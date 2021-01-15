@@ -76,7 +76,7 @@ public class OcrHighlightComponent extends org.apache.solr.handler.component.Hig
         NamedList<?> ocrHighlights = ocrHighlighter.doHighlighting(
             rb.getResults().docList,
             highlightQuery,
-            req, defaultHighlightFields, rb.rsp.getResponseHeader().asShallowMap());
+            req, rb.rsp.getResponseHeader().asShallowMap());
         if (ocrHighlights != null) {
           rb.rsp.add(highlightingResponseField(), ocrHighlights);
         }

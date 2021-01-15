@@ -20,8 +20,10 @@ import java.util.stream.StreamSupport;
 import javax.xml.stream.XMLStreamException;
 import org.codehaus.stax2.XMLStreamReader2;
 
+/** Base class for OCR  parsers operating on XML markup */
 public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
 
+  /** Set of features that can be turned on/off depending on the downstream needs */
   public enum ParsingFeature {
     /** Parse text, i.e. "default", alternatives and hyphenated forms */
     TEXT,
@@ -39,8 +41,18 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     PAGES,
   }
 
-  public static final String START_HL = "\uD83D\uDD25";
-  public static final String END_HL = "\uD83E\uDDEF";
+  // Named XML character entities that are used in hOCR
+  public static final ImmutableMap<Object, Object> ENTITIES = ImmutableMap.builder()
+      .put("shy", "\u00ad")
+      .put("nbsp", "\u00a0")
+      .put("ensp", "\u2002")
+      .put("emsp", "\u2003")
+      .put("thinsp", "\u2009")
+      .put("zwnj", "\u200c")
+      .put("zwj", "\u200d")
+      .build();
+  public static final String START_HL = "\uD83D\uDD25"; //🔥
+  public static final String END_HL = "\uD83E\uDDEF"; //🧯
 
   private static final WstxInputFactory xmlInputFactory = new WstxInputFactory();
 
@@ -65,20 +77,17 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
           ParsingFeature.CONFIDENCE, ParsingFeature.ALTERNATIVES, ParsingFeature.PAGES};
     }
     this.features.addAll(Arrays.asList(features));
+
+    // Woodstax sometimes splits long text nodes, this option forces it to merge them together
+    // before passing them to us
     xmlInputFactory.getConfig().doCoalesceText(true);
+    // This parsing mode allows us to read multiple "concatenated" XML documents in a single pass
     xmlInputFactory.getConfig()
         .setInputParsingMode(WstxInputProperties.PARSING_MODE_DOCUMENTS);
-    xmlInputFactory.getConfig()
-        .doSupportDTDs(false);
-    xmlInputFactory.getConfig().setCustomInternalEntities(ImmutableMap.builder()
-        .put("shy", "\u00ad")
-        .put("nbsp", "\u00a0")
-        .put("ensp", "\u2002")
-        .put("emsp", "\u2003")
-        .put("thinsp", "\u2009")
-        .put("zwnj", "\u200c")
-        .put("zwj", "\u200d")
-        .build());
+    // Ignore DTDs since they cause lookups to external URLs
+    xmlInputFactory.getConfig().doSupportDTDs(false);
+    // Register custom named entities used by hOCR
+    xmlInputFactory.getConfig().setCustomInternalEntities(ENTITIES);
     this.xmlReader = (XMLStreamReader2) xmlInputFactory.createXMLStreamReader(this.input);
     this.nextWord = this.readNext(this.xmlReader, this.features);
   }
@@ -124,6 +133,13 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     return Optional.of(this.nextWord);
   }
 
+  /** Keep track of highlighted box spans encountered during parsing.
+   *
+   * Implements should always call this method when they encounter OCR text, since it might
+   * contain highlighting markers that we need to track.
+   *
+   * Returns the identifier of the box's highlighting span, if present, else null.
+   */
   protected UUID trackHighlightSpan(String text, OcrBox box) {
     if (this.currentHighlightSpan == null && text.contains(OcrParser.START_HL)) {
       this.currentHighlightSpan = UUID.randomUUID();
@@ -144,13 +160,28 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     return this.currentHighlightSpan;
   }
 
+  /** Get the underlying peeking input reader. */
   public PeekingReader getInput() {
     return input;
   }
 
+  /** Read the next OCR box in the input stream.
+   *
+   * Implementers should take care to enable/disable various parsing steps depending on the set of
+   * features passed in.
+   */
   protected abstract OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
       throws XMLStreamException;
 
+
+  /** Helper method to convert a list of OCR boxes to a text string.
+   *
+   * Includes smart handling of partial hyphenations as well as handling of alternative tokens
+   * that are at the end and/or beginning of a highlighted span. In these cases the highlighted
+   * alternative will be used in the output string instead of the default form of the box. This
+   * is only possible if the alternative is at the beginning or end, since we otherwise don't have
+   * any information available to us if the default form or an alternative matched.
+   */
   public static String boxesToString(List<OcrBox> boxes) {
     StringBuilder sb = new StringBuilder();
     int idx = 0;

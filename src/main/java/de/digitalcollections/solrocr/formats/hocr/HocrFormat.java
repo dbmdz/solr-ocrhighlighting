@@ -1,6 +1,5 @@
 package de.digitalcollections.solrocr.formats.hocr;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import de.digitalcollections.solrocr.formats.OcrParser;
@@ -36,9 +35,6 @@ public class HocrFormat implements OcrFormat {
       .put(OcrBlock.LINE, ImmutableSet.of("ocr_line", "ocrx_line"))
       .put(OcrBlock.WORD, ImmutableSet.of("ocrx_word"))
       .build();
-  private static final List<String> blockHierarchy = ImmutableList.of(
-      "ocrx_word", "ocrx_line", "ocr_line", "ocr_par", "ocrx_block", "ocr_carea", "ocr_chapter",
-      "ocr_section", "ocr_subsection", "ocr_subsubsection", "ocr_page");
 
   @Override
   public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
@@ -59,7 +55,7 @@ public class HocrFormat implements OcrFormat {
 
   @Override
   public OcrPage parsePageFragment(String pageFragment) {
-    // TODO: Do we really need regexes for this?
+    // TODO: Might be faster without regexes? Profile!
     Matcher m = pageElemPat.matcher(pageFragment);
     if (m.find()) {
       return parsePage(m.group("attribs"));
@@ -67,7 +63,7 @@ public class HocrFormat implements OcrFormat {
     return null;
   }
 
-  // TODO: Replace with something non-regex based
+  // TODO: Might be faster without regexes? Profile!
   private OcrPage parsePage(String pageAttribs) {
     RuntimeException noPageIdExc = new RuntimeException("Pages must have an identifier, check your source files!");
     if (pageAttribs == null) {

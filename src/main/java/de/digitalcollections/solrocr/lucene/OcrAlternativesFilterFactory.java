@@ -20,6 +20,9 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  * Requires that the {@code expandAlternatives} attribute is set to {@code true} on the {@link OcrCharFilterFactory}
  * in the field type's analysis chain.
  *
+ * <p><strong>This filter factory needs to be placed after a {@code TokenizerFactory} whose input is an
+ * instance of {@code OcrCharFilterFactory}.</strong></p>
+ *
  * <p><strong>You cannot use the {@link org.apache.lucene.analysis.standard.ClassicTokenizer} with this filter</strong>,
  * since it splits tokens on the U+2060 (Word Joiner) codepoint, contrary to Unicode rules. Please use one of the newer,
  * unicode-compliant tokenizers like {@link org.apache.lucene.analysis.standard.StandardTokenizer}.

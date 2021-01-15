@@ -47,7 +47,7 @@ public interface OcrFormat {
   /**
    * Get a {@link PassageFormatter} that builds OCR snippets from passages
    *
-   * @param prehHighlightTag the tag to put in the snippet text before a highlighted region, e.g. &lt;em&gt;
+   * @param preHighlightTag the tag to put in the snippet text before a highlighted region, e.g. &lt;em&gt;
    * @param postHighlightTag the tag to put in the snippet text after a highlighted region, e.g. &lt;/em&gt;
    * @param absoluteHighlights whether the coordinates for highlights should be absolute, i.e. relative to the page
    *                           and not the containing snippet
@@ -56,8 +56,8 @@ public interface OcrFormat {
    *                   the OCR document.
    */
   default OcrPassageFormatter getPassageFormatter(
-      String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans, boolean trackPages) {
-    return new OcrPassageFormatter(prehHighlightTag, postHighlightTag, absoluteHighlights, alignSpans, trackPages, this);
+      String preHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans, boolean trackPages) {
+    return new OcrPassageFormatter(preHighlightTag, postHighlightTag, absoluteHighlights, alignSpans, trackPages, this);
   }
 
   /** Get a {@link CharFilter} implementation for the OCR format that outputs plaintext.

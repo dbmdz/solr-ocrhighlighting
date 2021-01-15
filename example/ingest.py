@@ -211,9 +211,6 @@ def bnl_load_documents(base_path):
                 futs.append(pool.submit(bnl_extract_article_docs, vol_id, mets_path, issue_dir / 'text'))
             for fut in as_completed(futs):
                 yield from fut.result()
-                #yield from bnl_extract_article_docs(
-                #    vol_id, etree.parse(str(mets_path)),
-                #    issue_dir / 'text')
 
 
 def index_documents(docs):

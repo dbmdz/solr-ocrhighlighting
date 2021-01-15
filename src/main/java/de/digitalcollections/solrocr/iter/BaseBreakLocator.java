@@ -44,12 +44,6 @@ public abstract class BaseBreakLocator implements BreakLocator {
         preceding = entry.getValue();
       }
     }
-    /*
-    Integer preceding = this.backwardCache.get(offset);
-    if (preceding == null) {
-      preceding = this.getPreceding(offset);
-    }
-    */
     int following = this.getFollowing(offset);
     if (following < 0) {
       following = this.text.length();
@@ -88,7 +82,4 @@ public abstract class BaseBreakLocator implements BreakLocator {
   protected abstract int getPreceding(int offset);
 
   protected abstract int getFollowing(int offset);
-
-
-
 }

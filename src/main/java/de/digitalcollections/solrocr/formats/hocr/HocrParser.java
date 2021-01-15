@@ -24,6 +24,7 @@ public class HocrParser extends OcrParser {
 
   @Override
   protected OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features) throws XMLStreamException {
+    // For hyphenated tokens, we parse  both parts first and then output them one after the other
     if (hyphenEnd != null) {
       OcrBox out = this.hyphenEnd;
       this.hyphenEnd = null;
@@ -34,6 +35,7 @@ public class HocrParser extends OcrParser {
       return null;
     }
 
+    // Advance parser to the next word if necessary
     if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT
         || !"span".equals(xmlReader.getLocalName())
         || !"ocrx_word".equals(xmlReader.getAttributeValue("", "class"))) {
@@ -88,8 +90,8 @@ public class HocrParser extends OcrParser {
       }
     }
 
-    // Boxes without text or coordinates (if either is requested with a feature flag) are ignored since they break
-    // things downstream
+    // Boxes without text or coordinates (if either is requested with a feature flag) are ignored
+    // since they break things downstream
     boolean ignoreBox =
         (features.contains(ParsingFeature.TEXT) && (box.getText() == null || box.getText().isEmpty()))
             || (features.contains(ParsingFeature.COORDINATES)
@@ -140,8 +142,9 @@ public class HocrParser extends OcrParser {
           inAlternatives = false;
           continue;
         }
-        // We assume that we're dealing with valid hOCR, and in this case this is the event for the end of the
-        // ocrx_word span, i.e. we can terminate and return
+        // We assume that we're dealing with valid hOCR, and in this case this is the event for the
+        // end of the ocrx_word span, i.e. we have all the text we needed from the box and can
+        // terminate and return
         box.setText(txt);
         if (withOffsets) {
           box.setTextOffset(txtOffset);
@@ -207,8 +210,10 @@ public class HocrParser extends OcrParser {
           foundWord = true;
           break;
         } else if ("div".equals(localName) && "ocr_line".equals(hocrClass) && trailingChars.lastIndexOf(" ") < 0) {
+          // Line breaks result in a trailing whitespace character
           trailingChars.append(' ');
         } else if (trackPages && "div".equals(localName) && "ocr_page".equals(hocrClass)) {
+          // Page break
           Map<String, String> pageProps = this.parseTitle(
               xmlReader.getAttributeValue("", "title"));
           Dimension pageDims = null;

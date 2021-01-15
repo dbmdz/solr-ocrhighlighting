@@ -44,7 +44,7 @@ public class OcrSnippet implements Comparable<OcrSnippet> {
     return text;
   }
 
-  /** Get the region of the page that the snippes is located in */
+  /** Get the region of the page that the snippets is located in */
   public List<OcrBox> getSnippetRegions() {
     return snippetRegions;
   }
@@ -70,8 +70,8 @@ public class OcrSnippet implements Comparable<OcrSnippet> {
 
   /** Convert the snippet to a {@link NamedList} that is used by Solr to populate the response. */
   @SuppressWarnings("rawtypes")
-  public NamedList toNamedList() {
-    SimpleOrderedMap m = new SimpleOrderedMap();
+  public NamedList<Object> toNamedList() {
+    SimpleOrderedMap<Object> m = new SimpleOrderedMap<>();
     m.add("text", this.getText());
     m.add("score", this.getScore());
     NamedList[] pageEntries = this.pages.stream()

@@ -72,21 +72,12 @@ public class SanitizingXmlFilterTest {
 
   @Test
   public void testConcatenatedHocr() throws IOException {
-    //String ptr = Files.walk(Paths.get("src/test/resources/data/chronicling_hocr"), 1)
-    //    //.sorted()
-    //    .filter(Files::isRegularFile)
-    //    .map(Path::toString)
-    //    .collect(Collectors.joining("+"));
     String ptr = Paths.get("src/test/resources/data/multicolumn.hocr").toString();
     Reader reader = new ExternalUtf8ContentFilterFactory(new HashMap<>())
         .create(new StringReader(ptr));
     Reader filteredReader = new PeekingReader(new SanitizingXmlFilter(reader), 2048, 16384);
     String filtered = IOUtils.toString(filteredReader);
     assertThat(filtered).isNotEmpty();
-    //OcrCharFilterFactory ocrFac = new OcrCharFilterFactory(new HashMap<>());
-    //OcrCharFilter ocrFilter = (OcrCharFilter) ocrFac.create(reader);
-    //String filtered = IOUtils.toString(ocrFilter);
-    //assertThat(filtered).isNotEmpty();
   }
 
   boolean isWellFormed(String xml) {

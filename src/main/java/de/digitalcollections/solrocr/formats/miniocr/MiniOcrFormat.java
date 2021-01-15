@@ -29,7 +29,8 @@ public class MiniOcrFormat implements OcrFormat {
   public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
     // FIXME: MiniOCR currently presupposes that the desired  block type exists, i.e. if you say
     //        "break on paragraph", we're just assuming that there are actually paragraphs in the OCR.
-    //        If they're not, therer will not be a break.
+    //        If they're not, there will not be a break. It would be better if we checked all of
+    //        the passed blocks.
     String breakTag = blockTagMapping.get(blockTypes[0]);
     return new TagBreakLocator(text, breakTag);
   }

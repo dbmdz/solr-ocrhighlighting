@@ -1,5 +1,7 @@
 package de.digitalcollections.solrocr.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.digitalcollections.solrocr.formats.hocr.HocrParser;
 import de.digitalcollections.solrocr.lucene.filters.SanitizingXmlFilter;
 import de.digitalcollections.solrocr.model.OcrBox;
@@ -15,8 +17,6 @@ import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class PeekingReaderTest {
 
@@ -101,20 +101,5 @@ class PeekingReaderTest {
     HocrParser parser = new HocrParser(peekingReader);
     List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
     assertThat(boxes).isNotEmpty();
-    /*
-    char[] cbuf = new char[12128];
-    int outOff = 0;
-    // 128 OK
-    int numRead = peekingReader.read(cbuf, 0, 128);
-    outOff += numRead;
-    // 4000 !! is 3929 in integration test?!
-    numRead = peekingReader.read(cbuf, outOff, 4000);
-    outOff += numRead;
-    // 336 !! is 403 in integration test, but 407 in unit test? what is going on!?
-    numRead = peekingReader.read(cbuf, outOff, 4000);
-    outOff += numRead;
-    // -1  !! is 3 in integreation test?!
-    numRead = peekingReader.read(cbuf, outOff, 4000);
-     */
   }
 }

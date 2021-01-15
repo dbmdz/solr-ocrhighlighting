@@ -4,17 +4,15 @@ import com.google.common.collect.ImmutableList;
 import de.digitalcollections.solrocr.iter.BaseBreakLocator;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import java.util.List;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 public class HocrClassBreakLocator extends BaseBreakLocator {
-  private final static Pattern CLASS_PAT = Pattern.compile("class=['\"](?<class>ocr.+?)['\"]");
   private final List<String> breakClasses;
   private final int overlap = 128;
+  private final int blockSize = 64 * 1024;
 
   public HocrClassBreakLocator(IterableCharSequence text, String breakClass) {
-    super(text);
-    this.breakClasses = ImmutableList.of(breakClass);
+    this(text, ImmutableList.of(breakClass));
   }
 
   public HocrClassBreakLocator(IterableCharSequence text, List<String> breakClasses) {
@@ -24,7 +22,6 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
 
   @Override
   public int getFollowing(int offset) {
-    int blockSize = 65536;
     int start = Math.min(offset + 1, this.text.getEndIndex());
     int end = Math.min(start + blockSize, this.text.getEndIndex());
     while (start < this.text.getEndIndex()) {
@@ -35,6 +32,9 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
         block = block.substring(0, lastTagClose + 1);
         end = start + lastTagClose;
       }
+
+      // In hOCR, there can be multiple options for expressing the same level in the block hierarchy,
+      // so we need to check for all of them.
       int idx = block.length();
       int closeIdx = block.length() - 1;
       outer:
@@ -92,7 +92,9 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
 
   @Override
   protected int getPreceding(int offset) {
-    int blockSize = 65536;
+    // FIXME: This method is currently significantly slower than `getFollowing`, since it makes use
+    //        of `lastIndexOf`, which is not accelerated by JVM compiler intrinsics in contrast to
+    //        `indexOf`, accounting for almost 25% of the time spent in highlighting a single snippet
     int end = Math.max(0, offset - 1);
     int start = Math.max(0, end - blockSize);
     while (start >= this.text.getBeginIndex()) {

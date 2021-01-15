@@ -26,7 +26,7 @@ public class AltoFormat implements OcrFormat {
   @Override
   public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
     // NOTE: The ALTO hierarchy we support is pretty rigid, i.e. Page > TextBlock > TextLine > String
-    //       is a given, hence we only grab t he lowest-hierarchy block and call it a day
+    //       is a given, hence we only grab the lowest-hierarchy block and call it a day
     String breakTag = blockTagMapping.get(blockTypes[0]);
     return new TagBreakLocator(text, breakTag);
   }
@@ -42,6 +42,7 @@ public class AltoFormat implements OcrFormat {
 
   @Override
   public OcrPage parsePageFragment(String pageFragment) {
+    // Poor/lean man's XML parsing
     pageFragment = pageFragment.substring(0, pageFragment.indexOf(">"));
     String[] elemParts = pageFragment.split(" ");
     String width = null;

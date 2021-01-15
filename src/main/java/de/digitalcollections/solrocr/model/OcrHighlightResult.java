@@ -2,7 +2,9 @@ package de.digitalcollections.solrocr.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
@@ -32,15 +34,15 @@ public class OcrHighlightResult {
     return snippetCounts.get(field);
   }
 
-  public NamedList toNamedList() {
-    SimpleOrderedMap out = new SimpleOrderedMap();
+  public NamedList<Object> toNamedList() {
+    SimpleOrderedMap<Object> out = new SimpleOrderedMap<>();
     for (String fieldName : fieldSnippets.keySet()) {
-      SimpleOrderedMap fieldOut = new SimpleOrderedMap();
+      SimpleOrderedMap<Object> fieldOut = new SimpleOrderedMap<>();
       int snipCount = getSnippetCount(fieldName);
       OcrSnippet[] snips = getFieldSnippets(fieldName);
-      NamedList[] outSnips = Arrays.stream(snips)
+      List<NamedList<Object>> outSnips = Arrays.stream(snips)
           .map(snip -> snip == null ? null : snip.toNamedList())
-          .toArray(NamedList[]::new);
+          .collect(Collectors.toList());
       fieldOut.add("snippets", outSnips);
       fieldOut.add("numTotal", snipCount);
       out.add(fieldName, fieldOut);

@@ -415,7 +415,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     // This method and some associated types changed in v8.2 and v8.4, so we have to delegate to an adapter method for
     // these versions
     if (VERSION_IS_PRE84) {
-      return getOcrFieldHighligherLegacy(field, query, allTerms, maxPassages);
+      return getOcrFieldHighlighterLegacy(field, query, allTerms, maxPassages);
     }
 
     Predicate<String> fieldMatcher = getFieldMatcher(field);
@@ -433,7 +433,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
         getScorer(field), maxPassages, getMaxNoHighlightPassages(field));
   }
 
-  private OcrFieldHighlighter getOcrFieldHighligherLegacy(
+  private OcrFieldHighlighter getOcrFieldHighlighterLegacy(
       String field, Query query, Set<Term> allTerms,  int maxPassages) {
     Predicate<String> fieldMatcher = getFieldMatcher(field);
     BytesRef[] terms = filterExtractedTerms(fieldMatcher, allTerms);

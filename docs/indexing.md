@@ -102,13 +102,13 @@ listed as **comma-separated byte-regions** inside of square brackets.
 
 The format of the regions is inspired by [Python's slicing syntax](https://docs.python.org/3/reference/expressions.html#slicings) and can take these forms:
 
-- `start:` → Evertying from byte offset `start` to the end of the file
+- `start:` → Everything from byte offset `start` to the end of the file
 - `start:end` → Everything between the byte offsets `start` (inclusive) and `end` (exclusive)
 - `:end` → Everything from the start of the file to byte offset `end` (exclusive)
 
 !!! caution "Byte Offsets"
     The region offsets are expected as **byte offsets**. Take care that the start and end of each region
-    falls on the start of a valid unicode byte sequence, and not in the middle of a multi-byte sequence.
+    fall on the start of a valid unicode byte sequence, and not in the middle of a multi-byte sequence.
     Care needs to be taken when determining the offsets, since obtaining byte offsets for UTF8-encoded
     text files is difficult in some programming languages (most notoriously Java, use the
     [`net.byteseek:byteseek`](https://github.com/nishihatapalmer/byteseek) package)

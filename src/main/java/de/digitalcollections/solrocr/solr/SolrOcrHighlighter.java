@@ -19,7 +19,7 @@ import org.apache.solr.util.SolrPluginUtils;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   public NamedList<Object> doHighlighting(
-      DocList docs, Query query, SolrQueryRequest req, String[] _defaultFields, Map<String, Object> respHeader)
+      DocList docs, Query query, SolrQueryRequest req, Map<String, Object> respHeader)
       throws IOException {
     // Copied from superclass
     // - *snip* -
@@ -49,9 +49,9 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
         ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader);
 
     // Assemble output data
-    SimpleOrderedMap out = new SimpleOrderedMap();
+    SimpleOrderedMap<Object> out = new SimpleOrderedMap<>();
     if (ocrSnippets != null) {
-      this.addOcrSnippets(out, keys, ocrFieldNames, ocrSnippets);
+      this.addOcrSnippets(out, keys, ocrSnippets);
     }
     return out;
   }
@@ -64,13 +64,12 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     return maxPassages;
   }
 
-  private void addOcrSnippets(NamedList<Object> out, String[] keys, String[] ocrFieldNames,
-                              OcrHighlightResult[] ocrSnippets) {
+  private void addOcrSnippets(NamedList<Object> out, String[] keys, OcrHighlightResult[] ocrSnippets) {
     for (int k=0; k < keys.length; k++) {
       String docId = keys[k];
-      SimpleOrderedMap docMap = (SimpleOrderedMap) out.get(docId);
+      SimpleOrderedMap<Object> docMap = (SimpleOrderedMap<Object>) out.get(docId);
       if (docMap == null) {
-        docMap = new SimpleOrderedMap();
+        docMap = new SimpleOrderedMap<>();
         out.add(docId, docMap);
       }
       if (ocrSnippets[k] == null) {

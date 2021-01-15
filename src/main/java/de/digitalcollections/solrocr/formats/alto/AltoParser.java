@@ -26,8 +26,12 @@ public class AltoParser extends OcrParser {
   protected OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
       throws XMLStreamException {
     if (this.hasExplicitSpaces == null) {
+      // ALTO can optionally encode explicit spaces with the <SP/> element.
       this.hasExplicitSpaces = this.input.peekBeginning().contains("<SP");
     }
+
+    // If we encounter hyphenated words, we parse both parts before outputting anything and then
+    // output them one after the other
     if (hyphenEnd != null) {
       OcrBox out = this.hyphenEnd;
       this.hyphenEnd = null;
@@ -37,6 +41,7 @@ public class AltoParser extends OcrParser {
       return null;
     }
 
+    // Advance reader to the next word if neccessary
     if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT
         || !"String".equals(xmlReader.getLocalName())) {
       this.seekToNextWord(xmlReader, features.contains(ParsingFeature.PAGES));
@@ -180,6 +185,9 @@ public class AltoParser extends OcrParser {
     return box;
   }
 
+  /** Advance parser to the next word, counting the number of pages encountered along the way, as
+   *  well as page breaks, if desired.
+   */
   private int seekToNextWord(XMLStreamReader2 xmlReader, boolean trackPages) throws XMLStreamException {
     int numSpaces = 0;
     boolean foundWord = false;

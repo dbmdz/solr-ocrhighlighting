@@ -1,8 +1,11 @@
 package de.digitalcollections.solrocr.formats.hocr;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
 import de.digitalcollections.solrocr.model.OcrBox;
+import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrPage;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,8 +22,6 @@ import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.apache.lucene.analysis.CharFilter;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class HocrParserTest {
   private static final ExternalUtf8ContentFilterFactory filterFac = new ExternalUtf8ContentFilterFactory(new HashMap<>());
