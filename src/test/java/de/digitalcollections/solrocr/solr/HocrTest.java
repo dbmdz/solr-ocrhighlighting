@@ -142,7 +142,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "Japan", "hl.ocr.absoluteHighlights", "true", "fq", "id:42");
     assertQ(req,
             "//int[@name='numTotal']/text()='6'",
-            "(//arr[@name='snippets']/lst/str[@name='text']/text())[1]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of<em>Japan</em>'");
+            "(//arr[@name='snippets']/lst/str[@name='text']/text())[1]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of <em>Japan</em>'");
   }
 
   @Test

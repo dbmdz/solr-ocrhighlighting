@@ -14,7 +14,7 @@ SOLR_HOST = os.environ.get('SOLR_HOST', 'localhost')
 HOCR_DOC = {"id": "test-hocr", "ocr_text": "/ocr-data/hocr.html"}
 HOCR_SNIPS = [
     {
-        "text": "rait par les bénéfices aux frais de l'expédition.Ce fut au mois de juin 1525 que partit <em>Francisco Pizarro de Panama</em> avec un navire et cent-vingt hommes.Nous le laisserons un instant pour revenir",
+        "text": "rait par les bénéfices aux frais de l'expédition. Ce fut au mois de juin 1525 que partit <em>Francisco Pizarro de Panama</em> avec un navire et cent-vingt hommes. Nous le laisserons un instant pour revenir",
         "pages": [{"height": 2393, "id": "page_205", "width": 1476}],
         "regions": [
             {"ulx": 170, "uly": 446, "lrx": 1124, "lry": 796, "pageIdx": 0,
