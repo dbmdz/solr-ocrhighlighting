@@ -209,7 +209,7 @@ public class HocrParser extends OcrParser {
         if ("span".equals(localName) && "ocrx_word".equals(hocrClass)) {
           foundWord = true;
           break;
-        } else if ("div".equals(localName) && "ocr_line".equals(hocrClass) && trailingChars.lastIndexOf(" ") < 0) {
+        } else if ("span".equals(localName) && "ocr_line".equals(hocrClass) && trailingChars.lastIndexOf(" ") < 0) {
           // Line breaks result in a trailing whitespace character
           trailingChars.append(' ');
         } else if (trackPages && "div".equals(localName) && "ocr_page".equals(hocrClass)) {
