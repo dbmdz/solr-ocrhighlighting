@@ -15,6 +15,29 @@ public abstract class BaseBreakLocator implements BreakLocator {
   private final RangeMap<Integer, Integer> backwardCache = TreeRangeMap.create();
   protected final IterableCharSequence text;
 
+  /** An "optimized" version of {@link String#lastIndexOf(String, int)}.
+   *
+   * This optimization is a bit counter-intuitive, since, on the surface, it uses the absolute worst way
+   * to search for the last occurrence of a substring in a larger string, by starting from the front of
+   * the string and working forward until there are no more matches.
+   *
+   * So why does using this approach speed up highlighting hOCR by ~25%? Well, during hOCR break locating,
+   * we need to look for multiple possible block type identifiers for each level in the block hierarchy,
+   * i.e. we often run into the situation there is no match. These cases are the absolute worst case for
+   * both {@link String#lastIndexOf(String, int)} and {@link String#indexOf(String, int)}.
+   * So why is the latter faster? Well, in recent Hotspot versions, it is is SIMD-accelerated via
+   * compiler intrinsics. And the speed-up we get from these worst cases is significant enough to
+   * completely make up for the slightly worse performance in more ideal cases (~25% slower).
+   */
+  protected static int optimizedLastIndexOf(String haystack, String needle, int fromIdx) {
+    int from = -1;
+    int idx;
+    while ((idx = haystack.indexOf(needle, from + 1)) >= 0 && idx < fromIdx) {
+      from = idx;
+    }
+    return from;
+  }
+
   protected BaseBreakLocator(IterableCharSequence text) {
     this.text = text;
   }

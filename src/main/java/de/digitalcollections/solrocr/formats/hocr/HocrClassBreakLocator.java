@@ -27,22 +27,23 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
     while (start < this.text.getEndIndex()) {
       String block = text.subSequence(start, end, true).toString();
       // Truncate block to last '>' to avoid splitting element openings across blocks
+      int blockEnd = block.length();
       int lastTagClose = block.lastIndexOf('>');
       if (lastTagClose > 0 && !StringUtils.isAllBlank(block.subSequence(lastTagClose, block.length()))) {
-        block = block.substring(0, lastTagClose + 1);
+        blockEnd = lastTagClose + 1;
         end = start + lastTagClose;
       }
 
       // In hOCR, there can be multiple options for expressing the same level in the block hierarchy,
       // so we need to check for all of them.
-      int idx = block.length();
-      int closeIdx = block.length() - 1;
+      int idx = blockEnd;
+      int closeIdx = blockEnd - 1;
       outer:
       for (String breakClass : this.breakClasses) {
         int fromIdx = 0;
         while (true) {
           int i = block.indexOf(breakClass, fromIdx);
-          if (i < 0) {
+          if (i < 0 || i > blockEnd) {
             // Not found, try next class
             break;
           }
@@ -92,33 +93,31 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
 
   @Override
   protected int getPreceding(int offset) {
-    // FIXME: This method is currently significantly slower than `getFollowing`, since it makes use
-    //        of `lastIndexOf`, which is not accelerated by JVM compiler intrinsics in contrast to
-    //        `indexOf`, accounting for almost 25% of the time spent in highlighting a single snippet
     int end = Math.max(0, offset - 1);
     int start = Math.max(0, end - blockSize);
     while (start >= this.text.getBeginIndex()) {
       String block = text.subSequence(start, end, true).toString();
       int firstTagOpen = block.indexOf('<');
+      int blockStart = 0;
       if (firstTagOpen > 0 && !StringUtils.isBlank(block.subSequence(0, firstTagOpen))) {
-        block = block.substring(firstTagOpen);
-        start += firstTagOpen;
+        // Limit all following searches to the beginning of the first tag in the block
+        blockStart = firstTagOpen;
       }
       int idx = -1;
       for (String breakClass: this.breakClasses) {
         // Look for the class in the block
-        int toIdx = block.length();
+        int fromIdx = block.length();
         while (true) {
-          int i = block.lastIndexOf(breakClass, toIdx);
-          if ( i < 0) {
+          int i = optimizedLastIndexOf(block, breakClass, fromIdx);
+          if (i < blockStart) {
             // Not found, try next class
             break;
           }
           int elemOpen = block.lastIndexOf('<', i);
           int previousClose = block.lastIndexOf('>', i);
-          if (previousClose > elemOpen || block.startsWith("meta", elemOpen + 1)) {
+          if (elemOpen < blockStart || previousClose > elemOpen || block.startsWith("meta", elemOpen + 1)) {
             // Class was not part of a tag or in the "meta" tag, keep looking
-            toIdx = Math.max(previousClose, elemOpen);
+            fromIdx = Math.max(previousClose, elemOpen);
             continue;
           }
           if (elemOpen > idx) {
@@ -128,7 +127,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
         }
       }
 
-      if (idx >= 0) {
+      if (idx >= blockStart) {
         return start + idx;
       }
 

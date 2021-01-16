@@ -46,7 +46,7 @@ public class TagBreakLocator extends BaseBreakLocator {
     int start = Math.max(0, end - blockSize);
     while (start >= this.text.getBeginIndex()) {
       String block = text.subSequence(start, end, true).toString();
-      int idx = block.lastIndexOf(breakTag);
+      int idx = optimizedLastIndexOf(block, breakTag, block.length());
       if (idx >= 0) {
         return start + idx;
       }
