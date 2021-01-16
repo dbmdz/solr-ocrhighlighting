@@ -3,6 +3,14 @@
 Highlighting based on locally stored files can take a long time, depending on the environment. This section gives some
 hints on potential knobs to tune to improve the performance.
 
+!!! note "Use JDK >= 9"
+    Java 9 introduced a feature called [String Compaction](https://openjdk.java.net/jeps/254)
+    that has a significant impact on several hot code paths used during OCR highlighting.
+    **You can expect a reduction in runtime of more than 50% if you use a JVM with string compaction
+    enabled compared to one without** (assuming you're running on flash storage).
+    We highly recommend using the latest LTS OpenJDK version released after Java 9, which
+    as of January 2021 is OpenJDK 11.
+
 ## Performance Analysis
 Before you start tuning the plugin, it is important to spend some time on analyzing the nature of the problems:
 

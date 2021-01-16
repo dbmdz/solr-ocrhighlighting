@@ -49,10 +49,14 @@ query parameters](query.md#available-highlighting-parameters) to control how the
 
 ## MiniOCR
 
-This plugin also includes support for a custom non-standard OCR format that we dubbed *MiniOCR*.
-You should use this format when reusing the existing OCR files is not possible or practical. In these cases,
-minimizing the storage requirements for the derived OCR files is important, which is why we defined this
-minimalistic format.
+This plugin also includes support for a custom non-standard OCR format that we dubbed *MiniOCR*, designed
+to be very simple (and thus performant) to parse and to occupy the least space possible.
+
+You should use this format when:
+
+- you want to store the OCR in the index (to keep the index size as low)
+- reusing the existing OCR files is not possible or practical (to keep occupied disk space low)
+- you want the best possible performance, highlighting MiniOCR is ~25% faster than ALTO and ~50% faster than hOCR
 
 A basic example looks like this:
 
@@ -66,7 +70,7 @@ A basic example looks like this:
 </ocr>
 ```
 
-Alternatives for words can be encoded with the `⇿` (`U+21D4`) marker. For example, this is how you would
+Alternatives for words can be encoded with the `⇿` (`U+21FF`) marker. For example, this is how you would
 encode a word with the default form `clistrias` and two alternatives `christmas` and `christrias`:
 
 ```xml

@@ -4,6 +4,7 @@ nav:
     - Introduction: index.md
     - Installation: installation.md
     - Indexing: indexing.md
+    - Indexing Alternative Terms: alternatives.md
     - Querying: query.md
     - Example Setup: example.md
     - Performance Tuning: performance.md

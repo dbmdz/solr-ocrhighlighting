@@ -5,6 +5,11 @@ a given word. These can either come from the OCR engine itself and consist of ot
 readings for a given sequence of characters, or they could come from an manual or semi-automatic
 OCR correction system.
 
+!!! note Expressing alternatives in OCR files
+    - For **hOCR**, use `<span class="alternatives"><ins class="alt">...</ins><del class="alt">...</del></span>` (see [hOCR specification](http://kba.cloud/hocr-spec/1.2/#segmentation))
+    - For **ALTO**, use `<String …><ALTERNATIVE>...</ALTERNATIVE></String>` (see `AlternativeType` in the [ALTO schema](https://www.loc.gov/standards/alto/v4/alto-4-2.xsd))
+    - For **MiniOCR**, delimit alternative forms with `⇿` (U+21FF) (see [MiniOCR documentation](../formats#miniocr))
+
 In any case, these alternative readings can improve your user's search experience, by allowing us to
 index *multiple forms for a given text position*. This enables users to find more matching passages
 for a given query than if only a single form was indexed for every word. This is a form of
@@ -59,12 +64,12 @@ A full field definition for an OCR field with alternative expansion could look l
 
 !!! caution "Unsupported tokenizers"
     The `OcrAlternativesFilterFactory` works with almost all tokenizers shipping with Solr, **except for
-    the `ClassicTokenizer`. This is because we use the `WORD JOINER` (U+2090) character to denote
-    alternative forms in the character stream and the classic tokenizers splits tokens on this character
+    the `ClassicTokenizer`.** This is because we use the `WORD JOINER` (U+2090) character to denote
+    alternative forms in the character stream and the classic tokenizer splits tokens on this character
     (contrary to Unicode rules). This also means that if you use a custom tokenizer, you need to make
     sure that it does not split tokens on U+2090.
 
 !!! note "Highlighting matches on alternative forms"
     During highlighting, you will only see the matching alternative form in the snippet if the match
-    is on a single word, or if it is at the beginning or the end of a phrase match, since we cannot
+    is on a single word, or if it is at the beginning or the end of a phrase match. This is because we cannot
     get to the offsets of matching terms inside of a phrase match through Lucene's highlighting machinery.
