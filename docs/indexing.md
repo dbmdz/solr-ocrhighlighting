@@ -69,7 +69,7 @@ POST http://solrhost:8983/solr/corename/update
 For indexing and highlighting, Solr will load the contents of the `ocrdoc-1_1.xml`, `ocrdoc-1_2.xml` and 
 `ocrdoc-1_2.xml` as a single continuous text.
 
-## One or more partial files per Solr document
+## Advanced: One or more *partial* files per Solr document
 
 A more complicated situation arises if the Solr documents need to refer to *parts* of one or more files on
 disk. This happens for example when you have scans of bound newspaper volumes, which frequently consist
@@ -102,7 +102,7 @@ POST http://solrhost:8983/solr/corename/update
 ]
 ```
 
-As before, we concateneate multiple file paths with the `+` character. The source regions for each file are
+As before, we concatenate multiple file paths with the `+` character. The source regions for each file are
 listed as **comma-separated byte-regions** inside of square brackets.
 
 The format of the regions is inspired by [Python's slicing syntax](https://docs.python.org/3/reference/expressions.html#slicings) and can take these forms:
@@ -110,6 +110,17 @@ The format of the regions is inspired by [Python's slicing syntax](https://docs.
 - `start:` → Everything from byte offset `start` to the end of the file
 - `start:end` → Everything between the byte offsets `start` (inclusive) and `end` (exclusive)
 - `:end` → Everything from the start of the file to byte offset `end` (exclusive)
+
+!!! caution "Region Requirements""
+    - The concatenated content of your regions must be a half-way valid XML structure. While we
+      tolerate *unclosed tags or unmatched closing tags* (they often can't be avoided), other
+      errors such as partial tags (i.e. a missing `<` or `>`) will lead  to an error during indexing.
+    - To get correct page numbers in your responses, make sure that you include any and all page
+      openings for your content in the set of regions. For example, if your document is an article
+      that spans from the bottom of one page to the top of the next, you will have to include a region
+      for the opening element of the first page so we can determine the page for the first part of the
+      article during highlighting
+
 
 !!! caution "Byte Offsets"
     The region offsets are expected as **byte offsets**. Take care that the start and end of each region
