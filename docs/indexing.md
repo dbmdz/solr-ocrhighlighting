@@ -1,8 +1,13 @@
 # Indexing OCR documents
 
-Indexing OCR documents with the plugin is relatively simple: When building the index document, instead of putting
-the actual OCR content into the field, you use a **source pointer**. This pointer will tell the plugin from which
-location to load the OCR content during indexing and highlighting.
+**If you want to store the OCR in the index itself** you can skip this section: Just put the OCR
+content in the field and submit it to Solr for indexing. We recommend using the space-efficient
+[MiniOCR format](./formats.md#miniocr) if you decide to go this way.
+
+Indexing OCR documents without storing the actual content in the index is also relatively simple:
+When building the index document, instead of putting  the actual OCR content into the field, you use
+a **source pointer**. This pointer will tell the plugin from which location to load the OCR content
+during indexing and highlighting.
 
 The advantage of this approach is a *significant* reduction in the amount of memory required for both the client
 and the Solr server, since neither of them has to keep the (potentially very large) OCR document in memory at
@@ -11,7 +16,7 @@ the index size is kept comparatively small, since Solr only needs to store the l
 the (again, potentially very large) contents themselves in the index.
 
 !!! note "Performance"
-    When using external files for highlighting, the performance depends almost exclusively on
+    When using external files for highlighting, the performance depends to a large degree on
     how fast the underlying storage is able to perform random I/O. This is why **we highly recommend
     using flash storage for the documents**.
     
@@ -64,7 +69,7 @@ POST http://solrhost:8983/solr/corename/update
 For indexing and highlighting, Solr will load the contents of the `ocrdoc-1_1.xml`, `ocrdoc-1_2.xml` and 
 `ocrdoc-1_2.xml` as a single continuous text.
 
-## One or more partial files per Solr document
+## Advanced: One or more *partial* files per Solr document
 
 A more complicated situation arises if the Solr documents need to refer to *parts* of one or more files on
 disk. This happens for example when you have scans of bound newspaper volumes, which frequently consist
@@ -97,18 +102,29 @@ POST http://solrhost:8983/solr/corename/update
 ]
 ```
 
-As before, we concateneate multiple file paths with the `+` character. The source regions for each file are
+As before, we concatenate multiple file paths with the `+` character. The source regions for each file are
 listed as **comma-separated byte-regions** inside of square brackets.
 
 The format of the regions is inspired by [Python's slicing syntax](https://docs.python.org/3/reference/expressions.html#slicings) and can take these forms:
 
-- `start:` → Evertying from byte offset `start` to the end of the file
+- `start:` → Everything from byte offset `start` to the end of the file
 - `start:end` → Everything between the byte offsets `start` (inclusive) and `end` (exclusive)
 - `:end` → Everything from the start of the file to byte offset `end` (exclusive)
 
+!!! caution "Region Requirements""
+    - The concatenated content of your regions must be a half-way valid XML structure. While we
+      tolerate *unclosed tags or unmatched closing tags* (they often can't be avoided), other
+      errors such as partial tags (i.e. a missing `<` or `>`) will lead  to an error during indexing.
+    - To get correct page numbers in your responses, make sure that you include any and all page
+      openings for your content in the set of regions. For example, if your document is an article
+      that spans from the bottom of one page to the top of the next, you will have to include a region
+      for the opening element of the first page so we can determine the page for the first part of the
+      article during highlighting
+
+
 !!! caution "Byte Offsets"
     The region offsets are expected as **byte offsets**. Take care that the start and end of each region
-    falls on the start of a valid unicode byte sequence, and not in the middle of a multi-byte sequence.
+    fall on the start of a valid unicode byte sequence, and not in the middle of a multi-byte sequence.
     Care needs to be taken when determining the offsets, since obtaining byte offsets for UTF8-encoded
     text files is difficult in some programming languages (most notoriously Java, use the
     [`net.byteseek:byteseek`](https://github.com/nishihatapalmer/byteseek) package)

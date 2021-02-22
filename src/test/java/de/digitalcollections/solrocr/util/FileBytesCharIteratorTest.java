@@ -20,8 +20,8 @@ class FileBytesCharIteratorTest {
   private static final Pattern OFFSET_PAT = Pattern.compile("\\s(.+?)⚑(\\d+)");
 
   private final Path ocrPath = Paths.get("src/test/resources/data/miniocr.xml");
-  private Map<Integer, String> words;
-  private FileBytesCharIterator it;
+  private final Map<Integer, String> words;
+  private final FileBytesCharIterator it;
 
   public FileBytesCharIteratorTest() throws IOException {
     it = new FileBytesCharIterator(ocrPath, null);

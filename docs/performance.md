@@ -3,6 +3,14 @@
 Highlighting based on locally stored files can take a long time, depending on the environment. This section gives some
 hints on potential knobs to tune to improve the performance.
 
+!!! note "Use JDK >= 9"
+    Java 9 introduced a feature called [String Compaction](https://openjdk.java.net/jeps/254)
+    that has a significant impact on several hot code paths used during OCR highlighting.
+    **You can expect a reduction in runtime of more than 50% if you use a JVM with string compaction
+    enabled compared to one without** (assuming you're running on flash storage).
+    We highly recommend using the latest LTS OpenJDK version released after Java 9, which
+    as of January 2021 is OpenJDK 11.
+
 ## Performance Analysis
 Before you start tuning the plugin, it is important to spend some time on analyzing the nature of the problems:
 
@@ -57,6 +65,9 @@ Example configuration tuned for remote NFS storage mounted with `rsize=65536`:
 Another option to influence the performance of the plugin is to tune some runtime options for highlighting.
 For any of these, refer to the [Querying section](https://dbmdz.github.io/solr-ocrhighlighting/query/) for more details.
 
+- If you're storing documents at the page-level in the index, you can set the `hl.ocr.trackPages` parameter to `false`
+  (default is `true`). This will skip seeking backward in the input from the match position to find the containing
+  page, which can be costly.
 - Tune the number of candidate passages for ranking with `hl.ocr.maxPassages`, which defaults to `100`. Lowering this is
   better for performance, but means that the resulting snippets might not be the most relevant in the document.
 - Change the limit (`hl.ocr.limitBlock`) and/or context block types (`hl.ocr.contextBlock`) to something lower in the

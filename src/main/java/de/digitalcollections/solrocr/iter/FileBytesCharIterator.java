@@ -19,13 +19,13 @@ import java.nio.file.StandardOpenOption;
  *             that don't mess with the index themselves.
  */
 public class FileBytesCharIterator implements IterableCharSequence, AutoCloseable {
-
+  private final byte[] copyBuf = new byte[128*1024];
   private final Path filePath;  // For copy-constructor
   private final FileChannel chan;
   private final MappedByteBuffer buf;
   private final int numBytes;
-  private final Charset charset;
   private final SourcePointer ptr;
+  private final Charset charset;
 
   private int current;
 
@@ -118,7 +118,27 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
     byte[] buf = new byte[end - start];
     this.buf.position(start);
     this.buf.get(buf);
-    return new String(buf, StandardCharsets.UTF_8);
+    return new String(buf, charset);
+  }
+
+  public CharSequence subSequence(int start, int end, boolean forceAscii) {
+    if (!forceAscii) {
+      return subSequence(start, end);
+    }
+    if (start < 0 || end < 0 || end > this.numBytes || end < start) {
+      throw new IndexOutOfBoundsException();
+    }
+    int copyLen = end - start;
+    this.buf.position(start);
+    this.buf.get(copyBuf, 0, end - start);
+
+    // Faster pure-ASCII decoding, just treat everything as ASCII, a good chunk faster than
+    // `new String(buf, StandardCharsets.US_ASCII)`, which has a few sanity checks.
+    // Ignore the deprecation warning, the drawbacks of this constructor don't concern us
+    // in this case, since we don't care about misinterpreted codepoints.
+    // Bonus: With the String compaction available in JDK >= 9, this should be *significantly*
+    //        faster than the constructor with an explicit charset.
+    return new String(copyBuf, 0, 0, copyLen);
   }
 
   @Override

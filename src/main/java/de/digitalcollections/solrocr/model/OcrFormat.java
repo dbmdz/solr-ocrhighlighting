@@ -1,26 +1,53 @@
 package de.digitalcollections.solrocr.model;
 
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
+import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
+import de.digitalcollections.solrocr.formats.OcrParser;
+import de.digitalcollections.solrocr.iter.BreakLocator;
+import de.digitalcollections.solrocr.iter.IterableCharSequence;
+import de.digitalcollections.solrocr.lucene.OcrPassageFormatter;
+import de.digitalcollections.solrocr.lucene.filters.OcrCharFilter;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.text.BreakIterator;
+import java.util.Set;
+import org.apache.lucene.analysis.CharFilter;
+import org.apache.lucene.search.uhighlight.PassageFormatter;
 
 /**
  * Provides access to format-specific {@link BreakIterator} and {@link OcrPassageFormatter} instances.
  */
 public interface OcrFormat {
-  /** Get a BreakIterator that splits the content according to the break parameters
+  /** Get a {@link BreakLocator} that splits the content on a given block type.
    *
-   * @param breakBlock the type of {@link OcrBlock} that the input document is split on to build passages
-   * @param limitBlock the type of {@link OcrBlock} that a passage may not cross
-   * @param contextSize the number of break blocks in a context that forms a highlighting passage
+   * @param blockTypes the type(s) of {@link OcrBlock} that the input document is split on
+   * @return the {@link BreakLocator} instance
    * */
-  BreakIterator getBreakIterator(OcrBlock breakBlock, OcrBlock limitBlock, int contextSize);
+  BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes);
+
+  /** Get the parser for the format.
+   *
+   * @param input the input reader to parse {@link OcrBox}es from
+   * @param features Desired features for the parsers
+   * @return a parser instance configured with the requested parsing features
+   */
+  OcrParser getParser(Reader input, OcrParser.ParsingFeature... features);
+
+  /** Parse an {@link OcrPage} from a string fragment of the page markup.
+   *
+   * <p>Implementers are safe to assume that {@code pageFragment} begins with the opening tag of
+   * a page, as determined by the format's {@link OcrFormat#getBreakLocator(IterableCharSequence, OcrBlock[])}
+   * output for the {@link OcrBlock#PAGE} block type.
+   *
+   * @param pageFragment The beginning of a page's markup, i.e. a String starting with {@code <$pageElem}
+   * @return the parsed {@link OcrPage}
+   */
+  OcrPage parsePageFragment(String pageFragment);
 
   /**
-   * Get a PassageFormatter that builds OCR snippets from passages
+   * Get a {@link PassageFormatter} that builds OCR snippets from passages
    *
-   * @param prehHighlightTag the tag to put in the snippet text before a highlighted region, e.g. &lt;em&gt;
+   * @param preHighlightTag the tag to put in the snippet text before a highlighted region, e.g. &lt;em&gt;
    * @param postHighlightTag the tag to put in the snippet text after a highlighted region, e.g. &lt;/em&gt;
    * @param absoluteHighlights whether the coordinates for highlights should be absolute, i.e. relative to the page
    *                           and not the containing snippet
@@ -28,10 +55,28 @@ public interface OcrFormat {
    *                   be more precise than the image "spans", since the latter are restricted to the granularity of
    *                   the OCR document.
    */
-  OcrPassageFormatter getPassageFormatter(
-      String prehHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans);
+  default OcrPassageFormatter getPassageFormatter(
+      String preHighlightTag, String postHighlightTag,  boolean absoluteHighlights, boolean alignSpans, boolean trackPages) {
+    return new OcrPassageFormatter(preHighlightTag, postHighlightTag, absoluteHighlights, alignSpans, trackPages, this);
+  }
 
-  Reader filter(PeekingReader input);
+  /** Get a {@link CharFilter} implementation for the OCR format that outputs plaintext.
+   *
+   * If the filter supports outputting alternatives, it must output the alternatives
+   *
+   * @param input Input reader for OCR markup
+   * @param expandAlternatives whether outputting alternatives from the OCR markup is desired.
+   * @return a {@link CharFilter} implementation that outputs plaintext from the OCR.
+   */
+  default Reader filter(PeekingReader input, boolean expandAlternatives) {
+    Set<OcrParser.ParsingFeature> features = Sets.newHashSet(
+        OcrParser.ParsingFeature.TEXT, OcrParser.ParsingFeature.OFFSETS);
+    if (expandAlternatives) {
+      features.add(OcrParser.ParsingFeature.ALTERNATIVES);
+    }
+    return new OcrCharFilter(
+        getParser(input, features.toArray(new OcrParser.ParsingFeature[]{})));
+  }
 
   /**
    * Check if the string chunk contains data formatted according to the implementing format.
@@ -40,4 +85,18 @@ public interface OcrFormat {
    * @return whether the chunk is formatted according to the implementing format.
    */
   boolean hasFormat(String ocrChunk);
+
+  int getLastContentStartIdx(String content);
+
+  int getFirstContentEndIdx(String content);
+
+  /** Get the range of positions contained by the word containing the given position.
+   *
+   * This default implementation is valid for OCR formats that encode word text as character
+   * nodes inside of a containing element (like hOCR and MiniOCR). For other formats, override. **/
+  default Range<Integer> getContainingWordLimits(String fragment, int position) {
+    return Range.closedOpen(
+        fragment.lastIndexOf('>', position) + 1,
+        fragment.indexOf('<', position + 1));
+  }
 }

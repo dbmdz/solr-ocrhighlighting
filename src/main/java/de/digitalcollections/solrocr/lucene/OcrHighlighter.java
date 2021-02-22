@@ -1,28 +1,28 @@
 package de.digitalcollections.solrocr.lucene;
 
 import com.google.common.collect.ImmutableSet;
-import de.digitalcollections.solrocr.model.OcrBlock;
-import de.digitalcollections.solrocr.model.OcrFormat;
-import de.digitalcollections.solrocr.formats.OcrPassageFormatter;
-import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.formats.alto.AltoFormat;
 import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
-import de.digitalcollections.solrocr.formats.mini.MiniOcrFormat;
-import de.digitalcollections.solrocr.solr.OcrHighlightParams;
+import de.digitalcollections.solrocr.formats.miniocr.MiniOcrFormat;
+import de.digitalcollections.solrocr.iter.BreakLocator;
+import de.digitalcollections.solrocr.iter.ContextBreakLocator;
 import de.digitalcollections.solrocr.iter.ExitingIterCharSeq;
 import de.digitalcollections.solrocr.iter.FileBytesCharIterator;
-import de.digitalcollections.solrocr.util.HighlightTimeout;
 import de.digitalcollections.solrocr.iter.IterableCharSequence;
 import de.digitalcollections.solrocr.iter.MultiFileBytesCharIterator;
+import de.digitalcollections.solrocr.model.OcrBlock;
+import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrHighlightResult;
-import de.digitalcollections.solrocr.util.PageCacheWarmer;
+import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.solr.OcrHighlightParams;
+import de.digitalcollections.solrocr.util.HighlightTimeout;
+import de.digitalcollections.solrocr.util.PageCacheWarmer;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -87,7 +87,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private static final Constructor<UHComponents> hlComponentsConstructorLegacy;
   private static final Method offsetSourceGetterLegacy;
   private static final Method extractAutomataLegacyMethod;
-  public static Function<Query, Collection<Query>> nopRewriteFn = q -> null;
 
   static {
     try {
@@ -278,22 +277,32 @@ public class OcrHighlighter extends UnifiedHighlighter {
           int docInIndex = docInIndexes[docIdx];//original input order
           assert resultByDocIn[docInIndex] == null;
           OcrFormat ocrFormat = getFormat(content);
-          String limitBlock = params.get(OcrHighlightParams.LIMIT_BLOCK, "block").toUpperCase();
-          BreakIterator breakIter = ocrFormat.getBreakIterator(
-              OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase()),
-              limitBlock.equals("NONE") ? null : OcrBlock.valueOf(limitBlock),
-              params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
+          String limitBlockParam = params.get(OcrHighlightParams.LIMIT_BLOCK, "block");
+          OcrBlock[] limitBlocks = null;
+          if (!limitBlockParam.equalsIgnoreCase("NONE")) {
+            limitBlocks = OcrBlock.getHierarchyFrom(
+                OcrBlock.valueOf(limitBlockParam.toUpperCase())).toArray(new OcrBlock[0]);
+          }
+          OcrBlock contextBlock = OcrBlock.valueOf(
+              params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase());
+          BreakLocator contextLocator = ocrFormat.getBreakLocator(content, contextBlock);
+          BreakLocator limitLocator = limitBlocks == null
+              ? null
+              : ocrFormat.getBreakLocator(content, limitBlocks);
+          BreakLocator breakLocator = new ContextBreakLocator(
+              contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
           OcrPassageFormatter formatter = ocrFormat.getPassageFormatter(
               params.get(HighlightParams.TAG_PRE, "<em>"),
               params.get(HighlightParams.TAG_POST, "</em>"),
               params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false),
-              params.getBool(OcrHighlightParams.ALIGN_SPANS, false));
+              params.getBool(OcrHighlightParams.ALIGN_SPANS, false),
+              params.getBool(OcrHighlightParams.TRACK_PAGES, true));
           int snippetLimit = Math.max(
               maxPassages[fieldIdx],
               params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
           try {
             resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
-                leafReader, docId, breakIter, formatter, content,
+                leafReader, docId, breakLocator, formatter, content,
                 params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
           } catch (ExitingIterCharSeq.ExitingIterCharSeqException | ExitableDirectoryReader.ExitingReaderException e) {
             log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
@@ -393,7 +402,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return fieldValues;
   }
 
-  private OcrFormat getFormat(IterableCharSequence content) throws IOException {
+  private OcrFormat getFormat(IterableCharSequence content) {
     // Sample the first 4k characters to determine the format
     String sampleChunk = content.subSequence(0, Math.min(4096, content.length())).toString();
     return FORMATS.stream()
@@ -406,7 +415,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     // This method and some associated types changed in v8.2 and v8.4, so we have to delegate to an adapter method for
     // these versions
     if (VERSION_IS_PRE84) {
-      return getOcrFieldHighligherLegacy(field, query, allTerms, maxPassages);
+      return getOcrFieldHighlighterLegacy(field, query, allTerms, maxPassages);
     }
 
     Predicate<String> fieldMatcher = getFieldMatcher(field);
@@ -424,7 +433,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
         getScorer(field), maxPassages, getMaxNoHighlightPassages(field));
   }
 
-  private OcrFieldHighlighter getOcrFieldHighligherLegacy(
+  private OcrFieldHighlighter getOcrFieldHighlighterLegacy(
       String field, Query query, Set<Term> allTerms,  int maxPassages) {
     Predicate<String> fieldMatcher = getFieldMatcher(field);
     BytesRef[] terms = filterExtractedTerms(fieldMatcher, allTerms);
@@ -574,7 +583,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       }
 
       @Override
-      public int nextDoc() throws IOException {
+      public int nextDoc() {
         idx++;
         return docID();
       }

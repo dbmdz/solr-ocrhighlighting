@@ -26,9 +26,9 @@ class MultiFileBytesCharIteratorTest {
       Paths.get("src/test/resources/data/multi_txt/part_4.txt"));
   private final Path utf8CompletePath;
 
-  private Map<Integer, Character> utf8Chars;
-  private MultiFileBytesCharIterator utf8It;
-  private String utf8Text;
+  private final Map<Integer, Character> utf8Chars;
+  private final MultiFileBytesCharIterator utf8It;
+  private final String utf8Text;
   private MultiFileBytesCharIterator asciiIt;
   private String asciiText;
 

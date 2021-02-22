@@ -73,8 +73,13 @@ public class ExitingIterCharSeq implements IterableCharSequence {
   }
 
   @Override
-  public CharSequence subSequence(int start, int end) {
-    return iter.subSequence(start, end);
+  public CharSequence subSequence(int start, int end, boolean forceAscii) {
+    untilNextCheck = Math.max(0, untilNextCheck - (end - start));
+    if (untilNextCheck == 0) {
+      checkAndThrow();
+      untilNextCheck = CHARS_BETWEEN_CHECKS;
+    }
+    return iter.subSequence(start, end, forceAscii);
   }
 
   @Override

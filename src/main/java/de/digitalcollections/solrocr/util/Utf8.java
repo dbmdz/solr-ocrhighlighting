@@ -118,7 +118,7 @@ public final class Utf8 {
       int hiBits = ((buf.get(i) & 0xFF) >> 4) & 0xF;
       switch (hiBits) {
         case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
-          // U+0000 to U+0080 are 1 byte UTF-8 and 1 char, so no changes neccessary
+          // U+0000 to U+0080 are 1 byte UTF-8 and 1 char, so no changes necessary
           i++;
           break;
         case 0xC: case 0xD:
@@ -132,7 +132,7 @@ public final class Utf8 {
           i += 3;
           break;
         case 0xF:
-          // U+10000 to U+10FFFF are 4 byts UTF-8 and 2 char, so the char length is decremented by two
+          // U+10000 to U+10FFFF are 4 bytes UTF-8 and 2 char, so the char length is decremented by two
           charLength -= 2;
           i += 4;
           break;

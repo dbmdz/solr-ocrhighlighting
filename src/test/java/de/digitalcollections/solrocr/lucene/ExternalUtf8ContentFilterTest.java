@@ -1,8 +1,6 @@
 package de.digitalcollections.solrocr.lucene;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.google.common.collect.ImmutableList;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilter;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
@@ -25,6 +23,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.lucene.analysis.CharFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExternalUtf8ContentFilterTest {
   private ExternalUtf8ContentFilterFactory fac;
@@ -60,9 +60,9 @@ public class ExternalUtf8ContentFilterTest {
     String full = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
     String filtered = IOUtils.toString(filter);
     assertThat(filtered).isNotEmpty();
-    assertThat(filter.correctOffset(full.indexOf("id='page_108'"))).isEqualTo(3033238);
-    assertThat(filter.correctOffset(full.indexOf("Sonnenw"))).isEqualTo(3035824);
-    assertThat(filter.correctOffset(full.indexOf("id='word_108_252'"))).isEqualTo(3066094);
+    assertThat(filter.correctOffset(full.indexOf("id='page_108'"))).isEqualTo(3033402);
+    assertThat(filter.correctOffset(full.indexOf("Sonnenw"))).isEqualTo(3035988);
+    assertThat(filter.correctOffset(full.indexOf("id='word_108_252'"))).isEqualTo(3066258);
   }
 
   @Test
@@ -76,9 +76,9 @@ public class ExternalUtf8ContentFilterTest {
     ExternalUtf8ContentFilter filter = (ExternalUtf8ContentFilter) fac.create(new StringReader(fieldValue));
     String filtered = IOUtils.toString(filter);
     assertThat(filtered).isEqualTo(subRegion);
-    assertThat(filter.correctOffset(subRegion.indexOf("id='page_108'"))).isEqualTo(3033238);
-    assertThat(filter.correctOffset(subRegion.indexOf("Sonnenw"))).isEqualTo(3035824);
-    assertThat(filter.correctOffset(subRegion.indexOf("id='word_108_252'"))).isEqualTo(3066094);
+    assertThat(filter.correctOffset(subRegion.indexOf("id='page_108'"))).isEqualTo(3033402);
+    assertThat(filter.correctOffset(subRegion.indexOf("Sonnenw"))).isEqualTo(3035988);
+    assertThat(filter.correctOffset(subRegion.indexOf("id='word_108_252'"))).isEqualTo(3066258);
     assertThat(filtered).contains("<div class='ocr_page' id='page_108'");
     assertThat(filtered).doesNotContain("<div class='ocr_page' id='page_109'");
   }

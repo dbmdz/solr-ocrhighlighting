@@ -138,7 +138,7 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
           int regionSize = region.end - region.start;
           region.start = charOffset;
           region.startOffset = byteOffset;
-          // Read region, determine character offsett of region end
+          // Read region, determine character offset of region end
           charOffset += getUtf8DecodedLength(fChan, buf, regionSize);
           byteOffset += regionSize;
           region.end = charOffset;

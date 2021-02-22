@@ -55,14 +55,17 @@ public class PeekingReader extends BaseCharFilter {
     int writeOff = off;
     // Empty start peek-buffer first
     if (peekStartOffset < peekStart.length) {
-      int restLen = Math.min(peekStart.length - peekStartOffset, cbuf.length - off);
+      int restLen = Math.min(peekStart.length - peekStartOffset, len);
       System.arraycopy(peekStart, peekStartOffset, cbuf, writeOff, restLen);
       numRead += restLen;
       writeOff += numRead;
       peekStartOffset += numRead;
     }
-    if (len > numRead) {
-      numRead += this.input.read(cbuf, writeOff, len - numRead);
+    if (peekStartOffset == peekStart.length && len > numRead) {
+      int r = this.input.read(cbuf, writeOff, len - numRead);
+      if (numRead == 0 || r > 0) {
+        numRead += r;
+      }
     }
 
     // Nothing read, no need to update back context

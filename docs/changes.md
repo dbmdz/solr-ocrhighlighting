@@ -1,3 +1,55 @@
+## 0.6.0 (2021-01-??)
+This is a major new release with significant improvements in stability, accuracy and most importantly performance.
+Uupdating is **highly** recommended, especially for ALTO users, who can expect a speed-up in indexing of roughly
+**6000% (i.e. 60x as fast)**. We also recommend updating your JVM to at least Java 11 (LTS), since Java 9 introduced
+a feature that speeds up highlighting significantly.
+
+**Performance:**
+
+- **Indexing performance drastically improved for ALTO, worse for hOCR and MiniOCR.** Under the
+  hood we switched from Regular Expression and Automaton-based parsing to a proper XML parser to support
+  more features and improve correctness.
+  This drastically improved indexing performance for ALTO (6000% speedup, the previous
+  implementation was pathologically slow), but caused a big hit for hOCR (~57% slower) and a slight hit
+  for MiniOCR (~15% slower). These numbers are based on benchmarks done on a ramdisk, so the changes might
+  be less pronounced in practice, depending on the choice of storage.
+  While the performance losses for hOCR and MiniOCR are disappointing, the
+  "proper" parsing allows for much more correctness in handling edge cases and new features like indexing alternatives.
+  We are looking into options to offer a way to get the old performance back
+  (at the cost of features/accuracy), this will likely be part of the next release.
+- **Highlighting performance significantly improved for all formats.**
+  The time for highlighting a single snippet has gone down for all formats
+  (ALTO 12x as fast, hOCR 10x as fast, MiniOCR 6x as fast). Again, these numbers are based on benchmarks
+  performed on a ramdisk and might be less pronounced in practice, depending on the storage layer.
+
+**New Feature:**
+
+- **Indexing alternative forms encoded in the source OCR files.**
+  All supported formats offer a way to encode alternative readings for recognized words. The plugin can now
+  parse these from the input files and index them at the same position as the default form. This is a form
+  of index-time term expansion (much like the [Synonym Graph Filter](https://lucene.apache.org/solr/guide/8_7/filter-descriptions.html#synonym-graph-filter)
+  shipping with Solr). For example, if you OCR file has the alternatives `christmas` and `christrias` for the token
+  `clistrias` in the span `presents on clistrias eve`, users would be able to search for `"presents christmas"` and
+  `"presents clistrias"` and would get the correct match in both cases, both with full highlighting.
+  Refer to the corresponding [section in the documentation](../alternatives) for instructions on setting it up.
+
+
+**API changes:**
+
+- **Add a new `hl.ocr.trackPages` parameter to disable page tracking during highlighting.**
+  This is intended for users who index one page per document, in these cases seeking backwards to determine
+  the page identifier a match is not needed, since the containing document contains enough information to
+  identify the page, improving highlighting performance due to the need for less backwards-seeking in the
+  input files.
+- **Add new `expandAlternatives` attribute to `OcrCharFilterFactory`.** This enables the parsing of
+   alternative readings from input files (see above and the [corresponding section in the documentation](../alternatives))
+
+**Bugfixes:**
+
+- **Improvements in the handling of hyphenated terms.** This release fixes a
+  few bugs in edge cases when handling hyphenated words during indexing,
+  highlighting and snippet text generation.
+
 ## 0.5.0 (2020-10-07)
 No breaking changes this time around, but a few essential bugfixes, more stability and a new feature.
 

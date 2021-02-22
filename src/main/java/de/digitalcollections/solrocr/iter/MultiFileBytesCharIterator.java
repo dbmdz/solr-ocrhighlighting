@@ -20,7 +20,6 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
 
   private final List<Path> paths;
   private final TreeMap<Integer, Path> offsetMap;
-  private final Map<Path, Integer> pathToOffset;
   private final Charset charset;
   private final int numBytes;
   private final SourcePointer ptr;
@@ -32,11 +31,9 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
     this.paths = filePaths;
     this.charset = charset;
     this.offsetMap = new TreeMap<>();
-    this.pathToOffset = new HashMap<>();
     int offset = 0;
     for (Path path : filePaths) {
       offsetMap.put(offset, path);
-      pathToOffset.put(path, offset);
       offset += Files.size(path);
     }
     this.numBytes = offset;
@@ -101,21 +98,21 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
   }
 
   @Override
-  public CharSequence subSequence(int start, int end) {
+  public CharSequence subSequence(int start, int end, boolean forceAscii) {
     if (start < 0 || end < 0 || end > this.numBytes || end < start) {
       throw new IndexOutOfBoundsException();
     }
     if (offsetMap.floorKey(start).equals(offsetMap.floorKey(end))) {
       // Easy mode, start and end are in the same file
       IterableCharSequence seq = getCharSeq(start);
-      return seq.subSequence(adjustOffset(start), adjustOffset(end));
+      return seq.subSequence(adjustOffset(start), adjustOffset(end), forceAscii);
     } else {
       IterableCharSequence seq = getCharSeq(start);
       int adjustedStart = adjustOffset(start);
-      StringBuilder sb = new StringBuilder(seq.subSequence(adjustedStart, seq.length()));
+      StringBuilder sb = new StringBuilder(seq.subSequence(adjustedStart, seq.length(), true));
       seq = getCharSeq(end);
       int adjustedEnd = adjustOffset(end);
-      sb.append(seq.subSequence(0, adjustedEnd));
+      sb.append(seq.subSequence(0, adjustedEnd, forceAscii));
       return sb.toString();
     }
   }

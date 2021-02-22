@@ -55,6 +55,7 @@
     <version.commons-text>1.9</version.commons-text>
     <version.junit>5.7.1</version.junit>
     <version.log4j>2.11.1</version.log4j>
+    <version.mockito>2.23.4</version.mockito>
     <version.slf4j>1.7.30</version.slf4j>
     <version.solr>8.7.0</version.solr>
 
@@ -80,6 +81,12 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-test-framework</artifactId>
+      <version>${version.solr}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-analysis-extras</artifactId>
       <version>${version.solr}</version>
       <scope>test</scope>
     </dependency>
@@ -111,6 +118,12 @@
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
       <version>${version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${version.mockito}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

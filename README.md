@@ -17,6 +17,14 @@ values. This means that all options and query types supported by the
 works transparently with non-OCR fields and just lets the default
 implementation handle those.
 
+In addition to improved highlighting for OCR, the plugin is able to [index
+alternative readings](https://dbmdz.github.io/solr-ocrhighlighting/alternatives/)
+listed in the markup. For example, if you OCR file
+has the alternatives `christmas` and `christrias` for the token
+`clistrias` in the span `presents on clistrias eve`, users would be able
+to search for `"presents christmas"` and `"presents clistrias"` and would
+get the correct match in both cases, both with full highlighting.
+
 The plugin **works with all Solr versions >= 7.5**.
 
 ## Features
@@ -70,6 +78,8 @@ For more information about the example setup, refer to the [documentation](https
 ## Limitations
 
 - The supported file size is limited to 2GiB, since Lucene uses 32 bit integers throughout for storing offsets
+- Snippets only contain matching alternative terms if these terms are isolated matches, or if part of
+  a phrase match, are at the beginning or end of a highlight span.
 
 
 ## Contributing

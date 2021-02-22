@@ -1,10 +1,10 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
 import com.google.common.collect.ImmutableSet;
+import de.digitalcollections.solrocr.formats.miniocr.MiniOcrFormat;
 import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.formats.alto.AltoFormat;
 import de.digitalcollections.solrocr.formats.hocr.HocrFormat;
-import de.digitalcollections.solrocr.formats.mini.MiniOcrFormat;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.util.Map;
@@ -15,8 +15,12 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
  * to convert the input OCR to plaintext.
  */
 public class OcrCharFilterFactory extends CharFilterFactory {
+  public static final String ALTERNATIVE_MARKER = "\u2060\u2060";
+
   private static final int BEGIN_BUF_SIZE = 2048;
   private static final int CTX_BUF_SIZE = 16384;
+
+  private final boolean expandAlternatives;
 
   private static final ImmutableSet<OcrFormat> FORMATS = ImmutableSet.of(
       new HocrFormat(),
@@ -24,19 +28,20 @@ public class OcrCharFilterFactory extends CharFilterFactory {
       new MiniOcrFormat());
 
   public OcrCharFilterFactory(Map<String, String> args) {
-    // We don't take any args at the moment
     super(args);
+    this.expandAlternatives = "true".equals(args.get("expandAlternatives"));
   }
 
   @Override
   public Reader create(Reader input) {
-    PeekingReader peeker = new PeekingReader(input, BEGIN_BUF_SIZE, CTX_BUF_SIZE);
+    PeekingReader peeker = new PeekingReader(
+       new SanitizingXmlFilter(input), BEGIN_BUF_SIZE, CTX_BUF_SIZE);
     OcrFormat fmt = FORMATS.stream()
         .filter(f -> f.hasFormat(peeker.peekBeginning()))
         .findFirst()
         .orElseThrow(() -> new RuntimeException(
             "Could not determine OCR format from chunk: " + peeker.peekBeginning()));
-    Reader formatFilter = fmt.filter(peeker);
+    Reader formatFilter = fmt.filter(peeker, expandAlternatives);
     if (formatFilter == null) {
       return peeker;
     } else {

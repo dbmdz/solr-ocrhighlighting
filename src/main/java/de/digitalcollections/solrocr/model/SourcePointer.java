@@ -18,7 +18,7 @@ public class SourcePointer {
   private static final Logger logger = LoggerFactory.getLogger(SourcePointer.class);
 
   public static class FileSource {
-    public Path path;
+    public final Path path;
     public List<Region> regions;
     public boolean isAscii;
 
@@ -56,9 +56,7 @@ public class SourcePointer {
 
     @Override
     public String toString() {
-      final StringBuffer sb = new StringBuffer("Region{");
-      sb.append(start).append(":").append(end).append("}");
-      return sb.toString();
+      return "Region{" + start + ":" + end + "}";
     }
   }
 
@@ -66,7 +64,7 @@ public class SourcePointer {
       "^(?<path>.+?)(?<isAscii>\\{ascii})?(?:\\[(?<regions>[0-9:,]+)])?$");
 
 
-  public List<FileSource> sources;
+  public final List<FileSource> sources;
 
   public static boolean isPointer(String pointer) {
     if (pointer.startsWith("<")) {
