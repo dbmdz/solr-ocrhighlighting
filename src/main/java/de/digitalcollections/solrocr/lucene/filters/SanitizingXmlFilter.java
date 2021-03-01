@@ -1,9 +1,11 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
+import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
@@ -17,6 +19,7 @@ import org.apache.lucene.analysis.charfilter.BaseCharFilter;
  *  that the XML we feed to the parser is well-formed.
  */
 public class SanitizingXmlFilter extends BaseCharFilter {
+  private static final Set<String> STRIP_TAGS = ImmutableSet.of("br");
   private final Deque<char[]> elementStack = new ArrayDeque<>();
   private char[] carryOver = null;
   private int carryOverIdx = -1;
@@ -61,11 +64,37 @@ public class SanitizingXmlFilter extends BaseCharFilter {
     numRead += numInputRead;
     int idx = off;
     boolean truncated = false;
+    outer:
     while (idx < (off + numRead)) {
+      // Check for invalid entities and try to fix them
+      while (idx < (off + numRead)) {
+        int match = multiIndexOf(cbuf, idx, '<', '&');
+        if (match < 0 || match > (off + numRead)) {
+          // Nothing to do in this buffer
+          break outer;
+        }
+        if (cbuf[match] == '<') {
+          // Start of element, no more entitites to check
+          break;
+        }
+        int entityEnd = multiIndexOf(cbuf, match + 1, '<', ';');
+        if (entityEnd < 0 || cbuf[entityEnd] == '<') {
+          // Illegal entity declaration (doesn't end before next element opening), mask
+          cbuf[match] = '_';
+        }
+        idx = match + 1;
+      }
       int startElem = ArrayUtils.indexOf(cbuf, '<', idx);
       if (startElem < 0 || startElem > (off + numRead)) {
-        // No more elements in this buffer, exit loop
         break;
+      }
+      int nextOpen = ArrayUtils.indexOf(cbuf, '<', startElem + 1);
+      int nextClose = ArrayUtils.indexOf(cbuf, '>', startElem);
+      if (nextOpen >= 0 && nextOpen < nextClose) {
+        // Isolated opening pointy bracket, is illegal XML, but can happen in some bad hOCR
+        cbuf[startElem] = '_';
+        idx += 1;
+        continue;
       }
       int endElem = ArrayUtils.indexOf(cbuf, '>', startElem + 1);
       if (endElem < 0 || endElem > (off + numRead)) {
@@ -119,7 +148,13 @@ public class SanitizingXmlFilter extends BaseCharFilter {
         // New open tag, add to stack
         char[] newTag = new char[tagLen];
         System.arraycopy(cbuf, startTag, newTag, 0, newTag.length);
-        elementStack.push(newTag);
+        if (STRIP_TAGS.contains(new String(newTag))) {
+          for (int i = startElem; i <= endElem; i++) {
+            cbuf[i] = ' ';
+          }
+        } else {
+          elementStack.push(newTag);
+        }
       }
     }
     if (!truncated && numRead < len && !elementStack.isEmpty()) {
@@ -143,5 +178,25 @@ public class SanitizingXmlFilter extends BaseCharFilter {
       numRead += toRead;
     }
     return numRead;
+  }
+
+  /** Variant of {@link org.apache.commons.lang3.ArrayUtils#indexOf(char[], char)} that supports
+   *  looking for multiple values.
+   */
+  private static int multiIndexOf(final char[] array, int startIndex, final char... valuesToFind) {
+    if (array == null) {
+      return -1;
+    }
+    if (startIndex < 0) {
+      startIndex = 0;
+    }
+    for (int i = startIndex; i < array.length; i++) {
+      for (char value : valuesToFind) {
+        if (value == array[i]) {
+          return i;
+        }
+      }
+    }
+    return -1;
   }
 }
