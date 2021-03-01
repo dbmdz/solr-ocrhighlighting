@@ -41,6 +41,10 @@ public class HocrParser extends OcrParser {
         || !"ocrx_word".equals(xmlReader.getAttributeValue("", "class"))) {
       this.seekToNextWord(xmlReader, features.contains(ParsingFeature.PAGES));
     }
+    if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT) {
+      // No words in this document, nothing to do
+      return null;
+    }
 
     OcrBox box = new OcrBox();
     Map<String, String> props = parseTitle(xmlReader.getAttributeValue("", "title"));
