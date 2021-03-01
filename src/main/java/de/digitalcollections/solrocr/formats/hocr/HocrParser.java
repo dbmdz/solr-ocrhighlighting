@@ -87,7 +87,7 @@ public class HocrParser extends OcrParser {
         hyphenEnd.setHyphenInfo(false, dehyphenated);
       } else {
         // No hyphen end, add hyphen character if needed and strip hyphenation info
-        if (!box.getText().endsWith("-")) {
+        if (box.getText() != null && !box.getText().endsWith("-")) {
           box.setText(box.getText() + "-");
         }
         box.setHyphenInfo(null, null);
