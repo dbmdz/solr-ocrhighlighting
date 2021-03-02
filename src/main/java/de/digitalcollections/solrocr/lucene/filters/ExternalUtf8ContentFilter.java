@@ -1,15 +1,18 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
 import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.util.SourceAwareReader;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 
-public class ExternalUtf8ContentFilter extends BaseCharFilter {
+public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceAwareReader {
+
   /**
    * The cumulative offset difference between the input (bytes) and the output (chars)
    * at the current position.
@@ -28,12 +31,19 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
    */
   private int currentOutOffset;
 
+  /**
+   * Source pointer of this reader, used for debugging and error reporting.
+   */
+  private final String pointer;
+
   private boolean nextIsOffset = false;
   private final Queue<SourcePointer.Region> remainingRegions;
   private SourcePointer.Region currentRegion;
 
-  public ExternalUtf8ContentFilter(Reader input, List<SourcePointer.Region> regions) throws IOException {
+  public ExternalUtf8ContentFilter(Reader input, List<SourcePointer.Region> regions, String pointer)
+      throws IOException {
     super(input);
+    this.pointer = pointer;
     this.currentOutOffset = 0;
     this.currentInOffset = 0;
     this.cumulative = 0;
@@ -105,5 +115,10 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter {
         nextIsOffset = true;
       }
     }
+  }
+
+  @Override
+  public Optional<String> getSource() {
+    return Optional.of(this.pointer);
   }
 }

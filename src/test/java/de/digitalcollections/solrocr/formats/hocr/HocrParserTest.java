@@ -1,11 +1,11 @@
 package de.digitalcollections.solrocr.formats.hocr;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
 import de.digitalcollections.solrocr.model.OcrBox;
-import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrPage;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -153,4 +153,22 @@ public class HocrParserTest {
         .allMatch(b -> b.getTrailingChars().contains(" "));
   }
 
+  @Test
+  public void testParsingErrorBeginningHasSource() throws XMLStreamException {
+    Path p = Paths.get("src/test/resources/data/multicolumn.hocr");
+    String ptr = p.toString() + "[5000:8000]";
+    CharFilter input = (CharFilter) filterFac.create(new StringReader(ptr));
+    assertThatThrownBy(() -> new HocrParser(input))
+        .hasMessageContaining(ptr);
+  }
+
+  @Test
+  public void testParsingErrorEndHasSource() throws XMLStreamException {
+    Path p = Paths.get("src/test/resources/data/multicolumn.hocr");
+    String ptr = p.toString() + "[3275:96251]";
+    CharFilter input = (CharFilter) filterFac.create(new StringReader(ptr));
+    OcrParser parser = new HocrParser(input);
+    assertThatThrownBy(() -> parser.stream().count())
+        .hasMessageContaining(ptr);
+  }
 }
