@@ -66,7 +66,7 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       List<SourcePointer.Region> charRegions = pointer.sources.stream()
           .flatMap(s -> s.regions.stream())
           .collect(Collectors.toList());
-      return new ExternalUtf8ContentFilter(new BufferedReader(r), charRegions);
+      return new ExternalUtf8ContentFilter(new BufferedReader(r), charRegions, ptrStr);
     } catch (IOException e) {
       throw new RuntimeException("Error while reading external content: " + e.toString(), e);
     }

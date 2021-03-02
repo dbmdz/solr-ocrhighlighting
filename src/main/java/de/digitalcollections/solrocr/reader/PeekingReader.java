@@ -1,12 +1,14 @@
 package de.digitalcollections.solrocr.reader;
 
+import de.digitalcollections.solrocr.util.SourceAwareReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Optional;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 
 /** Reader class that supports "peeking forward" into the beginning of the stream and "peeking backward" into a fixed
  * window of previously read data. */
-public class PeekingReader extends BaseCharFilter {
+public class PeekingReader extends BaseCharFilter implements SourceAwareReader {
   /** Buffer to hold the beginning of the input reader. */
   private final char[] peekStart;
 
@@ -132,5 +134,14 @@ public class PeekingReader extends BaseCharFilter {
   /** Get the maximum supported size of the back context. */
   public int getMaxBackContextSize() {
     return this.backContext.length;
+  }
+
+  @Override
+  public Optional<String> getSource() {
+    if (this.input instanceof SourceAwareReader) {
+      return ((SourceAwareReader) this.input).getSource();
+    } else {
+      return Optional.empty();
+    }
   }
 }

@@ -89,7 +89,13 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     // Register custom named entities used by hOCR
     xmlInputFactory.getConfig().setCustomInternalEntities(ENTITIES);
     this.xmlReader = (XMLStreamReader2) xmlInputFactory.createXMLStreamReader(this.input);
-    this.nextWord = this.readNext(this.xmlReader, this.features);
+    try {
+      this.nextWord = this.readNext(this.xmlReader, this.features);
+    } catch (XMLStreamException e) {
+      throw new RuntimeException(String.format(
+          "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on " +
+          "complete tags! (Source was: %s)", this.input.getSource().orElse("[unknown]")), e);
+    }
   }
 
   @Override
@@ -117,9 +123,9 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
         this.nextWord = readNext(xmlReader, features);
       } while (hasNext() && this.nextWord == null);
     } catch (XMLStreamException e) {
-      throw new RuntimeException(
+      throw new RuntimeException(String.format(
           "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on " +
-          "complete tags!",  e);
+          "complete tags! (Source was: %s)", this.input.getSource().orElse("[unknown]")), e);
     }
     return out;
   }

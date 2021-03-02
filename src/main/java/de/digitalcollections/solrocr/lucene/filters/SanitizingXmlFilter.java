@@ -1,10 +1,12 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
 import com.google.common.collect.ImmutableSet;
+import de.digitalcollections.solrocr.util.SourceAwareReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
@@ -18,7 +20,8 @@ import org.apache.lucene.analysis.charfilter.BaseCharFilter;
  *  a problem since we used a RegEx-based parsing approach, but with the new StAX-based approach we have to make sure
  *  that the XML we feed to the parser is well-formed.
  */
-public class SanitizingXmlFilter extends BaseCharFilter {
+public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareReader {
+
   private static final Set<String> STRIP_TAGS = ImmutableSet.of("br");
   private final Deque<char[]> elementStack = new ArrayDeque<>();
   private char[] carryOver = null;
@@ -198,5 +201,14 @@ public class SanitizingXmlFilter extends BaseCharFilter {
       }
     }
     return -1;
+  }
+
+  @Override
+  public Optional<String> getSource() {
+    if (this.input instanceof SourceAwareReader) {
+      return ((SourceAwareReader) this.input).getSource();
+    } else {
+      return Optional.empty();
+    }
   }
 }

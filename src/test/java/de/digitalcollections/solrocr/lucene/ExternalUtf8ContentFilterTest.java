@@ -1,6 +1,8 @@
 package de.digitalcollections.solrocr.lucene;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.ImmutableList;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilter;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
@@ -23,8 +25,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.lucene.analysis.CharFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExternalUtf8ContentFilterTest {
   private ExternalUtf8ContentFilterFactory fac;
@@ -56,7 +56,8 @@ public class ExternalUtf8ContentFilterTest {
     Path p = Paths.get("src/test/resources/data/hocr.html");
     CharFilter filter = new ExternalUtf8ContentFilter(
         new BufferedReader(new FileReader(p.toFile())),
-        ImmutableList.of(new SourcePointer.Region(0, (int) p.toFile().length())));
+        ImmutableList.of(new SourcePointer.Region(0, (int) p.toFile().length())),
+        p.toString());
     String full = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
     String filtered = IOUtils.toString(filter);
     assertThat(filtered).isNotEmpty();
