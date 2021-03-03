@@ -88,6 +88,9 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     xmlInputFactory.getConfig().doSupportDTDs(false);
     // Register custom named entities used by hOCR
     xmlInputFactory.getConfig().setCustomInternalEntities(ENTITIES);
+    // Fallback for unknown undeclared entities: just output them verbatim
+    xmlInputFactory.getConfig().setUndeclaredEntityResolver(
+        (publicID, systemID, baseURI, namespace) -> String.format("&amp;%s;", namespace));
     this.xmlReader = (XMLStreamReader2) xmlInputFactory.createXMLStreamReader(this.input);
     try {
       this.nextWord = this.readNext(this.xmlReader, this.features);
