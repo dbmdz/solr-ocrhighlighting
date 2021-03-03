@@ -110,14 +110,19 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
         break;
       }
       idx = endElem + 1;
-      if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-')) {
+      if (cbuf[startElem + 1] == '?' && cbuf[endElem - 1] != '?') {
+        // Illegal processing instruction, fix by stripping the question mark
+        cbuf[startElem + 1] = '_';
+      }
+      if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!'
+          && cbuf[startElem + 2] == '-')) {
         // XML Declaration or comment, nothing to do
         continue;
       }
 
-
       // Strip out duplicate doctype declarations, these break the multidoc parsing mode in Woodstox
-      if (cbuf[startElem  + 1] == '!' && (cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd')) {
+      if (cbuf[startElem + 1] == '!' && (cbuf[startElem + 2] == 'D'
+          || cbuf[startElem + 2] == 'd')) {
         if (hasDocType) {
           for (int i = startElem; i <= endElem; i++) {
             cbuf[i] = ' ';

@@ -1,6 +1,7 @@
 package de.digitalcollections.solrocr.formats;
 
 import com.ctc.wstx.api.WstxInputProperties;
+import com.ctc.wstx.exc.WstxLazyException;
 import com.ctc.wstx.stax.WstxInputFactory;
 import com.google.common.collect.ImmutableMap;
 import de.digitalcollections.solrocr.model.OcrBox;
@@ -125,7 +126,7 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
       do {
         this.nextWord = readNext(xmlReader, features);
       } while (hasNext() && this.nextWord == null);
-    } catch (XMLStreamException e) {
+    } catch (XMLStreamException| WstxLazyException e) {
       throw new RuntimeException(String.format(
           "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on " +
           "complete tags! (Source was: %s)", this.input.getSource().orElse("[unknown]")), e);
