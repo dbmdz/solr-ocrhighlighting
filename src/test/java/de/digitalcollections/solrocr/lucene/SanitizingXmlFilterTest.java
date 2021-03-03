@@ -36,11 +36,11 @@ public class SanitizingXmlFilterTest {
 
   @Test
   public void sanityTest() throws IOException {
-    String brokenXml = "<b><c>h&ello</c></b></a><a><b><c>ser>vus&lt;<br>welt<</c>";
+    String brokenXml = "<b><c>h&el<»?>lo</c></b></a><a><b><c>ser>vus&lt;<br>welt<</c>";
     CharFilter filter = new SanitizingXmlFilter(new StringReader(brokenXml));
     String filtered = IOUtils.toString(filter);
     assertThat(filtered).matches(this::isWellFormed, "is well formed XML");
-    assertThat(filtered).isEqualTo("<b><c>h_ello</c></b>    <a><b><c>ser>vus&lt;    welt_</c></b></a>");
+    assertThat(filtered).isEqualTo("<b><c>h_el_»?_lo</c></b>    <a><b><c>ser>vus&lt;    welt_</c></b></a>");
   }
 
   @Test

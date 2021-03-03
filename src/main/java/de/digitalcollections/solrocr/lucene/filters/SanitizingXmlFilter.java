@@ -134,6 +134,22 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
         endTag = cbuf[endElem - 1] == '/' ? endElem - 1 : endElem;
       }
       int tagLen = endTag - startTag;
+
+      // Check if we're dealing with a legal tag, in some early Google Books hOCR unescaped
+      // `<` and `>` characters sometimes lead to spans that look like elements but aren't actually
+      boolean illegalTag = false;
+      for (int i = 0; i < tagLen; i++) {
+        if (!Character.isLetter(cbuf[startTag + i])) {
+          illegalTag = true;
+          break;
+        }
+      }
+      if (illegalTag) {
+        cbuf[startElem] = '_';
+        cbuf[endElem] = '_';
+        continue;
+      }
+
       if (cbuf[startElem + 1] == '/') {
         char[] checkTag = elementStack.peek();
         if (checkTag == null || !tagEquals(cbuf, startTag, tagLen, checkTag)) {
