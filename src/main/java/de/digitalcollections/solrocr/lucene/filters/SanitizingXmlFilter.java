@@ -137,7 +137,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
 
       // Check if we're dealing with a legal tag, in some early Google Books hOCR unescaped
       // `<` and `>` characters sometimes lead to spans that look like elements but aren't actually
-      boolean illegalTag = false;
+      boolean illegalTag = tagLen == 0;
       for (int i = 0; i < tagLen; i++) {
         if (!Character.isLetter(cbuf[startTag + i])) {
           illegalTag = true;

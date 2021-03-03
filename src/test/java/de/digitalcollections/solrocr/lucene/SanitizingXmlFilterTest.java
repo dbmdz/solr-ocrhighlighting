@@ -37,12 +37,12 @@ public class SanitizingXmlFilterTest {
   @Test
   public void sanityTest() throws IOException {
     String brokenXml =
-        "<b><c>h&el<»?>lo</c></b></a><a><b><c>ser>vus&lt;<br>welt dieses xml ist&;ganz schön kaputt<</c>";
+        "<b><c>h&el<»?>lo</c></b></a><a><b><c>ser>vus&lt;<br>welt dieses xml ist&;ganz schön kap<>utt<</c>";
     CharFilter filter = new SanitizingXmlFilter(new StringReader(brokenXml));
     String filtered = IOUtils.toString(filter);
     assertThat(filtered).matches(this::isWellFormed, "is well formed XML");
     assertThat(filtered).isEqualTo(
-        "<b><c>h_el_»?_lo</c></b>    <a><b><c>ser>vus&lt;    welt dieses xml ist_;ganz schön kaputt_</c></b></a>");
+        "<b><c>h_el_»?_lo</c></b>    <a><b><c>ser>vus&lt;    welt dieses xml ist_;ganz schön kap__utt_</c></b></a>");
   }
 
   @Test
