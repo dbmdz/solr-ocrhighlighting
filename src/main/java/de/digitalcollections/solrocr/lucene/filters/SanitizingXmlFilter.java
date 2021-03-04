@@ -110,12 +110,28 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
         break;
       }
       idx = endElem + 1;
-      if (cbuf[startElem + 1] == '?' && cbuf[endElem - 1] != '?') {
+      if (cbuf[startElem + 1] == '?'  && (endElem - startElem < 3 || cbuf[endElem - 1] != '?')) {
         // Illegal processing instruction, fix by stripping the question mark
         cbuf[startElem + 1] = '_';
       }
+
+      if (cbuf[startElem + 1] == '!') {
+        boolean illegal = (
+            // Comment?
+            (cbuf[startElem + 2] == '-' && cbuf[startElem + 3] != '-')
+            // Doctype?
+            || ((cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd') && (endElem - startElem) < 12)
+            // CDATA?
+            || (cbuf[startElem + 2] == '[' && (endElem - startElem) < 10));
+        if (illegal) {
+          cbuf[startElem] = '_';
+          cbuf[endElem] = '-';
+          continue;
+        }
+      }
+
       if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!'
-          && cbuf[startElem + 2] == '-')) {
+          && cbuf[startElem + 2] == '-') && cbuf[startElem + 3] == '-') {
         // XML Declaration or comment, nothing to do
         continue;
       }
