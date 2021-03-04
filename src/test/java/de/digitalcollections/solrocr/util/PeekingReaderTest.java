@@ -97,7 +97,7 @@ class PeekingReaderTest {
         "\n" +
         "    <p class='ocr_par' id='par_17_6' lang='frk' title=\"bbox 185 823 1498 1084\">\n" +
         "     ";
-    Reader peekingReader = new PeekingReader(new SanitizingXmlFilter(new StringReader(fragment)), 2048, 16384);
+    Reader peekingReader = new PeekingReader(new SanitizingXmlFilter(new StringReader(fragment), false), 2048, 16384);
     HocrParser parser = new HocrParser(peekingReader);
     List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
     assertThat(boxes).isNotEmpty();

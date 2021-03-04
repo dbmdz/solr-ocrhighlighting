@@ -29,9 +29,11 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
   private char[] tail = null;
   private int tailIdx = -1;
   private boolean hasDocType = false;
+  private final boolean advancedFixing;
 
-  public SanitizingXmlFilter(Reader in) {
+  public SanitizingXmlFilter(Reader in, boolean advancedFixing) {
     super(in);
+    this.advancedFixing = advancedFixing;
   }
 
   boolean tagEquals(char[] markupBuf, int startTag, int tagLen, char[] checkTag) {
@@ -67,10 +69,11 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
     numRead += numInputRead;
     int idx = off;
     boolean truncated = false;
+
     outer:
     while (idx < (off + numRead)) {
       // Check for invalid entities and try to fix them
-      while (idx < (off + numRead)) {
+      while (advancedFixing && idx < (off + numRead)) {
         int match = multiIndexOf(cbuf, idx, '<', '&');
         if (match < 0 || match > (off + numRead)) {
           // Nothing to do in this buffer
@@ -91,13 +94,15 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       if (startElem < 0 || startElem > (off + numRead)) {
         break;
       }
-      int nextOpen = ArrayUtils.indexOf(cbuf, '<', startElem + 1);
-      int nextClose = ArrayUtils.indexOf(cbuf, '>', startElem);
-      if (nextOpen >= 0 && nextOpen < nextClose) {
-        // Isolated opening pointy bracket, is illegal XML, but can happen in some bad hOCR
-        cbuf[startElem] = '_';
-        idx += 1;
-        continue;
+      if (advancedFixing) {
+        int nextOpen = ArrayUtils.indexOf(cbuf, '<', startElem + 1);
+        int nextClose = ArrayUtils.indexOf(cbuf, '>', startElem);
+        if (nextOpen >= 0 && nextOpen < nextClose) {
+          // Isolated opening pointy bracket, is illegal XML, but can happen in some bad hOCR
+          cbuf[startElem] = '_';
+          idx += 1;
+          continue;
+        }
       }
       int endElem = ArrayUtils.indexOf(cbuf, '>', startElem + 1);
       if (endElem < 0 || endElem > (off + numRead)) {
@@ -110,28 +115,34 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
         break;
       }
       idx = endElem + 1;
-      if (cbuf[startElem + 1] == '?'  && (endElem - startElem < 3 || cbuf[endElem - 1] != '?')) {
-        // Illegal processing instruction, fix by stripping the question mark
-        cbuf[startElem + 1] = '_';
-      }
 
-      if (cbuf[startElem + 1] == '!') {
-        boolean illegal = (
-            // Comment?
-            (cbuf[startElem + 2] == '-' && cbuf[startElem + 3] != '-')
-            // Doctype?
-            || ((cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd') && (endElem - startElem) < 12)
-            // CDATA?
-            || (cbuf[startElem + 2] == '[' && (endElem - startElem) < 10));
-        if (illegal) {
-          cbuf[startElem] = '_';
-          cbuf[endElem] = '-';
+      if (advancedFixing) {
+        if (cbuf[startElem + 1] == '?'  && (endElem - startElem < 3 || cbuf[endElem - 1] != '?')) {
+          // Illegal processing instruction, fix by stripping the question mark
+          cbuf[startElem + 1] = '_';
+        }
+
+        if (cbuf[startElem + 1] == '!') {
+          boolean illegal = (
+              // Comment?
+              (cbuf[startElem + 2] == '-' && cbuf[startElem + 3] != '-')
+                  // Doctype?
+                  || ((cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd') && (endElem - startElem) < 12)
+                  // CDATA?
+                  || (cbuf[startElem + 2] == '[' && (endElem - startElem) < 10));
+          if (illegal) {
+            cbuf[startElem] = '_';
+            cbuf[endElem] = '-';
+            continue;
+          }
+        }
+
+        if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!'
+            && cbuf[startElem + 2] == '-') && cbuf[startElem + 3] == '-') {
+          // XML Declaration or comment, nothing to do
           continue;
         }
-      }
-
-      if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!'
-          && cbuf[startElem + 2] == '-') && cbuf[startElem + 3] == '-') {
+      } else if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-')) {
         // XML Declaration or comment, nothing to do
         continue;
       }
@@ -156,19 +167,21 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       }
       int tagLen = endTag - startTag;
 
-      // Check if we're dealing with a legal tag, in some early Google Books hOCR unescaped
-      // `<` and `>` characters sometimes lead to spans that look like elements but aren't actually
-      boolean illegalTag = tagLen == 0;
-      for (int i = 0; i < tagLen; i++) {
-        if (!Character.isLetter(cbuf[startTag + i])) {
-          illegalTag = true;
-          break;
+      if (advancedFixing) {
+        // Check if we're dealing with a legal tag, in some early Google Books hOCR unescaped
+        // `<` and `>` characters sometimes lead to spans that look like elements but aren't actually
+        boolean illegalTag = tagLen == 0;
+        for (int i = 0; i < tagLen; i++) {
+          if (!Character.isLetter(cbuf[startTag + i])) {
+            illegalTag = true;
+            break;
+          }
         }
-      }
-      if (illegalTag) {
-        cbuf[startElem] = '_';
-        cbuf[endElem] = '_';
-        continue;
+        if (illegalTag) {
+          cbuf[startElem] = '_';
+          cbuf[endElem] = '_';
+          continue;
+        }
       }
 
       if (cbuf[startElem + 1] == '/') {

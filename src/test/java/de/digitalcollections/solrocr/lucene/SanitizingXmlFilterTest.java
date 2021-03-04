@@ -38,7 +38,7 @@ public class SanitizingXmlFilterTest {
   public void sanityTest() throws IOException {
     String brokenXml =
         "<b><c>h&el<»?>lo</c></b></a><a><b><c>ser>vus&lt;<br>welt <!,!!>dieses xml ist&;ganz schön kap<>utt<? wa<</c>";
-    CharFilter filter = new SanitizingXmlFilter(new StringReader(brokenXml));
+    CharFilter filter = new SanitizingXmlFilter(new StringReader(brokenXml), true);
     String filtered = IOUtils.toString(filter);
     assertThat(filtered).matches(this::isWellFormed, "is well formed XML");
     assertThat(filtered).isEqualTo(
@@ -49,7 +49,7 @@ public class SanitizingXmlFilterTest {
   public void testWellformedXMLDoesntChange() throws IOException {
     Path p = Paths.get("src/test/resources/data/alto_nospace.xml");
     String alto = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
-    CharFilter filter = new SanitizingXmlFilter(new InputStreamReader(new FileInputStream(p.toFile())));
+    CharFilter filter = new SanitizingXmlFilter(new InputStreamReader(new FileInputStream(p.toFile())), true);
     String filtered = IOUtils.toString(filter);
     assertThat(filtered).isEqualTo(alto);
   }
@@ -58,7 +58,7 @@ public class SanitizingXmlFilterTest {
   public void testAltoPageCrossing() throws IOException {
     Path p = Paths.get("src/test/resources/data/alto.xml");
     String alto = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
-    CharFilter filter = new SanitizingXmlFilter(new StringReader(alto.substring(99762, 100508)));
+    CharFilter filter = new SanitizingXmlFilter(new StringReader(alto.substring(99762, 100508)), false);
     String filtered = IOUtils.toString(filter);
     assertThat(isWellFormed(filtered)).isTrue();
   }
@@ -78,7 +78,7 @@ public class SanitizingXmlFilterTest {
     String ptr = Paths.get("src/test/resources/data/multicolumn.hocr").toString();
     Reader reader = new ExternalUtf8ContentFilterFactory(new HashMap<>())
         .create(new StringReader(ptr));
-    Reader filteredReader = new PeekingReader(new SanitizingXmlFilter(reader), 2048, 16384);
+    Reader filteredReader = new PeekingReader(new SanitizingXmlFilter(reader, false), 2048, 16384);
     String filtered = IOUtils.toString(filteredReader);
     assertThat(filtered).isNotEmpty();
   }

@@ -21,6 +21,7 @@ public class OcrCharFilterFactory extends CharFilterFactory {
   private static final int CTX_BUF_SIZE = 16384;
 
   private final boolean expandAlternatives;
+  private final boolean fixMarkup;
 
   private static final ImmutableSet<OcrFormat> FORMATS = ImmutableSet.of(
       new HocrFormat(),
@@ -30,12 +31,13 @@ public class OcrCharFilterFactory extends CharFilterFactory {
   public OcrCharFilterFactory(Map<String, String> args) {
     super(args);
     this.expandAlternatives = "true".equals(args.get("expandAlternatives"));
+    this.fixMarkup = "true".equals(args.get("fixMarkup"));
   }
 
   @Override
   public Reader create(Reader input) {
     PeekingReader peeker = new PeekingReader(
-       new SanitizingXmlFilter(input), BEGIN_BUF_SIZE, CTX_BUF_SIZE);
+       new SanitizingXmlFilter(input, fixMarkup), BEGIN_BUF_SIZE, CTX_BUF_SIZE);
     OcrFormat fmt = FORMATS.stream()
         .filter(f -> f.hasFormat(peeker.peekBeginning()))
         .findFirst()
