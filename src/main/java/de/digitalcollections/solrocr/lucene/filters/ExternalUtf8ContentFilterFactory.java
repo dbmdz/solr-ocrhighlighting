@@ -36,9 +36,14 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
 
   @Override
   public Reader create(Reader input) {
+    // Read the input fully to obtain the source pointer
+    String ptrStr;
     try {
-      // Read the input fully to obtain the source pointer
-      String ptrStr = IOUtils.toString(input);
+      ptrStr = IOUtils.toString(input);
+    } catch (IOException e) {
+      throw new RuntimeException("Could not read source pointer from the input.", e);
+    }
+    try {
       SourcePointer pointer = SourcePointer.parse(ptrStr);
       if (pointer == null) {
         throw new RuntimeException(String.format(
@@ -68,7 +73,8 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
           .collect(Collectors.toList());
       return new ExternalUtf8ContentFilter(new BufferedReader(r), charRegions, ptrStr);
     } catch (IOException e) {
-      throw new RuntimeException("Error while reading external content: " + e.toString(), e);
+      throw new RuntimeException(String.format(
+          "Error while reading external content from pointer '%s': %s", ptrStr, e));
     }
   }
 
@@ -90,10 +96,18 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       if (buf.remaining() > (numBytes - numRead)) {
         buf.limit((int) (numBytes - numRead));
       }
-      numRead += fChan.read(buf);
+      int read = fChan.read(buf);
+      if (read < 0) {
+        break;
+      }
+      numRead += read;
       buf.flip();
       decodedLength += Utf8.decodedLength(buf);
       buf.clear();
+    }
+    if (numRead < numBytes) {
+      throw new IOException(String.format(
+          "Read fewer bytes than expected (%d vs %d), check your source pointer!", numRead, numBytes));
     }
     return decodedLength;
   }
