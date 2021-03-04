@@ -321,7 +321,7 @@ public class OcrPassageFormatter extends PassageFormatter {
       parsingFeatures.add(OcrParser.ParsingFeature.PAGES);
     }
     OcrParser parser = format.getParser(
-        new SanitizingXmlFilter(new StringReader(ocrFragment)),
+        new SanitizingXmlFilter(new StringReader(ocrFragment), true),
         parsingFeatures.toArray(new OcrParser.ParsingFeature[0]));
     boolean onStartPage = true;
     for (OcrBox box : parser) {
