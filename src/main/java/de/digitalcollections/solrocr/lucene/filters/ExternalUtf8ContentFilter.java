@@ -14,10 +14,12 @@ import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceAwareReader {
 
   /**
-   * The cumulative offset difference between the input (bytes) and the output (chars)
-   * at the current position.
+   * The cumulative offset difference between the input (bytes) and the output (chars) at the
+   * current position.
    *
+   * <pre>
    * current actual byte offset in input = currentOutOffset + cumulative
+   * </pre>
    */
   private int cumulative;
 
@@ -57,8 +59,8 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
   }
 
   /**
-   * Read <tt>len</tt> <tt>char</tt>s into <tt>cbuf</tt>, starting from character index <tt>off</tt> relative to
-   * the beginning of <tt>cbuf</tt> and return the number of <tt>char</tt>s read.
+   * Read <tt>len</tt> <tt>char</tt>s into <tt>cbuf</tt>, starting from character index <tt>off</tt>
+   * relative to the beginning of <tt>cbuf</tt> and return the number of <tt>char</tt>s read.
    **/
   @Override
   public int read(char[] cbuf, int off, int len) throws IOException {
@@ -101,7 +103,7 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
   }
 
   private void correctOffsets(char[] cbuf, int off, int len) {
-    for (int i=off; i < off + len; i++) {
+    for (int i = off; i < off + len; i++) {
       if (nextIsOffset) {
         this.addOffCorrectMap(currentOutOffset, cumulative);
         nextIsOffset = false;
