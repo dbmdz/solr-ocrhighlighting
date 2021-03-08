@@ -40,7 +40,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
     if (tagLen != checkTag.length) {
       return false;
     }
-    for (int i=0; i < tagLen; i++) {
+    for (int i = 0; i < tagLen; i++) {
       if (markupBuf[startTag + i] != checkTag[i]) {
         return false;
       }
