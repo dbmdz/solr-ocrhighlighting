@@ -345,7 +345,7 @@ public class OcrPassageFormatter extends PassageFormatter {
           if (!this.absoluteHighlights) {
             float xOffset = region.get().getUlx();
             float yOffset = region.get().getUly();
-            if (box.getUlx() < 1 || box.getUly() < 1) {
+            if ((box.getUlx() > 0 && box.getUlx() < 1) || (box.getUly() > 0 && box.getUly() < 1)) {
               // Relative coordinates, need to do some more calculations
               float snipWidth = region.get().getLrx() - xOffset;
               float snipHeight = region.get().getLry() - yOffset;
