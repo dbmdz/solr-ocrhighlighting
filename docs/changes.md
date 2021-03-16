@@ -1,4 +1,4 @@
-## 0.6.0 (2021-01-??)
+## 0.6.0 (2021-03-??)
 This is a major new release with significant improvements in stability, accuracy and most importantly performance.
 Uupdating is **highly** recommended, especially for ALTO users, who can expect a speed-up in indexing of roughly
 **6000% (i.e. 60x as fast)**. We also recommend updating your JVM to at least Java 11 (LTS), since Java 9 introduced
@@ -6,17 +6,16 @@ a feature that speeds up highlighting significantly.
 
 **Performance:**
 
-- **Indexing performance drastically improved for ALTO, worse for hOCR and MiniOCR.** Under the
+- **Indexing performance drastically improved for ALTO, slightly worse for hOCR and MiniOCR.** Under the
   hood we switched from Regular Expression and Automaton-based parsing to a proper XML parser to support
   more features and improve correctness.
   This drastically improved indexing performance for ALTO (6000% speedup, the previous
   implementation was pathologically slow), but caused a big hit for hOCR (~57% slower) and a slight hit
-  for MiniOCR (~15% slower). These numbers are based on benchmarks done on a ramdisk, so the changes might
-  be less pronounced in practice, depending on the choice of storage.
-  While the performance losses for hOCR and MiniOCR are disappointing, the
-  "proper" parsing allows for much more correctness in handling edge cases and new features like indexing alternatives.
-  We are looking into options to offer a way to get the old performance back
-  (at the cost of features/accuracy), this will likely be part of the next release.
+  for MiniOCR (~15% slower). These numbers are based on benchmarks done on a ramdisk, so the changes are very
+  likely to be be less pronounced in practice, depending on the choice of storage.
+  Note that this makes the parser also more strict in regards to whitespace. If you were indexing OCR documents
+  without any whitespace between word elements before, you will run into problems
+  (see [#147](https://github.com/dbmdz/solr-ocrhighlighting/issues/147#issuecomment-800452975)).
 - **Highlighting performance significantly improved for all formats.**
   The time for highlighting a single snippet has gone down for all formats
   (ALTO 12x as fast, hOCR 10x as fast, MiniOCR 6x as fast). Again, these numbers are based on benchmarks
@@ -32,6 +31,11 @@ a feature that speeds up highlighting significantly.
   `clistrias` in the span `presents on clistrias eve`, users would be able to search for `"presents christmas"` and
   `"presents clistrias"` and would get the correct match in both cases, both with full highlighting.
   Refer to the corresponding [section in the documentation](../alternatives) for instructions on setting it up.
+- **On-the-fly repair of 'broken' markup.**
+  `OcrCharFilterFactory` has a new option `fixMarkup` that enables on-the-fly repair of invalid XML in OCR input documents,
+  namely problems that can arise when the markup contains unescaped instances of `<`, `>` and `&`.
+  This option is disabled by default, we recommend enabling it when your OCR engine exhibits this problem and you
+  are unable to fix the files on disk, since it incurs a bit of a performance hit during indexing.
 
 
 **API changes:**
