@@ -179,3 +179,10 @@ Additionally, the plugin allows you to customize various OCR-specific parameters
     This can improve highlighting performance, since less of the input file needs to be read and should
     be disabled when you index your documents at the page-level, i.e. when the identify of the page is
     encoded elsewhere in the document.
+
+`hl.ocr.scorePassages`:
+:   When `off` (defaults to `on`), the snippets are returned in order of their occurrence in the document. Otherwise,
+    it will follow Solr's default strategy for scoring highlighting snippets, which treats each candidate snippet as
+    a 'mini-document' that is scored using TF-IDF/BM25, treating the parent document as the corpus. This results in
+    a relevance score in relation to the parent document, i.e. the first snippet should be the most relevant snippet
+    in the document.

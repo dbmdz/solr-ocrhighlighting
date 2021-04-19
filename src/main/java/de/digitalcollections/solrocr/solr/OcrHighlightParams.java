@@ -11,6 +11,7 @@ public interface OcrHighlightParams extends HighlightParams {
   String SCORE_BOOST_EARLY = "hl.score.boostEarly";
   String ABSOLUTE_HIGHLIGHTS = "hl.ocr.absoluteHighlights";
   String MAX_OCR_PASSAGES = "hl.ocr.maxPassages";
+  String SCORE_PASSAGES = "hl.ocr.scorePassages";
   String TIME_ALLOWED = "hl.ocr.timeAllowed";
   String ALIGN_SPANS = "hl.ocr.alignSpans";
   String TRACK_PAGES = "hl.ocr.trackPages";

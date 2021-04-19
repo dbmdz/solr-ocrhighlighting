@@ -409,4 +409,15 @@ public class HocrTest extends SolrTestCaseJ4 {
         "q", "ocr_text:\"returns the ee\"", "hl.weightMatches", "true");
     assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"<em>returning Saturday. !>ee</em>\")");
   }
+
+  public void testUnscoredSnippets() {
+    SolrQueryRequest req = xmlQ("q", "fenitſchka", "hl.ocr.scorePassages", "off");
+    assertQ(
+        req,
+        "((//lst[@name='42']//arr[@name='pages'])[1]/lst/str[@name='id'])[1]/text()='page_88'",
+        "((//lst[@name='42']//arr[@name='pages'])[2]/lst/str[@name='id'])[1]/text()='page_89'",
+        "((//lst[@name='42']//arr[@name='pages'])[3]/lst/str[@name='id'])[1]/text()='page_92'",
+        "((//lst[@name='42']//arr[@name='pages'])[4]/lst/str[@name='id'])[1]/text()='page_92'",
+        "((//lst[@name='42']//arr[@name='pages'])[5]/lst/str[@name='id'])[1]/text()='page_97'");
+  }
 }
