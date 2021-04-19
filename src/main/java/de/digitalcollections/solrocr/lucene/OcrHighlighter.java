@@ -300,10 +300,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
           int snippetLimit = Math.max(
               maxPassages[fieldIdx],
               params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
+          boolean scorePassages = params.getBool(OcrHighlightParams.SCORE_PASSAGES, true);
           try {
             resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
                 leafReader, docId, breakLocator, formatter, content,
-                params.get(OcrHighlightParams.PAGE_ID), snippetLimit);
+                params.get(OcrHighlightParams.PAGE_ID), snippetLimit, scorePassages);
           } catch (ExitingIterCharSeq.ExitingIterCharSeqException | ExitableDirectoryReader.ExitingReaderException e) {
             log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
             respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);

@@ -39,7 +39,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    */
   public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, BreakLocator breakLocator,
                                            OcrPassageFormatter formatter, IterableCharSequence content, String pageId,
-                                           int snippetLimit)
+                                           int snippetLimit, boolean scorePassages)
       throws IOException {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
 
@@ -51,7 +51,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
 
     Passage[] passages;
     try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
-      passages = highlightOffsetsEnums(offsetsEnums, docId, breakLocator, formatter, pageId, snippetLimit);
+      passages = highlightOffsetsEnums(offsetsEnums, docId, breakLocator, formatter, pageId, snippetLimit, scorePassages);
     }
 
     // Format the resulting Passages.
@@ -75,7 +75,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
 
   protected Passage[] highlightOffsetsEnums(
       OffsetsEnum off, int docId, BreakLocator breakLocator, OcrPassageFormatter formatter, String pageId,
-      int snippetLimit) throws IOException {
+      int snippetLimit, boolean scorePassages) throws IOException {
     final int contentLength = breakLocator.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
@@ -86,15 +86,22 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       queueSize = 512;
     }
 
-    PriorityQueue<Passage> passageQueue = new PriorityQueue<>(queueSize, (left, right) -> {
-      if (left.getScore() < right.getScore()) {
-        return -1;
-      } else if (left.getScore() > right.getScore()) {
-        return 1;
-      } else {
-        return left.getStartOffset() - right.getStartOffset();
-      }
-    });
+    Comparator<Passage> cmp;
+    if (scorePassages) {
+      cmp = (left, right) -> {
+        if (left.getScore() < right.getScore()) {
+          return -1;
+        } else if (left.getScore() > right.getScore()) {
+          return 1;
+        } else {
+          return left.getStartOffset() - right.getStartOffset();
+        }
+      };
+    } else {
+      cmp = Comparator.comparingInt(Passage::getStartOffset);
+    }
+
+    PriorityQueue<Passage> passageQueue = new PriorityQueue<>(queueSize, cmp);
     Passage passage = new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
 
     // If we've reached the limit, no longer calculate passages, only count matches as passages
@@ -131,7 +138,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         if (passage.getStartOffset() >= 0) {
           numTotal++;
         }
-        passage = maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
+        passage = maybeAddPassage(passageQueue, passageScorer, passage, contentLength, scorePassages);
         // if we exceed limit, we are done
         if (start >= contentLength) {
           break;
@@ -147,7 +154,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     if (passage.getStartOffset() >= 0) {
       numTotal++;
     }
-    maybeAddPassage(passageQueue, passageScorer, passage, contentLength);
+    maybeAddPassage(passageQueue, passageScorer, passage, contentLength, scorePassages);
 
     this.numMatches.put(docId, numTotal);
     Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
@@ -156,16 +163,18 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     return passages;
   }
 
-  /** Completely copied from {@link FieldHighlighter} due to private access there. */
+  /** Uses parts from {@link FieldHighlighter} due to private access there. */
   private Passage maybeAddPassage(PriorityQueue<Passage> passageQueue, PassageScorer scorer, Passage passage,
-                                  int contentLength) {
+                                  int contentLength, boolean score) {
     if (passage.getStartOffset() == -1) {
       // empty passage, we can ignore it
       return passage;
     }
-    passage.setScore(scorer.score(passage, contentLength));
+    if (score) {
+      passage.setScore(scorer.score(passage, contentLength));
+    }
     // new sentence: first add 'passage' to queue
-    if (passageQueue.size() == maxPassages && passage.getScore() < passageQueue.peek().getScore()) {
+    if (score && passageQueue.size() == maxPassages && passage.getScore() < passageQueue.peek().getScore()) {
       passage.reset(); // can't compete, just reset it
     } else {
       passageQueue.offer(passage);
