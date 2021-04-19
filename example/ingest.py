@@ -185,8 +185,7 @@ def bnl_load_documents(base_path):
                         mets_path = next(iter(vol_path.glob("*-mets.xml")))
                         vol_id = last_vol.replace("newspaper_lunion_", "")
                         yield from bnl_extract_article_docs(
-                            vol_id, etree.parse(str(mets_path)),
-                            vol_path / 'text')
+                            vol_id, mets_path, vol_path / 'text')
                     last_vol = ti.name
                 if ti.isdir():
                     (base_path / ti.name).mkdir(parents=True, exist_ok=True)
@@ -198,8 +197,7 @@ def bnl_load_documents(base_path):
             mets_path = next(iter(vol_path.glob("*-mets.xml")))
             vol_id = last_vol.replace("newspaper_lunion_", "")
             yield from bnl_extract_article_docs(
-                vol_id, etree.parse(str(mets_path)),
-                vol_path / 'text')
+                vol_id, mets_path, vol_path / 'text')
     else:
         with ProcessPoolExecutor(max_workers=4) as pool:
             futs = []

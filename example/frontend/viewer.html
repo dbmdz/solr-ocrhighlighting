@@ -22,6 +22,7 @@
           loadedManifest: manifestId,
           canvasId,
           thumbnailNavigationPosition: 'far-bottom',
+          defaultSearchQuery: params.get('q'),
         }],
         window: {
           allowFullscreen: true,
@@ -29,33 +30,6 @@
           sideBarOpenByDefault: true,
         }
       });
-      if (params.has("q")) {
-        let searchTriggered = false;
-        miradorInstance.store.subscribe(() => {
-          if (searchTriggered) {
-            return;
-          }
-          var state = miradorInstance.store.getState();
-          if (Object.values(state.manifests)[0].isFetching) {
-            return;
-          }
-          var companionWindows = Object.values(state.companionWindows)
-            .filter((obj) => obj.content !== 'thumbnailNavigation');
-          if (companionWindows.length === 0) {
-            return;
-          }
-          searchTriggered = true
-          var state = miradorInstance.store.getState();
-          var targetId = Object.keys(state.windows)[0];
-          var searchService = Object.values(state.manifests)[0].json.service['@id'];
-          miradorInstance.store.dispatch(
-            miradorInstance.actions.updateCompanionWindow(
-              targetId, companionWindows[0].id, {content: 'search', position: 'left'}));
-          miradorInstance.store.dispatch(
-            miradorInstance.actions.fetchSearch(
-              targetId, companionWindows[0].id, `${searchService}?q=${params.get("q")}`));
-        });
-      }
     </script>
   </body>
 </html>

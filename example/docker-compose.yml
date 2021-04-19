@@ -1,7 +1,7 @@
 version: '2'
 services:
   solr:
-    image: solr:8.6
+    image: solr:8.7
     ports:
       - "1044:1044"  # Debugging port
       - "8983:8983"  # Solr admin interface
