@@ -5,13 +5,17 @@ import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.model.OcrPage;
 import java.awt.Dimension;
 import java.io.Reader;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.stax2.XMLStreamReader2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MiniOcrParser extends OcrParser {
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final char alternativeMarker = '⇿';
 
   private boolean noMoreWords;
@@ -42,10 +46,20 @@ public class MiniOcrParser extends OcrParser {
     OcrBox box = new OcrBox();
     if (features.contains(ParsingFeature.COORDINATES)) {
       String[] coords = xmlReader.getAttributeValue("", "x").split(" ");
-      box.setUlx(Float.parseFloat(coords[0]));
-      box.setUly(Float.parseFloat(coords[1]));
-      box.setLrx(box.getUlx() + Float.parseFloat(coords[2]));
-      box.setLry(box.getUly() + Float.parseFloat(coords[3]));
+      if (coords.length > 0) {
+        box.setUlx(Float.parseFloat(coords[0]));
+      }
+      if (coords.length > 1) {
+        box.setUly(Float.parseFloat(coords[1]));
+      }
+      if (coords.length > 2) {
+        box.setLrx(box.getUlx() + Float.parseFloat(coords[2]));
+      }
+      if (coords.length > 3) {
+        box.setLry(box.getUly() + Float.parseFloat(coords[3]));
+      } else {
+        log.warn("x attribute is incomplete: '{}'", String.join(" ", coords));
+      }
     }
     if (features.contains(ParsingFeature.CONFIDENCE)) {
       String confidence = xmlReader.getAttributeValue("", "c");
