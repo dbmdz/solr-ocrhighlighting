@@ -5,6 +5,7 @@ import de.digitalcollections.solrocr.model.OcrBox;
 import de.digitalcollections.solrocr.model.OcrPage;
 import java.awt.Dimension;
 import java.io.Reader;
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,8 +13,12 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.stax2.XMLStreamReader2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HocrParser extends OcrParser {
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
   private boolean noMoreWords;
   private OcrPage currentPage;
   private OcrBox hyphenEnd = null;
@@ -118,13 +123,20 @@ public class HocrParser extends OcrParser {
 
   private void parseCoordinates(OcrBox box, String bboxStr) {
     String[] parts = bboxStr.split(" ");
-    if (parts.length != 4) {
-      throw new IllegalStateException("hOCR bbox property must have exactly 4 values.");
+    if (parts.length > 0) {
+      box.setUlx(Integer.parseInt(parts[0]));
     }
-    box.setUlx(Integer.parseInt(parts[0]));
-    box.setUly(Integer.parseInt(parts[1]));
-    box.setLrx(Integer.parseInt(parts[2]));
-    box.setLry(Integer.parseInt(parts[3]));
+    if (parts.length > 1) {
+      box.setUly(Integer.parseInt(parts[1]));
+    }
+    if (parts.length > 2) {
+      box.setLrx(Integer.parseInt(parts[2]));
+    }
+    if (parts.length > 3) {
+      box.setLry(Integer.parseInt(parts[3]));
+    } else {
+      log.warn("bbox attribute '{}' is incomplete.", bboxStr);
+    }
   }
 
   private void parseText(

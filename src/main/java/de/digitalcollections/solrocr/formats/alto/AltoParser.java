@@ -6,12 +6,17 @@ import de.digitalcollections.solrocr.model.OcrPage;
 import de.digitalcollections.solrocr.util.CharBufUtils;
 import java.awt.Dimension;
 import java.io.Reader;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.codehaus.stax2.XMLStreamReader2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AltoParser extends OcrParser {
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
   private boolean noMoreWords;
   private OcrPage currentPage;
   private Boolean hasExplicitSpaces = null;
@@ -76,14 +81,29 @@ public class AltoParser extends OcrParser {
 
     // Parse coordinates
     if (features.contains(ParsingFeature.COORDINATES)) {
-      int x = (int) Double.parseDouble(xmlReader.getAttributeValue("", "HPOS"));
-      int y = (int) Double.parseDouble(xmlReader.getAttributeValue("", "VPOS"));
-      int w = (int) Double.parseDouble(xmlReader.getAttributeValue("", "WIDTH"));
-      int h = (int) Double.parseDouble(xmlReader.getAttributeValue("", "HEIGHT"));
-      box.setUlx(x);
-      box.setUly(y);
-      box.setLrx(x + w);
-      box.setLry(y + h);
+      String x = xmlReader.getAttributeValue("", "HPOS");
+      String y = xmlReader.getAttributeValue("", "VPOS");
+      String width = xmlReader.getAttributeValue("", "WIDTH");
+      String height = xmlReader.getAttributeValue("", "HEIGHT");
+      if (x != null && !x.isEmpty()) {
+        double xNum =  Double.parseDouble(x);
+        box.setUlx((int) xNum);
+        if (width != null && !width.isEmpty()) {
+          box.setLrx((int) xNum + (int) Double.parseDouble(width));
+        }
+      }
+      if (y != null && !y.isEmpty()) {
+        double yNum =  Double.parseDouble(y);
+        box.setUly((int) yNum);
+        if (height != null && !height.isEmpty()) {
+          box.setLry((int) yNum + (int) Double.parseDouble(height));
+        }
+      }
+      if (box.getLrx() < 0 || box.getLry() < 0) {
+        log.warn(
+            "Incomplete coordinates encountered: 'HPOS={}, VPOS={}, WIDTH={}, HEIGHT={}",
+            x, y, width, height);
+      }
     }
 
     if (features.contains(ParsingFeature.CONFIDENCE)) {
