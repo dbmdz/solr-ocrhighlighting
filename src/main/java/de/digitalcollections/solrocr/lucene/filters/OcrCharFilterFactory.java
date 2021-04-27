@@ -38,6 +38,10 @@ public class OcrCharFilterFactory extends CharFilterFactory {
   public Reader create(Reader input) {
     PeekingReader peeker = new PeekingReader(
        new SanitizingXmlFilter(input, fixMarkup), BEGIN_BUF_SIZE, CTX_BUF_SIZE);
+    if (peeker.peekBeginning().isEmpty()) {
+      // Empty document, no special treatment necessary
+      return peeker;
+    }
     OcrFormat fmt = FORMATS.stream()
         .filter(f -> f.hasFormat(peeker.peekBeginning()))
         .findFirst()
