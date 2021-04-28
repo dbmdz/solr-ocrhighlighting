@@ -1,8 +1,8 @@
 package de.digitalcollections.solrocr.lucene.filters;
 
 import com.google.common.collect.ImmutableList;
-import de.digitalcollections.solrocr.reader.MultiFileReader;
 import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.reader.MultiFileReader;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,10 +21,10 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
 
 /**
- * A CharFilter implementation that loads the field value from an external UTF8-encoded source and maps Java character
- * offsets to their correct UTF8 byte-offsets in the source.
+ * A CharFilter implementation that loads the field value from an external UTF8-encoded source and
+ * maps Java character offsets to their correct UTF8 byte-offsets in the source.
  *
- * For more information on these source pointers, refer to {@link SourcePointer}.
+ * <p>For more information on these source pointers, refer to {@link SourcePointer}.
  */
 public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
   public ExternalUtf8ContentFilterFactory(Map<String, String> args) {
@@ -46,8 +46,10 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     try {
       SourcePointer pointer = SourcePointer.parse(ptrStr);
       if (pointer == null) {
-        throw new RuntimeException(String.format(
-            "Could not parse source pointer from field, check the format (value was: '%s')!", ptrStr));
+        throw new RuntimeException(
+            String.format(
+                "Could not parse source pointer from field, check the format (value was: '%s')!",
+                ptrStr));
       }
       pointer.sources.forEach(this::validateSource);
 
@@ -58,29 +60,32 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       Reader r;
       if (pointer.sources.isEmpty()) {
         throw new RuntimeException(
-            "No source files could be determined from pointer. " +
-            "Is it pointing to files that exist and are readable? " +
-            "Pointer was: " + ptrStr);
-      }
-      else if (pointer.sources.size() > 1) {
-        r = new MultiFileReader(pointer.sources.stream().map(s -> s.path).collect(Collectors.toList()));
+            "No source files could be determined from pointer. "
+                + "Is it pointing to files that exist and are readable? "
+                + "Pointer was: "
+                + ptrStr);
+      } else if (pointer.sources.size() > 1) {
+        r =
+            new MultiFileReader(
+                pointer.sources.stream().map(s -> s.path).collect(Collectors.toList()));
       } else {
         r = new FileReader(pointer.sources.get(0).path.toFile());
       }
 
-      List<SourcePointer.Region> charRegions = pointer.sources.stream()
-          .flatMap(s -> s.regions.stream())
-          .collect(Collectors.toList());
+      List<SourcePointer.Region> charRegions =
+          pointer.sources.stream().flatMap(s -> s.regions.stream()).collect(Collectors.toList());
       return new ExternalUtf8ContentFilter(new BufferedReader(r), charRegions, ptrStr);
     } catch (IOException e) {
-      throw new RuntimeException(String.format(
-          "Error while reading external content from pointer '%s': %s", ptrStr, e));
+      throw new RuntimeException(
+          String.format("Error while reading external content from pointer '%s': %s", ptrStr, e));
     }
   }
 
   private void validateSource(SourcePointer.FileSource src) {
-    // TODO: Check if sourcePath is located under one of the whitelisted base directories, abort otherwise
-    // TODO: Check if sourcePath's filename matches one of the whitelisted file name patterns, abort otherwise
+    // TODO: Check if sourcePath is located under one of the whitelisted base directories, abort
+    // otherwise
+    // TODO: Check if sourcePath's filename matches one of the whitelisted file name patterns, abort
+    // otherwise
     File f = src.path.toFile();
     if (!f.exists() || !f.canRead()) {
       throw new SolrException(
@@ -89,7 +94,8 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     }
   }
 
-  private static long getUtf8DecodedLength(FileChannel fChan, ByteBuffer buf, long numBytes) throws IOException {
+  private static long getUtf8DecodedLength(FileChannel fChan, ByteBuffer buf, long numBytes)
+      throws IOException {
     long numRead = 0;
     long decodedLength = 0;
     while (numRead < numBytes) {
@@ -106,8 +112,10 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       buf.clear();
     }
     if (numRead < numBytes) {
-      throw new IOException(String.format(
-          "Read fewer bytes than expected (%d vs %d), check your source pointer!", numRead, numBytes));
+      throw new IOException(
+          String.format(
+              "Read fewer bytes than expected (%d vs %d), check your source pointer!",
+              numRead, numBytes));
     }
     return decodedLength;
   }
@@ -116,8 +124,10 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     int byteOffset = 0;
     int charOffset = 0;
     ByteBuffer buf = ByteBuffer.allocateDirect(1024 * 1024 /* 1 MiB */);
-    // TODO: Use a queue for the file sources so we don't have to read until the end of the last file every time
-    // TODO: Think about building the UTF8 -> UTF16 offset map right here if the mapping part should become a
+    // TODO: Use a queue for the file sources so we don't have to read until the end of the last
+    // file every time
+    // TODO: Think about building the UTF8 -> UTF16 offset map right here if the mapping part should
+    // become a
     //       bottle neck
     for (SourcePointer.FileSource src : ptr.sources) {
       try (FileChannel fChan = FileChannel.open(src.path, StandardOpenOption.READ)) {

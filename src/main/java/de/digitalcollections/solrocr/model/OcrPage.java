@@ -37,8 +37,7 @@ public class OcrPage implements Comparable<OcrPage> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     OcrPage ocrPage = (OcrPage) o;
-    return id.equals(ocrPage.id) &&
-        Objects.equals(dimensions, ocrPage.dimensions);
+    return id.equals(ocrPage.id) && Objects.equals(dimensions, ocrPage.dimensions);
   }
 
   @Override

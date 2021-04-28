@@ -117,11 +117,20 @@ public final class Utf8 {
     while (i < utf8Length) {
       int hiBits = ((buf.get(i) & 0xFF) >> 4) & 0xF;
       switch (hiBits) {
-        case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
           // U+0000 to U+0080 are 1 byte UTF-8 and 1 char, so no changes necessary
           i++;
           break;
-        case 0xC: case 0xD:
+        case 0xC:
+        case 0xD:
           // U+0080 to U+07FF are 2 bytes UTF-8 and 1 char, so the char length is decrement by one
           charLength--;
           i += 2;
@@ -132,7 +141,8 @@ public final class Utf8 {
           i += 3;
           break;
         case 0xF:
-          // U+10000 to U+10FFFF are 4 bytes UTF-8 and 2 char, so the char length is decremented by two
+          // U+10000 to U+10FFFF are 4 bytes UTF-8 and 2 char, so the char length is decremented by
+          // two
           charLength -= 2;
           i += 4;
           break;
@@ -146,9 +156,7 @@ public final class Utf8 {
     return charLength;
   }
 
-  /**
-   * Returns the number of bytes required to encode the given Unicode codepoint into UTF8.
-   */
+  /** Returns the number of bytes required to encode the given Unicode codepoint into UTF8. */
   public static int encodedLength(int codePoint) {
     if (codePoint < 0x80) {
       return 1;

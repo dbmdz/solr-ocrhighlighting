@@ -38,24 +38,29 @@ public class AltoTest extends SolrTestCaseJ4 {
   }
 
   private static SolrQueryRequest xmlQ(String... extraArgs) {
-    Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
-        .put("hl", "true")
-        .put("hl.ocr.fl", "ocr_text")
-        .put("hl.usePhraseHighlighter", "true")
-        .put("df", "ocr_text")
-        .put("hl.ctxTag", "ocr_line")
-        .put("hl.ctxSize", "2")
-        .put("hl.snippets", "10")
-        .put("fl", "id")
-        .build());
+    Map<String, String> args =
+        new HashMap<>(
+            ImmutableMap.<String, String>builder()
+                .put("hl", "true")
+                .put("hl.ocr.fl", "ocr_text")
+                .put("hl.usePhraseHighlighter", "true")
+                .put("df", "ocr_text")
+                .put("hl.ctxTag", "ocr_line")
+                .put("hl.ctxSize", "2")
+                .put("hl.snippets", "10")
+                .put("fl", "id")
+                .build());
     for (int i = 0; i < extraArgs.length; i += 2) {
       String key = extraArgs[i];
       String val = extraArgs[i + 1];
       args.put(key, val);
     }
 
-    SolrQueryRequest q = req(
-        args.entrySet().stream().flatMap(e -> Stream.of(e.getKey(), e.getValue())).toArray(String[]::new));
+    SolrQueryRequest q =
+        req(
+            args.entrySet().stream()
+                .flatMap(e -> Stream.of(e.getKey(), e.getValue()))
+                .toArray(String[]::new));
     ModifiableSolrParams params = new ModifiableSolrParams(q.getParams());
     params.set("indent", "true");
     q.setParams(params);
@@ -65,21 +70,21 @@ public class AltoTest extends SolrTestCaseJ4 {
   @Test
   public void testAlto() {
     SolrQueryRequest req = xmlQ("q", "svadag");
-    assertQ(req,
+    assertQ(
+        req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
         "//str[@name='text'][1]/text()='H.ieifics Menighed Kl. eg for Nicolai Mcniohed Kl. > > Slet. <) Sftensan« om-exler««««« boggeMenighederzNicvlaiMe- Mighed h«r »stenfang paa <em>Svadag</em> ferrkkvm»,cnde. ->) Sknf- «ewaal til Ssndagen holdes i H.geNesKirte sorNicolaiMemghch L?verda.en Kl.«, oz f»r H-geist-S Menighed Kk72. e) Bor-'",
         "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=436",
-        "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=1504"
-    );
+        "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=1504");
   }
 
   @Test
   public void testAltoWithFloat() {
     SolrQueryRequest req = xmlQ("q", "mighty");
-    assertQ(req,
-            "count(//lst[@name='ocrHighlighting']/lst[@name='44']/lst[@name='ocr_text']/arr/lst)=1",
-            "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=524"
-    );
+    assertQ(
+        req,
+        "count(//lst[@name='ocrHighlighting']/lst[@name='44']/lst[@name='ocr_text']/arr/lst)=1",
+        "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=524");
   }
 
   @Test
@@ -96,7 +101,14 @@ public class AltoTest extends SolrTestCaseJ4 {
 
   @Test
   public void testMultiPageSnippet() {
-    SolrQueryRequest req = xmlQ("q", "\"jursensen permanent\"", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
+    SolrQueryRequest req =
+        xmlQ(
+            "q",
+            "\"jursensen permanent\"",
+            "hl.ocr.limitBlock",
+            "none",
+            "hl.weightMatches",
+            "true");
     assertQ(
         req,
         "//str[@name='text'][1]/text()='kaldes, agter om 3 a 4 Dage at atseile berfea til Stokbolm, Hvorhen han medtager Fragtgods og Passagerer. naar Vedkom- mende behager at henvende dem til Megler H. <em>Jursensen. Permanent</em> Committee'",
@@ -117,18 +129,20 @@ public class AltoTest extends SolrTestCaseJ4 {
   @Test
   public void testHyphenationResolved() {
     SolrQueryRequest req = xmlQ("q", "\"faux espoir\"", "hl.weightMatches", "true");
-    assertQ(req,
-            "//str[@name='text'][1]/text()=\"— <em>Faux espoir</em>, mon vieil ami, <em>faux espoir</em> ! Je n'ai jamais même vu un seul des anciens compagnons de ses plaisirs. Luimême avait renoncé à toute autre société\"",
-            "count(//arr[@name='highlights']/arr/lst)=3",
-            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='Faux espoir,'",
-            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='faux es-'",
-            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[3]='poir'");
+    assertQ(
+        req,
+        "//str[@name='text'][1]/text()=\"— <em>Faux espoir</em>, mon vieil ami, <em>faux espoir</em> ! Je n'ai jamais même vu un seul des anciens compagnons de ses plaisirs. Luimême avait renoncé à toute autre société\"",
+        "count(//arr[@name='highlights']/arr/lst)=3",
+        "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='Faux espoir,'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='faux es-'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[3]='poir'");
     req = xmlQ("q", "\"elle murmura\"", "hl.weightMatches", "true");
-    assertQ(req,
-            "//str[@name='text'][1]/text()=\"triste signe de tête avec lequel <em>elle murmura</em> :\"",
-            "count(//arr[@name='highlights']/arr/lst)=2",
-            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='elle mur-'",
-            "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='mura'");
+    assertQ(
+        req,
+        "//str[@name='text'][1]/text()=\"triste signe de tête avec lequel <em>elle murmura</em> :\"",
+        "count(//arr[@name='highlights']/arr/lst)=2",
+        "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[1]='elle mur-'",
+        "(//arr[@name='highlights']/arr/lst/str[@name='text']/text())[2]='mura'");
   }
 
   @Test
@@ -138,8 +152,7 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertQ(
         req,
         "count(//arr[@name='regions']/lst)=1",
-        "contains(//arr[@name='regions']/lst/str[@name='text']/text(), 'charrette de <em>Hans Bockel</em> qui passe,')"
-    );
+        "contains(//arr[@name='regions']/lst/str[@name='text']/text(), 'charrette de <em>Hans Bockel</em> qui passe,')");
     // Phrase spanning multiple columns
     req = xmlQ("q", "\"moineau qui possède\"", "hl.weightMatches", "true");
     assertQ(
@@ -152,8 +165,7 @@ public class AltoTest extends SolrTestCaseJ4 {
         "//arr[@name='highlights']/arr/lst[1]/int[@name='parentRegionIdx']/text()='0'",
         "//arr[@name='highlights']/arr/lst[1]/str[@name='text']/text()='moineau'",
         "//arr[@name='highlights']/arr/lst[2]/int[@name='parentRegionIdx']/text()='1'",
-        "//arr[@name='highlights']/arr/lst[2]/str[@name='text']/text()='qui possède'"
-    );
+        "//arr[@name='highlights']/arr/lst[2]/str[@name='text']/text()='qui possède'");
   }
 
   @Test
@@ -168,17 +180,28 @@ public class AltoTest extends SolrTestCaseJ4 {
 
   @Test
   public void testAlignSpans() {
-    String regionUnaligned = "Les seuls députés qui aient voté pour l'instruction primaire, gratuite et obligatoire, "
-        + "combattue par M. de Parieu, vice-<em>président</em> du conseil d'Etat, sont MM. Belmont et Carnet, "
-        + "Chevandier de <em>Valdrôme</em>. Favre (Jules). Garnier-Pcgès, Glais-B.'zoin, Guérouit. Havin, Hôr"
-        + ".on, Magnin, Marie, Le";
-    String regionAligned = "Les seuls députés qui aient voté pour l'instruction primaire, gratuite et obligatoire, "
-        + "combattue par M. de Parieu, <em>vice-président</em> du conseil d'Etat, sont MM. Belmont et Carnet, "
-        + "Chevandier de <em>Valdrôme.</em> Favre (Jules). Garnier-Pcgès, Glais-B.'zoin, Guérouit. Havin, Hôr"
-        + ".on, Magnin, Marie, Le";
+    String regionUnaligned =
+        "Les seuls députés qui aient voté pour l'instruction primaire, gratuite et obligatoire, "
+            + "combattue par M. de Parieu, vice-<em>président</em> du conseil d'Etat, sont MM. Belmont et Carnet, "
+            + "Chevandier de <em>Valdrôme</em>. Favre (Jules). Garnier-Pcgès, Glais-B.'zoin, Guérouit. Havin, Hôr"
+            + ".on, Magnin, Marie, Le";
+    String regionAligned =
+        "Les seuls députés qui aient voté pour l'instruction primaire, gratuite et obligatoire, "
+            + "combattue par M. de Parieu, <em>vice-président</em> du conseil d'Etat, sont MM. Belmont et Carnet, "
+            + "Chevandier de <em>Valdrôme.</em> Favre (Jules). Garnier-Pcgès, Glais-B.'zoin, Guérouit. Havin, Hôr"
+            + ".on, Magnin, Marie, Le";
     SolrQueryRequest req = xmlQ("q", "ocr_text:(président OR Valdrôme)", "hl.ocr.pageId", "P3");
-    assertQ(req, "(//arr[@name='regions']/lst/str[@name='text'])[1]/text()=\"" + regionUnaligned + "\"");
-    req = xmlQ("q", "ocr_text:(président OR Valdrôme)", "hl.ocr.pageId", "P3", "hl.ocr.alignSpans", "true");
+    assertQ(
+        req,
+        "(//arr[@name='regions']/lst/str[@name='text'])[1]/text()=\"" + regionUnaligned + "\"");
+    req =
+        xmlQ(
+            "q",
+            "ocr_text:(président OR Valdrôme)",
+            "hl.ocr.pageId",
+            "P3",
+            "hl.ocr.alignSpans",
+            "true");
     assertQ(req, "//arr[@name='regions']/lst/str[@name='text']/text()=\"" + regionAligned + "\"");
   }
 
@@ -189,17 +212,18 @@ public class AltoTest extends SolrTestCaseJ4 {
   }
 
   public void testConsistentSpaceHandling() {
-    String text = "Die Zahl derer, welche jene Schreckens: zeit <em>mit Augen ſahen, in welcher Zittau</em>"
-        + ", <em>im Gefolge</em> des ſiebenjährigen Krieges, den 23. Juli 1757, auf die "
-        + "ſchre>li<ſte Art zerſtört ward, kann zwar nur noch klein";
-    SolrQueryRequest req = xmlQ(
-        "q", "ocr_text:\"mit Augen ſahen, in welcher Zittau\" OR ocr_text:\"im Gefolge\"",
-        "hl.weightMatches", "true");
+    String text =
+        "Die Zahl derer, welche jene Schreckens: zeit <em>mit Augen ſahen, in welcher Zittau</em>"
+            + ", <em>im Gefolge</em> des ſiebenjährigen Krieges, den 23. Juli 1757, auf die "
+            + "ſchre>li<ſte Art zerſtört ward, kann zwar nur noch klein";
+    SolrQueryRequest req =
+        xmlQ(
+            "q", "ocr_text:\"mit Augen ſahen, in welcher Zittau\" OR ocr_text:\"im Gefolge\"",
+            "hl.weightMatches", "true");
     assertQ(
         req,
         "//arr[@name='snippets']/lst/str[@name='text']/text()=\"" + text + "\"",
-        "//arr[@name='regions']/lst/str[@name='text']/text()=\"" + text + "\""
-    );
+        "//arr[@name='regions']/lst/str[@name='text']/text()=\"" + text + "\"");
   }
 
   public void testAlternatives() {
@@ -215,11 +239,12 @@ public class AltoTest extends SolrTestCaseJ4 {
     Path ocrPath = Paths.get("src/test/resources/data/alto_hyphen.xml");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ("q", "ocr_text:\"able letter indeed it did mr\"", "hl.weightMatches", "true");
+    SolrQueryRequest req =
+        xmlQ("q", "ocr_text:\"able letter indeed it did mr\"", "hl.weightMatches", "true");
     assertQ(
         req,
         "//arr[@name='snippets']/lst/str[@name='text']/text()='fronts him. Tilden and Mis Letter. \" An <em>able letter indeed. It did Mr</em>. Tilden great credit. I read it carefully several times. Ne ; I havent read the Cin-'",
-       "//arr[@name='regions']/lst/str[@name='text']/text()='fronts him. Tilden and Mis Letter. \" An <em>able letter indeed. It did Mr</em>. Tilden great credit. I read it carefully several times. Ne ; I havent read the Cin-'");
+        "//arr[@name='regions']/lst/str[@name='text']/text()='fronts him. Tilden and Mis Letter. \" An <em>able letter indeed. It did Mr</em>. Tilden great credit. I read it carefully several times. Ne ; I havent read the Cin-'");
   }
 
   public void testWackyHyphenation() {
@@ -234,15 +259,15 @@ public class AltoTest extends SolrTestCaseJ4 {
         "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')",
         "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]//arr[@name='regions']/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')",
         "contains(((//lst[@name='47372']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')",
-        "contains(((//lst[@name='47372']//arr[@name='snippets'])[1]//arr[@name='regions']/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')"
-    );
+        "contains(((//lst[@name='47372']//arr[@name='snippets'])[1]//arr[@name='regions']/lst/str[@name='text'])[1]/text(), 'p- I Lucky Day')");
   }
 
   public void testNoMatch() {
     Path ocrPath = Paths.get("src/test/resources/data/nomatch.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ("q", "ocr_text:\"warfare is not checked governors and\"", "hl.weightMatches", "true");
+    SolrQueryRequest req =
+        xmlQ("q", "ocr_text:\"warfare is not checked governors and\"", "hl.weightMatches", "true");
     assertQ(req, "count(//arr[@name='snippets'])=1");
   }
 
@@ -251,7 +276,9 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"as to details\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[2]/text(), '<em>details</em>,')");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[2]/text(), '<em>details</em>,')");
   }
 
   public void testExtraWhitespace() {
@@ -259,15 +286,20 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"provo office\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Otnco Upstairs C5V4MainStreet <em>Provo office</em>')");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Otnco Upstairs C5V4MainStreet <em>Provo office</em>')");
   }
 
   public void testExtraWhitespaceBeginning() {
     Path ocrPath = Paths.get("src/test/resources/data/sn83032300_1881_12_29_3.xml");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ("q", "ocr_text:\"without trial the capture and\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'ANUAGK.ratal')");
+    SolrQueryRequest req =
+        xmlQ("q", "ocr_text:\"without trial the capture and\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'ANUAGK.ratal')");
   }
 
   public void testHighlightStartInTokenWithEscapes() {
@@ -275,24 +307,29 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"will lie of\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"'<em>lie</em> past\")");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"'<em>lie</em> past\")");
   }
 
   public void testHighlightEndInTokenWithEscapes() {
     Path ocrPath = Paths.get("src/test/resources/data/sn90050316_1920_06_02_1.xml");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ(
-        "q", "ocr_text:\"that the democrats had\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Virginia <em>Democrats \"had</em> set forth')");
+    SolrQueryRequest req =
+        xmlQ("q", "ocr_text:\"that the democrats had\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Virginia <em>Democrats \"had</em> set forth')");
   }
 
   public void testHighlightEndInTokenWithNamedEscapes() {
     Path ocrPath = Paths.get("src/test/resources/data/sn83032300_1882_04_06_3.xml");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ(
-        "q", "ocr_text:\"added that nothing\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>Ade About Nothings</em>')");
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"added that nothing\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>Ade About Nothings</em>')");
   }
 }

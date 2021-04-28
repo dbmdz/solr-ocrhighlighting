@@ -23,24 +23,31 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
 
 public class HocrFormat implements OcrFormat {
-  private static final Pattern pageIdPat = Pattern.compile(
-      "(?:id=['\"](?<id>.+?)['\"]|x_source (?<source>.+?)['\";]|ppageno (?<pageno>\\d+))");
-  private static final Pattern pageBboxPat = Pattern.compile("bbox 0 0 (?<width>\\d+) (?<height>\\d+)");
-  private static final Pattern pageElemPat = Pattern.compile("<div.+?class=['\"]ocr_page['\"]\\s*(?<attribs>.+?)>");
-  private static final Map<OcrBlock, Set<String>> blockClassMapping = ImmutableMap.<OcrBlock, Set<String>>builder()
-      .put(OcrBlock.PAGE, ImmutableSet.of("ocr_page"))
-      .put(OcrBlock.BLOCK, ImmutableSet.of("ocr_carea", "ocrx_block"))
-      .put(OcrBlock.SECTION, ImmutableSet.of("ocr_chapter", "ocr_section", "ocr_subsection", "ocr_subsubsection"))
-      .put(OcrBlock.PARAGRAPH, ImmutableSet.of("ocr_par"))
-      .put(OcrBlock.LINE, ImmutableSet.of("ocr_line", "ocrx_line"))
-      .put(OcrBlock.WORD, ImmutableSet.of("ocrx_word"))
-      .build();
+  private static final Pattern pageIdPat =
+      Pattern.compile(
+          "(?:id=['\"](?<id>.+?)['\"]|x_source (?<source>.+?)['\";]|ppageno (?<pageno>\\d+))");
+  private static final Pattern pageBboxPat =
+      Pattern.compile("bbox 0 0 (?<width>\\d+) (?<height>\\d+)");
+  private static final Pattern pageElemPat =
+      Pattern.compile("<div.+?class=['\"]ocr_page['\"]\\s*(?<attribs>.+?)>");
+  private static final Map<OcrBlock, Set<String>> blockClassMapping =
+      ImmutableMap.<OcrBlock, Set<String>>builder()
+          .put(OcrBlock.PAGE, ImmutableSet.of("ocr_page"))
+          .put(OcrBlock.BLOCK, ImmutableSet.of("ocr_carea", "ocrx_block"))
+          .put(
+              OcrBlock.SECTION,
+              ImmutableSet.of("ocr_chapter", "ocr_section", "ocr_subsection", "ocr_subsubsection"))
+          .put(OcrBlock.PARAGRAPH, ImmutableSet.of("ocr_par"))
+          .put(OcrBlock.LINE, ImmutableSet.of("ocr_line", "ocrx_line"))
+          .put(OcrBlock.WORD, ImmutableSet.of("ocrx_word"))
+          .build();
 
   @Override
   public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
-    List<String> breakClasses = Arrays.stream(blockTypes)
-          .flatMap(b -> blockClassMapping.get(b).stream())
-          .collect(Collectors.toList());
+    List<String> breakClasses =
+        Arrays.stream(blockTypes)
+            .flatMap(b -> blockClassMapping.get(b).stream())
+            .collect(Collectors.toList());
     return new HocrClassBreakLocator(text, breakClasses);
   }
 
@@ -65,7 +72,8 @@ public class HocrFormat implements OcrFormat {
 
   // TODO: Might be faster without regexes? Profile!
   private OcrPage parsePage(String pageAttribs) {
-    RuntimeException noPageIdExc = new RuntimeException("Pages must have an identifier, check your source files!");
+    RuntimeException noPageIdExc =
+        new RuntimeException("Pages must have an identifier, check your source files!");
     if (pageAttribs == null) {
       throw noPageIdExc;
     }
@@ -73,10 +81,12 @@ public class HocrFormat implements OcrFormat {
     Matcher idMatch = pageIdPat.matcher(pageAttribs);
     String pageId = null;
     while (idMatch.find()) {
-      String candidate = Stream.of("id", "source", "pageno")
-          .map(idMatch::group)
-          .filter(StringUtils::isNotEmpty)
-          .findFirst().orElseThrow(() -> noPageIdExc);
+      String candidate =
+          Stream.of("id", "source", "pageno")
+              .map(idMatch::group)
+              .filter(StringUtils::isNotEmpty)
+              .findFirst()
+              .orElseThrow(() -> noPageIdExc);
       if (candidate.equals(idMatch.group("id"))) {
         // A specific id is the ideal case, no need to check for further candidates
         pageId = candidate;
@@ -96,9 +106,10 @@ public class HocrFormat implements OcrFormat {
     Dimension pageDims = null;
     Matcher boxMatch = pageBboxPat.matcher(pageAttribs);
     if (boxMatch.find()) {
-      pageDims = new Dimension(
-          Integer.parseInt(boxMatch.group("width")),
-          Integer.parseInt(boxMatch.group("height")));
+      pageDims =
+          new Dimension(
+              Integer.parseInt(boxMatch.group("width")),
+              Integer.parseInt(boxMatch.group("height")));
     }
     return new OcrPage(pageId, pageDims);
   }

@@ -28,7 +28,8 @@ public class HocrParser extends OcrParser {
   }
 
   @Override
-  protected OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features) throws XMLStreamException {
+  protected OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
+      throws XMLStreamException {
     // For hyphenated tokens, we parse  both parts first and then output them one after the other
     if (hyphenEnd != null) {
       OcrBox out = this.hyphenEnd;
@@ -55,8 +56,11 @@ public class HocrParser extends OcrParser {
     Map<String, String> props = parseTitle(xmlReader.getAttributeValue("", "title"));
     if (features.contains(ParsingFeature.TEXT)) {
       this.parseText(
-          xmlReader, box, features.contains(ParsingFeature.HIGHLIGHTS),
-          features.contains(ParsingFeature.OFFSETS), features.contains(ParsingFeature.ALTERNATIVES));
+          xmlReader,
+          box,
+          features.contains(ParsingFeature.HIGHLIGHTS),
+          features.contains(ParsingFeature.OFFSETS),
+          features.contains(ParsingFeature.ALTERNATIVES));
     }
     if (features.contains(ParsingFeature.COORDINATES)) {
       this.parseCoordinates(box, props.get("bbox"));
@@ -102,9 +106,10 @@ public class HocrParser extends OcrParser {
     // Boxes without text or coordinates (if either is requested with a feature flag) are ignored
     // since they break things downstream
     boolean ignoreBox =
-        (features.contains(ParsingFeature.TEXT) && (box.getText() == null || box.getText().isEmpty()))
+        (features.contains(ParsingFeature.TEXT)
+                && (box.getText() == null || box.getText().isEmpty()))
             || (features.contains(ParsingFeature.COORDINATES)
-            && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
+                && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
     if (ignoreBox) {
       return null;
     }
@@ -114,7 +119,7 @@ public class HocrParser extends OcrParser {
   private Map<String, String> parseTitle(String title) {
     Map<String, String> props = new HashMap<>();
     String[] parts = title.split(";");
-    for (String part: parts) {
+    for (String part : parts) {
       int spaceIdx = part.indexOf(' ', 3);
       props.put(part.substring(0, spaceIdx).trim(), part.substring(spaceIdx + 1).trim());
     }
@@ -140,8 +145,12 @@ public class HocrParser extends OcrParser {
   }
 
   private void parseText(
-      XMLStreamReader2 xmlReader, OcrBox box, boolean withHighlights, boolean withOffsets,
-      boolean withAlternatives) throws XMLStreamException {
+      XMLStreamReader2 xmlReader,
+      OcrBox box,
+      boolean withHighlights,
+      boolean withOffsets,
+      boolean withAlternatives)
+      throws XMLStreamException {
     String txt = null;
     int txtOffset = -1;
     boolean inAlternatives = false;
@@ -200,9 +209,10 @@ public class HocrParser extends OcrParser {
           throw new IllegalStateException("<del> elements must have a text node as its sole child");
         }
         String altText = xmlReader.getText();
-        Integer altOffset = withOffsets
-            ? Math.toIntExact(xmlReader.getLocationInfo().getStartingCharOffset())
-            : null;
+        Integer altOffset =
+            withOffsets
+                ? Math.toIntExact(xmlReader.getLocationInfo().getStartingCharOffset())
+                : null;
         if (withHighlights && box.getHighlightSpan() == null) {
           box.setHighlightSpan(this.trackHighlightSpan(altText, box));
         }
@@ -214,7 +224,8 @@ public class HocrParser extends OcrParser {
     }
   }
 
-  private String seekToNextWord(XMLStreamReader2 xmlReader, boolean trackPages) throws XMLStreamException {
+  private String seekToNextWord(XMLStreamReader2 xmlReader, boolean trackPages)
+      throws XMLStreamException {
     boolean foundWord = false;
     StringBuilder trailingChars = new StringBuilder();
     while (xmlReader.hasNext()) {
@@ -225,17 +236,19 @@ public class HocrParser extends OcrParser {
         if ("span".equals(localName) && "ocrx_word".equals(hocrClass)) {
           foundWord = true;
           break;
-        } else if ("span".equals(localName) && "ocr_line".equals(hocrClass) && trailingChars.lastIndexOf(" ") < 0) {
+        } else if ("span".equals(localName)
+            && "ocr_line".equals(hocrClass)
+            && trailingChars.lastIndexOf(" ") < 0) {
           // Line breaks result in a trailing whitespace character
           trailingChars.append(' ');
         } else if (trackPages && "div".equals(localName) && "ocr_page".equals(hocrClass)) {
           // Page break
-          Map<String, String> pageProps = this.parseTitle(
-              xmlReader.getAttributeValue("", "title"));
+          Map<String, String> pageProps = this.parseTitle(xmlReader.getAttributeValue("", "title"));
           Dimension pageDims = null;
           if (pageProps.containsKey("bbox")) {
             String[] bboxParts = pageProps.get("bbox").split(" ");
-            pageDims = new Dimension(Integer.parseInt(bboxParts[2]), Integer.parseInt(bboxParts[3]));
+            pageDims =
+                new Dimension(Integer.parseInt(bboxParts[2]), Integer.parseInt(bboxParts[3]));
           }
           String pageId = xmlReader.getAttributeValue("", "id");
           if (pageId == null) {
@@ -246,10 +259,13 @@ public class HocrParser extends OcrParser {
           }
           this.currentPage = new OcrPage(pageId, pageDims);
         }
-      } else if (nextEvent == XMLStreamConstants.CHARACTERS || nextEvent == XMLStreamConstants.SPACE) {
+      } else if (nextEvent == XMLStreamConstants.CHARACTERS
+          || nextEvent == XMLStreamConstants.SPACE) {
         String txt = xmlReader.getText();
         boolean isBlank = StringUtils.isBlank(txt);
-        if (isBlank && (trailingChars.length() == 0 || trailingChars.lastIndexOf(" ") != (trailingChars.length() - 1))) {
+        if (isBlank
+            && (trailingChars.length() == 0
+                || trailingChars.lastIndexOf(" ") != (trailingChars.length() - 1))) {
           trailingChars.append(' ');
         } else if (!isBlank) {
           trailingChars.append(txt);

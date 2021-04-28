@@ -6,8 +6,10 @@ import java.io.Reader;
 import java.util.Optional;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 
-/** Reader class that supports "peeking forward" into the beginning of the stream and "peeking backward" into a fixed
- * window of previously read data. */
+/**
+ * Reader class that supports "peeking forward" into the beginning of the stream and "peeking
+ * backward" into a fixed window of previously read data.
+ */
 public class PeekingReader extends BaseCharFilter implements SourceAwareReader {
   /** Buffer to hold the beginning of the input reader. */
   private final char[] peekStart;
@@ -26,6 +28,7 @@ public class PeekingReader extends BaseCharFilter implements SourceAwareReader {
 
   /**
    * Construct a new peeking reader with the given buffer sizes
+   *
    * @param in input Reader instance
    * @param beginPeekSize number of characters to buffer from the beginning of the string
    * @param maxBackContextSize number of characters to buffer from previous reads
@@ -37,7 +40,8 @@ public class PeekingReader extends BaseCharFilter implements SourceAwareReader {
       char[] buf = new char[beginPeekSize];
       int numRead = this.input.read(buf, 0, beginPeekSize);
       if (numRead < beginPeekSize) {
-        // If the input reader has less characters than the requested start peek buffer, use a smaller buffer
+        // If the input reader has less characters than the requested start peek buffer, use a
+        // smaller buffer
         this.peekStart = new char[numRead];
         System.arraycopy(buf, 0, this.peekStart, 0, numRead);
       } else {
@@ -111,7 +115,9 @@ public class PeekingReader extends BaseCharFilter implements SourceAwareReader {
     return new String(peekStart);
   }
 
-  /** Peek into the back-context, i.e. the previously read data without seeking back in the stream. */
+  /**
+   * Peek into the back-context, i.e. the previously read data without seeking back in the stream.
+   */
   public String peekBackContext() {
     return new String(backContext, 0, this.backContextSize);
   }

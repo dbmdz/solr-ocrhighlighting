@@ -23,19 +23,13 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
    */
   private int cumulative;
 
-  /**
-   * The current <strong>char</strong> offset in the full file;
-   */
+  /** The current <strong>char</strong> offset in the full file; */
   private int currentInOffset;
 
-  /**
-   * The current <strong>char</strong> offset in the output.
-   */
+  /** The current <strong>char</strong> offset in the output. */
   private int currentOutOffset;
 
-  /**
-   * Source pointer of this reader, used for debugging and error reporting.
-   */
+  /** Source pointer of this reader, used for debugging and error reporting. */
   private final String pointer;
 
   private boolean nextIsOffset = false;
@@ -61,7 +55,7 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
   /**
    * Read <tt>len</tt> <tt>char</tt>s into <tt>cbuf</tt>, starting from character index <tt>off</tt>
    * relative to the beginning of <tt>cbuf</tt> and return the number of <tt>char</tt>s read.
-   **/
+   */
   @Override
   public int read(char[] cbuf, int off, int len) throws IOException {
     if (currentInOffset == currentRegion.end) {

@@ -11,9 +11,9 @@ public class TagBreakLocator extends BaseBreakLocator {
   public TagBreakLocator(IterableCharSequence text, String tagName, boolean closing) {
     super(text);
     if (closing) {
-      this.breakTag = ("</" + tagName + ">");//.toCharArray();
+      this.breakTag = ("</" + tagName + ">"); // .toCharArray();
     } else {
-      this.breakTag = ("<" + tagName);//.toCharArray();
+      this.breakTag = ("<" + tagName); // .toCharArray();
     }
   }
 

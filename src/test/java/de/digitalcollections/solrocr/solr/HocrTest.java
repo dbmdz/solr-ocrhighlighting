@@ -19,49 +19,58 @@ public class HocrTest extends SolrTestCaseJ4 {
   public static void beforeClass() throws Exception {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "general");
 
-    assertU(adoc(
-        "some_text",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor "
-        + "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
-        + "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute "
-        + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
-        + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
-        + "deserunt mollit anim id est laborum.", "id", "1337"));
+    assertU(
+        adoc(
+            "some_text",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor "
+                + "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
+                + "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute "
+                + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
+                + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
+                + "deserunt mollit anim id est laborum.",
+            "id",
+            "1337"));
     Path ocrPath = Paths.get("src/test/resources/data/hocr.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
     assertU(adoc("ocr_text", String.format("%s[3001845:3065626]", ocrPath.toString()), "id", "84"));
     Path multiColPath = Paths.get("src/test/resources/data/multicolumn.hocr");
-    assertU(adoc("ocr_text", multiColPath.toString(),  "id", "96"));
-    String ptr = Files.walk(Paths.get("src/test/resources/data/chronicling_hocr"), 1)
-        .sorted()
-        .filter(Files::isRegularFile)
-        .map(Path::toString)
-        .collect(Collectors.joining("+"));
-    assertU(adoc("ocr_text", ptr,  "id", "758"));
+    assertU(adoc("ocr_text", multiColPath.toString(), "id", "96"));
+    String ptr =
+        Files.walk(Paths.get("src/test/resources/data/chronicling_hocr"), 1)
+            .sorted()
+            .filter(Files::isRegularFile)
+            .map(Path::toString)
+            .collect(Collectors.joining("+"));
+    assertU(adoc("ocr_text", ptr, "id", "758"));
     Path path = Paths.get("src/test/resources/data/space_after.html");
-    assertU(adoc("ocr_text", path.toString(),  "id", "396"));
+    assertU(adoc("ocr_text", path.toString(), "id", "396"));
     assertU(commit());
   }
 
   private static SolrQueryRequest xmlQ(String... extraArgs) {
-    Map<String, String> args = new HashMap<>(ImmutableMap.<String, String>builder()
-        .put("hl", "true")
-        .put("hl.ocr.fl", "ocr_text")
-        .put("hl.usePhraseHighlighter", "true")
-        .put("df", "ocr_text")
-        .put("hl.ctxTag", "ocr_line")
-        .put("hl.ctxSize", "2")
-        .put("hl.snippets", "10")
-        .put("fl", "id")
-        .build());
+    Map<String, String> args =
+        new HashMap<>(
+            ImmutableMap.<String, String>builder()
+                .put("hl", "true")
+                .put("hl.ocr.fl", "ocr_text")
+                .put("hl.usePhraseHighlighter", "true")
+                .put("df", "ocr_text")
+                .put("hl.ctxTag", "ocr_line")
+                .put("hl.ctxSize", "2")
+                .put("hl.snippets", "10")
+                .put("fl", "id")
+                .build());
     for (int i = 0; i < extraArgs.length; i += 2) {
       String key = extraArgs[i];
       String val = extraArgs[i + 1];
       args.put(key, val);
     }
 
-    SolrQueryRequest q = req(
-        args.entrySet().stream().flatMap(e -> Stream.of(e.getKey(), e.getValue())).toArray(String[]::new));
+    SolrQueryRequest q =
+        req(
+            args.entrySet().stream()
+                .flatMap(e -> Stream.of(e.getKey(), e.getValue()))
+                .toArray(String[]::new));
     ModifiableSolrParams params = new ModifiableSolrParams(q.getParams());
     params.set("indent", "true");
     q.setParams(params);
@@ -71,43 +80,44 @@ public class HocrTest extends SolrTestCaseJ4 {
   @Test
   public void testHocr() {
     SolrQueryRequest req = xmlQ("q", "tamara");
-    assertQ(req,
+    assertQ(
+        req,
         "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=2",
         "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
             + "Jlluſtrationen zu Lermontoffs „Dämon“: die Verführung <em>Tamaras</em> durch den Dämon, ihre "
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",
         "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
-        "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=361"
-    );
+        "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=361");
   }
 
   @Test
   public void testWeightMatches() {
     SolrQueryRequest req = xmlQ("q", "\"Verführung Tamaras\"", "hl.weightMatches", "true");
-    assertQ(req,
-            "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
-            "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
+    assertQ(
+        req,
+        "count(//lst[@name='ocrHighlighting']/lst[@name='42']/lst[@name='ocr_text']/arr/lst)=1",
+        "//str[@name='text'][1]/text()='lung. Ganz vorn lagen die drei mittelmäßigen, aber ſehr populären "
             + "Jlluſtrationen zu Lermontoffs „Dämon“: die <em>Verführung Tamaras</em> durch den Dämon, ihre "
             + "Hingabe an ihn, ihr Tod durch ihn. Fenia wies mit dem Muff darauf hin.'",
-            "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
-            "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=83");
+        "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
+        "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=83");
   }
 
   @Test
   public void testSubsectionHighlighting() {
     SolrQueryRequest req = xmlQ("q", "\"brütenden Sonnenwärme\"", "hl.weightMatches", "true");
-    assertQ(req,
-            "count(//lst[@name='ocrHighlighting']/lst)=2",
-            "//lst[@name='ocrHighlighting']/lst[@name='42']//arr[@name='snippets']/lst/str[@name='text']/text()='"
+    assertQ(
+        req,
+        "count(//lst[@name='ocrHighlighting']/lst)=2",
+        "//lst[@name='ocrHighlighting']/lst[@name='42']//arr[@name='snippets']/lst/str[@name='text']/text()='"
             + "glückſeligen Klang ihres gedämpften Lachens und mit dem Eindru> der: <em>brütenden Sonnenwärme</em> um "
             + "uns. Wer will abwägen, wie unendlich zufällig, wie rein äußerlich bedingt es vielleicht iſt, wenn mir "
             + "bei dieſer Erinnerung'");
     req = xmlQ("q", "\"Volfslieder heller von den Lippen\"", "hl.weightMatches", "true");
-    assertQ(req,
-            "count(//lst[@name='ocrHighlighting']/lst)=2");
+    assertQ(req, "count(//lst[@name='ocrHighlighting']/lst)=2");
   }
 
-    @Test
+  @Test
   public void testPageNumberAtBeginningOfPage() {
     SolrQueryRequest req = xmlQ("q", "\"peramentvollere Glänzendere\"", "hl.weightMatches", "true");
     assertQ(
@@ -121,8 +131,8 @@ public class HocrTest extends SolrTestCaseJ4 {
 
   @Test
   public void testOverlappingMatches() {
-    SolrQueryRequest req = xmlQ("q", "\"pirate vessel\"~10", "hl.weightMatches", "true",
-                                "hl.ocr.contextSize", "0");
+    SolrQueryRequest req =
+        xmlQ("q", "\"pirate vessel\"~10", "hl.weightMatches", "true", "hl.ocr.contextSize", "0");
     assertQ(
         req,
         "//lst[@name='ocrHighlighting']//str[@name='text']/text()='<em>pirates hove their vessel that the other pirates</em> had trashed'",
@@ -132,31 +142,37 @@ public class HocrTest extends SolrTestCaseJ4 {
   @Test
   public void testAbsoluteHighlightRegions() {
     SolrQueryRequest req = xmlQ("q", "Verführung", "hl.ocr.absoluteHighlights", "true");
-    assertQ(req,
-            "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
-            "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=229");
+    assertQ(
+        req,
+        "//arr[@name='regions'][1]/lst/int[@name='ulx']/text()=146",
+        "//arr[@name='highlights']/arr/lst[1]/int[@name='ulx']/text()=229");
   }
 
   @Test
   public void testLimitBlockHonored() {
     SolrQueryRequest req = xmlQ("q", "Japan", "hl.ocr.absoluteHighlights", "true", "fq", "id:42");
-    assertQ(req,
-            "//int[@name='numTotal']/text()='6'",
-            "(//arr[@name='snippets']/lst/str[@name='text']/text())[1]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of <em>Japan</em>'");
+    assertQ(
+        req,
+        "//int[@name='numTotal']/text()='6'",
+        "(//arr[@name='snippets']/lst/str[@name='text']/text())[1]='object too hastily, in addition to the facts already stated it ought to be remarked, that Kunnpfer describes the coast of <em>Japan</em>'");
   }
 
   @Test
   public void testAccidentalMerge() {
     SolrQueryRequest req = xmlQ("q", "Robinson");
-    assertQ(
-        req,
-        "count(//arr[@name='regions']/lst)=1",
-        "count(//arr[@name='highlights']/arr)=2");
+    assertQ(req, "count(//arr[@name='regions']/lst)=1", "count(//arr[@name='highlights']/arr)=2");
   }
 
   @Test
   public void testMultiPageSnippet() {
-    SolrQueryRequest req = xmlQ("q", "\"max werner hochzeit\"~10", "hl.ocr.limitBlock", "none", "hl.weightMatches", "true");
+    SolrQueryRequest req =
+        xmlQ(
+            "q",
+            "\"max werner hochzeit\"~10",
+            "hl.ocr.limitBlock",
+            "none",
+            "hl.weightMatches",
+            "true");
     assertQ(
         req,
         "//str[@name='text'][1]/text()='einer Verwandten ihres zukünftigen Mannes, die im Auslande ſtudiert und kürzlich promoviert habe. Tief im Winter, Mitte Januar, reiſte <em>Max Werner zur Hochzeit</em> ſeiner Schweſter in die ruſſiſche Provinz. Dort, auf dem Gut von deren Freunden, wo eine Un- menge fremder Gäſte untergebracht waren, ſah er mitten'",
@@ -175,9 +191,10 @@ public class HocrTest extends SolrTestCaseJ4 {
   @Test
   public void testMergedRegionExceedsContext() {
     SolrQueryRequest req = xmlQ("q", "\"lord's prayer\"", "hl.weightMatches", "true");
-    assertQ(req,
-            "count(//arr[@name='regions']/lst)=1",
-            "//str[@name='text'][1]/text()=\"Witches are reported (amongst many other hellish observations, whereby "
+    assertQ(
+        req,
+        "count(//arr[@name='regions']/lst)=1",
+        "//str[@name='text'][1]/text()=\"Witches are reported (amongst many other hellish observations, whereby "
             + "they obh'ge themselves to Satan) to say the <em>Lord's prayer</em> backwards. "
             + "Are there not many, who, though they do not. pronounce the syllables of the <em>Lord's "
             + "prayer</em> retrograde (their discretion will not suffer them to be betrayed to such a "
@@ -201,7 +218,8 @@ public class HocrTest extends SolrTestCaseJ4 {
 
   @Test
   public void testHighlightingTimeout() {
-    // This test can only check for the worst case, since checking for partial results is unlikely to be stable across
+    // This test can only check for the worst case, since checking for partial results is unlikely
+    // to be stable across
     // multiple environments due to timing issues.
     SolrQueryRequest req = xmlQ("q", "Vögelchen", "hl.ocr.timeAllowed", "1");
     assertQ(
@@ -238,18 +256,25 @@ public class HocrTest extends SolrTestCaseJ4 {
 
   @Test
   public void testPassageSorting() {
-    String firstSnip = "auf und ſchob <em>Fenia</em> ſo eilig er konnte hinein. Denn vom untern Sto>werk wurden "
-        + "Stimmen laut, und einer der Tatarenkellner geleitete fremde Herrſchaften hinauf.";
+    String firstSnip =
+        "auf und ſchob <em>Fenia</em> ſo eilig er konnte hinein. Denn vom untern Sto>werk wurden "
+            + "Stimmen laut, und einer der Tatarenkellner geleitete fremde Herrſchaften hinauf.";
     SolrQueryRequest req = xmlQ("q", "fenia", "hl.snippets", "1");
-    assertQ(req, String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
+    assertQ(
+        req,
+        String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
     req = xmlQ("q", "fenia", "hl.snippets", "100");
-    assertQ(req, String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
+    assertQ(
+        req,
+        String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
   }
 
   @Test
   public void testAlignSpans() {
-    String unalignedText = "in die erſte Jugend, die nicht wiederkam. Lou <em>Andreas</em>-Salomet, Fenitſchka. 12";
-    String alignedText = "in die erſte Jugend, die nicht wiederkam. Lou <em>Andreas-Salomet,</em> Fenitſchka. 12";
+    String unalignedText =
+        "in die erſte Jugend, die nicht wiederkam. Lou <em>Andreas</em>-Salomet, Fenitſchka. 12";
+    String alignedText =
+        "in die erſte Jugend, die nicht wiederkam. Lou <em>Andreas-Salomet,</em> Fenitſchka. 12";
     SolrQueryRequest req = xmlQ("q", "Andreas", "hl.ocr.pageId", "page_181");
     assertQ(
         req,
@@ -264,17 +289,24 @@ public class HocrTest extends SolrTestCaseJ4 {
 
   @Test
   public void testRegularHighlighting() {
-    SolrQueryRequest req = req(
-        "q", "\"occaecat cupidatat\"", "hl.fl", "some_text", "df", "some_text", "hl", "true");
+    SolrQueryRequest req =
+        req("q", "\"occaecat cupidatat\"", "hl.fl", "some_text", "df", "some_text", "hl", "true");
     assertQ(req, "count(//lst[@name='highlighting']//arr[@name='some_text'])=1");
     assertQ(req, "count(//lst[@name='ocrHighlighting']//arr[@name='snippets'])=0");
   }
 
   @Test
   public void testCombinedHighlighting() {
-    SolrQueryRequest req = xmlQ(
-        "q", "\"occaecat cupidatat\" Salomet", "hl.fl", "some_text", "defType", "edismax",
-        "qf", "some_text ocr_text");
+    SolrQueryRequest req =
+        xmlQ(
+            "q",
+            "\"occaecat cupidatat\" Salomet",
+            "hl.fl",
+            "some_text",
+            "defType",
+            "edismax",
+            "qf",
+            "some_text ocr_text");
     assertQ(req, "count(//lst[@name='highlighting']//arr[@name='some_text'])=1");
     assertQ(req, "count(//lst[@name='ocrHighlighting']//arr[@name='snippets']/lst)=1");
   }
@@ -317,7 +349,8 @@ public class HocrTest extends SolrTestCaseJ4 {
     Path ocrPath = Paths.get("src/test/resources/data/hyphen_phrasematch.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ("q", "ocr_text:\"whose death was announced\"", "hl.weightMatches", "true");
+    SolrQueryRequest req =
+        xmlQ("q", "ocr_text:\"whose death was announced\"", "hl.weightMatches", "true");
     assertQ(
         req,
         "contains(//arr[@name='snippets']/lst/str[@name='text']/text(), '<em>whose death was announced</em>')");
@@ -335,15 +368,20 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"as to details\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[2]/text(), '<em>details</em>')");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[2]/text(), '<em>details</em>')");
   }
 
   public void testMissingClosing() {
     Path ocrPath = Paths.get("src/test/resources/data/missing_closing.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ("q", "ocr_text:\"body of the republican\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>body of independent Republicans</em>')");
+    SolrQueryRequest req =
+        xmlQ("q", "ocr_text:\"body of the republican\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>body of independent Republicans</em>')");
   }
 
   public void testAlternativeHighlighting() {
@@ -351,10 +389,12 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"atc of ai flitiia\"", "hl.weightMatches", "true");
-    assertQ(req,
+    assertQ(
+        req,
         "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>atC Of ai flItIIa</em>')");
     req = xmlQ("q", "ocr_text:\"atc of ai halrPt\"", "hl.weightMatches", "true");
-    assertQ(req,
+    assertQ(
+        req,
         "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>atC Of ai halrPt</em>')");
   }
 
@@ -363,15 +403,20 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"rain bide me jrajz\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '')");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '')");
   }
 
   public void testPartialHyphen() {
     Path ocrPath = Paths.get("src/test/resources/data/hyphen_partial.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ("q", "ocr_text:\"irregular manner in\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Ah for her re-')");
+    SolrQueryRequest req =
+        xmlQ("q", "ocr_text:\"irregular manner in\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), 'Ah for her re-')");
   }
 
   public void testExtraEndHyphen() {
@@ -379,10 +424,15 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"you never ill and\"", "hl.weightMatches", "true");
-    String snipText = "Hie recalcitrant organ, of palua beneath Iho right nheuMer blaOe, el dytpepllc aympteRM, "
-    + "conciliation and headache? Of course <em>you never ill</em> J, and of courts the lntlTUlual vrm net using "
-    + "llcxtetter't Stomach UltUra, or he vionlilnei se hare looked e hare com-cem-";
-    assertQ(req, "//lst[@name='47371']//arr[@name='snippets']/lst/str[@name='text']/text()=\"" + snipText + "\"");
+    String snipText =
+        "Hie recalcitrant organ, of palua beneath Iho right nheuMer blaOe, el dytpepllc aympteRM, "
+            + "conciliation and headache? Of course <em>you never ill</em> J, and of courts the lntlTUlual vrm net using "
+            + "llcxtetter't Stomach UltUra, or he vionlilnei se hare looked e hare com-cem-";
+    assertQ(
+        req,
+        "//lst[@name='47371']//arr[@name='snippets']/lst/str[@name='text']/text()=\""
+            + snipText
+            + "\"");
   }
 
   public void testLongTokenTruncated() {
@@ -390,7 +440,9 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"greatest of all\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"i!i!iiiitiiiiiiiiiiiiiiiiiiiiiiniiiiiiiFFf/^|SALEiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii^'Hi\")");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"i!i!iiiitiiiiiiiiiiiiiiiiiiiiiiniiiiiiiFFf/^|SALEiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii^'Hi\")");
   }
 
   public void testHighlightStartInTokenWithEscapes() {
@@ -398,16 +450,19 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"ere what it is\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"1'<em>er what</em>\")");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"1'<em>er what</em>\")");
   }
 
   public void testHighlightEndInTokenWithEscapes() {
     Path ocrPath = Paths.get("src/test/resources/data/sn90050316_1922_12_13_8.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ(
-        "q", "ocr_text:\"returns the ee\"", "hl.weightMatches", "true");
-    assertQ(req, "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"<em>returning Saturday. !>ee</em>\")");
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"returns the ee\"", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"<em>returning Saturday. !>ee</em>\")");
   }
 
   public void testUnscoredSnippets() {

@@ -19,29 +19,40 @@ import org.apache.lucene.search.uhighlight.Passage;
 import org.apache.lucene.search.uhighlight.PassageScorer;
 import org.apache.lucene.util.BytesRef;
 
-/**
- * A customization of {@link FieldHighlighter} to support OCR fields
- */
+/** A customization of {@link FieldHighlighter} to support OCR fields */
 public class OcrFieldHighlighter extends FieldHighlighter {
   private final Map<Integer, Integer> numMatches;
 
-  public OcrFieldHighlighter(String field, FieldOffsetStrategy fieldOffsetStrategy,
-                             PassageScorer passageScorer, int maxPassages, int maxNoHighlightPassages) {
-    super(field, fieldOffsetStrategy, null, passageScorer, maxPassages, maxNoHighlightPassages, null);
+  public OcrFieldHighlighter(
+      String field,
+      FieldOffsetStrategy fieldOffsetStrategy,
+      PassageScorer passageScorer,
+      int maxPassages,
+      int maxNoHighlightPassages) {
+    super(
+        field, fieldOffsetStrategy, null, passageScorer, maxPassages, maxNoHighlightPassages, null);
     this.numMatches = new HashMap<>();
   }
 
   /**
    * The primary method -- highlight this doc, assuming a specific field and given this content.
    *
-   * Largely copied from {@link FieldHighlighter#highlightFieldForDoc(LeafReader, int, String)}, modified to support
-   * an {@link IterableCharSequence} as content and dynamically setting the break iterator and the formatter.
+   * <p>Largely copied from {@link FieldHighlighter#highlightFieldForDoc(LeafReader, int, String)},
+   * modified to support an {@link IterableCharSequence} as content and dynamically setting the
+   * break iterator and the formatter.
    */
-  public OcrSnippet[] highlightFieldForDoc(LeafReader reader, int docId, BreakLocator breakLocator,
-                                           OcrPassageFormatter formatter, IterableCharSequence content, String pageId,
-                                           int snippetLimit, boolean scorePassages)
+  public OcrSnippet[] highlightFieldForDoc(
+      LeafReader reader,
+      int docId,
+      BreakLocator breakLocator,
+      OcrPassageFormatter formatter,
+      IterableCharSequence content,
+      String pageId,
+      int snippetLimit,
+      boolean scorePassages)
       throws IOException {
-    // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl for it.
+    // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl
+    // for it.
 
     // If page cache pre-warming is enabled, cancel it, since we're doing the I/O ourselves now
     PageCacheWarmer.getInstance().ifPresent(w -> w.cancelPreload(content.getPointer()));
@@ -51,13 +62,17 @@ public class OcrFieldHighlighter extends FieldHighlighter {
 
     Passage[] passages;
     try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
-      passages = highlightOffsetsEnums(offsetsEnums, docId, breakLocator, formatter, pageId, snippetLimit, scorePassages);
+      passages =
+          highlightOffsetsEnums(
+              offsetsEnums, docId, breakLocator, formatter, pageId, snippetLimit, scorePassages);
     }
 
     // Format the resulting Passages.
     if (passages.length == 0 && pageId == null) {
       // no passages were returned, so ask for a default summary
-      passages = getSummaryPassagesNoHighlight(maxNoHighlightPassages == -1 ? maxPassages : maxNoHighlightPassages);
+      passages =
+          getSummaryPassagesNoHighlight(
+              maxNoHighlightPassages == -1 ? maxPassages : maxNoHighlightPassages);
     }
 
     if (passages.length > 0) {
@@ -68,41 +83,50 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       return null;
     }
   }
+
   @Override
   protected Passage[] highlightOffsetsEnums(OffsetsEnum off) {
     throw new UnsupportedOperationException();
   }
 
   protected Passage[] highlightOffsetsEnums(
-      OffsetsEnum off, int docId, BreakLocator breakLocator, OcrPassageFormatter formatter, String pageId,
-      int snippetLimit, boolean scorePassages) throws IOException {
+      OffsetsEnum off,
+      int docId,
+      BreakLocator breakLocator,
+      OcrPassageFormatter formatter,
+      String pageId,
+      int snippetLimit,
+      boolean scorePassages)
+      throws IOException {
     final int contentLength = breakLocator.getText().getEndIndex();
     if (!off.nextPosition()) {
       return new Passage[0];
     }
     // If we're filtering by a page identifier, we want *all* hits on that page
     int queueSize = pageId != null ? 4096 : maxPassages;
-    if (queueSize  <= 0) {
+    if (queueSize <= 0) {
       queueSize = 512;
     }
 
     Comparator<Passage> cmp;
     if (scorePassages) {
-      cmp = (left, right) -> {
-        if (left.getScore() < right.getScore()) {
-          return -1;
-        } else if (left.getScore() > right.getScore()) {
-          return 1;
-        } else {
-          return left.getStartOffset() - right.getStartOffset();
-        }
-      };
+      cmp =
+          (left, right) -> {
+            if (left.getScore() < right.getScore()) {
+              return -1;
+            } else if (left.getScore() > right.getScore()) {
+              return 1;
+            } else {
+              return left.getStartOffset() - right.getStartOffset();
+            }
+          };
     } else {
       cmp = Comparator.comparingInt(Passage::getStartOffset);
     }
 
     PriorityQueue<Passage> passageQueue = new PriorityQueue<>(queueSize, cmp);
-    Passage passage = new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
+    Passage passage =
+        new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
 
     // If we've reached the limit, no longer calculate passages, only count matches as passages
     boolean limitReached = false;
@@ -110,7 +134,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     do {
       int start = off.startOffset();
       if (start == -1) {
-        throw new IllegalArgumentException("field '" + field + "' was indexed without offsets, cannot highlight");
+        throw new IllegalArgumentException(
+            "field '" + field + "' was indexed without offsets, cannot highlight");
       }
       if (pageId != null) {
         String passagePageId = formatter.determineStartPage(start, breakLocator.getText()).id;
@@ -122,8 +147,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       if (start < contentLength && end > contentLength) {
         continue;
       }
-      // Since building passages is expensive when using external files, we forego it past a certain limit
-      // (which can be set by the user) and just update the total count, counting each match as a single passage.
+      // Since building passages is expensive when using external files, we forego it past a certain
+      // limit (which can be set by the user) and just update the total count, counting each matc
+      // as a single passage.
       if (limitReached || numTotal > snippetLimit) {
         numTotal++;
         limitReached = true;
@@ -138,7 +164,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         if (passage.getStartOffset() >= 0) {
           numTotal++;
         }
-        passage = maybeAddPassage(passageQueue, passageScorer, passage, contentLength, scorePassages);
+        passage =
+            maybeAddPassage(passageQueue, passageScorer, passage, contentLength, scorePassages);
         // if we exceed limit, we are done
         if (start >= contentLength) {
           break;
@@ -147,7 +174,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
       passage.setEndOffset(passageEnd);
       // Add this term to the passage.
-      BytesRef term = off.getTerm();// a reference; safe to refer to
+      BytesRef term = off.getTerm(); // a reference; safe to refer to
       assert term != null;
       passage.addMatch(start, end, term, off.freq());
     } while (off.nextPosition());
@@ -164,8 +191,12 @@ public class OcrFieldHighlighter extends FieldHighlighter {
   }
 
   /** Uses parts from {@link FieldHighlighter} due to private access there. */
-  private Passage maybeAddPassage(PriorityQueue<Passage> passageQueue, PassageScorer scorer, Passage passage,
-                                  int contentLength, boolean score) {
+  private Passage maybeAddPassage(
+      PriorityQueue<Passage> passageQueue,
+      PassageScorer scorer,
+      Passage passage,
+      int contentLength,
+      boolean score) {
     if (passage.getStartOffset() == -1) {
       // empty passage, we can ignore it
       return passage;
@@ -174,7 +205,9 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       passage.setScore(scorer.score(passage, contentLength));
     }
     // new sentence: first add 'passage' to queue
-    if (score && passageQueue.size() == maxPassages && passage.getScore() < passageQueue.peek().getScore()) {
+    if (score
+        && passageQueue.size() == maxPassages
+        && passage.getScore() < passageQueue.peek().getScore()) {
       passage.reset(); // can't compete, just reset it
     } else {
       passageQueue.offer(passage);
@@ -191,10 +224,10 @@ public class OcrFieldHighlighter extends FieldHighlighter {
   /** We don't provide summaries if there is no highlighting, i.e. no matches in the OCR text */
   @Override
   protected Passage[] getSummaryPassagesNoHighlight(int maxPassages) {
-    return new Passage[]{};
+    return new Passage[] {};
   }
 
-  public int getNumMatches(int  docId) {
+  public int getNumMatches(int docId) {
     return numMatches.getOrDefault(docId, -1);
   }
 }

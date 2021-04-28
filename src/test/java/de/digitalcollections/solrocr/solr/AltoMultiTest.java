@@ -20,43 +20,49 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
     initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "general");
 
     Path ocrBasePath = Paths.get("src/test/resources/data/alto_multi");
-    String ptr = Files.list(ocrBasePath)
-        .filter(p -> p.getFileName().toString().startsWith("1860-11-30_01"))
-        .map(p -> p.toAbsolutePath().toString())
-        .sorted()
-        .collect(Collectors.joining("+"));
+    String ptr =
+        Files.list(ocrBasePath)
+            .filter(p -> p.getFileName().toString().startsWith("1860-11-30_01"))
+            .map(p -> p.toAbsolutePath().toString())
+            .sorted()
+            .collect(Collectors.joining("+"));
     assertU(adoc("ocr_text", ptr, "id", "42"));
     String debugPtr =
         Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00001.xml").toAbsolutePath()
-      + "[35835:36523,36528:37059,37064:86504,86509:138873,138878:193611,193616:244420,244425:247169]+"
-      + Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00002.xml").toAbsolutePath()
-      + "[2223:25803,25808:32247,32252:38770,38775:85408,85413:88087,88092:120911,120916:149458,"
-      +  "149463:178686,178691:220893,220898:231618,231623:242459]";
+            + "[35835:36523,36528:37059,37064:86504,86509:138873,138878:193611,193616:244420,244425:247169]+"
+            + Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00002.xml")
+                .toAbsolutePath()
+            + "[2223:25803,25808:32247,32252:38770,38775:85408,85413:88087,88092:120911,120916:149458,"
+            + "149463:178686,178691:220893,220898:231618,231623:242459]";
     assertU(adoc("ocr_text", debugPtr, "id", "84"));
     assertU(commit());
   }
 
   private static SolrQueryRequest xmlQ(String... extraArgs) {
-    Map<String, String> args = new HashMap<>(
-        ImmutableMap.<String, String>builder()
-           .put("hl", "true")
-           .put("hl.ocr.fl", "ocr_text")
-           .put("hl.weightMatches", "true")
-           .put("hl.usePhraseHighlighter", "true")
-           .put("df", "ocr_text")
-           .put("hl.ctxTag", "ocr_line")
-           .put("hl.ctxSize", "2")
-           .put("hl.snippets", "10")
-           .put("fl", "id")
-           .build());
+    Map<String, String> args =
+        new HashMap<>(
+            ImmutableMap.<String, String>builder()
+                .put("hl", "true")
+                .put("hl.ocr.fl", "ocr_text")
+                .put("hl.weightMatches", "true")
+                .put("hl.usePhraseHighlighter", "true")
+                .put("df", "ocr_text")
+                .put("hl.ctxTag", "ocr_line")
+                .put("hl.ctxSize", "2")
+                .put("hl.snippets", "10")
+                .put("fl", "id")
+                .build());
     for (int i = 0; i < extraArgs.length; i += 2) {
       String key = extraArgs[i];
       String val = extraArgs[i + 1];
       args.put(key, val);
     }
 
-    SolrQueryRequest q = req(
-        args.entrySet().stream().flatMap(e -> Stream.of(e.getKey(), e.getValue())).toArray(String[]::new));
+    SolrQueryRequest q =
+        req(
+            args.entrySet().stream()
+                .flatMap(e -> Stream.of(e.getKey(), e.getValue()))
+                .toArray(String[]::new));
     ModifiableSolrParams params = new ModifiableSolrParams(q.getParams());
     params.set("indent", "true");
     q.setParams(params);
@@ -119,5 +125,4 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         "contains(//arr[@name='snippets']/lst/str[@name='text']/text(), '<em>kalifat</em>')",
         "count(//arr[@name='highlights']/arr/lst)=2");
   }
-
 }

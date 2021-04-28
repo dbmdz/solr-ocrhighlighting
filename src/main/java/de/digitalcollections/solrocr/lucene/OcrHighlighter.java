@@ -64,24 +64,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link UnifiedHighlighter} variant to support generating snippets with text coordinates from OCR data and
- * lazy-loading field values from external storage.
+ * A {@link UnifiedHighlighter} variant to support generating snippets with text coordinates from
+ * OCR data and lazy-loading field values from external storage.
  */
 public class OcrHighlighter extends UnifiedHighlighter {
 
   private static final Logger log = LoggerFactory.getLogger(OcrHighlighter.class);
 
-  private static final CharacterRunAutomaton[] ZERO_LEN_AUTOMATA_ARRAY_LEGACY = new CharacterRunAutomaton[0];
+  private static final CharacterRunAutomaton[] ZERO_LEN_AUTOMATA_ARRAY_LEGACY =
+      new CharacterRunAutomaton[0];
   private static final IndexSearcher EMPTY_INDEXSEARCHER;
-  private static final Set<OcrFormat> FORMATS = ImmutableSet.of(
-      new HocrFormat(),
-      new AltoFormat(),
-      new MiniOcrFormat());
+  private static final Set<OcrFormat> FORMATS =
+      ImmutableSet.of(new HocrFormat(), new AltoFormat(), new MiniOcrFormat());
   private static final int DEFAULT_SNIPPET_LIMIT = 100;
   public static final String PARTIAL_OCR_HIGHLIGHTS = "partialOcrHighlights";
 
-  private static final boolean VERSION_IS_PRE81 = Version.LATEST.major < 8 || Version.LATEST.minor < 1;
-  private static final boolean VERSION_IS_PRE82 = Version.LATEST.major < 8 || Version.LATEST.minor < 2;
+  private static final boolean VERSION_IS_PRE81 =
+      Version.LATEST.major < 8 || Version.LATEST.minor < 1;
+  private static final boolean VERSION_IS_PRE82 =
+      Version.LATEST.major < 8 || Version.LATEST.minor < 2;
   private static final boolean VERSION_IS_PRE84 =
       VERSION_IS_PRE82 || (Version.LATEST.major == 8 && Version.LATEST.minor < 4);
   private static final Constructor<UHComponents> hlComponentsConstructorLegacy;
@@ -102,32 +103,53 @@ public class OcrHighlighter extends UnifiedHighlighter {
     try {
       if (VERSION_IS_PRE81) {
         @SuppressWarnings("rawtypes")
-        Class multiTermHl = Class.forName("org.apache.lucene.search.uhighlight.MultiTermHighlighting");
-        extractAutomataLegacyMethod = multiTermHl.getDeclaredMethod(
-            "extractAutomata", Query.class, Predicate.class, boolean.class, Function.class);
+        Class multiTermHl =
+            Class.forName("org.apache.lucene.search.uhighlight.MultiTermHighlighting");
+        extractAutomataLegacyMethod =
+            multiTermHl.getDeclaredMethod(
+                "extractAutomata", Query.class, Predicate.class, boolean.class, Function.class);
         extractAutomataLegacyMethod.setAccessible(true);
       } else if (VERSION_IS_PRE84) {
         @SuppressWarnings("rawtypes")
-        Class multiTermHl = Class.forName("org.apache.lucene.search.uhighlight.MultiTermHighlighting");
-        extractAutomataLegacyMethod = multiTermHl.getDeclaredMethod(
-            "extractAutomata", Query.class, Predicate.class, boolean.class);
+        Class multiTermHl =
+            Class.forName("org.apache.lucene.search.uhighlight.MultiTermHighlighting");
+        extractAutomataLegacyMethod =
+            multiTermHl.getDeclaredMethod(
+                "extractAutomata", Query.class, Predicate.class, boolean.class);
         extractAutomataLegacyMethod.setAccessible(true);
       } else {
         extractAutomataLegacyMethod = null;
       }
       if (VERSION_IS_PRE82) {
         //noinspection JavaReflectionMemberAccess
-        hlComponentsConstructorLegacy = UHComponents.class.getDeclaredConstructor(
-            String.class, Predicate.class, Query.class, BytesRef[].class, PhraseHelper.class,
-            CharacterRunAutomaton[].class, Set.class);
-        offsetSourceGetterLegacy = UnifiedHighlighter.class.getDeclaredMethod(
-            "getOptimizedOffsetSource", String.class, BytesRef[].class, PhraseHelper.class,
-            CharacterRunAutomaton[].class);
+        hlComponentsConstructorLegacy =
+            UHComponents.class.getDeclaredConstructor(
+                String.class,
+                Predicate.class,
+                Query.class,
+                BytesRef[].class,
+                PhraseHelper.class,
+                CharacterRunAutomaton[].class,
+                Set.class);
+        offsetSourceGetterLegacy =
+            UnifiedHighlighter.class.getDeclaredMethod(
+                "getOptimizedOffsetSource",
+                String.class,
+                BytesRef[].class,
+                PhraseHelper.class,
+                CharacterRunAutomaton[].class);
       } else if (VERSION_IS_PRE84) {
         //noinspection JavaReflectionMemberAccess
-        hlComponentsConstructorLegacy = UHComponents.class.getDeclaredConstructor(
-            String.class, Predicate.class, Query.class, BytesRef[].class, PhraseHelper.class,
-            CharacterRunAutomaton[].class, boolean.class, Set.class);
+        hlComponentsConstructorLegacy =
+            UHComponents.class.getDeclaredConstructor(
+                String.class,
+                Predicate.class,
+                Query.class,
+                BytesRef[].class,
+                PhraseHelper.class,
+                CharacterRunAutomaton[].class,
+                boolean.class,
+                Set.class);
         offsetSourceGetterLegacy = null;
       } else {
         hlComponentsConstructorLegacy = null;
@@ -138,9 +160,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }
   }
 
-
   private final SolrParams params;
-
 
   public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, SolrParams params) {
     super(indexSearcher, indexAnalyzer);
@@ -152,7 +172,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
     float k1 = params.getFieldFloat(fieldName, HighlightParams.SCORE_K1, 1.2f);
     float b = params.getFieldFloat(fieldName, HighlightParams.SCORE_B, 0.75f);
     float pivot = params.getFieldFloat(fieldName, HighlightParams.SCORE_PIVOT, 87f);
-    boolean boostEarly = params.getFieldBool(fieldName, OcrHighlightParams.SCORE_BOOST_EARLY, false);
+    boolean boostEarly =
+        params.getFieldBool(fieldName, OcrHighlightParams.SCORE_BOOST_EARLY, false);
     return new OcrPassageScorer(k1, b, pivot, boostEarly);
   }
 
@@ -168,14 +189,19 @@ public class OcrHighlighter extends UnifiedHighlighter {
     flags.add(HighlightFlag.PASSAGE_RELEVANCY_OVER_SPEED);
 
     if (params.getFieldBool(field, HighlightParams.WEIGHT_MATCHES, false) // true in 8.0
-        && flags.contains(HighlightFlag.PHRASES) && flags.contains(HighlightFlag.MULTI_TERM_QUERY)) {
+        && flags.contains(HighlightFlag.PHRASES)
+        && flags.contains(HighlightFlag.MULTI_TERM_QUERY)) {
       flags.add(HighlightFlag.WEIGHT_MATCHES);
     }
     return flags;
   }
 
   public OcrHighlightResult[] highlightOcrFields(
-      String[] ocrFieldNames, Query query, int[] docIDs, int[] maxPassagesOcr, Map<String, Object> respHeader)
+      String[] ocrFieldNames,
+      Query query,
+      int[] docIDs,
+      int[] maxPassagesOcr,
+      Map<String, Object> respHeader)
       throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
@@ -184,8 +210,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
       throw new IllegalArgumentException("invalid number of maxPassagesOcr");
     }
     if (searcher == null) {
-      throw new IllegalStateException("This method requires that an indexSearcher was passed in the "
-                                    + "constructor.  Perhaps you mean to call highlightWithoutSearcher?");
+      throw new IllegalStateException(
+          "This method requires that an indexSearcher was passed in the "
+              + "constructor.  Perhaps you mean to call highlightWithoutSearcher?");
     }
 
     Long timeAllowed = params.getLong(OcrHighlightParams.TIME_ALLOWED);
@@ -203,7 +230,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
     // Sort fields w/ maxPassages pair: (copy input arrays since we sort in-place)
     final String[] fields = new String[ocrFieldNames.length];
     final int[] maxPassages = new int[maxPassagesOcr.length];
-    copyAndSortFieldsWithMaxPassages(ocrFieldNames, maxPassagesOcr, fields, maxPassages); // latter 2 are "out" params
+    copyAndSortFieldsWithMaxPassages(
+        ocrFieldNames, maxPassagesOcr, fields, maxPassages); // latter 2 are "out" params
 
     // Init field highlighters (where most of the highlight logic lives, and on a per field basis)
     Set<Term> queryTerms = extractTerms(query);
@@ -211,8 +239,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
     int numTermVectors = 0;
     int numPostings = 0;
     for (int f = 0; f < fields.length; f++) {
-      OcrFieldHighlighter fieldHighlighter = getOcrFieldHighlighter(
-          fields[f], query, queryTerms, maxPassages[f]);
+      OcrFieldHighlighter fieldHighlighter =
+          getOcrFieldHighlighter(fields[f], query, queryTerms, maxPassages[f]);
       fieldHighlighters[f] = fieldHighlighter;
 
       switch (fieldHighlighter.getOffsetSource()) {
@@ -229,7 +257,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
         case ANALYSIS:
         case NONE_NEEDED:
         default:
-          //do nothing
+          // do nothing
           // FIXME: This will raise a RuntimeException down the road, catch early?
           break;
       }
@@ -249,10 +277,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
       // Highlight in per-field order first, then by doc (better I/O pattern)
       for (int fieldIdx = 0; fieldIdx < fields.length; fieldIdx++) {
-        OcrSnippet[][] resultByDocIn = highlightDocsInByField[fieldIdx];//parallel to docIdsIn
+        OcrSnippet[][] resultByDocIn = highlightDocsInByField[fieldIdx]; // parallel to docIdsIn
         OcrFieldHighlighter fieldHighlighter = fieldHighlighters[fieldIdx];
         for (int docIdx = batchDocIdx; docIdx - batchDocIdx < fieldValsByDoc.size(); docIdx++) {
-          int docId = docIds[docIdx];//sorted order
+          int docId = docIds[docIdx]; // sorted order
           IterableCharSequence content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
           if (content == null) {
             continue;
@@ -262,7 +290,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
           }
           IndexReader indexReader =
               (fieldHighlighter.getOffsetSource() == OffsetSource.TERM_VECTORS
-                  && indexReaderWithTermVecCache != null)
+                      && indexReaderWithTermVecCache != null)
                   ? indexReaderWithTermVecCache
                   : searcher.getIndexReader();
           final LeafReader leafReader;
@@ -274,45 +302,57 @@ public class OcrHighlighter extends UnifiedHighlighter {
             leafReader = leafReaderContext.reader();
             docId -= leafReaderContext.docBase; // adjust 'doc' to be within this leaf reader
           }
-          int docInIndex = docInIndexes[docIdx];//original input order
+          int docInIndex = docInIndexes[docIdx]; // original input order
           assert resultByDocIn[docInIndex] == null;
           OcrFormat ocrFormat = getFormat(content);
           String limitBlockParam = params.get(OcrHighlightParams.LIMIT_BLOCK, "block");
           OcrBlock[] limitBlocks = null;
           if (!limitBlockParam.equalsIgnoreCase("NONE")) {
-            limitBlocks = OcrBlock.getHierarchyFrom(
-                OcrBlock.valueOf(limitBlockParam.toUpperCase())).toArray(new OcrBlock[0]);
+            limitBlocks =
+                OcrBlock.getHierarchyFrom(OcrBlock.valueOf(limitBlockParam.toUpperCase()))
+                    .toArray(new OcrBlock[0]);
           }
-          OcrBlock contextBlock = OcrBlock.valueOf(
-              params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase());
+          OcrBlock contextBlock =
+              OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase());
           BreakLocator contextLocator = ocrFormat.getBreakLocator(content, contextBlock);
-          BreakLocator limitLocator = limitBlocks == null
-              ? null
-              : ocrFormat.getBreakLocator(content, limitBlocks);
-          BreakLocator breakLocator = new ContextBreakLocator(
-              contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
-          OcrPassageFormatter formatter = ocrFormat.getPassageFormatter(
-              params.get(HighlightParams.TAG_PRE, "<em>"),
-              params.get(HighlightParams.TAG_POST, "</em>"),
-              params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false),
-              params.getBool(OcrHighlightParams.ALIGN_SPANS, false),
-              params.getBool(OcrHighlightParams.TRACK_PAGES, true));
-          int snippetLimit = Math.max(
-              maxPassages[fieldIdx],
-              params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
+          BreakLocator limitLocator =
+              limitBlocks == null ? null : ocrFormat.getBreakLocator(content, limitBlocks);
+          BreakLocator breakLocator =
+              new ContextBreakLocator(
+                  contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
+          OcrPassageFormatter formatter =
+              ocrFormat.getPassageFormatter(
+                  params.get(HighlightParams.TAG_PRE, "<em>"),
+                  params.get(HighlightParams.TAG_POST, "</em>"),
+                  params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false),
+                  params.getBool(OcrHighlightParams.ALIGN_SPANS, false),
+                  params.getBool(OcrHighlightParams.TRACK_PAGES, true));
+          int snippetLimit =
+              Math.max(
+                  maxPassages[fieldIdx],
+                  params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
           boolean scorePassages = params.getBool(OcrHighlightParams.SCORE_PASSAGES, true);
           try {
-            resultByDocIn[docInIndex] = fieldHighlighter.highlightFieldForDoc(
-                leafReader, docId, breakLocator, formatter, content,
-                params.get(OcrHighlightParams.PAGE_ID), snippetLimit, scorePassages);
-          } catch (ExitingIterCharSeq.ExitingIterCharSeqException | ExitableDirectoryReader.ExitingReaderException e) {
+            resultByDocIn[docInIndex] =
+                fieldHighlighter.highlightFieldForDoc(
+                    leafReader,
+                    docId,
+                    breakLocator,
+                    formatter,
+                    content,
+                    params.get(OcrHighlightParams.PAGE_ID),
+                    snippetLimit,
+                    scorePassages);
+          } catch (ExitingIterCharSeq.ExitingIterCharSeqException
+              | ExitableDirectoryReader.ExitingReaderException e) {
             log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
             respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
             resultByDocIn[docInIndex] = null;
             // Stop highlighting
             break docLoop;
           } catch (RuntimeException e) {
-            // This catch-all prevents OCR highlighting from failing the complete query, instead users
+            // This catch-all prevents OCR highlighting from failing the complete query, instead
+            // users
             // get an error message in their Solr log.
             log.error("Could not highlight OCR content for document", e);
           } finally {
@@ -321,7 +361,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
                 ((AutoCloseable) content).close();
               } catch (Exception e) {
                 log.warn(
-                    "Encountered error while closing content iterator for {}: {}", content.getPointer(), e.getMessage());
+                    "Encountered error while closing content iterator for {}: {}",
+                    content.getPointer(),
+                    e.getMessage());
               }
             }
           }
@@ -336,7 +378,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     SolrQueryTimeoutImpl.reset();
 
     OcrHighlightResult[] out = new OcrHighlightResult[docIds.length];
-    for (int d=0; d < docIds.length; d++) {
+    for (int d = 0; d < docIds.length; d++) {
       OcrHighlightResult hl = new OcrHighlightResult();
       for (int f = 0; f < fields.length; f++) {
         if (snippetCountsByField[f][d] <= 0) {
@@ -354,21 +396,26 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   @Override
-  protected List<CharSequence[]> loadFieldValues(String[] fields, DocIdSetIterator docIter, int cacheCharsThreshold)
-      throws IOException {
+  protected List<CharSequence[]> loadFieldValues(
+      String[] fields, DocIdSetIterator docIter, int cacheCharsThreshold) throws IOException {
     return loadOcrFieldValues(fields, docIter).stream()
-        .map(seqs -> Arrays.stream(seqs).map(IterableCharSequence::toString).toArray(CharSequence[]::new))
+        .map(
+            seqs ->
+                Arrays.stream(seqs)
+                    .map(IterableCharSequence::toString)
+                    .toArray(CharSequence[]::new))
         .collect(Collectors.toList());
   }
 
-  protected List<IterableCharSequence[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter) throws IOException {
+  protected List<IterableCharSequence[]> loadOcrFieldValues(
+      String[] fields, DocIdSetIterator docIter) throws IOException {
     List<IterableCharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
       DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor(fields);
       IterableCharSequence[] ocrVals = new IterableCharSequence[fields.length];
       searcher.doc(docId, docIdVisitor);
-      for (int fieldIdx=0; fieldIdx < fields.length; fieldIdx++) {
+      for (int fieldIdx = 0; fieldIdx < fields.length; fieldIdx++) {
         String fieldName = fields[fieldIdx];
         String fieldValue = docIdVisitor.getDocument().get(fieldName);
         if (fieldValue == null) {
@@ -390,12 +437,15 @@ public class OcrHighlighter extends UnifiedHighlighter {
         // If preloading is enabled, start warming the cache for the pointer
         PageCacheWarmer.getInstance().ifPresent(w -> w.preload(sourcePointer));
         if (sourcePointer.sources.size() == 1) {
-          ocrVals[fieldIdx] = new FileBytesCharIterator(
-              sourcePointer.sources.get(0).path, StandardCharsets.UTF_8, sourcePointer);
+          ocrVals[fieldIdx] =
+              new FileBytesCharIterator(
+                  sourcePointer.sources.get(0).path, StandardCharsets.UTF_8, sourcePointer);
         } else {
-          ocrVals[fieldIdx] = new MultiFileBytesCharIterator(
-              sourcePointer.sources.stream().map(s -> s.path).collect(Collectors.toList()),
-              StandardCharsets.UTF_8, sourcePointer);
+          ocrVals[fieldIdx] =
+              new MultiFileBytesCharIterator(
+                  sourcePointer.sources.stream().map(s -> s.path).collect(Collectors.toList()),
+                  StandardCharsets.UTF_8,
+                  sourcePointer);
         }
       }
       fieldValues.add(ocrVals);
@@ -409,11 +459,16 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return FORMATS.stream()
         .filter(fmt -> fmt.hasFormat(sampleChunk))
         .findFirst()
-        .orElseThrow(() -> new RuntimeException("Could not determine OCR format for sample '" + sampleChunk + "'"));
+        .orElseThrow(
+            () ->
+                new RuntimeException(
+                    "Could not determine OCR format for sample '" + sampleChunk + "'"));
   }
 
-  private OcrFieldHighlighter getOcrFieldHighlighter(String field, Query query, Set<Term> allTerms, int maxPassages) {
-    // This method and some associated types changed in v8.2 and v8.4, so we have to delegate to an adapter method for
+  private OcrFieldHighlighter getOcrFieldHighlighter(
+      String field, Query query, Set<Term> allTerms, int maxPassages) {
+    // This method and some associated types changed in v8.2 and v8.4, so we have to delegate to an
+    // adapter method for
     // these versions
     if (VERSION_IS_PRE84) {
       return getOcrFieldHighlighterLegacy(field, query, allTerms, maxPassages);
@@ -425,46 +480,65 @@ public class OcrHighlighter extends UnifiedHighlighter {
     PhraseHelper phraseHelper = getPhraseHelper(field, query, highlightFlags);
     LabelledCharArrayMatcher[] automata = getAutomata(field, query, highlightFlags);
 
-    UHComponents components = new UHComponents(
-        field, fieldMatcher, query, terms, phraseHelper, automata, hasUnrecognizedQuery(fieldMatcher, query),
-        highlightFlags);
+    UHComponents components =
+        new UHComponents(
+            field,
+            fieldMatcher,
+            query,
+            terms,
+            phraseHelper,
+            automata,
+            hasUnrecognizedQuery(fieldMatcher, query),
+            highlightFlags);
     OffsetSource offsetSource = getOptimizedOffsetSource(components);
     return new OcrFieldHighlighter(
-        field, getOffsetStrategy(offsetSource, components),
-        getScorer(field), maxPassages, getMaxNoHighlightPassages(field));
+        field,
+        getOffsetStrategy(offsetSource, components),
+        getScorer(field),
+        maxPassages,
+        getMaxNoHighlightPassages(field));
   }
 
   private OcrFieldHighlighter getOcrFieldHighlighterLegacy(
-      String field, Query query, Set<Term> allTerms,  int maxPassages) {
+      String field, Query query, Set<Term> allTerms, int maxPassages) {
     Predicate<String> fieldMatcher = getFieldMatcher(field);
     BytesRef[] terms = filterExtractedTerms(fieldMatcher, allTerms);
     Set<HighlightFlag> highlightFlags = getFlags(field);
     PhraseHelper phraseHelper = getPhraseHelper(field, query, highlightFlags);
     CharacterRunAutomaton[] automata = getAutomataLegacy(field, query, highlightFlags);
 
-    // Obtaining these two values has changed with Solr 8.2, so we need to do some reflection for older versions
+    // Obtaining these two values has changed with Solr 8.2, so we need to do some reflection for
+    // older versions
     OffsetSource offsetSource;
     UHComponents components;
     if (VERSION_IS_PRE82) {
       offsetSource = this.getOffsetSourcePre82(field, terms, phraseHelper, automata);
-      components = this.getUHComponentsPre82(
-          field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
+      components =
+          this.getUHComponentsPre82(
+              field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
     } else {
-      components = this.getUHComponentsPre84(
-          field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
+      components =
+          this.getUHComponentsPre84(
+              field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
       offsetSource = this.getOptimizedOffsetSource(components);
     }
     return new OcrFieldHighlighter(
-        field, getOffsetStrategy(offsetSource, components),
-        getScorer(field), maxPassages, getMaxNoHighlightPassages(field));
+        field,
+        getOffsetStrategy(offsetSource, components),
+        getScorer(field),
+        maxPassages,
+        getMaxNoHighlightPassages(field));
   }
 
-  private CharacterRunAutomaton[] getAutomataLegacy(String field, Query query, Set<HighlightFlag> highlightFlags) {
-    // do we "eagerly" look in span queries for automata here, or do we not and let PhraseHelper handle those?
+  private CharacterRunAutomaton[] getAutomataLegacy(
+      String field, Query query, Set<HighlightFlag> highlightFlags) {
+    // do we "eagerly" look in span queries for automata here, or do we not and let PhraseHelper
+    // handle those?
     // if don't highlight phrases strictly,
     final boolean lookInSpan =
         !highlightFlags.contains(HighlightFlag.PHRASES) // no PhraseHelper
-            || highlightFlags.contains(HighlightFlag.WEIGHT_MATCHES); // Weight.Matches will find all
+            || highlightFlags.contains(
+                HighlightFlag.WEIGHT_MATCHES); // Weight.Matches will find all
 
     return highlightFlags.contains(HighlightFlag.MULTI_TERM_QUERY)
         ? extractAutomataLegacy(query, getFieldMatcher(field), lookInSpan)
@@ -476,30 +550,35 @@ public class OcrHighlighter extends UnifiedHighlighter {
     Function<Query, Collection<Query>> nopWriteFn = q -> null;
     try {
       if (VERSION_IS_PRE81) {
-        return (CharacterRunAutomaton[]) extractAutomataLegacyMethod.invoke(
-            null, query, fieldMatcher, lookInSpan, nopWriteFn);
+        return (CharacterRunAutomaton[])
+            extractAutomataLegacyMethod.invoke(null, query, fieldMatcher, lookInSpan, nopWriteFn);
       } else {
-        return (CharacterRunAutomaton[]) extractAutomataLegacyMethod.invoke(
-            null, query, fieldMatcher, lookInSpan);
+        return (CharacterRunAutomaton[])
+            extractAutomataLegacyMethod.invoke(null, query, fieldMatcher, lookInSpan);
       }
     } catch (IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
-
   }
 
-  private OffsetSource getOffsetSourcePre82(String field, BytesRef[] terms, PhraseHelper phraseHelper,
-                                            CharacterRunAutomaton[] automata) {
+  private OffsetSource getOffsetSourcePre82(
+      String field, BytesRef[] terms, PhraseHelper phraseHelper, CharacterRunAutomaton[] automata) {
     try {
-      return (OffsetSource) offsetSourceGetterLegacy.invoke(this, field, terms, phraseHelper, automata);
+      return (OffsetSource)
+          offsetSourceGetterLegacy.invoke(this, field, terms, phraseHelper, automata);
     } catch (IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   private UHComponents getUHComponentsPre82(
-      String field, Predicate<String> fieldMatcher, Query query, BytesRef[] terms, PhraseHelper phraseHelper,
-      CharacterRunAutomaton[] automata, Set<HighlightFlag> highlightFlags) {
+      String field,
+      Predicate<String> fieldMatcher,
+      Query query,
+      BytesRef[] terms,
+      PhraseHelper phraseHelper,
+      CharacterRunAutomaton[] automata,
+      Set<HighlightFlag> highlightFlags) {
     try {
       return hlComponentsConstructorLegacy.newInstance(
           field, fieldMatcher, query, terms, phraseHelper, automata, highlightFlags);
@@ -509,21 +588,32 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   private UHComponents getUHComponentsPre84(
-      String field, Predicate<String> fieldMatcher, Query query, BytesRef[] terms, PhraseHelper phraseHelper,
-      CharacterRunAutomaton[] automata, Set<HighlightFlag> highlightFlags) {
+      String field,
+      Predicate<String> fieldMatcher,
+      Query query,
+      BytesRef[] terms,
+      PhraseHelper phraseHelper,
+      CharacterRunAutomaton[] automata,
+      Set<HighlightFlag> highlightFlags) {
     try {
       return hlComponentsConstructorLegacy.newInstance(
-          field, fieldMatcher, query, terms, phraseHelper, automata, hasUnrecognizedQuery(fieldMatcher, query),
+          field,
+          fieldMatcher,
+          query,
+          terms,
+          phraseHelper,
+          automata,
+          hasUnrecognizedQuery(fieldMatcher, query),
           highlightFlags);
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
   }
 
-  // FIXME: This is copied straight from UnifiedHighlighter because it has private access there. Maybe open an issue to
-  //        make it protected?
-  private void copyAndSortFieldsWithMaxPassages(String[] fieldsIn, int[] maxPassagesIn, final String[] fields,
-                                                final int[] maxPassages) {
+  // FIXME: This is copied straight from UnifiedHighlighter because it has private access there.
+  //        Maybe open an issue to make it protected?
+  private void copyAndSortFieldsWithMaxPassages(
+      String[] fieldsIn, int[] maxPassagesIn, final String[] fields, final int[] maxPassages) {
     System.arraycopy(fieldsIn, 0, fields, 0, fieldsIn.length);
     System.arraycopy(maxPassagesIn, 0, maxPassages, 0, maxPassagesIn.length);
     new InPlaceMergeSorter() {
@@ -541,13 +631,13 @@ public class OcrHighlighter extends UnifiedHighlighter {
       protected int compare(int i, int j) {
         return fields[i].compareTo(fields[j]);
       }
-
     }.sort(0, fields.length);
   }
 
-  // FIXME: This is copied straight from UnifiedHighlighter because it has private access there. Maybe open an issue to
-  //        make it protected?
-  private void copyAndSortDocIdsWithIndex(int[] docIdsIn, final int[] docIds, final int[] docInIndexes) {
+  // FIXME: This is copied straight from UnifiedHighlighter because it has private access there.
+  //        Maybe open an issue to make it protected?
+  private void copyAndSortDocIdsWithIndex(
+      int[] docIdsIn, final int[] docIds, final int[] docInIndexes) {
     System.arraycopy(docIdsIn, 0, docIds, 0, docIdsIn.length);
     for (int i = 0; i < docInIndexes.length; i++) {
       docInIndexes[i] = i;
@@ -602,17 +692,18 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   /**
-   * Wraps an IndexReader that remembers/caches the last call to {@link LeafReader#getTermVectors(int)} so that
-   * if the next call has the same ID, then it is reused.  If TV's were column-stride (like doc-values), there would
-   * be no need for this.
+   * Wraps an IndexReader that remembers/caches the last call to {@link
+   * LeafReader#getTermVectors(int)} so that if the next call has the same ID, then it is reused. If
+   * TV's were column-stride (like doc-values), there would be no need for this.
    */
   // FIXME: This is copied straight from UnifiedHighlighter because it has private access...
   private static class TermVectorReusingLeafReader extends FilterLeafReader {
     static IndexReader wrap(IndexReader reader) throws IOException {
-      LeafReader[] leafReaders = reader.leaves().stream()
-          .map(LeafReaderContext::reader)
-          .map(TermVectorReusingLeafReader::new)
-          .toArray(LeafReader[]::new);
+      LeafReader[] leafReaders =
+          reader.leaves().stream()
+              .map(LeafReaderContext::reader)
+              .map(TermVectorReusingLeafReader::new)
+              .toArray(LeafReader[]::new);
       return new BaseCompositeReader<IndexReader>(leafReaders) {
         @Override
         protected void doClose() throws IOException {

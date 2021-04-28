@@ -60,9 +60,8 @@ public class SourcePointer {
     }
   }
 
-  private static final Pattern POINTER_PAT = Pattern.compile(
-      "^(?<path>.+?)(?<isAscii>\\{ascii})?(?:\\[(?<regions>[0-9:,]+)])?$");
-
+  private static final Pattern POINTER_PAT =
+      Pattern.compile("^(?<path>.+?)(?<isAscii>\\{ascii})?(?:\\[(?<regions>[0-9:,]+)])?$");
 
   public final List<FileSource> sources;
 
@@ -71,40 +70,52 @@ public class SourcePointer {
       return false;
     }
     return Arrays.stream(pointer.split("\\+"))
-        .allMatch(p -> {
-          Matcher m = POINTER_PAT.matcher(p);
-          return m.matches();
-        });
+        .allMatch(
+            p -> {
+              Matcher m = POINTER_PAT.matcher(p);
+              return m.matches();
+            });
   }
 
   public static SourcePointer parse(String pointer) {
     if (!isPointer(pointer)) {
       throw new RuntimeException("Could not parse pointer: " + pointer);
     }
-    List<FileSource> fileSources = Arrays.stream(pointer.split("\\+"))
-        .map(ptr -> {
-          Matcher m = POINTER_PAT.matcher(ptr);
-          if (!m.find()) {
-            throw new RuntimeException("Could not parse source pointer from '" + ptr + "', cannot index document.");
-          }
-          Path sourcePath = Paths.get(m.group("path"));
-          List<Region> regions = ImmutableList.of();
-          if (m.group("regions") != null) {
-            regions = Arrays.stream(m.group("regions").split(","))
-                .map(SourcePointer::parseRegion)
-                .sorted(Comparator.comparingInt(r -> r.start))
-                .collect(Collectors.toList());
-          }
-          try {
-            return new FileSource(sourcePath, regions, m.group("isAscii") != null);
-          } catch (FileNotFoundException e) {
-            throw new RuntimeException(
-                "Could not locate file at '" + sourcePath.toString() + "', cannot index document.");
-          } catch (IOException e) {
-            throw new RuntimeException(
-                "Could not read file at '" + sourcePath.toString() + "', cannot index document.");
-          }
-        }).collect(Collectors.toList());
+    List<FileSource> fileSources =
+        Arrays.stream(pointer.split("\\+"))
+            .map(
+                ptr -> {
+                  Matcher m = POINTER_PAT.matcher(ptr);
+                  if (!m.find()) {
+                    throw new RuntimeException(
+                        "Could not parse source pointer from '"
+                            + ptr
+                            + "', cannot index document.");
+                  }
+                  Path sourcePath = Paths.get(m.group("path"));
+                  List<Region> regions = ImmutableList.of();
+                  if (m.group("regions") != null) {
+                    regions =
+                        Arrays.stream(m.group("regions").split(","))
+                            .map(SourcePointer::parseRegion)
+                            .sorted(Comparator.comparingInt(r -> r.start))
+                            .collect(Collectors.toList());
+                  }
+                  try {
+                    return new FileSource(sourcePath, regions, m.group("isAscii") != null);
+                  } catch (FileNotFoundException e) {
+                    throw new RuntimeException(
+                        "Could not locate file at '"
+                            + sourcePath.toString()
+                            + "', cannot index document.");
+                  } catch (IOException e) {
+                    throw new RuntimeException(
+                        "Could not read file at '"
+                            + sourcePath.toString()
+                            + "', cannot index document.");
+                  }
+                })
+            .collect(Collectors.toList());
     if (fileSources.isEmpty()) {
       return null;
     } else {

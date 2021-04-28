@@ -26,7 +26,8 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
   private int current;
   private final Map<Path, FileBytesCharIterator> subiters = new HashMap<>();
 
-  public MultiFileBytesCharIterator(List<Path> filePaths, Charset charset, SourcePointer ptr) throws IOException {
+  public MultiFileBytesCharIterator(List<Path> filePaths, Charset charset, SourcePointer ptr)
+      throws IOException {
     this.ptr = ptr;
     this.paths = filePaths;
     this.charset = charset;
@@ -64,7 +65,8 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
 
   @Override
   public String getIdentifier() {
-    return String.format("{%s}", this.paths.stream().map(Path::toString).collect(Collectors.joining(", ")));
+    return String.format(
+        "{%s}", this.paths.stream().map(Path::toString).collect(Collectors.joining(", ")));
   }
 
   @Override
@@ -194,12 +196,13 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
 
   @Override
   public void close() {
-    subiters.forEach((p, it) -> {
-      try {
-        it.close();
-      } catch (Exception e) {
-        log.warn("Encountered error while closing sub-iterator for {}: {}", p, e.getMessage());
-      }
-    });
+    subiters.forEach(
+        (p, it) -> {
+          try {
+            it.close();
+          } catch (Exception e) {
+            log.warn("Encountered error while closing sub-iterator for {}: {}", p, e.getMessage());
+          }
+        });
   }
 }

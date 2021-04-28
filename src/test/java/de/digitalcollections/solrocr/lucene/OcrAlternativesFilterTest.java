@@ -30,18 +30,19 @@ public class OcrAlternativesFilterTest {
         StandardTokenizer.class,
         UnicodeWhitespaceTokenizer.class,
         WhitespaceTokenizer.class,
-        ICUTokenizer.class
-    );
+        ICUTokenizer.class);
   }
 
   @ParameterizedTest
   @MethodSource("getTokenizers")
-  public void testAlternativesSurviveTokenizer(Class<? extends Tokenizer> tokenizerCls) throws Exception {
+  public void testAlternativesSurviveTokenizer(Class<? extends Tokenizer> tokenizerCls)
+      throws Exception {
     Tokenizer tokenizer = tokenizerCls.getDeclaredConstructor().newInstance();
-    tokenizer.setReader(new StubOcrCharFilter(
-        "YoB\u2060\u2060123⁠⁠OB Greene pur-chased\u2060\u2060223⁠⁠"
-        + "pure-based\u2060\u2060323⁠⁠pUl-cohased\u2060\u2060423⁠⁠pure.bred of Ben F Mark 40"
-        + " cattle\u2060\u2060523⁠⁠cattlc"));
+    tokenizer.setReader(
+        new StubOcrCharFilter(
+            "YoB\u2060\u2060123⁠⁠OB Greene pur-chased\u2060\u2060223⁠⁠"
+                + "pure-based\u2060\u2060323⁠⁠pUl-cohased\u2060\u2060423⁠⁠pure.bred of Ben F Mark 40"
+                + " cattle\u2060\u2060523⁠⁠cattlc"));
     TokenFilter filter = new OcrAlternativesFilterFactory.OcrAlternativesFilter(tokenizer);
     List<String> tokens = new ArrayList<>();
     List<Integer> positionIncrements = new ArrayList<>();
@@ -50,28 +51,39 @@ public class OcrAlternativesFilterTest {
     while (filter.incrementToken()) {
       CharTermAttribute charAttr = filter.getAttribute(CharTermAttribute.class);
       tokens.add(new String(charAttr.buffer(), 0, charAttr.length()));
-      positionIncrements.add(filter.getAttribute(PositionIncrementAttribute.class).getPositionIncrement());
+      positionIncrements.add(
+          filter.getAttribute(PositionIncrementAttribute.class).getPositionIncrement());
       startOffsets.add(filter.getAttribute(OffsetAttribute.class).startOffset());
     }
     filter.end();
     filter.close();
     if (tokenizer instanceof StandardTokenizer || tokenizer instanceof ICUTokenizer) {
-      assertThat(tokens).containsExactly(
-          "YoB", "OB", "Greene", "pur", "chased", "of", "Ben", "F", "Mark", "40", "cattle", "cattlc");
-      assertThat(positionIncrements).containsExactly(
-          1,    0,        1,     1,        1,    1,     1,   1,      1,    1,        1,        0);
-      assertThat(startOffsets).containsExactly(
-          0,  123,       13,    20,       24,   82,    85,  89,     91,   96,       99,      523);
+      assertThat(tokens)
+          .containsExactly(
+              "YoB", "OB", "Greene", "pur", "chased", "of", "Ben", "F", "Mark", "40", "cattle",
+              "cattlc");
+      assertThat(positionIncrements).containsExactly(1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0);
+      assertThat(startOffsets).containsExactly(0, 123, 13, 20, 24, 82, 85, 89, 91, 96, 99, 523);
     } else {
-      assertThat(tokens).containsExactly(
-          "YoB", "OB", "Greene", "pur-chased", "pure-based", "pUl-cohased", "pure.bred", "of", "Ben", "F", "Mark", "40",
-          "cattle", "cattlc");
-      assertThat(positionIncrements).containsExactly(
-             1,    0,        1,            1,            0,             0,           0,    1,     1,   1,      1,    1,
-                1,        0);
-      assertThat(startOffsets).containsExactly(
-             0,  123,       13,           20,          223,           323,         423,   82,    85,  89,     91,   96,
-               99,      523);
+      assertThat(tokens)
+          .containsExactly(
+              "YoB",
+              "OB",
+              "Greene",
+              "pur-chased",
+              "pure-based",
+              "pUl-cohased",
+              "pure.bred",
+              "of",
+              "Ben",
+              "F",
+              "Mark",
+              "40",
+              "cattle",
+              "cattlc");
+      assertThat(positionIncrements).containsExactly(1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0);
+      assertThat(startOffsets)
+          .containsExactly(0, 123, 13, 20, 223, 323, 423, 82, 85, 89, 91, 96, 99, 523);
     }
   }
 
@@ -80,17 +92,12 @@ public class OcrAlternativesFilterTest {
 
     public StubOcrCharFilter(String filteredStream) {
       super(
-          Mockito.when(Mockito.mock(OcrParser.class).getInput()).thenReturn(
-          new PeekingReader(new StringReader(filteredStream), 2048, 16384)).getMock());
-      this.alternativeMap.put(
-          Range.closedOpen(0, 12),
-          new TokenWithAlternatives(0, 3, 2));
-      this.alternativeMap.put(
-          Range.closedOpen(20, 81),
-          new TokenWithAlternatives(20, 30, 4));
-      this.alternativeMap.put(
-          Range.closedOpen(99, 118),
-          new TokenWithAlternatives(99, 105, 2));
+          Mockito.when(Mockito.mock(OcrParser.class).getInput())
+              .thenReturn(new PeekingReader(new StringReader(filteredStream), 2048, 16384))
+              .getMock());
+      this.alternativeMap.put(Range.closedOpen(0, 12), new TokenWithAlternatives(0, 3, 2));
+      this.alternativeMap.put(Range.closedOpen(20, 81), new TokenWithAlternatives(20, 30, 4));
+      this.alternativeMap.put(Range.closedOpen(99, 118), new TokenWithAlternatives(99, 105, 2));
     }
 
     @Override

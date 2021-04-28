@@ -2,9 +2,10 @@ package de.digitalcollections.solrocr.util;
 
 /** Some utility functions to work with character buffers */
 public class CharBufUtils {
-  /** Find the offset of the needle in the haystack.
+  /**
+   * Find the offset of the needle in the haystack.
    *
-   * FIXME: Is there really no stdlib method for this?
+   * <p>FIXME: Is there really no stdlib method for this?
    *
    * @param haystack target buffer to find characters in
    * @param fromIndex offset to start looking for in the haystack buffer

@@ -33,9 +33,12 @@ public class OcrCharFilter extends BaseCharFilter {
 
       // For hyphenated words where both the hyphen start and the end word are next to each
       // other, we only index the dehyphenated content and the trailing chars of the hyphen end.
-      boolean wordIsCompleteHyphenation = (
-          nextWord.isHyphenated()
-          && this.parser.peek().filter(b -> b.isHyphenated() && !b.isHyphenStart()).isPresent());
+      boolean wordIsCompleteHyphenation =
+          (nextWord.isHyphenated()
+              && this.parser
+                  .peek()
+                  .filter(b -> b.isHyphenated() && !b.isHyphenStart())
+                  .isPresent());
       if (wordIsCompleteHyphenation) {
         String text = nextWord.getDehyphenatedForm();
         int offset = nextWord.getTextOffset();
@@ -52,8 +55,9 @@ public class OcrCharFilter extends BaseCharFilter {
         }
         this.curWord = text.toCharArray();
         this.curWordIdx = 0;
-        // Map the offsets correctly: We output the full dehyphenated form, but the offsets point to the constituting
-        // parts, i.e. the beginning and end text. This only makes a difference for ALTO.
+        // Map the offsets correctly: We output the full dehyphenated form, but the offsets point to
+        // the constituting parts, i.e. the beginning and end text. This only makes a difference for
+        // ALTO.
         this.addOffCorrectMap(outputOffset, offset - outputOffset);
         this.addOffCorrectMap(endOutputOffset, endOffset - endOutputOffset);
         break;
@@ -65,19 +69,24 @@ public class OcrCharFilter extends BaseCharFilter {
       if (!nextWord.getAlternatives().isEmpty()) {
         List<String> alts = nextWord.getAlternatives();
         int wordIdx = text.length();
-        for (int i=0; i < alts.size(); i++) {
-          // Every alternative is preceded a sequence of `<marker><offset><marker>`. The markers are sequences of
-          // unicode `WORD JOINER` characters that prevent tokenizers from separating alternatives and their offsets
-          // from each other so they can be accessed as a single unit downstream in the `OcrAlternativesFilter`.
+        for (int i = 0; i < alts.size(); i++) {
+          // Every alternative is preceded a sequence of `<marker><offset><marker>`. The markers are
+          // sequences of unicode `WORD JOINER` characters that prevent tokenizers from separating
+          // alternatives and their offsets from each other so they can be accessed as a single unit
+          // downstream in the `OcrAlternativesFilter`.
           text.append(OcrCharFilterFactory.ALTERNATIVE_MARKER);
-          int offset; if (this.input instanceof CharFilter) {
-            offset = ((CharFilter) this.input).correctOffset(nextWord.getAlternativeOffsets().get(i));
+          int offset;
+          if (this.input instanceof CharFilter) {
+            offset =
+                ((CharFilter) this.input).correctOffset(nextWord.getAlternativeOffsets().get(i));
           } else {
             offset = nextWord.getAlternativeOffsets().get(i);
           }
           text.append(offset);
           text.append(OcrCharFilterFactory.ALTERNATIVE_MARKER);
-          int markerLen = OcrCharFilterFactory.ALTERNATIVE_MARKER.length() * 2 + Integer.toString(offset).length();
+          int markerLen =
+              OcrCharFilterFactory.ALTERNATIVE_MARKER.length() * 2
+                  + Integer.toString(offset).length();
           wordIdx += markerLen;
           int outOff = this.outputOffset + wordIdx;
           this.addOffCorrectMap(outOff, nextWord.getAlternativeOffsets().get(i) - outOff);
@@ -85,9 +94,11 @@ public class OcrCharFilter extends BaseCharFilter {
           wordIdx += alts.get(i).length();
         }
         alternativeMap.put(
-            Range.closedOpen(this.correctOffset(outputOffset), this.correctOffset(outputOffset + wordIdx)),
+            Range.closedOpen(
+                this.correctOffset(outputOffset), this.correctOffset(outputOffset + wordIdx)),
             new TokenWithAlternatives(
-                this.correctOffset(outputOffset), this.correctOffset(outputOffset + text.length()),
+                this.correctOffset(outputOffset),
+                this.correctOffset(outputOffset + text.length()),
                 1 + alts.size()));
         if ((nextWord.isHyphenStart() == null || !nextWord.isHyphenStart())
             && !nextWord.getTrailingChars().contains(" ")) {
@@ -145,7 +156,8 @@ public class OcrCharFilter extends BaseCharFilter {
 
     @Override
     public String toString() {
-      return String.format("TokenWithAlternatives{%d@[%d:%d[}", numForms, defaultFormStart, defaultFormEnd);
+      return String.format(
+          "TokenWithAlternatives{%d@[%d:%d[}", numForms, defaultFormStart, defaultFormEnd);
     }
   }
 }
