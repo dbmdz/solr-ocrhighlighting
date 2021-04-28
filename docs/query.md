@@ -2,11 +2,6 @@
 To enable highlighting, make sure you set `hl=true` in you query. Additionally, you need to pass the OCR fields that
 you want to have highlighted in the `hl.ocr.fl` parameter.
 
-!!! caution "Highlighting Non-OCR Fields"
-    One unfortunate side effect of the way the plugin works is that you need to pass non-OCR fields to be highlighted
-    **explicitly** via the `hl.fl` parameter. By default, Solr falls back on highlighting all stored fields if the
-    parameter is not present, which no longer works if this plugin is used.
-
 ## Response Format
 With OCR highlighting enabled, your Solr response will now include a new item `ocrHighlighting`, mapping all
 highlighted OCR fields to their highlighting snippets:

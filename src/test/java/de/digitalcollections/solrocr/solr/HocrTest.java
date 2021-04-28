@@ -296,13 +296,27 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
+  public void testImplicitRegularHighlighting() {
+    SolrQueryRequest req =
+        req(
+            "q",
+            "\"occaecat cupidatat\"",
+            "defType",
+            "edismax",
+            "qf",
+            "some_text ocr_text",
+            "hl",
+            "true");
+    assertQ(req, "count(//lst[@name='highlighting']//arr[@name='some_text'])=1");
+    assertQ(req, "count(//lst[@name='ocrHighlighting']//arr[@name='snippets'])=0");
+  }
+
+  @Test
   public void testCombinedHighlighting() {
     SolrQueryRequest req =
         xmlQ(
             "q",
             "\"occaecat cupidatat\" Salomet",
-            "hl.fl",
-            "some_text",
             "defType",
             "edismax",
             "qf",

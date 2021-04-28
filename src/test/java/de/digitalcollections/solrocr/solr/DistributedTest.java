@@ -113,15 +113,13 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
   }
 
   @Test
-  public void testCombinedHighlightingWoriks() throws Exception {
+  public void testCombinedHighlightingWorks() throws Exception {
     QueryResponse resp =
         query(
             "q",
             "\"commodo consequat\" svadag",
             "hl",
             "true",
-            "hl.fl",
-            "some_text",
             "defType",
             "edismax",
             "hl.weightMatches",
