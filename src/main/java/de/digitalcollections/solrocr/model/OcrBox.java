@@ -10,10 +10,10 @@ import org.apache.solr.common.util.SimpleOrderedMap;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class OcrBox implements Comparable<OcrBox> {
-  private final Comparator<OcrBox> comparator = Comparator
-      .comparing(OcrBox::getPage)
-      .thenComparingDouble(OcrBox::getUly)
-      .thenComparingDouble(OcrBox::getUlx);
+  private final Comparator<OcrBox> comparator =
+      Comparator.comparing(OcrBox::getPage)
+          .thenComparingDouble(OcrBox::getUly)
+          .thenComparingDouble(OcrBox::getUlx);
 
   private String text;
   private int textOffset = -1;
@@ -32,12 +32,11 @@ public class OcrBox implements Comparable<OcrBox> {
   private Boolean hyphenStart;
   private Double confidence;
 
-  public OcrBox() {
-  }
+  public OcrBox() {}
 
   // FIXME: Is this really ulx/uly?
-  public OcrBox(String text, OcrPage page, float ulx, float uly, float lrx, float lry,
-                UUID highlightSpan) {
+  public OcrBox(
+      String text, OcrPage page, float ulx, float uly, float lrx, float lry, UUID highlightSpan) {
     this.text = text;
     this.page = page;
     this.ulx = ulx;
@@ -74,7 +73,7 @@ public class OcrBox implements Comparable<OcrBox> {
     SimpleOrderedMap snipRegion = (SimpleOrderedMap) this.toNamedList();
     if (this.page != null) {
       snipRegion.remove("pageId");
-      for (int i=0; i < pages.size(); i++) {
+      for (int i = 0; i < pages.size(); i++) {
         OcrPage p = pages.get(i);
         if (p.id.equals(this.page.id)) {
           snipRegion.add("pageIdx", i);
@@ -290,8 +289,7 @@ public class OcrBox implements Comparable<OcrBox> {
   }
 
   public boolean contains(OcrBox other) {
-    return
-        other.page == this.page
+    return other.page == this.page
         && other.ulx >= this.ulx
         && other.uly >= this.uly
         && other.lrx <= this.lrx
@@ -303,28 +301,42 @@ public class OcrBox implements Comparable<OcrBox> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     OcrBox ocrBox = (OcrBox) o;
-    return textOffset == ocrBox.textOffset &&
-        Float.compare(ocrBox.ulx, ulx) == 0 &&
-        Float.compare(ocrBox.uly, uly) == 0 &&
-        Float.compare(ocrBox.lrx, lrx) == 0 &&
-        Float.compare(ocrBox.lry, lry) == 0 &&
-        Objects.equals(text, ocrBox.text) &&
-        Objects.equals(alternatives, ocrBox.alternatives) &&
-        Objects.equals(alternativeOffsets, ocrBox.alternativeOffsets) &&
-        Objects.equals(trailingChars, ocrBox.trailingChars) &&
-        Objects.equals(page, ocrBox.page) &&
-        Objects.equals(highlightSpan, ocrBox.highlightSpan) &&
-        Objects.equals(parentRegionIdx, ocrBox.parentRegionIdx) &&
-        Objects.equals(dehyphenatedForm, ocrBox.dehyphenatedForm) &&
-        Objects.equals(dehyphenatedOffset, ocrBox.dehyphenatedOffset) &&
-        Objects.equals(hyphenStart, ocrBox.hyphenStart) &&
-        Objects.equals(confidence, ocrBox.confidence);
+    return textOffset == ocrBox.textOffset
+        && Float.compare(ocrBox.ulx, ulx) == 0
+        && Float.compare(ocrBox.uly, uly) == 0
+        && Float.compare(ocrBox.lrx, lrx) == 0
+        && Float.compare(ocrBox.lry, lry) == 0
+        && Objects.equals(text, ocrBox.text)
+        && Objects.equals(alternatives, ocrBox.alternatives)
+        && Objects.equals(alternativeOffsets, ocrBox.alternativeOffsets)
+        && Objects.equals(trailingChars, ocrBox.trailingChars)
+        && Objects.equals(page, ocrBox.page)
+        && Objects.equals(highlightSpan, ocrBox.highlightSpan)
+        && Objects.equals(parentRegionIdx, ocrBox.parentRegionIdx)
+        && Objects.equals(dehyphenatedForm, ocrBox.dehyphenatedForm)
+        && Objects.equals(dehyphenatedOffset, ocrBox.dehyphenatedOffset)
+        && Objects.equals(hyphenStart, ocrBox.hyphenStart)
+        && Objects.equals(confidence, ocrBox.confidence);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-        text, textOffset, alternatives, alternativeOffsets, trailingChars, page, ulx, uly, lrx, lry, highlightSpan,
-        parentRegionIdx, dehyphenatedForm, dehyphenatedOffset, hyphenStart, confidence);
+        text,
+        textOffset,
+        alternatives,
+        alternativeOffsets,
+        trailingChars,
+        page,
+        ulx,
+        uly,
+        lrx,
+        lry,
+        highlightSpan,
+        parentRegionIdx,
+        dehyphenatedForm,
+        dehyphenatedOffset,
+        hyphenStart,
+        confidence);
   }
 }

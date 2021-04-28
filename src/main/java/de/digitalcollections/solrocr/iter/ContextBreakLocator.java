@@ -1,7 +1,8 @@
 package de.digitalcollections.solrocr.iter;
 
 /**
- * A break locator that wraps other {@link BreakLocator}s and aggregates their breaks to form larger contexts.
+ * A break locator that wraps other {@link BreakLocator}s and aggregates their breaks to form larger
+ * contexts.
  */
 public class ContextBreakLocator implements BreakLocator {
 
@@ -27,7 +28,7 @@ public class ContextBreakLocator implements BreakLocator {
     if (idx >= limit) {
       return limit;
     }
-    for (int i=0; i < contextSize; i++) {
+    for (int i = 0; i < contextSize; i++) {
       int next = baseLocator.following(idx);
       if (next >= limit) {
         return limit;
@@ -47,7 +48,7 @@ public class ContextBreakLocator implements BreakLocator {
     if (idx <= limit) {
       return limit;
     }
-    for (int i=0; i < contextSize; i++) {
+    for (int i = 0; i < contextSize; i++) {
       int next = baseLocator.preceding(idx);
       if (next <= limit) {
         return limit;

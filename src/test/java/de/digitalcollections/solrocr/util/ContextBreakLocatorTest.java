@@ -23,7 +23,8 @@ class ContextBreakLocatorTest {
   private static final Path utf8Path = Paths.get("src/test/resources/data/miniocr.xml");
 
   private String stripTags(String val) throws IOException {
-    HTMLStripCharFilter filter = new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));
+    HTMLStripCharFilter filter =
+        new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));
     return IOUtils.toString(filter).replaceAll("\n", "").trim();
   }
 
@@ -40,13 +41,15 @@ class ContextBreakLocatorTest {
     String snippet = seq.subSequence(start, end).toString();
     assertThat(StringUtils.countMatches(snippet, "<w")).isEqualTo(2 * 5 + 1);
     assertThat(StringUtils.countMatches(snippet, "</w>")).isEqualTo(2 * 5 + 1);
-    assertThat(stripTags(snippet)).isEqualTo("Sgr. 6 Pf, für die viergeſpaltene Petitzeile oder deren Raum berechnet,");
+    assertThat(stripTags(snippet))
+        .isEqualTo("Sgr. 6 Pf, für die viergeſpaltene Petitzeile oder deren Raum berechnet,");
   }
 
   @Test
   void testContextHonorsLimits() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(Paths.get("src/test/resources/data/hocr.html"),
-                                                         StandardCharsets.UTF_8, null);
+    IterableCharSequence seq =
+        new FileBytesCharIterator(
+            Paths.get("src/test/resources/data/hocr.html"), StandardCharsets.UTF_8, null);
     BreakLocator baseLocator = new HocrClassBreakLocator(seq, "ocr_line");
     BreakLocator limitLocator = new HocrClassBreakLocator(seq, "ocrx_block");
     ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 5);
@@ -65,9 +68,12 @@ class ContextBreakLocatorTest {
 
     int offStart = 42736;
     int offEnd = 42919;
-    for (int i=0; i < 3; i++) {
-      IterableCharSequence seq = new FileBytesCharIterator(
-          Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"), StandardCharsets.UTF_8, null);
+    for (int i = 0; i < 3; i++) {
+      IterableCharSequence seq =
+          new FileBytesCharIterator(
+              Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"),
+              StandardCharsets.UTF_8,
+              null);
       BreakLocator baseLocator = new TagBreakLocator(seq, "TextLine");
       BreakLocator limitLocator = new TagBreakLocator(seq, "TextBlock");
       ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 2);
@@ -85,8 +91,11 @@ class ContextBreakLocatorTest {
 
   @Test
   void testContextWithHyphenationAndCaching() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(
-        Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"), StandardCharsets.UTF_8, null);
+    IterableCharSequence seq =
+        new FileBytesCharIterator(
+            Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"),
+            StandardCharsets.UTF_8,
+            null);
     BreakLocator baseLocator = new TagBreakLocator(seq, "TextLine");
     BreakLocator limitLocator = new TagBreakLocator(seq, "TextBlock");
     ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 2);

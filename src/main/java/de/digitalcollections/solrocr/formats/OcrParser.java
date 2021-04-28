@@ -21,7 +21,7 @@ import java.util.stream.StreamSupport;
 import javax.xml.stream.XMLStreamException;
 import org.codehaus.stax2.XMLStreamReader2;
 
-/** Base class for OCR  parsers operating on XML markup */
+/** Base class for OCR parsers operating on XML markup */
 public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
 
   /** Set of features that can be turned on/off depending on the downstream needs */
@@ -43,17 +43,18 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
   }
 
   // Named XML character entities that are used in hOCR
-  public static final ImmutableMap<Object, Object> ENTITIES = ImmutableMap.builder()
-      .put("shy", "\u00ad")
-      .put("nbsp", "\u00a0")
-      .put("ensp", "\u2002")
-      .put("emsp", "\u2003")
-      .put("thinsp", "\u2009")
-      .put("zwnj", "\u200c")
-      .put("zwj", "\u200d")
-      .build();
-  public static final String START_HL = "\uD83D\uDD25"; //🔥
-  public static final String END_HL = "\uD83E\uDDEF"; //🧯
+  public static final ImmutableMap<Object, Object> ENTITIES =
+      ImmutableMap.builder()
+          .put("shy", "\u00ad")
+          .put("nbsp", "\u00a0")
+          .put("ensp", "\u2002")
+          .put("emsp", "\u2003")
+          .put("thinsp", "\u2009")
+          .put("zwnj", "\u200c")
+          .put("zwj", "\u200d")
+          .build();
+  public static final String START_HL = "\uD83D\uDD25"; // 🔥
+  public static final String END_HL = "\uD83E\uDDEF"; // 🧯
 
   private static final WstxInputFactory xmlInputFactory = new WstxInputFactory();
 
@@ -73,9 +74,16 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
       this.input = new PeekingReader(input, 2048, 16384);
     }
     if (features.length == 0) {
-      features = new ParsingFeature[]{
-          ParsingFeature.TEXT, ParsingFeature.OFFSETS, ParsingFeature.COORDINATES, ParsingFeature.HIGHLIGHTS,
-          ParsingFeature.CONFIDENCE, ParsingFeature.ALTERNATIVES, ParsingFeature.PAGES};
+      features =
+          new ParsingFeature[] {
+            ParsingFeature.TEXT,
+            ParsingFeature.OFFSETS,
+            ParsingFeature.COORDINATES,
+            ParsingFeature.HIGHLIGHTS,
+            ParsingFeature.CONFIDENCE,
+            ParsingFeature.ALTERNATIVES,
+            ParsingFeature.PAGES
+          };
     }
     this.features.addAll(Arrays.asList(features));
 
@@ -83,22 +91,26 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     // before passing them to us
     xmlInputFactory.getConfig().doCoalesceText(true);
     // This parsing mode allows us to read multiple "concatenated" XML documents in a single pass
-    xmlInputFactory.getConfig()
-        .setInputParsingMode(WstxInputProperties.PARSING_MODE_DOCUMENTS);
+    xmlInputFactory.getConfig().setInputParsingMode(WstxInputProperties.PARSING_MODE_DOCUMENTS);
     // Ignore DTDs since they cause lookups to external URLs
     xmlInputFactory.getConfig().doSupportDTDs(false);
     // Register custom named entities used by hOCR
     xmlInputFactory.getConfig().setCustomInternalEntities(ENTITIES);
     // Fallback for unknown undeclared entities: just output them verbatim
-    xmlInputFactory.getConfig().setUndeclaredEntityResolver(
-        (publicID, systemID, baseURI, namespace) -> String.format("&amp;%s;", namespace));
+    xmlInputFactory
+        .getConfig()
+        .setUndeclaredEntityResolver(
+            (publicID, systemID, baseURI, namespace) -> String.format("&amp;%s;", namespace));
     this.xmlReader = (XMLStreamReader2) xmlInputFactory.createXMLStreamReader(this.input);
     try {
       this.nextWord = this.readNext(this.xmlReader, this.features);
     } catch (XMLStreamException e) {
-      throw new RuntimeException(String.format(
-          "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on " +
-          "complete tags! (Source was: %s)", this.input.getSource().orElse("[unknown]")), e);
+      throw new RuntimeException(
+          String.format(
+              "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on "
+                  + "complete tags! (Source was: %s)",
+              this.input.getSource().orElse("[unknown]")),
+          e);
     }
   }
 
@@ -108,7 +120,8 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
   }
 
   public Stream<OcrBox> stream() {
-    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this, Spliterator.ORDERED), false);
+    return StreamSupport.stream(
+        Spliterators.spliteratorUnknownSize(this, Spliterator.ORDERED), false);
   }
 
   @Override
@@ -126,16 +139,21 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
       do {
         this.nextWord = readNext(xmlReader, features);
       } while (hasNext() && this.nextWord == null);
-    } catch (XMLStreamException| WstxLazyException e) {
-      throw new RuntimeException(String.format(
-          "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on " +
-          "complete tags! (Source was: %s)", this.input.getSource().orElse("[unknown]")), e);
+    } catch (XMLStreamException | WstxLazyException e) {
+      throw new RuntimeException(
+          String.format(
+              "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on "
+                  + "complete tags! (Source was: %s)",
+              this.input.getSource().orElse("[unknown]")),
+          e);
     }
     return out;
   }
 
-  /** "Peek" at the next word from the parse without advancing the parse to the word after it
-   *  (i.e. calling this does not influence the result of the `next()` call **/
+  /**
+   * "Peek" at the next word from the parse without advancing the parse to the word after it (i.e.
+   * calling this does not influence the result of the `next()` call *
+   */
   public Optional<OcrBox> peek() {
     if (!hasNext()) {
       return Optional.empty();
@@ -143,19 +161,22 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     return Optional.of(this.nextWord);
   }
 
-  /** Keep track of highlighted box spans encountered during parsing.
+  /**
+   * Keep track of highlighted box spans encountered during parsing.
    *
-   * Implements should always call this method when they encounter OCR text, since it might
+   * <p>Implements should always call this method when they encounter OCR text, since it might
    * contain highlighting markers that we need to track.
    *
-   * Returns the identifier of the box's highlighting span, if present, else null.
+   * <p>Returns the identifier of the box's highlighting span, if present, else null.
    */
   protected UUID trackHighlightSpan(String text, OcrBox box) {
     if (this.currentHighlightSpan == null && text.contains(OcrParser.START_HL)) {
       this.currentHighlightSpan = UUID.randomUUID();
     }
-    if ( this.currentHighlightSpan != null && (terminateHighlightSpanAfterNext || text.contains(OcrParser.END_HL))) {
-      // Highlight spans that end on the start of a hyphenation should stretch as far as the end of the hyphenation,
+    if (this.currentHighlightSpan != null
+        && (terminateHighlightSpanAfterNext || text.contains(OcrParser.END_HL))) {
+      // Highlight spans that end on the start of a hyphenation should stretch as far as the end of
+      // the hyphenation,
       // so we toggle a flag to delay the termination
       if (terminateHighlightSpanAfterNext) {
         terminateHighlightSpanAfterNext = false;
@@ -175,22 +196,23 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     return input;
   }
 
-  /** Read the next OCR box in the input stream.
+  /**
+   * Read the next OCR box in the input stream.
    *
-   * Implementers should take care to enable/disable various parsing steps depending on the set of
-   * features passed in.
+   * <p>Implementers should take care to enable/disable various parsing steps depending on the set
+   * of features passed in.
    */
   protected abstract OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
       throws XMLStreamException;
 
-
-  /** Helper method to convert a list of OCR boxes to a text string.
+  /**
+   * Helper method to convert a list of OCR boxes to a text string.
    *
-   * Includes smart handling of partial hyphenations as well as handling of alternative tokens
+   * <p>Includes smart handling of partial hyphenations as well as handling of alternative tokens
    * that are at the end and/or beginning of a highlighted span. In these cases the highlighted
-   * alternative will be used in the output string instead of the default form of the box. This
-   * is only possible if the alternative is at the beginning or end, since we otherwise don't have
-   * any information available to us if the default form or an alternative matched.
+   * alternative will be used in the output string instead of the default form of the box. This is
+   * only possible if the alternative is at the beginning or end, since we otherwise don't have any
+   * information available to us if the default form or an alternative matched.
    */
   public static String boxesToString(List<OcrBox> boxes) {
     StringBuilder sb = new StringBuilder();
@@ -199,9 +221,10 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     while (it.hasNext()) {
       OcrBox b = it.next();
       if (b.isHyphenated() && b.isHyphenStart()) {
-        boolean wordIsCompleteHyphenation = (
-            idx < boxes.size() - 1
-            && boxes.get(idx + 1).isHyphenated() && !boxes.get(idx + 1).isHyphenStart());
+        boolean wordIsCompleteHyphenation =
+            (idx < boxes.size() - 1
+                && boxes.get(idx + 1).isHyphenated()
+                && !boxes.get(idx + 1).isHyphenStart());
         if (wordIsCompleteHyphenation) {
           // Both parts of the hyphenation are present, put the dehyphenated form in the text
           OcrBox next = it.next();
@@ -218,10 +241,12 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
           sb.append(text);
         }
       } else if (!b.getAlternatives().isEmpty()) {
-        Optional<String> alternativeWithHighlight = b.getAlternatives().stream()
-            .filter(a -> a.contains(START_HL) || a.contains(END_HL))
-            .findFirst();
-        // If the highlight is on an alternative, output that alternative instead of the default token
+        Optional<String> alternativeWithHighlight =
+            b.getAlternatives().stream()
+                .filter(a -> a.contains(START_HL) || a.contains(END_HL))
+                .findFirst();
+        // If the highlight is on an alternative, output that alternative instead of the default
+        // token
         if (alternativeWithHighlight.isPresent()) {
           sb.append(alternativeWithHighlight.get());
         } else {

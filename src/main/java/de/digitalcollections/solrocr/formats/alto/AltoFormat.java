@@ -16,17 +16,18 @@ import java.util.stream.IntStream;
 import javax.xml.stream.XMLStreamException;
 
 public class AltoFormat implements OcrFormat {
-  private static final Map<OcrBlock, String> blockTagMapping = ImmutableMap.of(
-      OcrBlock.PAGE, "Page",
-      //OcrBlock.SECTION, "",
-      OcrBlock.BLOCK, "TextBlock",
-      OcrBlock.LINE, "TextLine",
-      OcrBlock.WORD, "String");
+  private static final Map<OcrBlock, String> blockTagMapping =
+      ImmutableMap.of(
+          OcrBlock.PAGE, "Page",
+          // OcrBlock.SECTION, "",
+          OcrBlock.BLOCK, "TextBlock",
+          OcrBlock.LINE, "TextLine",
+          OcrBlock.WORD, "String");
 
   @Override
   public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
-    // NOTE: The ALTO hierarchy we support is pretty rigid, i.e. Page > TextBlock > TextLine > String
-    //       is a given, hence we only grab the lowest-hierarchy block and call it a day
+    // NOTE: The ALTO hierarchy we support is pretty rigid, i.e. Page > TextBlock > TextLine >
+    // String is a given, hence we only grab the lowest-hierarchy block and call it a day
     String breakTag = blockTagMapping.get(blockTypes[0]);
     return new TagBreakLocator(text, breakTag);
   }
@@ -80,8 +81,7 @@ public class AltoFormat implements OcrFormat {
   public boolean hasFormat(String ocrChunk) {
     // Check if the chunk contains any ALTO tags
     return ocrChunk.contains("<alto")
-        || blockTagMapping.values().stream()
-            .anyMatch(t -> ocrChunk.contains("<" + t));
+        || blockTagMapping.values().stream().anyMatch(t -> ocrChunk.contains("<" + t));
   }
 
   @Override
@@ -119,7 +119,6 @@ public class AltoFormat implements OcrFormat {
     } else {
       attribChar = '<';
     }
-    return Range.closedOpen(
-        startIdx, fragment.indexOf(attribChar, position));
+    return Range.closedOpen(startIdx, fragment.indexOf(attribChar, position));
   }
 }

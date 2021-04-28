@@ -12,12 +12,10 @@ public enum OcrBlock {
   LINE,
   WORD;
 
-  public static final List<OcrBlock> blockHierarchy = ImmutableList.of(
-      WORD, LINE, PARAGRAPH, BLOCK, SECTION, PAGE);
+  public static final List<OcrBlock> blockHierarchy =
+      ImmutableList.of(WORD, LINE, PARAGRAPH, BLOCK, SECTION, PAGE);
 
   public static List<OcrBlock> getHierarchyFrom(OcrBlock block) {
-    return blockHierarchy.subList(
-        blockHierarchy.indexOf(block), blockHierarchy.size()
-    );
+    return blockHierarchy.subList(blockHierarchy.indexOf(block), blockHierarchy.size());
   }
 }

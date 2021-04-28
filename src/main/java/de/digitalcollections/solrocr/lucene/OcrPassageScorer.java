@@ -10,8 +10,10 @@ public class OcrPassageScorer extends PassageScorer {
     this.boostEarly = boostEarly;
   }
 
-  /** If enabled with `hl.score.boostEarly`, normalize the passage start so that earlier starts are
-   *  given more weight. */
+  /**
+   * If enabled with `hl.score.boostEarly`, normalize the passage start so that earlier starts are
+   * given more weight.
+   */
   @Override
   public float norm(int passageStart) {
     if (boostEarly) {

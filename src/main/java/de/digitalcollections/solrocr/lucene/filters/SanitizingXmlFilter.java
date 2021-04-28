@@ -12,13 +12,15 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
 
-/** Character filter that "sanitizes" malformed input XML by inserting closing tags for unmatched opening tags and
- *  dropping unmatched closing tags, while maintaining the input offsets.
+/**
+ * Character filter that "sanitizes" malformed input XML by inserting closing tags for unmatched
+ * opening tags and dropping unmatched closing tags, while maintaining the input offsets.
  *
- *  We have to deal with malformed XML, since we allow users to index relatively arbitrary regions from input files
- *  and also concatenate them with each other, resulting in some unmatched opening/ending tags. This didn't use to be
- *  a problem since we used a RegEx-based parsing approach, but with the new StAX-based approach we have to make sure
- *  that the XML we feed to the parser is well-formed.
+ * <p>We have to deal with malformed XML, since we allow users to index relatively arbitrary regions
+ * from input files and also concatenate them with each other, resulting in some unmatched
+ * opening/ending tags. This didn't use to be a problem since we used a RegEx-based parsing
+ * approach, but with the new StAX-based approach we have to make sure that the XML we feed to the
+ * parser is well-formed.
  */
 public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareReader {
 
@@ -106,7 +108,8 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       }
       int endElem = ArrayUtils.indexOf(cbuf, '>', startElem + 1);
       if (endElem < 0 || endElem > (off + numRead)) {
-        // End of element is not part of this buffer, reduce read size so the element is fully part of the next read
+        // End of element is not part of this buffer, reduce read size so the element is fully part
+        // of the next read
         truncated = true;
         this.carryOver = new char[numRead - (startElem - off)];
         System.arraycopy(cbuf, startElem, this.carryOver, 0, this.carryOver.length);
@@ -117,7 +120,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       idx = endElem + 1;
 
       if (advancedFixing) {
-        if (cbuf[startElem + 1] == '?'  && (endElem - startElem < 3 || cbuf[endElem - 1] != '?')) {
+        if (cbuf[startElem + 1] == '?' && (endElem - startElem < 3 || cbuf[endElem - 1] != '?')) {
           // Illegal processing instruction, fix by stripping the question mark
           cbuf[startElem + 1] = '_';
         }
@@ -127,7 +130,8 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
               // Comment?
               (cbuf[startElem + 2] == '-' && cbuf[startElem + 3] != '-')
                   // Doctype?
-                  || ((cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd') && (endElem - startElem) < 12)
+                  || ((cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd')
+                      && (endElem - startElem) < 12)
                   // CDATA?
                   || (cbuf[startElem + 2] == '[' && (endElem - startElem) < 10));
           if (illegal) {
@@ -137,19 +141,21 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
           }
         }
 
-        if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!'
-            && cbuf[startElem + 2] == '-') && cbuf[startElem + 3] == '-') {
+        if (cbuf[startElem + 1] == '?'
+            || (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-')
+                && cbuf[startElem + 3] == '-') {
           // XML Declaration or comment, nothing to do
           continue;
         }
-      } else if (cbuf[startElem + 1] == '?' || (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-')) {
+      } else if (cbuf[startElem + 1] == '?'
+          || (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-')) {
         // XML Declaration or comment, nothing to do
         continue;
       }
 
       // Strip out duplicate doctype declarations, these break the multidoc parsing mode in Woodstox
-      if (cbuf[startElem + 1] == '!' && (cbuf[startElem + 2] == 'D'
-          || cbuf[startElem + 2] == 'd')) {
+      if (cbuf[startElem + 1] == '!'
+          && (cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd')) {
         if (hasDocType) {
           for (int i = startElem; i <= endElem; i++) {
             cbuf[i] = ' ';
@@ -169,7 +175,8 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
 
       if (advancedFixing) {
         // Check if we're dealing with a legal tag, in some early Google Books hOCR unescaped
-        // `<` and `>` characters sometimes lead to spans that look like elements but aren't actually
+        // `<` and `>` characters sometimes lead to spans that look like elements but aren't
+        // actually
         boolean illegalTag = tagLen == 0;
         for (int i = 0; i < tagLen; i++) {
           if (!Character.isLetter(cbuf[startTag + i])) {
@@ -187,10 +194,11 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       if (cbuf[startElem + 1] == '/') {
         char[] checkTag = elementStack.peek();
         if (checkTag == null || !tagEquals(cbuf, startTag, tagLen, checkTag)) {
-          // Closing tag doesn't match last opened tag, "zero out" the tag by replacing it with whitespace
-          // Yeah, this is pure cheating, a proper CharFilter implementation would strip those chars from the output,
-          // but this would require more copying around of data, and we normalize whitespace anyway down the line, so
-          // this isn't really an issue for now (I think....)
+          // Closing tag doesn't match last opened tag, "zero out" the tag by replacing it with
+          // whitespace. Yeah, this is pure cheating, a proper CharFilter implementation would strip
+          // those chars from the output, but this would require more copying around of data, and we
+          // normalize whitespace anyway down the line, so this isn't really an issue for now
+          // (I think....)
           for (int i = startElem; i <= endElem; i++) {
             cbuf[i] = ' ';
           }
@@ -212,17 +220,17 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
     }
     if (!truncated && numRead < len && !elementStack.isEmpty()) {
       if (this.tail == null) {
-        this.tail = elementStack.stream()
-            .map(tag -> "</" + new String(tag) + ">")
-            .collect(Collectors.joining("")).toCharArray();
+        this.tail =
+            elementStack.stream()
+                .map(tag -> "</" + new String(tag) + ">")
+                .collect(Collectors.joining(""))
+                .toCharArray();
         this.tailIdx = 0;
       } else if (this.tailIdx == this.tail.length) {
         return -1;
       }
 
-      int toRead = Math.min(
-          len - Math.max(0, numRead),
-          tail.length - tailIdx);
+      int toRead = Math.min(len - Math.max(0, numRead), tail.length - tailIdx);
       System.arraycopy(this.tail, tailIdx, cbuf, off + Math.max(0, numRead), toRead);
       this.tailIdx += toRead;
       if (numRead < 0) {
@@ -233,8 +241,9 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
     return numRead;
   }
 
-  /** Variant of {@link org.apache.commons.lang3.ArrayUtils#indexOf(char[], char)} that supports
-   *  looking for multiple values.
+  /**
+   * Variant of {@link org.apache.commons.lang3.ArrayUtils#indexOf(char[], char)} that supports
+   * looking for multiple values.
    */
   private static int multiIndexOf(final char[] array, int startIndex, final char... valuesToFind) {
     if (array == null) {

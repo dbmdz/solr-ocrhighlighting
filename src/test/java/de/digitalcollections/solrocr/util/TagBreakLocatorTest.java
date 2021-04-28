@@ -21,7 +21,8 @@ class TagBreakLocatorTest {
   private static final Path utf8Path = Paths.get("src/test/resources/data/miniocr.xml");
 
   private String stripTags(String val) throws IOException {
-    HTMLStripCharFilter filter = new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));
+    HTMLStripCharFilter filter =
+        new HTMLStripCharFilter(new StringReader(val), ImmutableSet.of("em"));
     return IOUtils.toString(filter).replaceAll("\n", "");
   }
 

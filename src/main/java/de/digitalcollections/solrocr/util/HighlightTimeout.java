@@ -12,14 +12,15 @@ public class HighlightTimeout implements QueryTimeout {
     return instance;
   }
 
-  private HighlightTimeout() { }
+  private HighlightTimeout() {}
 
   public static Long get() {
     return timeoutAt.get();
   }
 
   public static void set(Long timeAllowed) {
-    timeoutAt.set(System.nanoTime() + TimeUnit.NANOSECONDS.convert(timeAllowed, TimeUnit.MILLISECONDS));
+    timeoutAt.set(
+        System.nanoTime() + TimeUnit.NANOSECONDS.convert(timeAllowed, TimeUnit.MILLISECONDS));
   }
 
   public static void reset() {

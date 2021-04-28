@@ -59,6 +59,7 @@
     <version.slf4j>1.7.30</version.slf4j>
     <version.solr>8.8.2</version.solr>
 
+    <version.fmt-maven-plugin>2.9.1</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.2.0</version.maven-javadoc-plugin>
     <version.maven-shade-plugin>3.2.4</version.maven-shade-plugin>
@@ -142,6 +143,18 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>com.coveo</groupId>
+        <artifactId>fmt-maven-plugin</artifactId>
+        <version>${version.fmt-maven-plugin}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>de.sormuras.junit</groupId>
         <artifactId>junit-platform-maven-plugin</artifactId>

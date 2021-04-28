@@ -27,12 +27,13 @@ public class MiniOcrByteOffsetsParser {
       new SequenceMatcherSearcher(new ByteSequenceMatcher("</w>"));
 
   private static int getClosingOffsetFrom(byte[] ocrBytes, char tag, int fromOffset) {
-    final Searcher<SequenceMatcher> searcher = new SequenceMatcherSearcher(new ByteSequenceMatcher(
-        "</" + tag + ">"));
-    final ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<>(
-        searcher, ocrBytes, fromOffset);
+    final Searcher<SequenceMatcher> searcher =
+        new SequenceMatcherSearcher(new ByteSequenceMatcher("</" + tag + ">"));
+    final ForwardSearchIterator<SequenceMatcher> it =
+        new ForwardSearchIterator<>(searcher, ocrBytes, fromOffset);
     if (!it.hasNext()) {
-      throw new IllegalArgumentException("Invalid MiniOCR, could not find closing tag for '" + tag + "'");
+      throw new IllegalArgumentException(
+          "Invalid MiniOCR, could not find closing tag for '" + tag + "'");
     }
     return (int) it.next().get(0).getMatchPosition();
   }
@@ -40,12 +41,14 @@ public class MiniOcrByteOffsetsParser {
   private static int getIdOffset(byte[] ocrBytes, int startOffset, String id) {
     final Searcher<SequenceMatcher> idSearcher;
     try {
-      idSearcher = new SequenceMatcherSearcher(SequenceMatcherCompiler.compileFrom(
-          "'<' . ' xml:id=\"" + id + "'"));
+      idSearcher =
+          new SequenceMatcherSearcher(
+              SequenceMatcherCompiler.compileFrom("'<' . ' xml:id=\"" + id + "'"));
     } catch (CompileException e) {
       throw new RuntimeException(e);
     }
-    ForwardSearchIterator<SequenceMatcher> it = new ForwardSearchIterator<>(idSearcher, ocrBytes, startOffset);
+    ForwardSearchIterator<SequenceMatcher> it =
+        new ForwardSearchIterator<>(idSearcher, ocrBytes, startOffset);
     if (!it.hasNext()) {
       throw new IllegalArgumentException("Could not find element with id '" + id + "'");
     }
@@ -53,7 +56,8 @@ public class MiniOcrByteOffsetsParser {
   }
 
   @SuppressWarnings("UnstableApiUsage")
-  public static List<Pair<String, Integer>> parse(byte[] ocrBytes, int startOffset, String firstId, String lastId) {
+  public static List<Pair<String, Integer>> parse(
+      byte[] ocrBytes, int startOffset, String firstId, String lastId) {
     if (firstId != null) {
       startOffset = getIdOffset(ocrBytes, startOffset, firstId);
     }
@@ -66,13 +70,12 @@ public class MiniOcrByteOffsetsParser {
       char tag = new String(ocrBytes, lastOffset, 6, StandardCharsets.UTF_8).charAt(1);
       endOffset = getClosingOffsetFrom(ocrBytes, tag, lastOffset);
     }
-    ForwardSearchIterator<SequenceMatcher> beginIt = new ForwardSearchIterator<>(
-        BEGIN_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
-    ForwardSearchIterator<SequenceMatcher> endIt = new ForwardSearchIterator<>(
-        END_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
+    ForwardSearchIterator<SequenceMatcher> beginIt =
+        new ForwardSearchIterator<>(BEGIN_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
+    ForwardSearchIterator<SequenceMatcher> endIt =
+        new ForwardSearchIterator<>(END_WORD_SEARCHER, startOffset, endOffset, ocrBytes);
 
-    return
-        Streams.zip(
+    return Streams.zip(
             Streams.stream(beginIt).flatMap(Collection::stream).map(SearchResult::getMatchPosition),
             Streams.stream(endIt).flatMap(Collection::stream).map(SearchResult::getMatchPosition),
             ImmutablePair::new)
@@ -86,7 +89,8 @@ public class MiniOcrByteOffsetsParser {
     int startTerm = ArrayUtils.indexOf(ocrBytes, (byte) '>', start) + 1;
     assert startTerm < end;
     int termWidth = (end - startTerm);
-    return ImmutablePair.of(new String(ocrBytes, startTerm, termWidth, StandardCharsets.UTF_8), startTerm);
+    return ImmutablePair.of(
+        new String(ocrBytes, startTerm, termWidth, StandardCharsets.UTF_8), startTerm);
   }
 
   public static void parse(byte[] ocrBytes, OutputStream os) throws IOException {
@@ -97,7 +101,8 @@ public class MiniOcrByteOffsetsParser {
     parse(ocrBytes, os, onlyId, "\uFFFF");
   }
 
-  public static void parse(byte[] ocrBytes, OutputStream os, String firstId, String lastId) throws IOException {
+  public static void parse(byte[] ocrBytes, OutputStream os, String firstId, String lastId)
+      throws IOException {
     for (Pair<String, Integer> pair : parse(ocrBytes, 0, firstId, lastId)) {
       os.write(pair.getLeft().getBytes(StandardCharsets.UTF_8));
       os.write(String.format("⚑%d ", pair.getRight()).getBytes(StandardCharsets.UTF_8));

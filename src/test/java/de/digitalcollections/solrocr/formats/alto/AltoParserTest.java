@@ -1,5 +1,7 @@
 package de.digitalcollections.solrocr.formats.alto;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory;
 import de.digitalcollections.solrocr.model.OcrBox;
@@ -22,25 +24,25 @@ import org.apache.lucene.analysis.CharFilter;
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class AltoParserTest {
-  private static final ExternalUtf8ContentFilterFactory filterFac = new ExternalUtf8ContentFilterFactory(new HashMap<>());
+  private static final ExternalUtf8ContentFilterFactory filterFac =
+      new ExternalUtf8ContentFilterFactory(new HashMap<>());
 
   public static String boxesToString(Iterable<OcrBox> boxes) {
     StringBuilder sb = new StringBuilder();
-    boxes.forEach(b -> {
-      if (b.isHyphenated()) {
-        if (b.isHyphenStart()) {
-          sb.append(b.getDehyphenatedForm());
-        }
-      } else {
-        sb.append(b.getText());
-      }
-      if (b.getTrailingChars() != null) {
-        sb.append(b.getTrailingChars());
-      }
-    });
+    boxes.forEach(
+        b -> {
+          if (b.isHyphenated()) {
+            if (b.isHyphenStart()) {
+              sb.append(b.getDehyphenatedForm());
+            }
+          } else {
+            sb.append(b.getText());
+          }
+          if (b.getTrailingChars() != null) {
+            sb.append(b.getTrailingChars());
+          }
+        });
     return sb.toString();
   }
 
@@ -102,11 +104,13 @@ public class AltoParserTest {
   @Test
   public void testHighlightedFragmentParse() throws XMLStreamException, IOException {
     Path p = Paths.get("src/test/resources/data/chronicling_america.xml");
-    StringBuilder fragment = new StringBuilder(
-        new String(Files.readAllBytes(p), StandardCharsets.UTF_8).substring(26773, 31997));
+    StringBuilder fragment =
+        new StringBuilder(
+            new String(Files.readAllBytes(p), StandardCharsets.UTF_8).substring(26773, 31997));
     fragment.insert(2327, OcrParser.START_HL);
     fragment.insert(3109 + OcrParser.START_HL.length(), OcrParser.END_HL);
-    List<OcrBox> boxes = new AltoParser(new StringReader(fragment.toString())).stream().collect(Collectors.toList());
+    List<OcrBox> boxes =
+        new AltoParser(new StringReader(fragment.toString())).stream().collect(Collectors.toList());
     assertThat(boxes.get(9).getHighlightSpan()).isNull();
     UUID hlSpan = boxes.get(10).getHighlightSpan();
     assertThat(hlSpan).isNotNull();
@@ -119,14 +123,17 @@ public class AltoParserTest {
 
   @Test
   public void testMultiFileParse() throws XMLStreamException, IOException {
-    String ptr = Files.list(Paths.get("src/test/resources/data/alto_multi"))
-        .filter(p -> p.getFileName().toString().startsWith("1860-"))
-        .map(Path::toAbsolutePath)
-        .map(Path::toString)
-        .collect(Collectors.joining("+"));
-    List<OcrBox> boxes = new AltoParser(filterFac.create(new StringReader(ptr)))
-        .stream().collect(Collectors.toList());
-    List<OcrPage> pages = boxes.stream().map(OcrBox::getPage).distinct().collect(Collectors.toList());
+    String ptr =
+        Files.list(Paths.get("src/test/resources/data/alto_multi"))
+            .filter(p -> p.getFileName().toString().startsWith("1860-"))
+            .map(Path::toAbsolutePath)
+            .map(Path::toString)
+            .collect(Collectors.joining("+"));
+    List<OcrBox> boxes =
+        new AltoParser(filterFac.create(new StringReader(ptr)))
+            .stream().collect(Collectors.toList());
+    List<OcrPage> pages =
+        boxes.stream().map(OcrBox::getPage).distinct().collect(Collectors.toList());
     assertThat(pages).hasSize(4);
     assertThat(pages.get(0).dimensions)
         .hasFieldOrPropertyWithValue("width", 3170.0)
@@ -136,29 +143,36 @@ public class AltoParserTest {
   @Test
   public void testWeirdParsingIssue() throws XMLStreamException {
     String ptr = Paths.get("src/test/resources/data/alto_nospace.xml").toAbsolutePath().toString();
-    List<OcrBox> boxes = new AltoParser(filterFac.create(new StringReader(ptr))).stream().collect(Collectors.toList());
+    List<OcrBox> boxes =
+        new AltoParser(filterFac.create(new StringReader(ptr)))
+            .stream().collect(Collectors.toList());
     assertThat(boxes).isNotEmpty();
   }
 
-
   @Test
   public void testSpaceAtLineEnd() throws FileNotFoundException, XMLStreamException {
-    AltoParser parser = new AltoParser(
-        new FileReader(Paths.get("src/test/resources/data/space_after.xml").toFile()),
-        OcrParser.ParsingFeature.TEXT);
+    AltoParser parser =
+        new AltoParser(
+            new FileReader(Paths.get("src/test/resources/data/space_after.xml").toFile()),
+            OcrParser.ParsingFeature.TEXT);
     List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
     assertThat(boxes.stream().limit(boxes.size() - 1).filter(b -> !b.isHyphenStart()))
         .allMatch(b -> b.getTrailingChars().contains(" "));
   }
 
-
   @Test
   public void testConsequtiveHyphens() throws FileNotFoundException, XMLStreamException {
-    AltoParser parser = new AltoParser(
-        new FileReader(Paths.get("src/test/resources/data/hyphenconseq.xml").toFile()),
-        OcrParser.ParsingFeature.TEXT);
+    AltoParser parser =
+        new AltoParser(
+            new FileReader(Paths.get("src/test/resources/data/hyphenconseq.xml").toFile()),
+            OcrParser.ParsingFeature.TEXT);
     List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
-    assertThat(boxes.stream().filter(b -> b.getText().equals("li-")).findFirst().map(OcrBox::getTrailingChars)).isEqualTo(Optional.of(""));
+    assertThat(
+            boxes.stream()
+                .filter(b -> b.getText().equals("li-"))
+                .findFirst()
+                .map(OcrBox::getTrailingChars))
+        .isEqualTo(Optional.of(""));
     assertThat(OcrParser.boxesToString(boxes)).contains("li-li-li-conse");
   }
 }

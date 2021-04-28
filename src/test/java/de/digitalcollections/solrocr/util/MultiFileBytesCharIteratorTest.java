@@ -19,11 +19,12 @@ import org.junit.jupiter.api.Test;
 class MultiFileBytesCharIteratorTest {
   private static final Pattern OFFSET_PAT = Pattern.compile("\\s(.+?)⚑(\\d+)");
 
-  private final List<Path> utfPaths = ImmutableList.of(
-      Paths.get("src/test/resources/data/multi_txt/part_1.txt"),
-      Paths.get("src/test/resources/data/multi_txt/part_2.txt"),
-      Paths.get("src/test/resources/data/multi_txt/part_3.txt"),
-      Paths.get("src/test/resources/data/multi_txt/part_4.txt"));
+  private final List<Path> utfPaths =
+      ImmutableList.of(
+          Paths.get("src/test/resources/data/multi_txt/part_1.txt"),
+          Paths.get("src/test/resources/data/multi_txt/part_2.txt"),
+          Paths.get("src/test/resources/data/multi_txt/part_3.txt"),
+          Paths.get("src/test/resources/data/multi_txt/part_4.txt"));
   private final Path utf8CompletePath;
 
   private final Map<Integer, Character> utf8Chars;
@@ -36,9 +37,11 @@ class MultiFileBytesCharIteratorTest {
     utf8It = new MultiFileBytesCharIterator(utfPaths, StandardCharsets.UTF_8, null);
     utf8CompletePath = Paths.get("src/test/resources/data/multi_txt/complete.txt");
     utf8Text = new String(Files.readAllBytes(utf8CompletePath), StandardCharsets.UTF_8);
-    Matcher m = OFFSET_PAT.matcher(new String(
-        Files.readAllBytes(Paths.get("src/test/resources/data/multi_txt/index.txt")),
-        StandardCharsets.UTF_8));
+    Matcher m =
+        OFFSET_PAT.matcher(
+            new String(
+                Files.readAllBytes(Paths.get("src/test/resources/data/multi_txt/index.txt")),
+                StandardCharsets.UTF_8));
     utf8Chars = new HashMap<>();
     while (m.find()) {
       String charStr = m.group(1);

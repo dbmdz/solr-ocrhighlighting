@@ -11,16 +11,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-/** ATTENTION: This breaks the semantics of {@link java.text.CharacterIterator} and {@link java.lang.CharSequence}
- *             since all indices are byte offsets into the underlying file, <strong>not</strong> character indices.
- *             All methods that don't operate on indices should work as expected.
+/**
+ * ATTENTION: This breaks the semantics of {@link java.text.CharacterIterator} and {@link
+ * java.lang.CharSequence} since all indices are byte offsets into the underlying file,
+ * <strong>not</strong> character indices. All methods that don't operate on indices should work as
+ * expected.
  *
- *             Please note that this means that this type will only work with {@link java.text.BreakIterator} types
- *             that don't mess with the index themselves.
+ * <p>Please note that this means that this type will only work with {@link java.text.BreakIterator}
+ * types that don't mess with the index themselves.
  */
 public class FileBytesCharIterator implements IterableCharSequence, AutoCloseable {
-  private final byte[] copyBuf = new byte[128*1024];
-  private final Path filePath;  // For copy-constructor
+  private final byte[] copyBuf = new byte[128 * 1024];
+  private final Path filePath; // For copy-constructor
   private final FileChannel chan;
   private final MappedByteBuffer buf;
   private final int numBytes;
@@ -68,7 +70,7 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
     return numBytes;
   }
 
-  /** Move offset to the left until we're on an UTF8 starting byte **/
+  /** Move offset to the left until we're on an UTF8 starting byte * */
   private int adjustOffset(int b, int offset) {
     while ((b >> 6) == 0b10) {
       offset -= 1;
@@ -85,17 +87,19 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
     return adjustOffset(b, offset);
   }
 
-  /** Get ASCII character at the given byte offset.
+  /**
+   * Get ASCII character at the given byte offset.
    *
-   * Note that for performance reason this will simply return `?` if the byte at the given position is not ASCII.
-   * This is done for a 25% performance boost while highlighting, with the reasoning that the `charAt` method is only
-   * used by the `BreakIterator` implementations to find OCR blocks. Every format supported by this plugin uses element
-   * names and attribute names that are pure ASCII, so we're not missing out on anything relevant, as long as the user
-   * doesn't put non-ASCII characters into attribute values.
+   * <p>Note that for performance reason this will simply return `?` if the byte at the given
+   * position is not ASCII. This is done for a 25% performance boost while highlighting, with the
+   * reasoning that the `charAt` method is only used by the `BreakIterator` implementations to find
+   * OCR blocks. Every format supported by this plugin uses element names and attribute names that
+   * are pure ASCII, so we're not missing out on anything relevant, as long as the user doesn't put
+   * non-ASCII characters into attribute values.
    */
   @Override
   public char charAt(int offset) {
-    int b = buf.get(offset) & 0xFF;  // bytes are signed in Java....
+    int b = buf.get(offset) & 0xFF; // bytes are signed in Java....
     if (b < 0x80) {
       // Optimization: It's just ASCII, so simply cast to a char
       return (char) b;
@@ -104,7 +108,6 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
       return '?';
     }
   }
-
 
   @Override
   public CharSequence subSequence(int start, int end) {
@@ -167,7 +170,7 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
     int inc = 1;
     if (Character.isHighSurrogate(c) || c > '\u07FF') {
       inc = 3;
-    }  else if (c > '\u007F') {
+    } else if (c > '\u007F') {
       inc = 2;
     }
     this.current = Math.min(this.current + inc, this.numBytes);

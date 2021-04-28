@@ -29,12 +29,14 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
       // Truncate block to last '>' to avoid splitting element openings across blocks
       int blockEnd = block.length();
       int lastTagClose = block.lastIndexOf('>');
-      if (lastTagClose > 0 && !StringUtils.isAllBlank(block.subSequence(lastTagClose, block.length()))) {
+      if (lastTagClose > 0
+          && !StringUtils.isAllBlank(block.subSequence(lastTagClose, block.length()))) {
         blockEnd = lastTagClose + 1;
         end = start + lastTagClose;
       }
 
-      // In hOCR, there can be multiple options for expressing the same level in the block hierarchy,
+      // In hOCR, there can be multiple options for expressing the same level in the block
+      // hierarchy,
       // so we need to check for all of them.
       int idx = blockEnd;
       int closeIdx = blockEnd - 1;
@@ -104,7 +106,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
         blockStart = firstTagOpen;
       }
       int idx = -1;
-      for (String breakClass: this.breakClasses) {
+      for (String breakClass : this.breakClasses) {
         // Look for the class in the block
         int fromIdx = block.length();
         while (true) {
@@ -115,7 +117,9 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
           }
           int elemOpen = block.lastIndexOf('<', i);
           int previousClose = block.lastIndexOf('>', i);
-          if (elemOpen < blockStart || previousClose > elemOpen || block.startsWith("meta", elemOpen + 1)) {
+          if (elemOpen < blockStart
+              || previousClose > elemOpen
+              || block.startsWith("meta", elemOpen + 1)) {
             // Class was not part of a tag or in the "meta" tag, keep looking
             fromIdx = Math.max(previousClose, elemOpen);
             continue;

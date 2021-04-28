@@ -36,76 +36,111 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
     index(
         "some_text",
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor "
-        + "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
-        + "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute "
-        + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
-        + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
-        + "deserunt mollit anim id est laborum.", "id", "1337");
+            + "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
+            + "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute "
+            + "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
+            + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
+            + "deserunt mollit anim id est laborum.",
+        "id",
+        "1337");
     Path dataPath = Paths.get("src", "test", "resources", "data").toAbsolutePath();
     Path ocrPath = dataPath.resolve("alto.xml");
     index("ocr_text", ocrPath.toString(), "id", "31337");
     commit();
-
   }
 
   @Test
   public void testDistributedSearch() throws Exception {
-    QueryResponse resp = query(
-        "q", "svadag",
-        "hl", "true",
-        "hl.ocr.fl", "ocr_text",
-        "hl.usePhraseHighlighter", "true",
-        "df", "ocr_text",
-        "hl.ctxTag", "ocr_line",
-        "hl.ctxSize", "2",
-        "hl.snippets", "10",
-        "fl", "id,score");
+    QueryResponse resp =
+        query(
+            "q", "svadag",
+            "hl", "true",
+            "hl.ocr.fl", "ocr_text",
+            "hl.usePhraseHighlighter", "true",
+            "df", "ocr_text",
+            "hl.ctxTag", "ocr_line",
+            "hl.ctxSize", "2",
+            "hl.snippets", "10",
+            "fl", "id,score");
     assertEquals(1, resp.getResults().getNumFound());
-    // NOTE: the `query` method itself also validates the response against a non-sharded setup, so we don't have to
-    //       do a lot of assertions here, since the general case is already covered by the other tests.
+    // NOTE: the `query` method itself also validates the response against a non-sharded setup, so
+    // we don't have to
+    //       do a lot of assertions here, since the general case is already covered by the other
+    // tests.
   }
 
   @Test
   public void testDistributedTimeout() throws Exception {
-    QueryResponse resp = query(
-        "q", "svadag",
-        "hl", "true",
-        "hl.ocr.fl", "ocr_text",
-        "hl.usePhraseHighlighter", "true",
-        "df", "ocr_text",
-        "hl.ctxTag", "ocr_line",
-        "hl.ctxSize", "2",
-        "hl.snippets", "10",
-        "hl.ocr.timeAllowed", "-1",
-        "fl", "id,score");
+    QueryResponse resp =
+        query(
+            "q", "svadag",
+            "hl", "true",
+            "hl.ocr.fl", "ocr_text",
+            "hl.usePhraseHighlighter", "true",
+            "df", "ocr_text",
+            "hl.ctxTag", "ocr_line",
+            "hl.ctxSize", "2",
+            "hl.snippets", "10",
+            "hl.ocr.timeAllowed", "-1",
+            "fl", "id,score");
     assertEquals(1, resp.getResults().getNumFound());
     assertEquals(true, resp.getHeader().getBooleanArg("partialOcrHighlights"));
   }
 
   @Test
   public void testRegularHighlightingWorks() throws Exception {
-    QueryResponse resp = query("q", "\"commodo consequat\"", "hl", "true", "hl.fl", "some_text", "hl.weightMatches",
-        "true", "df", "some_text", "fl", "id,score");
+    QueryResponse resp =
+        query(
+            "q",
+            "\"commodo consequat\"",
+            "hl",
+            "true",
+            "hl.fl",
+            "some_text",
+            "hl.weightMatches",
+            "true",
+            "df",
+            "some_text",
+            "fl",
+            "id,score");
     assertEquals(1, resp.getResults().getNumFound());
     List<String> hls = resp.getHighlighting().get("1337").get("some_text");
     assertEquals(hls.size(), 1);
-    assertEquals(hls.get(0), " aliquip ex ea <em>commodo</em> <em>consequat</em>. Duis aute irure dolor in "
-        + "reprehenderit in voluptate velit esse cillum");
+    assertEquals(
+        hls.get(0),
+        " aliquip ex ea <em>commodo</em> <em>consequat</em>. Duis aute irure dolor in "
+            + "reprehenderit in voluptate velit esse cillum");
   }
 
   @Test
   public void testCombinedHighlightingWoriks() throws Exception {
-    QueryResponse resp = query(
-        "q", "\"commodo consequat\" svadag", "hl", "true", "hl.fl", "some_text", "defType", "edismax",
-        "hl.weightMatches", "true", "qf", "some_text ocr_text", "fl", "id,score", "hl.ocr.fl", "ocr_text");
+    QueryResponse resp =
+        query(
+            "q",
+            "\"commodo consequat\" svadag",
+            "hl",
+            "true",
+            "hl.fl",
+            "some_text",
+            "defType",
+            "edismax",
+            "hl.weightMatches",
+            "true",
+            "qf",
+            "some_text ocr_text",
+            "fl",
+            "id,score",
+            "hl.ocr.fl",
+            "ocr_text");
     assertEquals(2, resp.getResults().getNumFound());
     List<String> hls = resp.getHighlighting().get("1337").get("some_text");
     assertEquals(hls.size(), 1);
-    assertEquals(hls.get(0), " aliquip ex ea <em>commodo</em> <em>consequat</em>. Duis aute irure dolor in "
-        + "reprehenderit in voluptate velit esse cillum");
+    assertEquals(
+        hls.get(0),
+        " aliquip ex ea <em>commodo</em> <em>consequat</em>. Duis aute irure dolor in "
+            + "reprehenderit in voluptate velit esse cillum");
     NamedList<?> ocrHls = (NamedList<?>) resp.getResponse().get("ocrHighlighting");
     assertEquals(2, ocrHls.size());
     assertEquals(1, ((NamedList<?>) ocrHls.get("31337")).size());
   }
-
 }

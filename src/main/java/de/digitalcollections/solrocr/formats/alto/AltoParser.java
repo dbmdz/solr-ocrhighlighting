@@ -74,7 +74,8 @@ public class AltoParser extends OcrParser {
       if (features.contains(ParsingFeature.OFFSETS)) {
         box.setTextOffset(Math.toIntExact(getAttributeValueOffset("CONTENT", xmlReader)));
         if (hyphenStart != null) {
-          box.setDehyphenatedOffset(Math.toIntExact(getAttributeValueOffset("SUBS_CONTENT", xmlReader)));
+          box.setDehyphenatedOffset(
+              Math.toIntExact(getAttributeValueOffset("SUBS_CONTENT", xmlReader)));
         }
       }
     }
@@ -86,14 +87,14 @@ public class AltoParser extends OcrParser {
       String width = xmlReader.getAttributeValue("", "WIDTH");
       String height = xmlReader.getAttributeValue("", "HEIGHT");
       if (x != null && !x.isEmpty()) {
-        double xNum =  Double.parseDouble(x);
+        double xNum = Double.parseDouble(x);
         box.setUlx((int) xNum);
         if (width != null && !width.isEmpty()) {
           box.setLrx((int) xNum + (int) Double.parseDouble(width));
         }
       }
       if (y != null && !y.isEmpty()) {
-        double yNum =  Double.parseDouble(y);
+        double yNum = Double.parseDouble(y);
         box.setUly((int) yNum);
         if (height != null && !height.isEmpty()) {
           box.setLry((int) yNum + (int) Double.parseDouble(height));
@@ -102,7 +103,10 @@ public class AltoParser extends OcrParser {
       if (box.getLrx() < 0 || box.getLry() < 0) {
         log.warn(
             "Incomplete coordinates encountered: 'HPOS={}, VPOS={}, WIDTH={}, HEIGHT={}",
-            x, y, width, height);
+            x,
+            y,
+            width,
+            height);
       }
     }
 
@@ -122,19 +126,21 @@ public class AltoParser extends OcrParser {
         }
         int evt = xmlReader.next();
         if (evt != XMLStreamConstants.CHARACTERS) {
-          throw new IllegalStateException("An ALTERNATIVE element can only have a text node as its sole child");
+          throw new IllegalStateException(
+              "An ALTERNATIVE element can only have a text node as its sole child");
         }
-        Long offset = features.contains(ParsingFeature.OFFSETS)
-            ? xmlReader.getLocationInfo().getStartingCharOffset() : null;
+        Long offset =
+            features.contains(ParsingFeature.OFFSETS)
+                ? xmlReader.getLocationInfo().getStartingCharOffset()
+                : null;
         String alternative = xmlReader.getText();
-        box.addAlternative(alternative, offset != null
-            ? Math.toIntExact(offset)
-            : null);
+        box.addAlternative(alternative, offset != null ? Math.toIntExact(offset) : null);
         if (features.contains(ParsingFeature.HIGHLIGHTS) && box.getHighlightSpan() == null) {
           box.setHighlightSpan(this.trackHighlightSpan(alternative, box));
         }
         if (xmlReader.next() != XMLStreamConstants.END_ELEMENT) {
-          throw new IllegalStateException("An ALTERNATIVE element can only have a text node as its sole child");
+          throw new IllegalStateException(
+              "An ALTERNATIVE element can only have a text node as its sole child");
         }
       }
     }
@@ -158,7 +164,9 @@ public class AltoParser extends OcrParser {
       }
       this.inHyphenation = true;
       this.hyphenEnd = this.readNext(xmlReader, features);
-      if (this.hyphenEnd != null && this.hyphenEnd.isHyphenated() && !this.hyphenEnd.isHyphenStart()) {
+      if (this.hyphenEnd != null
+          && this.hyphenEnd.isHyphenated()
+          && !this.hyphenEnd.isHyphenStart()) {
         // Insert highlighting markers at correct positions in the dehyphenated content
         // This is assuming that both the end is fully part of the dehyphenated form.
         boolean modified = false;
@@ -171,7 +179,8 @@ public class AltoParser extends OcrParser {
           dehyphenated.insert(box.getText().indexOf(END_HL), END_HL);
           modified = true;
         }
-        int endIdx = dehyphenated.indexOf(hyphenEnd.getText().replace(END_HL, "").replace(START_HL, ""));
+        int endIdx =
+            dehyphenated.indexOf(hyphenEnd.getText().replace(END_HL, "").replace(START_HL, ""));
         if (hyphenEnd.getText().contains(START_HL) && endIdx >= 0) {
           dehyphenated.insert(endIdx + hyphenEnd.getText().indexOf(START_HL), START_HL);
           modified = true;
@@ -193,22 +202,26 @@ public class AltoParser extends OcrParser {
       this.inHyphenation = false;
     }
 
-    // Boxes without text or coordinates (if either is requested with a feature flag) are ignored since they break
+    // Boxes without text or coordinates (if either is requested with a feature flag) are ignored
+    // since they break
     // things downstream
     boolean ignoreBox =
-        (features.contains(ParsingFeature.TEXT) && (box.getText() == null || box.getText().isEmpty()))
-        || (features.contains(ParsingFeature.COORDINATES)
-            && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
+        (features.contains(ParsingFeature.TEXT)
+                && (box.getText() == null || box.getText().isEmpty()))
+            || (features.contains(ParsingFeature.COORDINATES)
+                && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
     if (ignoreBox) {
       return null;
     }
     return box;
   }
 
-  /** Advance parser to the next word, counting the number of pages encountered along the way, as
-   *  well as page breaks, if desired.
+  /**
+   * Advance parser to the next word, counting the number of pages encountered along the way, as
+   * well as page breaks, if desired.
    */
-  private int seekToNextWord(XMLStreamReader2 xmlReader, boolean trackPages) throws XMLStreamException {
+  private int seekToNextWord(XMLStreamReader2 xmlReader, boolean trackPages)
+      throws XMLStreamException {
     int numSpaces = 0;
     boolean foundWord = false;
     while (xmlReader.hasNext()) {
@@ -245,7 +258,7 @@ public class AltoParser extends OcrParser {
   /**
    * Get the character offset of the value for the given attribute in the reader.
    *
-   * <strong>Assumes the XMLStreamReader is on a START_ELEMENT event.</strong>
+   * <p><strong>Assumes the XMLStreamReader is on a START_ELEMENT event.</strong>
    */
   private long getAttributeValueOffset(String targetAttrib, XMLStreamReader2 xmlReader) {
     if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT) {
@@ -255,9 +268,10 @@ public class AltoParser extends OcrParser {
     int contextLen = input.getBackContextSize();
 
     // Place the back-context pointer on the start of the element
-    int contextIdx = Math.toIntExact(
-        xmlReader.getLocationInfo().getStartingCharOffset()
-            - input.getBackContextStartOffset());
+    int contextIdx =
+        Math.toIntExact(
+            xmlReader.getLocationInfo().getStartingCharOffset()
+                - input.getBackContextStartOffset());
 
     // Look for the attribute in the back context, starting from the start of
     // the element. Done with character buffers since it's *way* *way* faster than
@@ -268,7 +282,7 @@ public class AltoParser extends OcrParser {
 
     if (needleIdx >= 0) {
       // Append 1 to the index to account for the single- or double-quote after the `=`
-      return  input.getBackContextStartOffset() + needleIdx + needle.length + 1;
+      return input.getBackContextStartOffset() + needleIdx + needle.length + 1;
     }
     return -1;
   }

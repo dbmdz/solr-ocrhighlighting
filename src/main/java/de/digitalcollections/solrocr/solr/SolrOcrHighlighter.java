@@ -43,10 +43,10 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     int[] maxPassagesOcr = getMaxPassages(ocrFieldNames, params);
 
     // Highlight OCR fields
-    OcrHighlighter ocrHighlighter = new OcrHighlighter(
-        req.getSearcher(), req.getSchema().getIndexAnalyzer(), req.getParams());
-    OcrHighlightResult[] ocrSnippets = ocrHighlighter.highlightOcrFields(
-        ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader);
+    OcrHighlighter ocrHighlighter =
+        new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer(), req.getParams());
+    OcrHighlightResult[] ocrSnippets =
+        ocrHighlighter.highlightOcrFields(ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader);
 
     // Assemble output data
     SimpleOrderedMap<Object> out = new SimpleOrderedMap<>();
@@ -64,8 +64,9 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     return maxPassages;
   }
 
-  private void addOcrSnippets(NamedList<Object> out, String[] keys, OcrHighlightResult[] ocrSnippets) {
-    for (int k=0; k < keys.length; k++) {
+  private void addOcrSnippets(
+      NamedList<Object> out, String[] keys, OcrHighlightResult[] ocrSnippets) {
+    for (int k = 0; k < keys.length; k++) {
       String docId = keys[k];
       SimpleOrderedMap<Object> docMap = (SimpleOrderedMap<Object>) out.get(docId);
       if (docMap == null) {
@@ -85,15 +86,15 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
     if (fields != null && fields.length > 0) {
       Set<String> expandedFields = new LinkedHashSet<>();
-      Collection<String> storedHighlightFieldNames = req.getSearcher().getDocFetcher().getStoredHighlightFieldNames();
+      Collection<String> storedHighlightFieldNames =
+          req.getSearcher().getDocFetcher().getStoredHighlightFieldNames();
       for (String field : fields) {
         expandWildcardsInHighlightFields(
-            expandedFields,
-            storedHighlightFieldNames,
-            SolrPluginUtils.split(field));
+            expandedFields, storedHighlightFieldNames, SolrPluginUtils.split(field));
       }
-      fields = expandedFields.toArray(new String[]{});
-      // Trim them now in case they haven't been yet.  Not needed for all code-paths above but do it here.
+      fields = expandedFields.toArray(new String[] {});
+      // Trim them now in case they haven't been yet.  Not needed for all code-paths above but do it
+      // here.
       for (int i = 0; i < fields.length; i++) {
         fields[i] = fields[i].trim();
       }
@@ -101,11 +102,9 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     return fields;
   }
 
-  static private void expandWildcardsInHighlightFields (
+  private static void expandWildcardsInHighlightFields(
       // Copied verbatim from SolrHighlighter
-      Set<String> expandedFields,
-      Collection<String> storedHighlightFieldNames,
-      String... fields) {
+      Set<String> expandedFields, Collection<String> storedHighlightFieldNames, String... fields) {
     for (String field : fields) {
       if (field.contains("*")) {
         // create a Java regular expression from the wildcard string

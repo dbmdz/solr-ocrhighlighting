@@ -12,7 +12,7 @@ public class ExitingIterCharSeq implements IterableCharSequence {
     }
   }
 
-  private final static int CHARS_BETWEEN_CHECKS = 8192;
+  private static final int CHARS_BETWEEN_CHECKS = 8192;
 
   private final IterableCharSequence iter;
   private final QueryTimeout timeout;
@@ -25,11 +25,13 @@ public class ExitingIterCharSeq implements IterableCharSequence {
 
   private void checkAndThrow() {
     if (timeout.shouldExit()) {
-      throw new ExitingIterCharSeqException(String.format(
-          "The request took to long to highlight the OCR files (pointer: %s, timeout was: %s)", getPointer(), timeout));
+      throw new ExitingIterCharSeqException(
+          String.format(
+              "The request took to long to highlight the OCR files (pointer: %s, timeout was: %s)",
+              getPointer(), timeout));
     } else if (Thread.interrupted()) {
-      throw new ExitingIterCharSeqException(String.format(
-          "Interrupted while reading the file for OCR (pointer: %s).", getPointer()));
+      throw new ExitingIterCharSeqException(
+          String.format("Interrupted while reading the file for OCR (pointer: %s).", getPointer()));
     }
   }
 

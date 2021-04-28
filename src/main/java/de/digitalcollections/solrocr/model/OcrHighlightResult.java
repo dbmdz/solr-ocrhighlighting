@@ -12,7 +12,6 @@ public class OcrHighlightResult {
   private final Map<String, OcrSnippet[]> fieldSnippets;
   private final Map<String, Integer> snippetCounts;
 
-
   public OcrHighlightResult() {
     snippetCounts = new HashMap<>();
     fieldSnippets = new HashMap<>();
@@ -40,9 +39,10 @@ public class OcrHighlightResult {
       SimpleOrderedMap<Object> fieldOut = new SimpleOrderedMap<>();
       int snipCount = getSnippetCount(fieldName);
       OcrSnippet[] snips = getFieldSnippets(fieldName);
-      List<NamedList<Object>> outSnips = Arrays.stream(snips)
-          .map(snip -> snip == null ? null : snip.toNamedList())
-          .collect(Collectors.toList());
+      List<NamedList<Object>> outSnips =
+          Arrays.stream(snips)
+              .map(snip -> snip == null ? null : snip.toNamedList())
+              .collect(Collectors.toList());
       fieldOut.add("snippets", outSnips);
       fieldOut.add("numTotal", snipCount);
       out.add(fieldName, fieldOut);

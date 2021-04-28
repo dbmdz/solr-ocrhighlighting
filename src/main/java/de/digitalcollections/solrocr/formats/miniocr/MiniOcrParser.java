@@ -22,12 +22,14 @@ public class MiniOcrParser extends OcrParser {
   private OcrPage currentPage;
   private OcrBox hyphenEnd = null;
 
-  public MiniOcrParser(Reader input, OcrParser.ParsingFeature... features) throws XMLStreamException {
+  public MiniOcrParser(Reader input, OcrParser.ParsingFeature... features)
+      throws XMLStreamException {
     super(input, features);
   }
 
   @Override
-  protected OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features) throws XMLStreamException {
+  protected OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
+      throws XMLStreamException {
     if (hyphenEnd != null) {
       OcrBox out = this.hyphenEnd;
       this.hyphenEnd = null;
@@ -69,8 +71,11 @@ public class MiniOcrParser extends OcrParser {
     }
     if (features.contains(ParsingFeature.TEXT)) {
       this.parseText(
-          xmlReader, box, features.contains(ParsingFeature.HIGHLIGHTS),
-          features.contains(ParsingFeature.OFFSETS), features.contains(ParsingFeature.ALTERNATIVES));
+          xmlReader,
+          box,
+          features.contains(ParsingFeature.HIGHLIGHTS),
+          features.contains(ParsingFeature.OFFSETS),
+          features.contains(ParsingFeature.ALTERNATIVES));
     }
     if (features.contains(ParsingFeature.PAGES) && this.currentPage != null) {
       box.setPage(this.currentPage);
@@ -108,12 +113,14 @@ public class MiniOcrParser extends OcrParser {
       }
     }
 
-    // Boxes without text or coordinates (if either is requested with a feature flag) are ignored since they break
+    // Boxes without text or coordinates (if either is requested with a feature flag) are ignored
+    // since they break
     // things downstream
     boolean ignoreBox =
-        (features.contains(ParsingFeature.TEXT) && (box.getText() == null || box.getText().isEmpty()))
+        (features.contains(ParsingFeature.TEXT)
+                && (box.getText() == null || box.getText().isEmpty()))
             || (features.contains(ParsingFeature.COORDINATES)
-            && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
+                && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
     if (ignoreBox) {
       return null;
     }
@@ -121,14 +128,17 @@ public class MiniOcrParser extends OcrParser {
   }
 
   private void parseText(
-      XMLStreamReader2 xmlReader, OcrBox box, boolean withHighlights, boolean withOffsets,
-      boolean withAlternatives) throws XMLStreamException {
+      XMLStreamReader2 xmlReader,
+      OcrBox box,
+      boolean withHighlights,
+      boolean withOffsets,
+      boolean withAlternatives)
+      throws XMLStreamException {
     if (xmlReader.next() != XMLStreamConstants.CHARACTERS) {
       throw new IllegalStateException("A word element must have text content.");
     }
     if (withOffsets) {
-      box.setTextOffset(Math.toIntExact(
-          xmlReader.getLocationInfo().getStartingCharOffset()));
+      box.setTextOffset(Math.toIntExact(xmlReader.getLocationInfo().getStartingCharOffset()));
     }
 
     String chars = xmlReader.getText();
@@ -138,7 +148,7 @@ public class MiniOcrParser extends OcrParser {
     }
 
     if (chars.indexOf(alternativeMarker) < 0) {
-        box.setText(chars);
+      box.setText(chars);
     } else {
       int idx = 0;
       while (idx < chars.length()) {
@@ -153,16 +163,15 @@ public class MiniOcrParser extends OcrParser {
           }
         } else {
           String altText = chars.substring(idx, end);
-          box.addAlternative(
-              altText,
-              withOffsets ? box.getTextOffset() + idx : null );
+          box.addAlternative(altText, withOffsets ? box.getTextOffset() + idx : null);
         }
         idx = Math.min(end + 1, chars.length());
       }
     }
   }
 
-  private String seekToNextWord(XMLStreamReader2 xmlReader, boolean trackPages) throws XMLStreamException {
+  private String seekToNextWord(XMLStreamReader2 xmlReader, boolean trackPages)
+      throws XMLStreamException {
     boolean foundWord = false;
     StringBuilder trailingChars = new StringBuilder();
     while (xmlReader.hasNext()) {
@@ -181,8 +190,7 @@ public class MiniOcrParser extends OcrParser {
             String[] dimParts = dimStr.split(" ");
             dims = new Dimension(Integer.parseInt(dimParts[0]), Integer.parseInt(dimParts[1]));
           }
-          String id = xmlReader.getAttributeValue(
-              "http://www.w3.org/XML/1998/namespace", "id");
+          String id = xmlReader.getAttributeValue("http://www.w3.org/XML/1998/namespace", "id");
           if (id == null || id.isEmpty()) {
             id = xmlReader.getAttributeValue("", "pid");
           }
@@ -191,7 +199,9 @@ public class MiniOcrParser extends OcrParser {
       } else if (nextEvent == XMLStreamConstants.CHARACTERS) {
         String txt = xmlReader.getText();
         boolean isBlank = StringUtils.isBlank(txt);
-        if (isBlank && (trailingChars.length() == 0 || trailingChars.lastIndexOf(" ") != (trailingChars.length() - 1))) {
+        if (isBlank
+            && (trailingChars.length() == 0
+                || trailingChars.lastIndexOf(" ") != (trailingChars.length() - 1))) {
           trailingChars.append(' ');
         } else if (!isBlank) {
           trailingChars.append(txt);

@@ -35,9 +35,7 @@ import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances.
- */
+/** Takes care of formatting fragments of the OCR format into {@link OcrSnippet} instances. */
 public class OcrPassageFormatter extends PassageFormatter {
   protected static final Pattern LAST_INNER_TAG_PAT = Pattern.compile("[a-zA-Z0-9]</");
 
@@ -50,9 +48,12 @@ public class OcrPassageFormatter extends PassageFormatter {
   protected final boolean alignSpans;
   protected final boolean trackPages;
 
-
   public OcrPassageFormatter(
-      String startHlTag, String endHlTag, boolean absoluteHighlights, boolean alignSpans, boolean trackPages,
+      String startHlTag,
+      String endHlTag,
+      boolean absoluteHighlights,
+      boolean alignSpans,
+      boolean trackPages,
       OcrFormat format) {
     this.startHlTag = startHlTag;
     this.endHlTag = endHlTag;
@@ -62,11 +63,12 @@ public class OcrPassageFormatter extends PassageFormatter {
     this.format = format;
   }
 
-  /** Merge overlapping matches. **/
+  /** Merge overlapping matches. * */
   protected List<PassageMatch> mergeMatches(int numMatches, int[] matchStarts, int[] matchEnds) {
-    Deque<PassageMatch> sortedMatches = IntStream.range(0, numMatches)
-        .mapToObj(idx -> new PassageMatch(matchStarts[idx], matchEnds[idx]))
-        .collect(Collectors.toCollection(ArrayDeque::new));
+    Deque<PassageMatch> sortedMatches =
+        IntStream.range(0, numMatches)
+            .mapToObj(idx -> new PassageMatch(matchStarts[idx], matchEnds[idx]))
+            .collect(Collectors.toCollection(ArrayDeque::new));
     Deque<PassageMatch> mergedMatches = new ArrayDeque<>();
     mergedMatches.add(sortedMatches.removeFirst());
     while (!sortedMatches.isEmpty()) {
@@ -83,7 +85,8 @@ public class OcrPassageFormatter extends PassageFormatter {
   }
 
   /**
-   * Format the passages that point to subsequences of the document text into {@link OcrSnippet} instances
+   * Format the passages that point to subsequences of the document text into {@link OcrSnippet}
+   * instances
    *
    * @param passages in the the document text that contain highlighted text
    * @param content of the OCR field, implemented as an {@link IterableCharSequence}
@@ -91,15 +94,16 @@ public class OcrPassageFormatter extends PassageFormatter {
    */
   public OcrSnippet[] format(Passage[] passages, IterableCharSequence content) {
     OcrSnippet[] snippets = new OcrSnippet[passages.length];
-    for (int i=0; i < passages.length; i++) {
+    for (int i = 0; i < passages.length; i++) {
       Passage passage = passages[i];
       try {
         snippets[i] = format(passage, content);
       } catch (IndexOutOfBoundsException e) {
-        String errorMsg = String.format(
-            "Could not create snippet (start=%d, end=%d) from content at '%s' due to an out-of-bounds error.\n"
-          + "\nDoes the file on disk correspond to the document that was used during indexing?",
-            passage.getStartOffset(), passage.getEndOffset(), content.getIdentifier());
+        String errorMsg =
+            String.format(
+                "Could not create snippet (start=%d, end=%d) from content at '%s' due to an out-of-bounds error.\n"
+                    + "\nDoes the file on disk correspond to the document that was used during indexing?",
+                passage.getStartOffset(), passage.getEndOffset(), content.getIdentifier());
         logger.error(errorMsg, e);
       }
     }
@@ -107,14 +111,18 @@ public class OcrPassageFormatter extends PassageFormatter {
   }
 
   protected String getHighlightedFragment(Passage passage, IterableCharSequence content) {
-    StringBuilder sb = new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
+    StringBuilder sb =
+        new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
     int extraChars = 0;
     if (passage.getNumMatches() > 0) {
-      List<PassageMatch> matches = mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
+      List<PassageMatch> matches =
+          mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
       for (PassageMatch match : matches) {
-        // Can't just do match.start - passage.getStartOffset(), since both offsets are relative to **UTF-8 bytes**, but
+        // Can't just do match.start - passage.getStartOffset(), since both offsets are relative to
+        // **UTF-8 bytes**, but
         // we need **UTF-16 codepoint** offsets in the code.
-        String preMatchContent = content.subSequence(passage.getStartOffset(), match.start).toString();
+        String preMatchContent =
+            content.subSequence(passage.getStartOffset(), match.start).toString();
         int matchStart = preMatchContent.length();
         if (alignSpans) {
           matchStart = format.getLastContentStartIdx(preMatchContent);
@@ -123,11 +131,13 @@ public class OcrPassageFormatter extends PassageFormatter {
             this.adjustPositionToCharacterEntities(sb.toString(), extraChars + matchStart),
             START_HL);
         extraChars += START_HL.length();
-        // Again, can't just do match.end - passage.getStartOffset(), since we need char offsets (see above).
+        // Again, can't just do match.end - passage.getStartOffset(), since we need char offsets
+        // (see above).
         int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
         String matchText = sb.substring(extraChars + matchStart, extraChars + matchEnd);
         if (matchText.trim().endsWith(">")) {
-          // Set the end of the match to the position before the last inner closing tag inside of the match. This is only relevant for hOCR at the moment
+          // Set the end of the match to the position before the last inner closing tag inside of
+          // the match. This is only relevant for hOCR at the moment
           Matcher m = LAST_INNER_TAG_PAT.matcher(matchText);
           int idx = -1;
           while (m.find()) {
@@ -149,13 +159,14 @@ public class OcrPassageFormatter extends PassageFormatter {
     return sb.toString();
   }
 
-  /** Adjust the given position within the OCR fragment to account for XML character entities
-   *  in the OCR word, assumes that the position is within an OCR word.
+  /**
+   * Adjust the given position within the OCR fragment to account for XML character entities in the
+   * OCR word, assumes that the position is within an OCR word.
    *
-   *  This is necessary since doing this at indexing time would be extremely costly, given that
-   *  it would need to be run for every single word. At highlighting time it only needs to be run
-   *  for words that have a highlighting marker inside, since the difference is otherwise not
-   *  problematic.
+   * <p>This is necessary since doing this at indexing time would be extremely costly, given that it
+   * would need to be run for every single word. At highlighting time it only needs to be run for
+   * words that have a highlighting marker inside, since the difference is otherwise not
+   * problematic.
    */
   private int adjustPositionToCharacterEntities(String fragment, int position) {
     Range<Integer> wordRange = this.format.getContainingWordLimits(fragment, position);
@@ -168,8 +179,8 @@ public class OcrPassageFormatter extends PassageFormatter {
       }
       int entEnd = fragment.indexOf(';', entStart);
       int entLength = entEnd - entStart;
-      // This assumes that the entity decodes to a codepoint that is only one character wide in UTF16,
-      // which should be the case for >99.9% of terms people search for...
+      // This assumes that the entity decodes to a codepoint that is only one character wide in
+      // UTF16, which should be the case for >99.9% of terms people search for...
       position += entLength;
       idx = entEnd + 1;
     }
@@ -198,8 +209,8 @@ public class OcrPassageFormatter extends PassageFormatter {
       // parsing anyway
       return null;
     }
-    String pageFragment = content.subSequence(
-        pageOffset, Math.min(pageOffset + 512, content.length())).toString();
+    String pageFragment =
+        content.subSequence(pageOffset, Math.min(pageOffset + 512, content.length())).toString();
     return this.format.parsePageFragment(pageFragment);
   }
 
@@ -216,10 +227,12 @@ public class OcrPassageFormatter extends PassageFormatter {
     OcrBox prevBox = null;
     String pageId = null;
     for (OcrBox box : allBoxes) {
-      // Stupid, haphazard heuristic for column detection: If the next box is at least the height of the current box
-      // times five higher on the page, we're on a new column. Or if the page changes.
+      // Stupid, haphazard heuristic for column detection: If the next box is at least the height of
+      // the current box times five higher on the page, we're on a new column. Or if the page
+      // changes.
       // FIXME: This clearly needs some more thought put into it
-      boolean newColumn = prevBox != null && (box.getUly() + prevBox.getHeight() * 5) < prevBox.getUly();
+      boolean newColumn =
+          prevBox != null && (box.getUly() + prevBox.getHeight() * 5) < prevBox.getUly();
       String boxPageId = box.getPage() == null ? null : box.getPage().id;
       boolean newPage = pageId != null && !pageId.equals(boxPageId);
       if (newColumn || newPage) {
@@ -227,7 +240,8 @@ public class OcrPassageFormatter extends PassageFormatter {
         currentCol = new ArrayList<>();
       }
       currentCol.add(box);
-      // Skip very low-height boxes since they throw off the heuristic, we still track page changes, though!
+      // Skip very low-height boxes since they throw off the heuristic, we still track page changes,
+      // though!
       if (box.getHeight() > 5) {
         prevBox = box;
       }
@@ -244,10 +258,10 @@ public class OcrPassageFormatter extends PassageFormatter {
         pages.add(wordBox.getPage());
       }
       if (wordBox.isInHighlight()) {
-        boolean isInNewSpan = (
-            currentSpan == null
-            || currentSpan.isEmpty()
-            || !wordBox.getHighlightSpan().equals(currentSpan.get(0).getHighlightSpan()));
+        boolean isInNewSpan =
+            (currentSpan == null
+                || currentSpan.isEmpty()
+                || !wordBox.getHighlightSpan().equals(currentSpan.get(0).getHighlightSpan()));
         if (isInNewSpan) {
           if (currentSpan != null && !currentSpan.isEmpty()) {
             hlSpans.add(currentSpan);
@@ -264,26 +278,30 @@ public class OcrPassageFormatter extends PassageFormatter {
       hlSpans.add(currentSpan);
     }
 
-    String highlightedText = OcrParser.boxesToString(allBoxes)
-        .replace(START_HL, startHlTag)
-        .replace(OcrParser.END_HL, endHlTag);
-    List<OcrBox> snippetRegions = byColumns.stream()
-        .map(this::determineSnippetRegion)
-        .filter(r -> !r.getText().isEmpty() && !r.getText().trim().isEmpty())
-        .collect(Collectors.toList());
-    Set<String> snippetPageIds = snippetRegions.stream()
-        .filter(b -> b.getPage() != null)
-        .map(b -> b.getPage().id)
-        .collect(Collectors.toSet());
+    String highlightedText =
+        OcrParser.boxesToString(allBoxes)
+            .replace(START_HL, startHlTag)
+            .replace(OcrParser.END_HL, endHlTag);
+    List<OcrBox> snippetRegions =
+        byColumns.stream()
+            .map(this::determineSnippetRegion)
+            .filter(r -> !r.getText().isEmpty() && !r.getText().trim().isEmpty())
+            .collect(Collectors.toList());
+    Set<String> snippetPageIds =
+        snippetRegions.stream()
+            .filter(b -> b.getPage() != null)
+            .map(b -> b.getPage().id)
+            .collect(Collectors.toSet());
     List<OcrPage> allPages = new ArrayList<>();
     if (page != null) {
       allPages.add(page);
     }
     allPages.addAll(pages);
-    List<OcrPage> snippetPages = allPages.stream()
-        .filter(p -> snippetPageIds.contains(p.id))
-        .distinct()
-        .collect(Collectors.toList());
+    List<OcrPage> snippetPages =
+        allPages.stream()
+            .filter(p -> snippetPageIds.contains(p.id))
+            .distinct()
+            .collect(Collectors.toList());
 
     OcrSnippet snip = new OcrSnippet(highlightedText, snippetPages, snippetRegions);
     this.addHighlightsToSnippet(hlSpans, snip);
@@ -314,15 +332,19 @@ public class OcrPassageFormatter extends PassageFormatter {
   /** Parse word boxes from an OCR fragment. */
   protected List<OcrBox> parseWords(String ocrFragment, OcrPage startPage) {
     List<OcrBox> words = new ArrayList<>();
-    List<OcrParser.ParsingFeature> parsingFeatures = Lists.newArrayList(
-        OcrParser.ParsingFeature.TEXT,  OcrParser.ParsingFeature.COORDINATES, OcrParser.ParsingFeature.ALTERNATIVES,
-        OcrParser.ParsingFeature.HIGHLIGHTS);
+    List<OcrParser.ParsingFeature> parsingFeatures =
+        Lists.newArrayList(
+            OcrParser.ParsingFeature.TEXT,
+            OcrParser.ParsingFeature.COORDINATES,
+            OcrParser.ParsingFeature.ALTERNATIVES,
+            OcrParser.ParsingFeature.HIGHLIGHTS);
     if (trackPages) {
       parsingFeatures.add(OcrParser.ParsingFeature.PAGES);
     }
-    OcrParser parser = format.getParser(
-        new SanitizingXmlFilter(new StringReader(ocrFragment), true),
-        parsingFeatures.toArray(new OcrParser.ParsingFeature[0]));
+    OcrParser parser =
+        format.getParser(
+            new SanitizingXmlFilter(new StringReader(ocrFragment), true),
+            parsingFeatures.toArray(new OcrParser.ParsingFeature[0]));
     boolean onStartPage = true;
     for (OcrBox box : parser) {
       if (onStartPage && box.getPage() == null) {
@@ -336,39 +358,42 @@ public class OcrPassageFormatter extends PassageFormatter {
   }
 
   protected void addHighlightsToSnippet(List<List<OcrBox>> hlSpans, OcrSnippet snippet) {
-    hlSpans.stream().flatMap(Collection::stream)
-        .forEach(box -> {
-          Optional<OcrBox> region = snippet.getSnippetRegions().stream().filter(r -> r.contains(box)).findFirst();
-          if (!region.isPresent()) {
-            return;
-          }
-          if (!this.absoluteHighlights) {
-            float xOffset = region.get().getUlx();
-            float yOffset = region.get().getUly();
-            if ((box.getUlx() > 0 && box.getUlx() < 1) || (box.getUly() > 0 && box.getUly() < 1)) {
-              // Relative coordinates, need to do some more calculations
-              float snipWidth = region.get().getLrx() - xOffset;
-              float snipHeight = region.get().getLry() - yOffset;
-              box.setUlx(truncateFloat((box.getUlx() - xOffset) / snipWidth));
-              box.setLrx(truncateFloat((box.getLrx() - xOffset) / snipWidth));
-              box.setUly(truncateFloat((box.getUly() - yOffset) / snipHeight));
-              box.setLry(truncateFloat((box.getLry() - yOffset) / snipHeight));
-            } else {
-              box.setUlx(box.getUlx() - xOffset);
-              box.setLrx(box.getLrx() - xOffset);
-              box.setUly(box.getUly() - yOffset);
-              box.setLry(box.getLry() - yOffset);
-            }
-          }
-          box.setParentRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
-          // Remove the highlighting tags from the text
-          box.setText(box.getText().replace(START_HL, "").replace(END_HL, ""));
-        });
+    hlSpans.stream()
+        .flatMap(Collection::stream)
+        .forEach(
+            box -> {
+              Optional<OcrBox> region =
+                  snippet.getSnippetRegions().stream().filter(r -> r.contains(box)).findFirst();
+              if (!region.isPresent()) {
+                return;
+              }
+              if (!this.absoluteHighlights) {
+                float xOffset = region.get().getUlx();
+                float yOffset = region.get().getUly();
+                if ((box.getUlx() > 0 && box.getUlx() < 1)
+                    || (box.getUly() > 0 && box.getUly() < 1)) {
+                  // Relative coordinates, need to do some more calculations
+                  float snipWidth = region.get().getLrx() - xOffset;
+                  float snipHeight = region.get().getLry() - yOffset;
+                  box.setUlx(truncateFloat((box.getUlx() - xOffset) / snipWidth));
+                  box.setLrx(truncateFloat((box.getLrx() - xOffset) / snipWidth));
+                  box.setUly(truncateFloat((box.getUly() - yOffset) / snipHeight));
+                  box.setLry(truncateFloat((box.getLry() - yOffset) / snipHeight));
+                } else {
+                  box.setUlx(box.getUlx() - xOffset);
+                  box.setLrx(box.getLrx() - xOffset);
+                  box.setUly(box.getUly() - yOffset);
+                  box.setLry(box.getLry() - yOffset);
+                }
+              }
+              box.setParentRegionIdx(snippet.getSnippetRegions().indexOf(region.get()));
+              // Remove the highlighting tags from the text
+              box.setText(box.getText().replace(START_HL, "").replace(END_HL, ""));
+            });
     hlSpans.forEach(span -> snippet.addHighlightSpan(this.mergeBoxes(span)));
   }
 
-
-  /** Merge adjacent OCR boxes into a single one, taking line breaks into account **/
+  /** Merge adjacent OCR boxes into a single one, taking line breaks into account * */
   protected List<OcrBox> mergeBoxes(List<OcrBox> boxes) {
     if (boxes.size() < 2) {
       return boxes;
@@ -380,7 +405,8 @@ public class OcrPassageFormatter extends PassageFormatter {
     // Combine word boxes into a single new OCR box until we hit a linebreak
     while (it.hasNext()) {
       OcrBox nextBox = it.next();
-      // We consider a box on a new line if its vertical distance from the current box is close to the line height
+      // We consider a box on a new line if its vertical distance from the current box is close to
+      // the line height
       float lineHeight = curBox.getLry() - curBox.getUly();
       float yDiff = Math.abs(nextBox.getUly() - curBox.getUly());
       boolean newLine = yDiff > (0.75 * lineHeight);
@@ -413,8 +439,8 @@ public class OcrPassageFormatter extends PassageFormatter {
   /**
    * Convenience implementation to format document text that is available as a {@link String}.
    *
-   * Wraps the {@link String} in a {@link IterableCharSequence} implementation and calls
-   * {@link #format(Passage[], IterableCharSequence)}
+   * <p>Wraps the {@link String} in a {@link IterableCharSequence} implementation and calls {@link
+   * #format(Passage[], IterableCharSequence)}
    *
    * @param passages in the the document text that contain highlighted text
    * @param content of the OCR field, implemented as an {@link IterableCharSequence}
@@ -426,9 +452,10 @@ public class OcrPassageFormatter extends PassageFormatter {
     return Arrays.stream(snips).map(OcrSnippet::getText).toArray(String[]::new);
   }
 
-  /** Truncate float to a precision of two digits after the decimal point.
+  /**
+   * Truncate float to a precision of two digits after the decimal point.
    *
-   * Intended to keep the plugin response small and tidy.
+   * <p>Intended to keep the plugin response small and tidy.
    */
   private static float truncateFloat(float num) {
     return (float) Math.floor(num * 10000) / 10000;
@@ -448,14 +475,16 @@ public class OcrPassageFormatter extends PassageFormatter {
       int e1 = this.end;
       int s2 = other.start;
       int e2 = other.end;
-      return (s1 <= s2 && s2 <= e1) ||  //   --------
-                                        // -----
+      return (s1 <= s2 && s2 <= e1)
+          || //   --------
+          // -----
 
-             (s1 <= e2 && e2 <= e1) ||  // --------
-                                        //      -----
+          (s1 <= e2 && e2 <= e1)
+          || // --------
+          //      -----
 
-             (s2 <= s1 && s1 <= e2 &&   // --------
-              s2 <= e1 && e1 <= e2);    //   ---
+          (s2 <= s1 && s1 <= e2 && // --------
+              s2 <= e1 && e1 <= e2); //   ---
     }
 
     public void merge(PassageMatch other) {
@@ -471,5 +500,4 @@ public class OcrPassageFormatter extends PassageFormatter {
       return String.format("PassageMatch{start=%d, end=%d}", start, end);
     }
   }
-
 }
