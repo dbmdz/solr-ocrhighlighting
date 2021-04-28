@@ -1,3 +1,27 @@
+/*
+ * Contains verbatim code and custom code based on code from the Lucene
+ * project, licensed under the following terms. All parts where this is
+ * the case are clearly marked as such in a source code comment referring
+ * to this header.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE.upstream file distributed
+ * with this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For all parts where this is not the case, refer to the LICENSE file in the
+ * repository root.
+ */
 package de.digitalcollections.solrocr.lucene;
 
 import com.google.common.collect.ImmutableSet;
@@ -90,6 +114,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private static final Method extractAutomataLegacyMethod;
 
   static {
+    /**
+     * Copied from the upstreama {@link UnifiedHighlighter} code. <strong>Please refer to the file
+     * header for licensing information</strong>
+     */
     try {
       IndexReader emptyReader = new MultiReader();
       EMPTY_INDEXSEARCHER = new IndexSearcher(emptyReader);
@@ -196,6 +224,14 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return flags;
   }
 
+  /**
+   * Highlight passages from OCR fields in multiple documents.
+   *
+   * <p>Heavily based on {@link UnifiedHighlighter#highlightFieldsAsObjects(String[], Query, int[],
+   * int[])} with modifications to add support for OCR-specific functionality and timeouts.
+   * <strong>Please refer to the file header for licensing information on the original
+   * code.</strong>
+   */
   public OcrHighlightResult[] highlightOcrFields(
       String[] ocrFieldNames,
       Query query,
@@ -465,11 +501,18 @@ public class OcrHighlighter extends UnifiedHighlighter {
                     "Could not determine OCR format for sample '" + sampleChunk + "'"));
   }
 
+  /**
+   * Configure the field highlighter.
+   *
+   * <p>Heavily based on {@link UnifiedHighlighter#getFieldHighlighter(String, Query, Set, int)} and
+   * {@link UnifiedHighlighter#getHighlightComponents(String, Query, Set)}, modified to integrate it
+   * into our custom OCR highlighting setup. <strong>Please refer to the file header for licensing
+   * information on the original code.</strong>
+   */
   private OcrFieldHighlighter getOcrFieldHighlighter(
       String field, Query query, Set<Term> allTerms, int maxPassages) {
     // This method and some associated types changed in v8.2 and v8.4, so we have to delegate to an
-    // adapter method for
-    // these versions
+    // adapter method for these versions
     if (VERSION_IS_PRE84) {
       return getOcrFieldHighlighterLegacy(field, query, allTerms, maxPassages);
     }
@@ -610,8 +653,12 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }
   }
 
-  // FIXME: This is copied straight from UnifiedHighlighter because it has private access there.
-  //        Maybe open an issue to make it protected?
+  /**
+   * This is copied straight from {@link
+   * UnifiedHighlighter#copyAndSortFieldsWithMaxPassages(String[], int[], String[], int[])} because
+   * it has private access there. <strong>Please refer to the file header for licensing information
+   * on the original code.</strong>
+   */
   private void copyAndSortFieldsWithMaxPassages(
       String[] fieldsIn, int[] maxPassagesIn, final String[] fields, final int[] maxPassages) {
     System.arraycopy(fieldsIn, 0, fields, 0, fieldsIn.length);
@@ -634,8 +681,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }.sort(0, fields.length);
   }
 
-  // FIXME: This is copied straight from UnifiedHighlighter because it has private access there.
-  //        Maybe open an issue to make it protected?
+  /**
+   * This is copied straight from {@link UnifiedHighlighter#copyAndSortDocIdsWithIndex(int[], int[],
+   * int[])} )} because it has private access there. <strong>Please refer to the file header for
+   * licensing information on the original code.</strong>
+   */
   private void copyAndSortDocIdsWithIndex(
       int[] docIdsIn, final int[] docIds, final int[] docInIndexes) {
     System.arraycopy(docIdsIn, 0, docIds, 0, docIdsIn.length);
@@ -660,7 +710,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }.sort(0, docIds.length);
   }
 
-  // FIXME: And another one copied straight from UnifiedHighlighter because it has private access.
+  /**
+   * This is copied straight from {@link UnifiedHighlighter#asDocIdSetIterator(int[])} )} because it
+   * has private access there. <strong>Please refer to the file header for licensing information on
+   * the original code.</strong>
+   */
   private DocIdSetIterator asDocIdSetIterator(int[] sortedDocIds) {
     return new DocIdSetIterator() {
       int idx = -1;
@@ -695,8 +749,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
    * Wraps an IndexReader that remembers/caches the last call to {@link
    * LeafReader#getTermVectors(int)} so that if the next call has the same ID, then it is reused. If
    * TV's were column-stride (like doc-values), there would be no need for this.
+   *
+   * <p>This is copied straight from {@link UnifiedHighlighter#asDocIdSetIterator(int[])} )} because
+   * it has private access there. <strong>Please refer to the file header for licensing information
+   * on the original code.</strong>
    */
-  // FIXME: This is copied straight from UnifiedHighlighter because it has private access...
   private static class TermVectorReusingLeafReader extends FilterLeafReader {
     static IndexReader wrap(IndexReader reader) throws IOException {
       LeafReader[] leafReaders =

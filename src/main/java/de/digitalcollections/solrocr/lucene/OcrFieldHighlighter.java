@@ -1,3 +1,27 @@
+/*
+ * Contains verbatim code and custom code based on code from the Lucene
+ * project, licensed under the following terms. All parts where this is
+ * the case are clearly marked as such in a source code comment referring
+ * to this header.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE.upstream file distributed
+ * with this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For all parts where this is not the case, refer to the LICENSE file in the
+ * repository root.
+ */
 package de.digitalcollections.solrocr.lucene;
 
 import de.digitalcollections.solrocr.iter.BreakLocator;
@@ -39,7 +63,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    *
    * <p>Largely copied from {@link FieldHighlighter#highlightFieldForDoc(LeafReader, int, String)},
    * modified to support an {@link IterableCharSequence} as content and dynamically setting the
-   * break iterator and the formatter.
+   * break iterator and the formatter. <strong>Please refer to the file header for licensing
+   * information on the original code.</strong>
    */
   public OcrSnippet[] highlightFieldForDoc(
       LeafReader reader,
@@ -89,6 +114,15 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     throw new UnsupportedOperationException();
   }
 
+  /**
+   * Score snippets as mini-documents, either based on TF-IDF/BM25 or simply their position.
+   *
+   * <p>Largely based on {@link FieldHighlighter#highlightOffsetsEnums(OffsetsEnum)} with
+   * modifications to add support for the {@link BreakLocator} interrface, the option to disable
+   * scoring, the option to limit the number of snippets to consider for scoring as well as
+   * restricting the returned snippets to those from OCR pages with a given identifier. <strong>
+   * Please refer to the file header for licensing information on the original code.</strong>
+   */
   protected Passage[] highlightOffsetsEnums(
       OffsetsEnum off,
       int docId,
@@ -190,7 +224,14 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     return passages;
   }
 
-  /** Uses parts from {@link FieldHighlighter} due to private access there. */
+  /**
+   * Largely identical to {@link FieldHighlighter#maybeAddPassage(PriorityQueue, PassageScorer,
+   * Passage, int)}.
+   *
+   * <p>This was copied due to private access in the upstream code and to add support for disabling
+   * scoring. <strong>Please refer to the file header for licensing information on the original
+   * code.</strong>
+   */
   private Passage maybeAddPassage(
       PriorityQueue<Passage> passageQueue,
       PassageScorer scorer,

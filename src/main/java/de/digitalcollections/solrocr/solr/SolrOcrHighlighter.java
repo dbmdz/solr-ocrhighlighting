@@ -1,3 +1,27 @@
+/*
+ * Contains verbatim code and custom code based on code from the Solr
+ * project, licensed under the following terms. All parts where this is
+ * the case are clearly marked as such in a source code comment referring
+ * to this header.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE.upstream file distributed
+ * with this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * For all parts where this is not the case, refer to the LICENSE file in the
+ * repository root.
+ */
 package de.digitalcollections.solrocr.solr;
 
 import de.digitalcollections.solrocr.lucene.OcrHighlighter;
@@ -102,8 +126,13 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     return fields;
   }
 
+  /**
+   * Copied from {@link
+   * org.apache.solr.highlight.SolrHighlighter#expandWildcardsInHighlightFields(java.util.Set,
+   * java.util.Collection, java.lang.String...)} due to private access there. <strong>Please refer
+   * to the file header for licensing information on the original code.</strong>
+   */
   private static void expandWildcardsInHighlightFields(
-      // Copied verbatim from SolrHighlighter
       Set<String> expandedFields, Collection<String> storedHighlightFieldNames, String... fields) {
     for (String field : fields) {
       if (field.contains("*")) {
