@@ -1,6 +1,6 @@
 ## 0.6.0 (2021-05-??)
 This is a major new release with significant improvements in stability, accuracy and most importantly performance.
-Uupdating is **highly** recommended, especially for ALTO users, who can expect a speed-up in indexing of up to
+Updating is **highly** recommended, especially for ALTO users, who can expect a speed-up in indexing of up to
 **6000% (i.e. 60x as fast)**. We also recommend updating your JVM to at least Java 11 (LTS), since Java 9 introduced
 [a feature](https://arnaudroger.github.io/blog/2017/06/14/CompactStrings.html) that speeds up highlighting
 significantly.
