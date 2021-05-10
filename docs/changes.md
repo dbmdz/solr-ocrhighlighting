@@ -1,8 +1,9 @@
-## 0.6.0 (2021-03-??)
+## 0.6.0 (2021-05-??)
 This is a major new release with significant improvements in stability, accuracy and most importantly performance.
-Uupdating is **highly** recommended, especially for ALTO users, who can expect a speed-up in indexing of roughly
+Uupdating is **highly** recommended, especially for ALTO users, who can expect a speed-up in indexing of up to
 **6000% (i.e. 60x as fast)**. We also recommend updating your JVM to at least Java 11 (LTS), since Java 9 introduced
-a feature that speeds up highlighting significantly.
+[a feature](https://arnaudroger.github.io/blog/2017/06/14/CompactStrings.html) that speeds up highlighting
+significantly.
 
 **Performance:**
 
@@ -12,8 +13,8 @@ a feature that speeds up highlighting significantly.
   This drastically improved indexing performance for ALTO (6000% speedup, the previous
   implementation was pathologically slow), but caused a big hit for hOCR (~57% slower) and a slight hit
   for MiniOCR (~15% slower). These numbers are based on benchmarks done on a ramdisk, so the changes are very
-  likely to be be less pronounced in practice, depending on the choice of storage.
-  Note that this makes the parser also more strict in regards to whitespace. If you were indexing OCR documents
+  likely to be less pronounced in practice, depending on the choice of storage.
+  **Note that this makes the parser also more strict in regard to whitespace.** If you were indexing OCR documents
   without any whitespace between word elements before, you will run into problems
   (see [#147](https://github.com/dbmdz/solr-ocrhighlighting/issues/147#issuecomment-800452975)).
 - **Highlighting performance significantly improved for all formats.**
@@ -21,7 +22,7 @@ a feature that speeds up highlighting significantly.
   (ALTO 12x as fast, hOCR 10x as fast, MiniOCR 6x as fast). Again, these numbers are based on benchmarks
   performed on a ramdisk and might be less pronounced in practice, depending on the storage layer.
 
-**New Feature:**
+**New Features:**
 
 - **Indexing alternative forms encoded in the source OCR files.**
   All supported formats offer a way to encode alternative readings for recognized words. The plugin can now
@@ -36,10 +37,20 @@ a feature that speeds up highlighting significantly.
   namely problems that can arise when the markup contains unescaped instances of `<`, `>` and `&`.
   This option is disabled by default, we recommend enabling it when your OCR engine exhibits this problem and you
   are unable to fix the files on disk, since it incurs a bit of a performance hit during indexing.
+- **Return snippets in order of appearance**.
+  By default, Solr scores each highlighted passage as a "mini-document" and returns the passages
+  ordered by their decreasing score. While this is a good match for a lot of use cases, there are
+  many other that are better suited with a simple by-appearance order. This can now be controlled
+  with the new `hl.ocr.scorePassages` parameter, which will switch to the by-appearance sort order
+  if set to `off` (it is set to `on` by default)
 
 
 **API changes:**
-
+- **No more need for an explicit `hl.fl` parameter for highlighting non-OCR fields.** By default,
+  if highlighting is enabled and  no `hl.fl` parameter is passed by the user, Solr falls back to
+  highlighting every stored field  in the document. Previously this did not work with the plugin and
+  users had to always explicitly specify which fields they wanted to have highlighted. *This is no
+  longer neccessary*, the default behavior now works as expected.
 - **Add a new `hl.ocr.trackPages` parameter to disable page tracking during highlighting.**
   This is intended for users who index one page per document, in these cases seeking backwards to determine
   the page identifier a match is not needed, since the containing document contains enough information to
@@ -47,12 +58,18 @@ a feature that speeds up highlighting significantly.
   input files.
 - **Add new `expandAlternatives` attribute to `OcrCharFilterFactory`.** This enables the parsing of
    alternative readings from input files (see above and the [corresponding section in the documentation](../alternatives))
+  - **Add new `hl.ocr.scorePassages` parameter to disable sorting of passages by their score.**
+    See the above section unter *New Features* for an explanation of this flag.
 
 **Bugfixes:**
-
+- **Improved tolerance for incomplete bounding boxes.** Previously the occurrence of an incomplete
+  bounding box in a snippet (i.e. with one or more missing coordinates) would crash the whole query.
+  We now simply insert a `0` default value in these cases.
 - **Improvements in the handling of hyphenated terms.** This release fixes a
   few bugs in edge cases when handling hyphenated words during indexing,
   highlighting and snippet text generation.
+- **Handle empty field values during indexing.** This would previously lead to an exception since
+  the OCR parsers would try to either load a file from the empty string or parse OCR markup from it.
 
 ## 0.5.0 (2020-10-07)
 No breaking changes this time around, but a few essential bugfixes, more stability and a new feature.
