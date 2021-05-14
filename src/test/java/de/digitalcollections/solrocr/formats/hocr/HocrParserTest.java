@@ -181,4 +181,11 @@ public class HocrParserTest {
     OcrParser parser = new HocrParser(input);
     assertThatThrownBy(() -> parser.stream().count()).hasMessageContaining(ptr);
   }
+
+  @Test
+  public void testEmptyPage() throws XMLStreamException {
+    String doc = "<html><body><div class=\"ocr_page\" id=\"page_1\"></div></body></html>";
+    HocrParser parser = new HocrParser(new StringReader(doc));
+    assertThat(parser.stream().count()).isZero();
+  }
 }
