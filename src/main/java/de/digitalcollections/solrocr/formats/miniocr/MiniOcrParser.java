@@ -36,13 +36,13 @@ public class MiniOcrParser extends OcrParser {
       return out;
     }
 
-    if (noMoreWords) {
-      return null;
-    }
-
     if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT
         || !"w".equals(xmlReader.getLocalName())) {
       this.seekToNextWord(xmlReader, features.contains(ParsingFeature.PAGES));
+    }
+
+    if (noMoreWords) {
+      return null;
     }
 
     OcrBox box = new OcrBox();

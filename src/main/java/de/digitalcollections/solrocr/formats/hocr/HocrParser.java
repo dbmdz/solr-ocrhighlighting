@@ -118,6 +118,9 @@ public class HocrParser extends OcrParser {
 
   private Map<String, String> parseTitle(String title) {
     Map<String, String> props = new HashMap<>();
+    if (title == null) {
+      return props;
+    }
     String[] parts = title.split(";");
     for (String part : parts) {
       int spaceIdx = part.indexOf(' ', 3);

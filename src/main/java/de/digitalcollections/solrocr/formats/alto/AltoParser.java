@@ -42,14 +42,15 @@ public class AltoParser extends OcrParser {
       this.hyphenEnd = null;
       return out;
     }
-    if (noMoreWords) {
-      return null;
-    }
 
     // Advance reader to the next word if neccessary
     if (xmlReader.getEventType() != XMLStreamConstants.START_ELEMENT
         || !"String".equals(xmlReader.getLocalName())) {
       this.seekToNextWord(xmlReader, features.contains(ParsingFeature.PAGES));
+    }
+
+    if (noMoreWords) {
+      return null;
     }
 
     OcrBox box = new OcrBox();
