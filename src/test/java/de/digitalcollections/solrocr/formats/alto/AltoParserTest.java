@@ -178,7 +178,10 @@ public class AltoParserTest {
 
   @Test
   public void testEmptyDoc() throws XMLStreamException {
-    AltoParser parser = new AltoParser(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\"?><alto xmlns=\"http://www.loc.gov/standards/alto/ns-v3#\" ><Description><MeasurementUnit>pixel</MeasurementUnit><sourceImageInformation><fileName>23-n1_343578.pdf</fileName></sourceImageInformation><OCRProcessing ID=\"IdOcr\"><ocrProcessingStep><processingDateTime>2021-05-13T09:26:19Z</processingDateTime><processingSoftware><softwareCreator>CONTRIBUTORS</softwareCreator><softwareName>pdfalto</softwareName><softwareVersion>0.5</softwareVersion></processingSoftware></ocrProcessingStep></OCRProcessing></Description><Styles/><Layout><Page ID=\"Page6\" PHYSICAL_IMG_NR=\"6\" WIDTH=\"595.276\" HEIGHT=\"841.890\"><PrintSpace/></Page></Layout></alto>"));
+    AltoParser parser =
+        new AltoParser(
+            new StringReader(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><alto xmlns=\"http://www.loc.gov/standards/alto/ns-v3#\" ><Description><MeasurementUnit>pixel</MeasurementUnit><sourceImageInformation><fileName>23-n1_343578.pdf</fileName></sourceImageInformation><OCRProcessing ID=\"IdOcr\"><ocrProcessingStep><processingDateTime>2021-05-13T09:26:19Z</processingDateTime><processingSoftware><softwareCreator>CONTRIBUTORS</softwareCreator><softwareName>pdfalto</softwareName><softwareVersion>0.5</softwareVersion></processingSoftware></ocrProcessingStep></OCRProcessing></Description><Styles/><Layout><Page ID=\"Page6\" PHYSICAL_IMG_NR=\"6\" WIDTH=\"595.276\" HEIGHT=\"841.890\"><PrintSpace/></Page></Layout></alto>"));
     List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
     assertThat(boxes).isEmpty();
     assertThat(OcrParser.boxesToString(boxes)).isEmpty();
