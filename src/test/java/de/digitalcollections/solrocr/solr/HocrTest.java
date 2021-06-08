@@ -489,4 +489,10 @@ public class HocrTest extends SolrTestCaseJ4 {
         "((//lst[@name='42']//arr[@name='pages'])[4]/lst/str[@name='id'])[1]/text()='page_92'",
         "((//lst[@name='42']//arr[@name='pages'])[5]/lst/str[@name='id'])[1]/text()='page_97'");
   }
+
+  public void testEmptyDoc() {
+    assertU(adoc("id", "57371"));
+    assertU(adoc("id", "57371", "ocr_text", ""));
+    assertU(commit());
+  }
 }

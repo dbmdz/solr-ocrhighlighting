@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -42,6 +43,9 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       ptrStr = IOUtils.toString(input);
     } catch (IOException e) {
       throw new RuntimeException("Could not read source pointer from the input.", e);
+    }
+    if (ptrStr.isEmpty()) {
+      return new StringReader("");
     }
     try {
       SourcePointer pointer = SourcePointer.parse(ptrStr);

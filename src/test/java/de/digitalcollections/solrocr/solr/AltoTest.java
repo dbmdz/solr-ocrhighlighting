@@ -332,4 +332,9 @@ public class AltoTest extends SolrTestCaseJ4 {
         req,
         "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>Ade About Nothings</em>')");
   }
+
+  public void testEmptyDoc() {
+    assertU(adoc("id", "57371"));
+    assertU(adoc("id", "57371", "ocr_text", ""));
+  }
 }
