@@ -38,7 +38,7 @@ public class OcrCharFilterFactory extends CharFilterFactory {
         new PeekingReader(new SanitizingXmlFilter(input, fixMarkup), BEGIN_BUF_SIZE, CTX_BUF_SIZE);
     if (peeker.peekBeginning().isEmpty()) {
       // Empty document, no special treatment necessary
-      return peeker;
+      return OcrCharFilter.nopFilter();
     }
     OcrFormat fmt =
         FORMATS.stream()
@@ -50,7 +50,7 @@ public class OcrCharFilterFactory extends CharFilterFactory {
                         "Could not determine OCR format from chunk: " + peeker.peekBeginning()));
     Reader formatFilter = fmt.filter(peeker, expandAlternatives);
     if (formatFilter == null) {
-      return peeker;
+      return OcrCharFilter.nopFilter();
     } else {
       return formatFilter;
     }

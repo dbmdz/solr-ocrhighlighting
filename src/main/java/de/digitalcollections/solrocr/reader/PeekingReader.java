@@ -42,8 +42,10 @@ public class PeekingReader extends BaseCharFilter implements SourceAwareReader {
       if (numRead < beginPeekSize) {
         // If the input reader has less characters than the requested start peek buffer, use a
         // smaller buffer
-        this.peekStart = new char[numRead];
-        System.arraycopy(buf, 0, this.peekStart, 0, numRead);
+        this.peekStart = new char[Math.max(0, numRead)];
+        if (numRead > 0) {
+          System.arraycopy(buf, 0, this.peekStart, 0, numRead);
+        }
       } else {
         this.peekStart = buf;
       }

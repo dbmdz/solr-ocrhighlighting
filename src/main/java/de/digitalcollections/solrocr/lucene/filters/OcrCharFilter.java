@@ -5,6 +5,7 @@ import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.model.OcrBox;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 import org.apache.lucene.analysis.CharFilter;
@@ -18,6 +19,15 @@ public class OcrCharFilter extends BaseCharFilter {
   private char[] curWord;
   private int curWordIdx = -1;
   private int outputOffset = 0;
+
+  public static OcrCharFilter nopFilter() {
+    return new OcrCharFilter();
+  }
+
+  private OcrCharFilter() {
+    super(new StringReader(""));
+    this.parser = null;
+  }
 
   public OcrCharFilter(OcrParser parser) {
     super(parser.getInput());
@@ -117,7 +127,7 @@ public class OcrCharFilter extends BaseCharFilter {
 
   @Override
   public int read(char[] cbuf, int off, int len) {
-    if (!this.parser.hasNext()) {
+    if (this.parser == null || !this.parser.hasNext()) {
       return -1;
     }
 
