@@ -111,7 +111,8 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
     } else {
       IterableCharSequence seq = getCharSeq(start);
       int adjustedStart = adjustOffset(start);
-      StringBuilder sb = new StringBuilder(seq.subSequence(adjustedStart, seq.length(), true));
+      StringBuilder sb =
+          new StringBuilder(seq.subSequence(adjustedStart, seq.length(), forceAscii));
       seq = getCharSeq(end);
       int adjustedEnd = adjustOffset(end);
       sb.append(seq.subSequence(0, adjustedEnd, forceAscii));

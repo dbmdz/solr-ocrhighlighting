@@ -1,0 +1,1220 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<alto xmlns="http://www.loc.gov/standards/alto/ns-v4#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/standards/alto/ns-v4# https://www.loc.gov/standards/alto/v4/alto.xsd">
+  <Description>
+    <MeasurementUnit>pixel</MeasurementUnit>
+    <sourceImageInformation>
+      <fileName>es-scbg_bblg/1895/es-scbg_bblg_18950101/es-scbg_bblg_18950101_0007.jpg</fileName>
+    </sourceImageInformation>
+    <OCRProcessing ID="IdOcr">
+      <ocrProcessingStep>
+        <processingDateTime>2021-01-21</processingDateTime>
+        <processingSoftware>
+          <softwareCreator>ABBYY</softwareCreator>
+          <softwareName>ABBYY Recognition Server</softwareName>
+          <softwareVersion>4.0</softwareVersion>
+        </processingSoftware>
+      </ocrProcessingStep>
+    </OCRProcessing>
+  </Description>
+  <Styles>
+    <TextStyle ID="font6" FONTFAMILY="Times New Roman" FONTSIZE="9" />
+    <TextStyle ID="font7" FONTFAMILY="Times New Roman" FONTSIZE="10" />
+    <TextStyle ID="font8" FONTFAMILY="Times New Roman" FONTSIZE="11" />
+    <TextStyle ID="font10" FONTFAMILY="Times New Roman" FONTSIZE="16" />
+    <ParagraphStyle ID="StyleId-E967C083-0397-47B6-BE44-48572E97C211-" ALIGN="Left" LEFT="0." RIGHT="0." FIRSTLINE="0." LINESPACE="12.19999981" />
+    <ParagraphStyle ID="StyleId-7F8E26E2-C03B-4E71-862A-B7E563B59A2A-" ALIGN="Left" LEFT="0." RIGHT="0." FIRSTLINE="0." LINESPACE="17.70000076" />
+    <ParagraphStyle ID="StyleId-89FC58F4-6DBC-4426-BA95-3EF98D8F1C12-" ALIGN="Block" LEFT="0." RIGHT="0." FIRSTLINE="-66." LINESPACE="10.80000019" />
+    <ParagraphStyle ID="StyleId-B52267E0-C937-4062-92A8-176ED87E96AA-" ALIGN="Block" LEFT="0." RIGHT="0." FIRSTLINE="-17." LINESPACE="9.720000267" />
+  </Styles>
+  <Layout>
+    <Page ID="Page7" PHYSICAL_IMG_NR="7" HEIGHT="1938" WIDTH="1363">
+      <TopMargin HEIGHT="150" WIDTH="1363" VPOS="0" HPOS="0">
+        <TextBlock ID="Page7_Block1" HEIGHT="34" WIDTH="468" VPOS="87" HPOS="448" LANG="es" STYLEREFS="StyleId-E967C083-0397-47B6-BE44-48572E97C211- font8">
+          <TextLine HEIGHT="26" WIDTH="460" VPOS="90" HPOS="452">
+            <String WC="0.3249999881" CONTENT="DE" HEIGHT="21" WIDTH="40" VPOS="90" HPOS="452" />
+            <SP HEIGHT="21" WIDTH="27" VPOS="90" HPOS="493" />
+            <String WC="0.5450000167" CONTENT="LA" HEIGHT="20" WIDTH="38" VPOS="92" HPOS="521" />
+            <SP HEIGHT="19" WIDTH="29" VPOS="93" HPOS="560" />
+            <String WC="0.5" CONTENT="LIBRERIA" HEIGHT="21" WIDTH="145" VPOS="93" HPOS="590" />
+            <SP HEIGHT="20" WIDTH="27" VPOS="95" HPOS="736" />
+            <String WC="0.6637499928" CONTENT="GALLEGA." HEIGHT="21" WIDTH="148" VPOS="95" HPOS="764" />
+          </TextLine>
+        </TextBlock>
+        <ComposedBlock ID="Page7_Block2" HEIGHT="54" WIDTH="1147" VPOS="96" HPOS="98" TYPE="container">
+          <ComposedBlock ID="Page7_Block3" HEIGHT="54" WIDTH="1138" VPOS="96" HPOS="104" TYPE="container">
+            <TextBlock ID="Page7_Block4" HEIGHT="22" WIDTH="45" VPOS="96" HPOS="1197" STYLEREFS="StyleId-E967C083-0397-47B6-BE44-48572E97C211- font8" LANG="es">
+              <TextLine HEIGHT="18" WIDTH="13" VPOS="100" HPOS="1200">
+                <String WC="0.3100000024" CONTENT="7" HEIGHT="18" WIDTH="13" VPOS="100" HPOS="1200" />
+              </TextLine>
+            </TextBlock>
+          </ComposedBlock>
+        </ComposedBlock>
+        <GraphicalElement ID="Page7_Block5" HEIGHT="12" WIDTH="912" VPOS="0" HPOS="451" />
+        <GraphicalElement ID="Page7_Block6" HEIGHT="5" WIDTH="182" VPOS="115" HPOS="123" />
+        <GraphicalElement ID="Page7_Block7" HEIGHT="14" WIDTH="894" VPOS="118" HPOS="305" />
+        <GraphicalElement ID="Page7_Block8" HEIGHT="150" WIDTH="16" VPOS="0" HPOS="40" />
+      </TopMargin>
+      <LeftMargin HEIGHT="1650" WIDTH="90" VPOS="150" HPOS="0" />
+      <RightMargin HEIGHT="1650" WIDTH="118" VPOS="150" HPOS="1245" />
+      <BottomMargin HEIGHT="138" WIDTH="1363" VPOS="1800" HPOS="0" />
+      <PrintSpace HEIGHT="1650" WIDTH="1155" VPOS="150" HPOS="90">
+        <ComposedBlock ID="Page7_Block9" HEIGHT="918" WIDTH="1147" VPOS="150" HPOS="98" TYPE="container">
+          <ComposedBlock ID="Page7_Block10" HEIGHT="213" WIDTH="1138" VPOS="150" HPOS="104" TYPE="container">
+            <TextBlock ID="Page7_Block11" HEIGHT="125" WIDTH="1138" VPOS="150" HPOS="104" STYLEREFS="StyleId-89FC58F4-6DBC-4426-BA95-3EF98D8F1C12- font7" LANG="es">
+              <TextLine HEIGHT="39" WIDTH="1076" VPOS="150" HPOS="161">
+                <String WC="0.6223077178" CONTENT="Diccionarios," HEIGHT="27" WIDTH="149" VPOS="150" HPOS="161" />
+                <SP HEIGHT="18" WIDTH="10" VPOS="160" HPOS="311" />
+                <String WC="0.4889999926" CONTENT="gramáticas" HEIGHT="24" WIDTH="125" VPOS="154" HPOS="322" />
+                <SP HEIGHT="19" WIDTH="9" VPOS="162" HPOS="448" />
+                <String WC="0.3400000036" CONTENT="y" HEIGHT="18" WIDTH="14" VPOS="163" HPOS="458" />
+                <SP HEIGHT="19" WIDTH="9" VPOS="163" HPOS="473" />
+                <String WC="0.4460000098" CONTENT="guias" HEIGHT="25" WIDTH="62" VPOS="157" HPOS="483" />
+                <SP HEIGHT="20" WIDTH="9" VPOS="157" HPOS="546" />
+                <String WC="0.9350000024" CONTENT="de" HEIGHT="20" WIDTH="24" VPOS="157" HPOS="556" />
+                <SP HEIGHT="13" WIDTH="9" VPOS="164" HPOS="581" />
+                <String WC="0.603333354" CONTENT="conversación" HEIGHT="20" WIDTH="147" VPOS="159" HPOS="591" />
+                <SP HEIGHT="19" WIDTH="9" VPOS="160" HPOS="739" />
+                <String WC="0.7149999738" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="160" HPOS="749" />
+                <SP HEIGHT="17" WIDTH="9" VPOS="163" HPOS="775" />
+                <String WC="0.6800000072" CONTENT="todos" HEIGHT="20" WIDTH="59" VPOS="161" HPOS="785" />
+                <SP HEIGHT="20" WIDTH="9" VPOS="161" HPOS="845" />
+                <String WC="0.7166666389" CONTENT="los" HEIGHT="20" WIDTH="29" VPOS="161" HPOS="855" />
+                <SP HEIGHT="20" WIDTH="10" VPOS="161" HPOS="885" />
+                <String WC="0.7766666412" CONTENT="dialectos" HEIGHT="21" WIDTH="98" VPOS="161" HPOS="896" />
+                <SP HEIGHT="20" WIDTH="9" VPOS="162" HPOS="995" />
+                <String WC="0.9700000286" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="162" HPOS="1005" />
+                <SP HEIGHT="19" WIDTH="9" VPOS="163" HPOS="1031" />
+                <String WC="0.7583333254" CONTENT="España" HEIGHT="24" WIDTH="84" VPOS="163" HPOS="1041" />
+                <SP HEIGHT="19" WIDTH="9" VPOS="170" HPOS="1126" />
+                <String WC="0.2800000012" CONTENT="y" HEIGHT="19" WIDTH="14" VPOS="170" HPOS="1136" />
+                <SP HEIGHT="26" WIDTH="9" VPOS="163" HPOS="1151" />
+                <String WC="0.8299999833" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="163" HPOS="1161" />
+                <SP HEIGHT="19" WIDTH="18" VPOS="164" HPOS="1187" />
+                <String WC="0.6700000167" CONTENT="las" HEIGHT="19" WIDTH="31" VPOS="164" HPOS="1206" />
+              </TextLine>
+              <TextLine HEIGHT="33" WIDTH="948" VPOS="181" HPOS="108">
+                <String WC="0.4528571367" CONTENT="lenguas" HEIGHT="23" WIDTH="87" VPOS="181" HPOS="108" />
+                <SP HEIGHT="19" WIDTH="9" VPOS="185" HPOS="196" />
+                <String WC="0.7690908909" CONTENT="portuguesa," HEIGHT="23" WIDTH="133" VPOS="182" HPOS="206" />
+                <SP HEIGHT="23" WIDTH="9" VPOS="181" HPOS="340" />
+                <String WC="0.50222224" CONTENT="francesa," HEIGHT="26" WIDTH="101" VPOS="181" HPOS="350" />
+                <SP HEIGHT="24" WIDTH="8" VPOS="183" HPOS="452" />
+                <String WC="0.823333323" CONTENT="italiana," HEIGHT="24" WIDTH="95" VPOS="183" HPOS="461" />
+                <SP HEIGHT="15" WIDTH="10" VPOS="192" HPOS="557" />
+                <String WC="0.84375" CONTENT="alemana," HEIGHT="25" WIDTH="99" VPOS="185" HPOS="568" />
+                <SP HEIGHT="24" WIDTH="10" VPOS="186" HPOS="668" />
+                <String WC="0.7524999976" CONTENT="inglesa," HEIGHT="26" WIDTH="88" VPOS="186" HPOS="679" />
+                <SP HEIGHT="17" WIDTH="9" VPOS="195" HPOS="768" />
+                <String WC="0.6299999952" CONTENT="rusa," HEIGHT="17" WIDTH="55" VPOS="195" HPOS="778" />
+                <SP HEIGHT="18" WIDTH="10" VPOS="196" HPOS="834" />
+                <String WC="0.9028571248" CONTENT="griega," HEIGHT="25" WIDTH="80" VPOS="189" HPOS="845" />
+                <SP HEIGHT="24" WIDTH="9" VPOS="189" HPOS="926" />
+                <String WC="0.7814285755" CONTENT="latina," HEIGHT="24" WIDTH="72" VPOS="189" HPOS="936" />
+                <SP HEIGHT="17" WIDTH="9" VPOS="196" HPOS="1009" />
+                <String WC="0.8849999905" CONTENT="etc." HEIGHT="15" WIDTH="37" VPOS="194" HPOS="1019" />
+              </TextLine>
+              <TextLine HEIGHT="34" WIDTH="1072" VPOS="209" HPOS="163">
+                <String WC="0.2753846049" CONTENT="IMF*R.E!SIO;y" HEIGHT="31" WIDTH="241" VPOS="209" HPOS="163" />
+                <SP HEIGHT="27" WIDTH="5" VPOS="213" HPOS="405" />
+                <String WC="6.499999762e-002" CONTENT="RS" HEIGHT="18" WIDTH="47" VPOS="213" HPOS="411" />
+                <SP HEIGHT="20" WIDTH="9" VPOS="211" HPOS="459" />
+                <String WC="0.5849999785" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="211" HPOS="469" />
+                <SP HEIGHT="15" WIDTH="9" VPOS="216" HPOS="495" />
+                <String WC="0.5500000119" CONTENT="todas" HEIGHT="20" WIDTH="58" VPOS="212" HPOS="505" />
+                <SP HEIGHT="13" WIDTH="8" VPOS="219" HPOS="564" />
+                <String WC="0.6428571343" CONTENT="clases," HEIGHT="24" WIDTH="72" VPOS="213" HPOS="573" />
+                <SP HEIGHT="16" WIDTH="10" VPOS="221" HPOS="646" />
+                <String WC="0.6230000257" CONTENT="membretes," HEIGHT="24" WIDTH="127" VPOS="215" HPOS="657" />
+                <SP HEIGHT="24" WIDTH="10" VPOS="215" HPOS="785" />
+                <String WC="0.646666646" CONTENT="facturas," HEIGHT="25" WIDTH="97" VPOS="215" HPOS="796" />
+                <SP HEIGHT="18" WIDTH="11" VPOS="224" HPOS="894" />
+                <String WC="0.8633333445" CONTENT="pases," HEIGHT="19" WIDTH="65" VPOS="223" HPOS="906" />
+                <SP HEIGHT="16" WIDTH="10" VPOS="224" HPOS="972" />
+                <String WC="0.7483333349" CONTENT="vendís" HEIGHT="20" WIDTH="74" VPOS="217" HPOS="983" />
+                <SP HEIGHT="20" WIDTH="8" VPOS="217" HPOS="1058" />
+                <String WC="0.9850000143" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="217" HPOS="1067" />
+                <SP HEIGHT="13" WIDTH="9" VPOS="224" HPOS="1093" />
+                <String WC="0.7683333158" CONTENT="circulación," HEIGHT="25" WIDTH="132" VPOS="218" HPOS="1103" />
+              </TextLine>
+              <TextLine HEIGHT="34" WIDTH="1129" VPOS="236" HPOS="108">
+                <String WC="0.7827273011" CONTENT="circulares," HEIGHT="22" WIDTH="118" VPOS="236" HPOS="108" />
+                <SP HEIGHT="21" WIDTH="10" VPOS="237" HPOS="227" />
+                <String WC="0.6037499905" CONTENT="tarjetas" HEIGHT="23" WIDTH="85" VPOS="237" HPOS="238" />
+                <SP HEIGHT="19" WIDTH="7" VPOS="236" HPOS="324" />
+                <String WC="1." CONTENT="de" HEIGHT="19" WIDTH="25" VPOS="236" HPOS="332" />
+                <SP HEIGHT="14" WIDTH="9" VPOS="242" HPOS="358" />
+                <String WC="0.7799999714" CONTENT="visita," HEIGHT="26" WIDTH="72" VPOS="236" HPOS="368" />
+                <SP HEIGHT="25" WIDTH="9" VPOS="237" HPOS="441" />
+                <String WC="0.7599999905" CONTENT="fonda" HEIGHT="21" WIDTH="63" VPOS="237" HPOS="451" />
+                <SP HEIGHT="19" WIDTH="8" VPOS="246" HPOS="515" />
+                <String WC="1." CONTENT="y" HEIGHT="19" WIDTH="14" VPOS="246" HPOS="524" />
+                <SP HEIGHT="26" WIDTH="10" VPOS="239" HPOS="539" />
+                <String WC="0.6209999919" CONTENT="funerales," HEIGHT="29" WIDTH="112" VPOS="239" HPOS="550" />
+                <SP HEIGHT="18" WIDTH="10" VPOS="247" HPOS="663" />
+                <String WC="0.5920000076" CONTENT="etc.," HEIGHT="22" WIDTH="46" VPOS="244" HPOS="674" />
+                <SP HEIGHT="21" WIDTH="8" VPOS="245" HPOS="721" />
+                <String WC="0.9950000048" CONTENT="todo" HEIGHT="20" WIDTH="46" VPOS="242" HPOS="730" />
+                <SP HEIGHT="13" WIDTH="9" VPOS="249" HPOS="777" />
+                <String WC="0.6633333564" CONTENT="con" HEIGHT="12" WIDTH="36" VPOS="250" HPOS="787" />
+                <SP HEIGHT="19" WIDTH="10" VPOS="250" HPOS="824" />
+                <String WC="0.8069999814" CONTENT="prontitud," HEIGHT="25" WIDTH="115" VPOS="244" HPOS="835" />
+                <SP HEIGHT="25" WIDTH="8" VPOS="244" HPOS="951" />
+                <String WC="0.5" CONTENT="buen" HEIGHT="20" WIDTH="55" VPOS="244" HPOS="960" />
+                <SP HEIGHT="19" WIDTH="19" VPOS="251" HPOS="1016" />
+                <String WC="0.6620000005" CONTENT="gusto" HEIGHT="22" WIDTH="62" VPOS="248" HPOS="1036" />
+                <SP HEIGHT="18" WIDTH="9" VPOS="252" HPOS="1099" />
+                <String WC="1." CONTENT="y" HEIGHT="18" WIDTH="14" VPOS="252" HPOS="1109" />
+                <SP HEIGHT="18" WIDTH="9" VPOS="252" HPOS="1124" />
+                <String WC="1." CONTENT="economía" HEIGHT="21" WIDTH="103" VPOS="245" HPOS="1134" />
+              </TextLine>
+            </TextBlock>
+            <TextBlock ID="Page7_Block12" HEIGHT="56" WIDTH="839" VPOS="307" HPOS="247" LANG="es" STYLEREFS="StyleId-7F8E26E2-C03B-4E71-862A-B7E563B59A2A- font10">
+              <TextLine HEIGHT="48" WIDTH="831" VPOS="311" HPOS="251">
+                <String WC="0.6228571534" CONTENT="SECCIÓN" HEIGHT="41" WIDTH="193" VPOS="311" HPOS="251" />
+                <SP HEIGHT="33" WIDTH="15" VPOS="320" HPOS="445" />
+                <String WC="0.5037500262" CONTENT="NACIONAL" HEIGHT="34" WIDTH="239" VPOS="321" HPOS="461" />
+                <SP HEIGHT="32" WIDTH="14" VPOS="324" HPOS="701" />
+                <String WC="0.9499999881" CONTENT="Y" HEIGHT="31" WIDTH="28" VPOS="325" HPOS="716" />
+                <SP HEIGHT="32" WIDTH="12" VPOS="325" HPOS="745" />
+                <String WC="0.7536363602" CONTENT="EXTRANJERA." HEIGHT="34" WIDTH="324" VPOS="325" HPOS="758" />
+              </TextLine>
+            </TextBlock>
+          </ComposedBlock>
+          <TextBlock ID="Page7_Block13" HEIGHT="675" WIDTH="560" VPOS="391" HPOS="98" LANG="es" STYLEREFS="StyleId-89FC58F4-6DBC-4426-BA95-3EF98D8F1C12- font7">
+            <TextLine HEIGHT="29" WIDTH="519" VPOS="394" HPOS="134">
+              <String WC="0.5799999833" CONTENT="En" HEIGHT="20" WIDTH="32" VPOS="394" HPOS="134" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="401" HPOS="167" />
+              <String WC="0.7599999905" CONTENT="esta" HEIGHT="17" WIDTH="44" VPOS="397" HPOS="176" />
+              <SP HEIGHT="14" WIDTH="8" VPOS="401" HPOS="221" />
+              <String WC="0.4514285624" CONTENT="sección" HEIGHT="21" WIDTH="81" VPOS="395" HPOS="230" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="397" HPOS="312" />
+              <String WC="0.6600000262" CONTENT="daremos" HEIGHT="22" WIDTH="93" VPOS="397" HPOS="331" />
+              <SP HEIGHT="13" WIDTH="16" VPOS="406" HPOS="425" />
+              <String WC="0.7799999714" CONTENT="cuenta" HEIGHT="17" WIDTH="75" VPOS="403" HPOS="442" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="402" HPOS="518" />
+              <String WC="0.8133333325" CONTENT="del" HEIGHT="20" WIDTH="33" VPOS="402" HPOS="536" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="402" HPOS="570" />
+              <String WC="0.7149999738" CONTENT="movi" HEIGHT="20" WIDTH="55" VPOS="403" HPOS="589" SUBS_TYPE="HypPart1" SUBS_CONTENT="movimiento" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="32" WIDTH="468" VPOS="422" HPOS="107">
+              <String WC="0.9033333063" CONTENT="miento" HEIGHT="20" WIDTH="75" VPOS="422" HPOS="107" SUBS_TYPE="HypPart2" SUBS_CONTENT="movimiento" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="423" HPOS="183" />
+              <String WC="0.5866666436" CONTENT="literario" HEIGHT="21" WIDTH="93" VPOS="422" HPOS="193" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="424" HPOS="287" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="424" HPOS="296" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="425" HPOS="322" />
+              <String WC="0.7350000143" CONTENT="España" HEIGHT="27" WIDTH="85" VPOS="425" HPOS="332" />
+              <SP HEIGHT="19" WIDTH="7" VPOS="434" HPOS="418" />
+              <String WC="1." CONTENT="y" HEIGHT="19" WIDTH="15" VPOS="434" HPOS="426" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="434" HPOS="442" />
+              <String WC="0.6827272773" CONTENT="extranjero." HEIGHT="25" WIDTH="123" VPOS="429" HPOS="452" />
+            </TextLine>
+            <TextLine HEIGHT="30" WIDTH="518" VPOS="449" HPOS="134">
+              <String WC="0.7266666889" CONTENT="Hoy" HEIGHT="26" WIDTH="47" VPOS="449" HPOS="134" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="457" HPOS="182" />
+              <String WC="1." CONTENT="por" HEIGHT="19" WIDTH="36" VPOS="457" HPOS="192" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="457" HPOS="229" />
+              <String WC="0.7087500095" CONTENT="carencia" HEIGHT="19" WIDTH="95" VPOS="452" HPOS="238" />
+              <SP HEIGHT="19" WIDTH="7" VPOS="453" HPOS="334" />
+              <String WC="1." CONTENT="de" HEIGHT="19" WIDTH="25" VPOS="453" HPOS="342" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="453" HPOS="368" />
+              <String WC="0.8500000238" CONTENT="lugar," HEIGHT="26" WIDTH="68" VPOS="453" HPOS="378" />
+              <SP HEIGHT="17" WIDTH="9" VPOS="462" HPOS="447" />
+              <String WC="0.72299999" CONTENT="anunciamos" HEIGHT="20" WIDTH="133" VPOS="457" HPOS="457" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="465" HPOS="591" />
+              <String WC="0.6650000215" CONTENT="sola" HEIGHT="20" WIDTH="42" VPOS="458" HPOS="601" SUBS_TYPE="HypPart1" SUBS_CONTENT="solamente" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="32" WIDTH="545" VPOS="477" HPOS="107">
+              <String WC="0.6359999776" CONTENT="mente" HEIGHT="16" WIDTH="68" VPOS="480" HPOS="107" SUBS_TYPE="HypPart2" SUBS_CONTENT="solamente" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="477" HPOS="176" />
+              <String WC="0.5" CONTENT="á" HEIGHT="20" WIDTH="11" VPOS="477" HPOS="186" />
+              <SP HEIGHT="27" WIDTH="8" VPOS="477" HPOS="198" />
+              <String WC="0.854285717" CONTENT="grandes" HEIGHT="26" WIDTH="91" VPOS="478" HPOS="207" />
+              <SP HEIGHT="14" WIDTH="9" VPOS="485" HPOS="299" />
+              <String WC="0.6899999976" CONTENT="rasgos" HEIGHT="21" WIDTH="72" VPOS="485" HPOS="309" />
+              <SP HEIGHT="19" WIDTH="18" VPOS="482" HPOS="382" />
+              <String WC="0.6700000167" CONTENT="lo" HEIGHT="19" WIDTH="19" VPOS="482" HPOS="401" />
+              <SP HEIGHT="20" WIDTH="17" VPOS="489" HPOS="421" />
+              <String WC="0.8899999857" CONTENT="publicado" HEIGHT="26" WIDTH="110" VPOS="483" HPOS="439" />
+              <SP HEIGHT="14" WIDTH="17" VPOS="491" HPOS="550" />
+              <String WC="0.573333323" CONTENT="última" HEIGHT="21" WIDTH="75" VPOS="485" HPOS="568" SUBS_TYPE="HypPart1" SUBS_CONTENT="últimamente." />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="17" WIDTH="74" VPOS="507" HPOS="107">
+              <String WC="0.7799999714" CONTENT="mente." HEIGHT="17" WIDTH="74" VPOS="507" HPOS="107" SUBS_TYPE="HypPart2" SUBS_CONTENT="últimamente." />
+            </TextLine>
+            <TextLine HEIGHT="25" WIDTH="118" VPOS="531" HPOS="320">
+              <String WC="0.6216666698" CONTENT="ESPAÑA" HEIGHT="25" WIDTH="118" VPOS="531" HPOS="320" />
+            </TextLine>
+            <TextLine HEIGHT="33" WIDTH="517" VPOS="586" HPOS="134" STYLEREFS="StyleId-B52267E0-C937-4062-92A8-176ED87E96AA- font7">
+              <String STYLE="italics" WC="0.6290000081" CONTENT="Biblioteca" HEIGHT="22" WIDTH="117" VPOS="586" HPOS="134" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="595" HPOS="252" />
+              <String STYLE="italics" WC="0.4799999893" CONTENT="selecta," HEIGHT="26" WIDTH="81" VPOS="589" HPOS="261" />
+              <SP HEIGHT="25" WIDTH="4" VPOS="590" HPOS="343" />
+              <String STYLE="italics" WC="0.4862500131" CONTENT="Diamante" HEIGHT="22" WIDTH="114" VPOS="590" HPOS="348" />
+              <SP HEIGHT="20" WIDTH="1" VPOS="599" HPOS="463" />
+              <String STYLE="italics" WC="0.3000000119" CONTENT="y" HEIGHT="19" WIDTH="15" VPOS="600" HPOS="465" />
+              <SP HEIGHT="26" WIDTH="13" VPOS="593" HPOS="481" />
+              <String STYLE="italics" WC="0.6166666746" CONTENT="Universal" HEIGHT="22" WIDTH="109" VPOS="593" HPOS="495" />
+              <SP HEIGHT="20" WIDTH="7" VPOS="595" HPOS="605" />
+              <String WC="1." CONTENT="etc." HEIGHT="18" WIDTH="38" VPOS="598" HPOS="613" />
+            </TextLine>
+            <TextLine HEIGHT="27" WIDTH="200" VPOS="613" HPOS="109" STYLEREFS="StyleId-B52267E0-C937-4062-92A8-176ED87E96AA- font7">
+              <String WC="0.349999994" CONTENT="á" HEIGHT="20" WIDTH="12" VPOS="613" HPOS="109" />
+              <SP HEIGHT="20" WIDTH="7" VPOS="613" HPOS="122" />
+              <String WC="0.5" CONTENT="0‘50" HEIGHT="20" WIDTH="48" VPOS="614" HPOS="130" />
+              <SP HEIGHT="25" WIDTH="6" VPOS="615" HPOS="179" />
+              <String WC="0.7620000243" CONTENT="ptas." HEIGHT="22" WIDTH="53" VPOS="618" HPOS="186" />
+              <SP HEIGHT="16" WIDTH="9" VPOS="619" HPOS="240" />
+              <String WC="1." CONTENT="tomo." HEIGHT="18" WIDTH="59" VPOS="619" HPOS="250" />
+            </TextLine>
+            <TextLine HEIGHT="35" WIDTH="520" VPOS="641" HPOS="132" STYLEREFS="StyleId-B52267E0-C937-4062-92A8-176ED87E96AA- font7">
+              <String STYLE="italics" WC="0.6579999924" CONTENT="Almanaques" HEIGHT="27" WIDTH="141" VPOS="641" HPOS="132" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="644" HPOS="274" />
+              <String STYLE="italics" WC="0.7799999714" CONTENT="de" HEIGHT="20" WIDTH="23" VPOS="644" HPOS="284" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="645" HPOS="308" />
+              <String STYLE="italics" WC="0.9850000143" CONTENT="la" HEIGHT="20" WIDTH="20" VPOS="645" HPOS="318" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="646" HPOS="339" />
+              <String STYLE="italics" WC="0.6666666865" CONTENT="Ilustración," HEIGHT="27" WIDTH="136" VPOS="646" HPOS="349" />
+              <SP HEIGHT="25" WIDTH="16" VPOS="648" HPOS="486" />
+              <String STYLE="italics" WC="0.5333333611" CONTENT="Kneipp,'y" HEIGHT="28" WIDTH="116" VPOS="648" HPOS="503" />
+              <SP HEIGHT="18" WIDTH="11" VPOS="658" HPOS="620" />
+              <String WC="0.7900000215" CONTENT="el" HEIGHT="20" WIDTH="20" VPOS="651" HPOS="632" />
+            </TextLine>
+            <TextLine HEIGHT="24" WIDTH="312" VPOS="670" HPOS="107" STYLEREFS="StyleId-B52267E0-C937-4062-92A8-176ED87E96AA- font7">
+              <String WC="0.8650000095" CONTENT="acontecimiento" HEIGHT="21" WIDTH="170" VPOS="670" HPOS="107" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="672" HPOS="278" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="672" HPOS="287" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="679" HPOS="313" />
+              <String WC="0.6449999809" CONTENT="esle" HEIGHT="16" WIDTH="41" VPOS="677" HPOS="323" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="680" HPOS="365" />
+              <String WC="0.8849999905" CONTENT="año:" HEIGHT="18" WIDTH="45" VPOS="676" HPOS="374" />
+            </TextLine>
+            <TextLine HEIGHT="33" WIDTH="519" VPOS="696" HPOS="131" STYLEREFS="StyleId-B52267E0-C937-4062-92A8-176ED87E96AA- font7">
+              <String STYLE="italics" WC="0.6633333564" CONTENT="Almanaque" HEIGHT="27" WIDTH="129" VPOS="696" HPOS="131" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="699" HPOS="261" />
+              <String STYLE="italics" WC="0.4715384543" CONTENT="Enciclopédico" HEIGHT="27" WIDTH="159" VPOS="699" HPOS="280" />
+              <SP HEIGHT="19" WIDTH="12" VPOS="703" HPOS="440" />
+              <String STYLE="italics" WC="0.9599999785" CONTENT="de" HEIGHT="19" WIDTH="24" VPOS="703" HPOS="453" />
+              <SP HEIGHT="20" WIDTH="26" VPOS="703" HPOS="478" />
+              <String STYLE="italics" WC="0.8683333397" CONTENT="Baylli" HEIGHT="26" WIDTH="75" VPOS="703" HPOS="505" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="705" HPOS="581" />
+              <String STYLE="italics" WC="0.6474999785" CONTENT="Bai-" HEIGHT="21" WIDTH="51" VPOS="705" HPOS="599" />
+            </TextLine>
+            <TextLine HEIGHT="22" WIDTH="68" VPOS="723" HPOS="106" STYLEREFS="StyleId-B52267E0-C937-4062-92A8-176ED87E96AA- font7">
+              <String STYLE="italics" WC="0.8371428847" CONTENT="lliere." HEIGHT="22" WIDTH="68" VPOS="723" HPOS="106" />
+            </TextLine>
+            <TextLine HEIGHT="35" WIDTH="518" VPOS="751" HPOS="132">
+              <String WC="0.4379999936" CONTENT="Obras" HEIGHT="21" WIDTH="65" VPOS="751" HPOS="132" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="753" HPOS="198" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="753" HPOS="208" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="754" HPOS="234" />
+              <String WC="0.8885714412" CONTENT="Galdos," HEIGHT="26" WIDTH="84" VPOS="754" HPOS="244" />
+              <SP HEIGHT="25" WIDTH="19" VPOS="755" HPOS="329" />
+              <String WC="0.791428566" CONTENT="Pereda," HEIGHT="27" WIDTH="86" VPOS="755" HPOS="349" />
+              <SP HEIGHT="24" WIDTH="19" VPOS="758" HPOS="436" />
+              <String WC="0.7357142568" CONTENT="Valdés," HEIGHT="25" WIDTH="84" VPOS="758" HPOS="456" />
+              <SP HEIGHT="24" WIDTH="25" VPOS="759" HPOS="541" />
+              <String WC="0.6842857003" CONTENT="Valera," HEIGHT="27" WIDTH="83" VPOS="759" HPOS="567" />
+            </TextLine>
+            <TextLine HEIGHT="31" WIDTH="368" VPOS="778" HPOS="105">
+              <String WC="0.7440000176" CONTENT="Pardo" HEIGHT="21" WIDTH="68" VPOS="778" HPOS="105" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="780" HPOS="174" />
+              <String WC="0.6716666818" CONTENT="Bazán," HEIGHT="26" WIDTH="76" VPOS="780" HPOS="184" />
+              <SP HEIGHT="24" WIDTH="9" VPOS="782" HPOS="261" />
+              <String WC="0.8062499762" CONTENT="Alarcón," HEIGHT="26" WIDTH="98" VPOS="782" HPOS="271" />
+              <SP HEIGHT="17" WIDTH="9" VPOS="791" HPOS="370" />
+              <String WC="1." CONTENT="etc.," HEIGHT="22" WIDTH="44" VPOS="787" HPOS="380" />
+              <SP HEIGHT="17" WIDTH="9" VPOS="792" HPOS="425" />
+              <String WC="0.8924999833" CONTENT="etc." HEIGHT="18" WIDTH="38" VPOS="788" HPOS="435" />
+            </TextLine>
+            <TextLine HEIGHT="33" WIDTH="519" VPOS="806" HPOS="131">
+              <String WC="0.8725000024" CONTENT="Todo" HEIGHT="21" WIDTH="54" VPOS="806" HPOS="131" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="814" HPOS="186" />
+              <String WC="0.9233333468" CONTENT="cuanto" HEIGHT="17" WIDTH="76" VPOS="812" HPOS="195" />
+              <SP HEIGHT="14" WIDTH="8" VPOS="816" HPOS="272" />
+              <String WC="0.6100000143" CONTENT="se" HEIGHT="14" WIDTH="21" VPOS="816" HPOS="281" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="816" HPOS="303" />
+              <String WC="0.6028571725" CONTENT="publica" HEIGHT="25" WIDTH="84" VPOS="811" HPOS="313" />
+              <SP HEIGHT="14" WIDTH="8" VPOS="818" HPOS="398" />
+              <String WC="0.5899999738" CONTENT="en" HEIGHT="13" WIDTH="25" VPOS="819" HPOS="407" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="813" HPOS="433" />
+              <String WC="0.6485714316" CONTENT="España," HEIGHT="26" WIDTH="90" VPOS="813" HPOS="443" />
+              <SP HEIGHT="18" WIDTH="9" VPOS="821" HPOS="534" />
+              <String WC="0.6449999809" CONTENT="se" HEIGHT="13" WIDTH="22" VPOS="821" HPOS="544" />
+              <SP HEIGHT="14" WIDTH="15" VPOS="821" HPOS="567" />
+              <String WC="0.9499999881" CONTENT="vende" HEIGHT="20" WIDTH="67" VPOS="816" HPOS="583" />
+            </TextLine>
+            <TextLine HEIGHT="19" WIDTH="141" VPOS="837" HPOS="106">
+              <String WC="0.6299999952" CONTENT="en" HEIGHT="14" WIDTH="23" VPOS="839" HPOS="106" />
+              <SP HEIGHT="13" WIDTH="10" VPOS="840" HPOS="130" />
+              <String WC="0.6999999881" CONTENT="esta" HEIGHT="17" WIDTH="43" VPOS="837" HPOS="141" />
+              <SP HEIGHT="14" WIDTH="8" VPOS="841" HPOS="185" />
+              <String WC="0.7839999795" CONTENT="casa." HEIGHT="14" WIDTH="53" VPOS="842" HPOS="194" />
+            </TextLine>
+            <TextLine HEIGHT="32" WIDTH="423" VPOS="861" HPOS="130">
+              <String WC="0.6790909171" CONTENT="Condiciones" HEIGHT="23" WIDTH="136" VPOS="861" HPOS="130" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="871" HPOS="267" />
+              <String WC="0.7870000005" CONTENT="especiales" HEIGHT="25" WIDTH="112" VPOS="866" HPOS="276" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="873" HPOS="389" />
+              <String WC="0.8199999928" CONTENT="para" HEIGHT="19" WIDTH="50" VPOS="874" HPOS="399" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="868" HPOS="450" />
+              <String WC="0.7133333087" CONTENT="libreros." HEIGHT="21" WIDTH="94" VPOS="868" HPOS="459" />
+            </TextLine>
+            <TextLine HEIGHT="23" WIDTH="200" VPOS="920" HPOS="276">
+              <String WC="0.7559999824" CONTENT="EXTRANJERO" HEIGHT="23" WIDTH="200" VPOS="920" HPOS="276" />
+            </TextLine>
+            <TextLine HEIGHT="33" WIDTH="519" VPOS="972" HPOS="130">
+              <String WC="0.2849999964" CONTENT="El" HEIGHT="20" WIDTH="25" VPOS="972" HPOS="130" />
+              <SP HEIGHT="26" WIDTH="9" VPOS="973" HPOS="156" />
+              <String WC="0.8799999952" CONTENT="gran" HEIGHT="19" WIDTH="53" VPOS="980" HPOS="166" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="981" HPOS="220" />
+              <String WC="0.8849999905" CONTENT="suceso" HEIGHT="14" WIDTH="71" VPOS="981" HPOS="230" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="975" HPOS="302" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="975" HPOS="311" />
+              <SP HEIGHT="19" WIDTH="12" VPOS="976" HPOS="337" />
+              <String WC="0.4600000083" CONTENT="la" HEIGHT="20" WIDTH="20" VPOS="976" HPOS="350" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="977" HPOS="371" />
+              <String WC="0.8087499738" CONTENT="librería" HEIGHT="21" WIDTH="86" VPOS="977" HPOS="389" />
+              <SP HEIGHT="14" WIDTH="18" VPOS="985" HPOS="476" />
+              <String WC="0.8312500119" CONTENT="moderna," HEIGHT="25" WIDTH="105" VPOS="980" HPOS="495" />
+              <SP HEIGHT="24" WIDTH="19" VPOS="981" HPOS="601" />
+              <String STYLE="italics" WC="0.8450000286" CONTENT="El" HEIGHT="19" WIDTH="28" VPOS="981" HPOS="621" />
+            </TextLine>
+            <TextLine HEIGHT="29" WIDTH="547" VPOS="999" HPOS="102">
+              <String STYLE="italics" WC="0.1733333319" CONTENT="Por" HEIGHT="20" WIDTH="46" VPOS="999" HPOS="102" />
+              <SP HEIGHT="18" WIDTH="1" VPOS="1002" HPOS="149" />
+              <String STYLE="italics" WC="0.8249999881" CONTENT="te" HEIGHT="18" WIDTH="18" VPOS="1002" HPOS="150" />
+              <SP HEIGHT="24" WIDTH="1" VPOS="1002" HPOS="169" />
+              <String STYLE="italics" WC="0.9539999962" CONTENT="folio" HEIGHT="24" WIDTH="54" VPOS="1002" HPOS="167" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="1001" HPOS="222" />
+              <String STYLE="italics" WC="0.7112500072" CONTENT="Stoddar," HEIGHT="27" WIDTH="99" VPOS="1001" HPOS="232" />
+              <SP HEIGHT="18" WIDTH="9" VPOS="1010" HPOS="332" />
+              <String WC="0.7566666603" CONTENT="colección" HEIGHT="21" WIDTH="100" VPOS="1004" HPOS="342" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="1006" HPOS="443" />
+              <String WC="0.6449999809" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1006" HPOS="453" />
+              <SP HEIGHT="19" WIDTH="10" VPOS="1007" HPOS="479" />
+              <String WC="0.4449999928" CONTENT="16" HEIGHT="19" WIDTH="24" VPOS="1007" HPOS="490" />
+              <SP HEIGHT="20" WIDTH="10" VPOS="1007" HPOS="515" />
+              <String WC="0.4149999917" CONTENT="albums" HEIGHT="21" WIDTH="80" VPOS="1007" HPOS="526" />
+              <SP HEIGHT="20" WIDTH="16" VPOS="1008" HPOS="607" />
+              <String WC="0.7149999738" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1008" HPOS="624" />
+            </TextLine>
+            <TextLine HEIGHT="34" WIDTH="543" VPOS="1027" HPOS="105">
+              <String WC="0.4149999917" CONTENT="16" HEIGHT="19" WIDTH="23" VPOS="1027" HPOS="105" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="1028" HPOS="129" />
+              <String WC="0.7063636184" CONTENT="fotografías" HEIGHT="27" WIDTH="121" VPOS="1028" HPOS="139" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="1037" HPOS="261" />
+              <String WC="0.8249999881" CONTENT="cada" HEIGHT="20" WIDTH="50" VPOS="1030" HPOS="271" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="1038" HPOS="322" />
+              <String WC="0.7024999857" CONTENT="uno," HEIGHT="18" WIDTH="47" VPOS="1038" HPOS="332" />
+              <SP HEIGHT="24" WIDTH="9" VPOS="1032" HPOS="380" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1032" HPOS="390" />
+              <SP HEIGHT="20" WIDTH="7" VPOS="1039" HPOS="416" />
+              <String WC="0.7174999714" CONTENT="gran" HEIGHT="19" WIDTH="53" VPOS="1040" HPOS="424" />
+              <SP HEIGHT="16" WIDTH="9" VPOS="1037" HPOS="478" />
+              <String WC="0.9599999785" CONTENT="tamaño" HEIGHT="18" WIDTH="82" VPOS="1037" HPOS="488" />
+              <SP HEIGHT="19" WIDTH="6" VPOS="1042" HPOS="571" />
+              <String WC="1." CONTENT="y" HEIGHT="19" WIDTH="15" VPOS="1042" HPOS="578" />
+              <SP HEIGHT="25" WIDTH="6" VPOS="1036" HPOS="594" />
+              <String WC="0.4799999893" CONTENT="her" HEIGHT="20" WIDTH="37" VPOS="1036" HPOS="601" />
+              <HYP CONTENT="­" />
+            </TextLine>
+          </TextBlock>
+          <TextBlock ID="Page7_Block14" HEIGHT="667" WIDTH="580" VPOS="401" HPOS="665" LANG="es" STYLEREFS="StyleId-89FC58F4-6DBC-4426-BA95-3EF98D8F1C12- font7">
+            <TextLine HEIGHT="27" WIDTH="547" VPOS="405" HPOS="691">
+              <String WC="0.5666666627" CONTENT="mosamente" HEIGHT="17" WIDTH="124" VPOS="407" HPOS="691" />
+              <SP HEIGHT="19" WIDTH="10" VPOS="405" HPOS="816" />
+              <String WC="0.603333354" CONTENT="hechas" HEIGHT="20" WIDTH="75" VPOS="405" HPOS="827" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="406" HPOS="903" />
+              <String WC="1." CONTENT="de" HEIGHT="19" WIDTH="25" VPOS="406" HPOS="913" />
+              <SP HEIGHT="17" WIDTH="9" VPOS="408" HPOS="939" />
+              <String WC="0.7279999852" CONTENT="todas" HEIGHT="21" WIDTH="58" VPOS="405" HPOS="949" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="406" HPOS="1008" />
+              <String WC="0.603333354" CONTENT="las" HEIGHT="20" WIDTH="30" VPOS="406" HPOS="1018" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="413" HPOS="1049" />
+              <String WC="0.9309090972" CONTENT="principales" HEIGHT="25" WIDTH="125" VPOS="407" HPOS="1059" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="414" HPOS="1185" />
+              <String WC="0.625" CONTENT="ciu-" HEIGHT="19" WIDTH="43" VPOS="408" HPOS="1195" />
+            </TextLine>
+            <TextLine HEIGHT="29" WIDTH="550" VPOS="431" HPOS="690">
+              <String WC="0.6833333373" CONTENT="dsdes," HEIGHT="23" WIDTH="67" VPOS="431" HPOS="690" />
+              <SP HEIGHT="19" WIDTH="10" VPOS="439" HPOS="758" />
+              <String WC="0.7733333111" CONTENT="paisajes," HEIGHT="26" WIDTH="94" VPOS="432" HPOS="769" />
+              <SP HEIGHT="16" WIDTH="10" VPOS="440" HPOS="864" />
+              <String WC="0.8263636231" CONTENT="monumentos," HEIGHT="22" WIDTH="147" VPOS="436" HPOS="875" />
+              <SP HEIGHT="17" WIDTH="18" VPOS="441" HPOS="1023" />
+              <String WC="0.8999999762" CONTENT="etc." HEIGHT="16" WIDTH="38" VPOS="438" HPOS="1042" />
+              <SP HEIGHT="20" WIDTH="20" VPOS="434" HPOS="1081" />
+              <String WC="0.8999999762" CONTENT="del" HEIGHT="20" WIDTH="33" VPOS="434" HPOS="1102" />
+              <SP HEIGHT="19" WIDTH="18" VPOS="435" HPOS="1136" />
+              <String WC="0.6783333421" CONTENT="mundo," HEIGHT="25" WIDTH="85" VPOS="435" HPOS="1155" />
+            </TextLine>
+            <TextLine HEIGHT="26" WIDTH="548" VPOS="459" HPOS="689">
+              <String WC="0.9850000143" CONTENT="al" HEIGHT="19" WIDTH="21" VPOS="459" HPOS="689" />
+              <SP HEIGHT="26" WIDTH="8" VPOS="459" HPOS="711" />
+              <String WC="0.8083333373" CONTENT="precio" HEIGHT="25" WIDTH="69" VPOS="460" HPOS="720" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="460" HPOS="790" />
+              <String WC="0.7566666603" CONTENT="increíble" HEIGHT="20" WIDTH="100" VPOS="460" HPOS="799" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="460" HPOS="900" />
+              <String WC="0.8949999809" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="460" HPOS="910" />
+              <SP HEIGHT="14" WIDTH="10" VPOS="467" HPOS="936" />
+              <String WC="0.2666666806" CONTENT="una" HEIGHT="13" WIDTH="65" VPOS="468" HPOS="947" />
+              <SP HEIGHT="17" WIDTH="11" VPOS="468" HPOS="1013" />
+              <String WC="0.4933333397" CONTENT="peseta" HEIGHT="18" WIDTH="114" VPOS="467" HPOS="1025" />
+              <SP HEIGHT="13" WIDTH="10" VPOS="469" HPOS="1140" />
+              <String WC="0.9549999833" CONTENT="el" HEIGHT="19" WIDTH="19" VPOS="462" HPOS="1151" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="462" HPOS="1171" />
+              <String WC="0.7766666412" CONTENT="cua" HEIGHT="13" WIDTH="38" VPOS="469" HPOS="1190" SUBS_TYPE="HypPart1" SUBS_CONTENT="cuaderno." />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="29" WIDTH="546" VPOS="486" HPOS="690">
+              <String WC="0.823333323" CONTENT="derno." HEIGHT="20" WIDTH="69" VPOS="486" HPOS="690" SUBS_TYPE="HypPart2" SUBS_CONTENT="cuaderno." />
+              <SP HEIGHT="20" WIDTH="9" VPOS="486" HPOS="760" />
+              <String WC="0.6299999952" CONTENT="Se" HEIGHT="21" WIDTH="26" VPOS="486" HPOS="770" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="487" HPOS="797" />
+              <String WC="0.7566666603" CONTENT="han" HEIGHT="20" WIDTH="41" VPOS="487" HPOS="807" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="494" HPOS="849" />
+              <String WC="0.7542856932" CONTENT="vendido" HEIGHT="19" WIDTH="90" VPOS="488" HPOS="859" />
+              <SP HEIGHT="12" WIDTH="10" VPOS="495" HPOS="950" />
+              <String WC="0.6449999809" CONTENT="millones" HEIGHT="20" WIDTH="93" VPOS="488" HPOS="961" />
+              <SP HEIGHT="19" WIDTH="21" VPOS="489" HPOS="1055" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="24" VPOS="489" HPOS="1077" />
+              <SP HEIGHT="14" WIDTH="7" VPOS="495" HPOS="1102" />
+              <String WC="0.7663636208" CONTENT="ejemplares." HEIGHT="26" WIDTH="126" VPOS="489" HPOS="1110" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="419" VPOS="513" HPOS="690">
+              <String WC="0.7590909004" CONTENT="Condiciones" HEIGHT="21" WIDTH="135" VPOS="513" HPOS="690" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="521" HPOS="826" />
+              <String WC="0.7030000091" CONTENT="especiales" HEIGHT="26" WIDTH="111" VPOS="515" HPOS="836" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="522" HPOS="948" />
+              <String WC="0.4074999988" CONTENT="para" HEIGHT="19" WIDTH="50" VPOS="522" HPOS="958" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="516" HPOS="1009" />
+              <String WC="0.6533333063" CONTENT="libreros." HEIGHT="20" WIDTH="91" VPOS="516" HPOS="1018" />
+            </TextLine>
+            <TextLine HEIGHT="23" WIDTH="517" VPOS="542" HPOS="719">
+              <String WC="0.5299999714" CONTENT="Los" HEIGHT="19" WIDTH="38" VPOS="542" HPOS="719" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="548" HPOS="758" />
+              <String WC="0.7485714555" CONTENT="números" HEIGHT="20" WIDTH="96" VPOS="542" HPOS="767" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="543" HPOS="864" />
+              <String WC="0.5419999957" CONTENT="ilustrados" HEIGHT="20" WIDTH="111" VPOS="543" HPOS="874" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="543" HPOS="986" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="543" HPOS="996" />
+              <SP HEIGHT="20" WIDTH="17" VPOS="543" HPOS="1022" />
+              <String WC="0.8571428657" CONTENT="Navidad" HEIGHT="21" WIDTH="98" VPOS="543" HPOS="1040" />
+              <SP HEIGHT="20" WIDTH="16" VPOS="544" HPOS="1139" />
+              <String WC="0.9150000215" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="544" HPOS="1156" />
+              <SP HEIGHT="19" WIDTH="22" VPOS="545" HPOS="1182" />
+              <String WC="0.7566666603" CONTENT="los" HEIGHT="20" WIDTH="31" VPOS="545" HPOS="1205" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="545" VPOS="569" HPOS="689">
+              <String WC="0.6549999714" CONTENT="primeros" HEIGHT="25" WIDTH="99" VPOS="569" HPOS="689" />
+              <SP HEIGHT="19" WIDTH="11" VPOS="576" HPOS="789" />
+              <String WC="0.5950000286" CONTENT="periódicos" HEIGHT="26" WIDTH="113" VPOS="569" HPOS="801" />
+              <SP HEIGHT="19" WIDTH="12" VPOS="577" HPOS="915" />
+              <String WC="1." CONTENT="y" HEIGHT="18" WIDTH="14" VPOS="578" HPOS="928" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="577" HPOS="943" />
+              <String WC="0.7337499857" CONTENT="revistas" HEIGHT="21" WIDTH="92" VPOS="570" HPOS="961" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="571" HPOS="1054" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="26" VPOS="571" HPOS="1063" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="571" HPOS="1090" />
+              <String WC="0.6554545164" CONTENT="Inglaterra," HEIGHT="26" WIDTH="125" VPOS="571" HPOS="1109" />
+            </TextLine>
+            <TextLine HEIGHT="27" WIDTH="352" VPOS="596" HPOS="689">
+              <String WC="0.625" CONTENT="Francia," HEIGHT="25" WIDTH="96" VPOS="596" HPOS="689" />
+              <SP HEIGHT="24" WIDTH="9" VPOS="597" HPOS="786" />
+              <String WC="0.6600000262" CONTENT="Italia," HEIGHT="25" WIDTH="70" VPOS="597" HPOS="796" />
+              <SP HEIGHT="24" WIDTH="9" VPOS="598" HPOS="867" />
+              <String WC="0.8822222352" CONTENT="Alemania," HEIGHT="25" WIDTH="116" VPOS="598" HPOS="877" />
+              <SP HEIGHT="18" WIDTH="9" VPOS="605" HPOS="994" />
+              <String WC="0.9175000191" CONTENT="etc." HEIGHT="17" WIDTH="37" VPOS="601" HPOS="1004" />
+            </TextLine>
+            <TextLine HEIGHT="31" WIDTH="568" VPOS="620" HPOS="669">
+              <String WC="0.3600000143" CONTENT="I" HEIGHT="25" WIDTH="3" VPOS="620" HPOS="669" />
+              <SP HEIGHT="25" WIDTH="42" VPOS="620" HPOS="673" />
+              <String WC="0.6755555272" CONTENT="Preciosos" HEIGHT="21" WIDTH="106" VPOS="624" HPOS="716" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="625" HPOS="823" />
+              <String WC="0.5466666818" CONTENT="libros" HEIGHT="20" WIDTH="64" VPOS="625" HPOS="832" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="625" HPOS="897" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="625" HPOS="906" />
+              <SP HEIGHT="14" WIDTH="7" VPOS="632" HPOS="932" />
+              <String STYLE="italics" WC="0.9275000095" CONTENT="etrennes" HEIGHT="19" WIDTH="94" VPOS="627" HPOS="940" />
+              <SP HEIGHT="20" WIDTH="7" VPOS="626" HPOS="1035" />
+              <String WC="1." CONTENT="de" HEIGHT="19" WIDTH="25" VPOS="626" HPOS="1043" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="626" HPOS="1069" />
+              <String WC="0.8874999881" CONTENT="Francia," HEIGHT="25" WIDTH="95" VPOS="626" HPOS="1087" />
+              <SP HEIGHT="24" WIDTH="14" VPOS="627" HPOS="1183" />
+              <String WC="0.6600000262" CONTENT="In" HEIGHT="19" WIDTH="25" VPOS="627" HPOS="1198" />
+              <SP HEIGHT="12" WIDTH="5" VPOS="634" HPOS="1224" />
+              <String WC="1." CONTENT="-" HEIGHT="2" WIDTH="7" VPOS="639" HPOS="1230" />
+            </TextLine>
+            <TextLine HEIGHT="25" WIDTH="548" VPOS="652" HPOS="688">
+              <String WC="0.5155555606" CONTENT="glaterra," HEIGHT="23" WIDTH="98" VPOS="652" HPOS="688" />
+              <SP HEIGHT="21" WIDTH="20" VPOS="653" HPOS="787" />
+              <String WC="0.7644444704" CONTENT="Alemania," HEIGHT="25" WIDTH="115" VPOS="652" HPOS="808" />
+              <SP HEIGHT="18" WIDTH="10" VPOS="659" HPOS="924" />
+              <String WC="0.9300000072" CONTENT="etc.," HEIGHT="21" WIDTH="44" VPOS="656" HPOS="935" />
+              <SP HEIGHT="17" WIDTH="18" VPOS="660" HPOS="980" />
+              <String WC="0.8575000167" CONTENT="etc." HEIGHT="17" WIDTH="37" VPOS="656" HPOS="999" />
+              <SP HEIGHT="13" WIDTH="22" VPOS="660" HPOS="1037" />
+              <String WC="0.7666666508" CONTENT="con" HEIGHT="13" WIDTH="37" VPOS="660" HPOS="1060" />
+              <SP HEIGHT="19" WIDTH="22" VPOS="654" HPOS="1098" />
+              <String WC="0.6470000148" CONTENT="bellísimas" HEIGHT="20" WIDTH="115" VPOS="654" HPOS="1121" />
+            </TextLine>
+            <TextLine HEIGHT="27" WIDTH="566" VPOS="679" HPOS="669">
+              <String WC="0.7300000191" CONTENT="l" HEIGHT="14" WIDTH="2" VPOS="683" HPOS="669" />
+              <SP HEIGHT="19" WIDTH="15" VPOS="679" HPOS="672" />
+              <String WC="0.5623077154" CONTENT="ilustraciones" HEIGHT="21" WIDTH="145" VPOS="679" HPOS="688" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="687" HPOS="834" />
+              <String WC="0.5799999833" CONTENT="en" HEIGHT="12" WIDTH="25" VPOS="687" HPOS="844" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="687" HPOS="870" />
+              <String WC="0.7825000286" CONTENT="colores," HEIGHT="25" WIDTH="83" VPOS="680" HPOS="879" />
+              <SP HEIGHT="18" WIDTH="19" VPOS="687" HPOS="963" />
+              <String WC="0.8299999833" CONTENT="el" HEIGHT="20" WIDTH="19" VPOS="680" HPOS="983" />
+              <SP HEIGHT="20" WIDTH="20" VPOS="680" HPOS="1003" />
+              <String STYLE="italics" WC="0.8199999928" CONTENT="non" HEIGHT="13" WIDTH="40" VPOS="687" HPOS="1024" />
+              <SP HEIGHT="19" WIDTH="6" VPOS="687" HPOS="1065" />
+              <String STYLE="italics" WC="0.3474999964" CONTENT="plus" HEIGHT="25" WIDTH="51" VPOS="681" HPOS="1072" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="681" HPOS="1124" />
+              <String WC="0.9166666865" CONTENT="del" HEIGHT="20" WIDTH="33" VPOS="681" HPOS="1133" />
+              <SP HEIGHT="19" WIDTH="16" VPOS="682" HPOS="1167" />
+              <String WC="0.878000021" CONTENT="arte." HEIGHT="18" WIDTH="51" VPOS="684" HPOS="1184" />
+            </TextLine>
+            <TextLine HEIGHT="33" WIDTH="565" VPOS="701" HPOS="668">
+              <String WC="0.2599999905" CONTENT="|" HEIGHT="29" WIDTH="3" VPOS="701" HPOS="668" />
+              <SP HEIGHT="29" WIDTH="41" VPOS="701" HPOS="672" />
+              <String WC="0.8642857075" CONTENT="Novelas" HEIGHT="21" WIDTH="90" VPOS="706" HPOS="714" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="708" HPOS="805" />
+              <String WC="0.8550000191" CONTENT="de" HEIGHT="19" WIDTH="25" VPOS="708" HPOS="815" />
+              <SP HEIGHT="19" WIDTH="18" VPOS="708" HPOS="841" />
+              <String WC="0.6133333445" CONTENT="los" HEIGHT="20" WIDTH="30" VPOS="708" HPOS="860" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="715" HPOS="891" />
+              <String WC="0.7012500167" CONTENT="primeros" HEIGHT="26" WIDTH="100" VPOS="708" HPOS="909" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="715" HPOS="1010" />
+              <String WC="0.6200000048" CONTENT="autores" HEIGHT="16" WIDTH="83" VPOS="712" HPOS="1020" />
+              <SP HEIGHT="19" WIDTH="18" VPOS="709" HPOS="1104" />
+              <String WC="0.7120000124" CONTENT="franceses," HEIGHT="25" WIDTH="110" VPOS="709" HPOS="1123" />
+            </TextLine>
+            <TextLine HEIGHT="26" WIDTH="548" VPOS="734" HPOS="688">
+              <String WC="0.6566666961" CONTENT="ingleses," HEIGHT="26" WIDTH="96" VPOS="734" HPOS="688" />
+              <SP HEIGHT="17" WIDTH="10" VPOS="742" HPOS="785" />
+              <String WC="0.7900000215" CONTENT="alemanes," HEIGHT="24" WIDTH="109" VPOS="735" HPOS="796" />
+              <SP HEIGHT="17" WIDTH="9" VPOS="742" HPOS="906" />
+              <String WC="0.878000021" CONTENT="etc.," HEIGHT="22" WIDTH="44" VPOS="738" HPOS="916" />
+              <SP HEIGHT="18" WIDTH="10" VPOS="742" HPOS="961" />
+              <String WC="0.871999979" CONTENT="etc.," HEIGHT="21" WIDTH="44" VPOS="738" HPOS="972" />
+              <SP HEIGHT="17" WIDTH="9" VPOS="742" HPOS="1017" />
+              <String WC="0.6399999857" CONTENT="en" HEIGHT="13" WIDTH="24" VPOS="742" HPOS="1027" />
+              <SP HEIGHT="13" WIDTH="10" VPOS="742" HPOS="1052" />
+              <String WC="0.7577777505" CONTENT="ediciones" HEIGHT="20" WIDTH="103" VPOS="736" HPOS="1063" />
+              <SP HEIGHT="13" WIDTH="12" VPOS="743" HPOS="1167" />
+              <String WC="0.5899999738" CONTENT="com" HEIGHT="13" WIDTH="43" VPOS="743" HPOS="1180" SUBS_TYPE="HypPart1" SUBS_CONTENT="completas" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="545" VPOS="761" HPOS="687">
+              <String WC="0.6700000167" CONTENT="pletas" HEIGHT="26" WIDTH="66" VPOS="761" HPOS="687" SUBS_TYPE="HypPart2" SUBS_CONTENT="completas" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="769" HPOS="754" />
+              <String WC="0.8100000024" CONTENT="con" HEIGHT="13" WIDTH="36" VPOS="769" HPOS="763" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="762" HPOS="800" />
+              <String WC="0.6971428394" CONTENT="ilustraciones," HEIGHT="25" WIDTH="151" VPOS="762" HPOS="810" />
+              <SP HEIGHT="17" WIDTH="9" VPOS="770" HPOS="962" />
+              <String WC="0.6899999976" CONTENT="en" HEIGHT="12" WIDTH="25" VPOS="770" HPOS="972" />
+              <SP HEIGHT="12" WIDTH="10" VPOS="770" HPOS="998" />
+              <String WC="0.2399999946" CONTENT="un" HEIGHT="12" WIDTH="27" VPOS="770" HPOS="1009" />
+              <SP HEIGHT="13" WIDTH="11" VPOS="770" HPOS="1037" />
+              <String WC="0.7612500191" CONTENT="volumen," HEIGHT="26" WIDTH="102" VPOS="763" HPOS="1049" />
+              <SP HEIGHT="25" WIDTH="17" VPOS="764" HPOS="1152" />
+              <String WC="0.8259999752" CONTENT="desde" HEIGHT="20" WIDTH="62" VPOS="764" HPOS="1170" />
+            </TextLine>
+            <TextLine HEIGHT="26" WIDTH="110" VPOS="789" HPOS="686">
+              <String WC="0.5049999952" CONTENT="0‘50" HEIGHT="19" WIDTH="47" VPOS="789" HPOS="686" />
+              <SP HEIGHT="25" WIDTH="9" VPOS="790" HPOS="734" />
+              <String WC="0.9100000262" CONTENT="ptas." HEIGHT="23" WIDTH="52" VPOS="792" HPOS="744" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="520" VPOS="816" HPOS="713">
+              <String WC="0.7144444585" CONTENT="Almanaque" HEIGHT="28" WIDTH="131" VPOS="816" HPOS="713" />
+              <SP HEIGHT="20" WIDTH="5" VPOS="817" HPOS="845" />
+              <String STYLE="italics" WC="0.5322222114" CONTENT="Hachette," HEIGHT="26" WIDTH="106" VPOS="817" HPOS="851" />
+              <SP HEIGHT="18" WIDTH="10" VPOS="825" HPOS="958" />
+              <String WC="0.8000000119" CONTENT="el" HEIGHT="20" WIDTH="18" VPOS="818" HPOS="969" />
+              <SP HEIGHT="26" WIDTH="4" VPOS="818" HPOS="988" />
+              <String WC="0.7524999976" CONTENT="gran" HEIGHT="19" WIDTH="54" VPOS="825" HPOS="993" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="825" HPOS="1048" />
+              <String WC="0.94599998" CONTENT="acontecimiento." HEIGHT="21" WIDTH="176" VPOS="818" HPOS="1057" />
+            </TextLine>
+            <TextLine HEIGHT="26" WIDTH="565" VPOS="845" HPOS="666">
+              <String WC="0.2599999905" CONTENT="•" HEIGHT="5" WIDTH="3" VPOS="854" HPOS="666" />
+              <SP HEIGHT="18" WIDTH="42" VPOS="845" HPOS="670" />
+              <String STYLE="italics" WC="0.7900000215" CONTENT="Atlas" HEIGHT="19" WIDTH="62" VPOS="845" HPOS="713" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="845" HPOS="776" />
+              <String STYLE="italics" WC="1." CONTENT="de" HEIGHT="19" WIDTH="23" VPOS="845" HPOS="785" />
+              <SP HEIGHT="18" WIDTH="11" VPOS="852" HPOS="809" />
+              <String STYLE="italics" WC="0.5944444537" CONTENT="geografía" HEIGHT="25" WIDTH="109" VPOS="846" HPOS="821" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="852" HPOS="931" />
+              <String WC="0.6114285588" CONTENT="antigua" HEIGHT="24" WIDTH="88" VPOS="846" HPOS="940" />
+              <SP HEIGHT="18" WIDTH="17" VPOS="853" HPOS="1029" />
+              <String WC="1." CONTENT="y" HEIGHT="18" WIDTH="14" VPOS="853" HPOS="1047" />
+              <SP HEIGHT="18" WIDTH="16" VPOS="853" HPOS="1062" />
+              <String WC="0.7387499809" CONTENT="moderna," HEIGHT="25" WIDTH="102" VPOS="846" HPOS="1079" />
+              <SP HEIGHT="25" WIDTH="24" VPOS="846" HPOS="1182" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="24" VPOS="846" HPOS="1207" />
+            </TextLine>
+            <TextLine HEIGHT="27" WIDTH="546" VPOS="872" HPOS="685">
+              <String WC="0.6274999976" CONTENT="bolsillo" HEIGHT="19" WIDTH="81" VPOS="872" HPOS="685" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="879" HPOS="767" />
+              <String WC="1." CONTENT="con" HEIGHT="13" WIDTH="36" VPOS="879" HPOS="777" />
+              <SP HEIGHT="19" WIDTH="10" VPOS="873" HPOS="814" />
+              <String WC="0.7200000286" CONTENT="128" HEIGHT="19" WIDTH="39" VPOS="873" HPOS="825" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="873" HPOS="865" />
+              <String WC="0.8320000172" CONTENT="mapas" HEIGHT="19" WIDTH="70" VPOS="880" HPOS="874" />
+              <SP HEIGHT="20" WIDTH="10" VPOS="873" HPOS="945" />
+              <String WC="0.6333333254" CONTENT="índice" HEIGHT="20" WIDTH="68" VPOS="873" HPOS="956" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="873" HPOS="1025" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="873" HPOS="1044" />
+              <SP HEIGHT="19" WIDTH="12" VPOS="874" HPOS="1070" />
+              <String WC="0.5600000024" CONTENT="10.000" HEIGHT="19" WIDTH="73" VPOS="874" HPOS="1083" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="874" HPOS="1157" />
+              <String WC="0.6833333373" CONTENT="nom" HEIGHT="13" WIDTH="47" VPOS="880" HPOS="1175" SUBS_TYPE="HypPart1" SUBS_CONTENT="nombres," />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="27" WIDTH="545" VPOS="899" HPOS="685">
+              <String WC="0.7839999795" CONTENT="bres," HEIGHT="24" WIDTH="53" VPOS="899" HPOS="685" SUBS_TYPE="HypPart2" SUBS_CONTENT="nombres," />
+              <SP HEIGHT="17" WIDTH="9" VPOS="906" HPOS="739" />
+              <String WC="1." CONTENT="etc." HEIGHT="16" WIDTH="36" VPOS="903" HPOS="749" />
+              <SP HEIGHT="12" WIDTH="20" VPOS="907" HPOS="786" />
+              <String WC="0.8592857122" CONTENT="admirablemente" HEIGHT="21" WIDTH="182" VPOS="900" HPOS="807" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="907" HPOS="990" />
+              <String WC="0.8299999833" CONTENT="grabados," HEIGHT="25" WIDTH="108" VPOS="901" HPOS="1008" />
+              <SP HEIGHT="24" WIDTH="18" VPOS="901" HPOS="1117" />
+              <String WC="0.8539999723" CONTENT="desde" HEIGHT="20" WIDTH="62" VPOS="901" HPOS="1136" />
+              <SP HEIGHT="19" WIDTH="17" VPOS="902" HPOS="1199" />
+              <String WC="0.2899999917" CONTENT="4" HEIGHT="19" WIDTH="13" VPOS="902" HPOS="1217" />
+            </TextLine>
+            <TextLine HEIGHT="22" WIDTH="86" VPOS="930" HPOS="686">
+              <String WC="0.7549999952" CONTENT="pesetas." HEIGHT="22" WIDTH="86" VPOS="930" HPOS="686" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="519" VPOS="954" HPOS="713">
+              <String WC="0.8000000119" CONTENT="Y" HEIGHT="19" WIDTH="20" VPOS="954" HPOS="713" />
+              <SP HEIGHT="20" WIDTH="6" VPOS="954" HPOS="734" />
+              <String WC="1." CONTENT="otra" HEIGHT="16" WIDTH="45" VPOS="958" HPOS="741" />
+              <SP HEIGHT="18" WIDTH="8" VPOS="962" HPOS="787" />
+              <String WC="0.8728571534" CONTENT="porción" HEIGHT="25" WIDTH="83" VPOS="955" HPOS="796" />
+              <SP HEIGHT="20" WIDTH="19" VPOS="955" HPOS="880" />
+              <String WC="0.9049999714" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="955" HPOS="900" />
+              <SP HEIGHT="13" WIDTH="15" VPOS="962" HPOS="926" />
+              <String WC="0.9399999976" CONTENT="novedades" HEIGHT="21" WIDTH="117" VPOS="955" HPOS="942" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="962" HPOS="1060" />
+              <String WC="0.5833333135" CONTENT="que" HEIGHT="20" WIDTH="39" VPOS="962" HPOS="1070" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="956" HPOS="1110" />
+              <String WC="0.7866666913" CONTENT="detallare" HEIGHT="21" WIDTH="99" VPOS="955" HPOS="1120" SUBS_TYPE="HypPart1" SUBS_CONTENT="detallaremos" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="21" WIDTH="543" VPOS="982" HPOS="685">
+              <String WC="0.6666666865" CONTENT="mos" HEIGHT="13" WIDTH="42" VPOS="988" HPOS="685" SUBS_TYPE="HypPart2" SUBS_CONTENT="detallaremos" />
+              <SP HEIGHT="14" WIDTH="9" VPOS="988" HPOS="728" />
+              <String WC="0.6449999809" CONTENT="en" HEIGHT="13" WIDTH="24" VPOS="989" HPOS="738" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="989" HPOS="763" />
+              <String WC="1." CONTENT="el" HEIGHT="20" WIDTH="19" VPOS="982" HPOS="773" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="982" HPOS="793" />
+              <String STYLE="smallcaps" STYLEREFS="font6" WC="0.5871428847" CONTENT="Boletín" HEIGHT="19" WIDTH="106" VPOS="983" HPOS="803" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="983" HPOS="910" />
+              <String WC="0.8199999928" CONTENT="de" HEIGHT="19" WIDTH="25" VPOS="983" HPOS="919" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="983" HPOS="945" />
+              <String WC="0.7300000191" CONTENT="Febrero:" HEIGHT="20" WIDTH="95" VPOS="983" HPOS="954" />
+              <SP HEIGHT="16" WIDTH="23" VPOS="987" HPOS="1050" />
+              <String WC="0.8379999995" CONTENT="todas" HEIGHT="20" WIDTH="58" VPOS="983" HPOS="1074" />
+              <SP HEIGHT="13" WIDTH="17" VPOS="990" HPOS="1133" />
+              <String WC="0.7099999785" CONTENT="se" HEIGHT="13" WIDTH="22" VPOS="990" HPOS="1151" />
+              <SP HEIGHT="20" WIDTH="17" VPOS="983" HPOS="1174" />
+              <String WC="0.6200000048" CONTENT="ha" HEIGHT="20" WIDTH="27" VPOS="983" HPOS="1192" SUBS_TYPE="HypPart1" SUBS_CONTENT="hallan" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="544" VPOS="1009" HPOS="685">
+              <String WC="0.6399999857" CONTENT="llan" HEIGHT="20" WIDTH="42" VPOS="1009" HPOS="685" SUBS_TYPE="HypPart2" SUBS_CONTENT="hallan" />
+              <SP HEIGHT="20" WIDTH="10" VPOS="1009" HPOS="728" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="24" VPOS="1009" HPOS="739" />
+              <SP HEIGHT="13" WIDTH="7" VPOS="1016" HPOS="764" />
+              <String WC="0.7960000038" CONTENT="venta" HEIGHT="16" WIDTH="62" VPOS="1014" HPOS="772" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1017" HPOS="835" />
+              <String WC="0.9399999976" CONTENT="en" HEIGHT="13" WIDTH="26" VPOS="1017" HPOS="844" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1017" HPOS="871" />
+              <String WC="0.8274999857" CONTENT="esta" HEIGHT="17" WIDTH="44" VPOS="1013" HPOS="880" />
+              <SP HEIGHT="13" WIDTH="6" VPOS="1017" HPOS="925" />
+              <String WC="0.8539999723" CONTENT="casa," HEIGHT="18" WIDTH="52" VPOS="1017" HPOS="932" />
+              <SP HEIGHT="25" WIDTH="10" VPOS="1010" HPOS="985" />
+              <String WC="0.9919999838" CONTENT="única" HEIGHT="20" WIDTH="60" VPOS="1010" HPOS="996" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="1011" HPOS="1057" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1011" HPOS="1066" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="1011" HPOS="1092" />
+              <String WC="0.8371428847" CONTENT="Galicia" HEIGHT="21" WIDTH="81" VPOS="1010" HPOS="1102" />
+              <SP HEIGHT="19" WIDTH="7" VPOS="1018" HPOS="1184" />
+              <String WC="0.5600000024" CONTENT="pa" HEIGHT="19" WIDTH="26" VPOS="1018" HPOS="1192" SUBS_TYPE="HypPart1" SUBS_CONTENT="para" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="26" WIDTH="264" VPOS="1038" HPOS="685">
+              <String WC="0.5899999738" CONTENT="ra" HEIGHT="12" WIDTH="23" VPOS="1044" HPOS="685" SUBS_TYPE="HypPart2" SUBS_CONTENT="para" />
+              <SP HEIGHT="14" WIDTH="8" VPOS="1043" HPOS="709" />
+              <String WC="0.4979999959" CONTENT="estas" HEIGHT="17" WIDTH="55" VPOS="1040" HPOS="718" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1044" HPOS="774" />
+              <String WC="0.9393333197" CONTENT="especialidades." HEIGHT="26" WIDTH="166" VPOS="1038" HPOS="783" />
+            </TextLine>
+          </TextBlock>
+        </ComposedBlock>
+        <TextBlock ID="Page7_Block15" HEIGHT="301" WIDTH="1136" VPOS="1122" HPOS="96" LANG="es" STYLEREFS="StyleId-89FC58F4-6DBC-4426-BA95-3EF98D8F1C12- font7">
+          <TextLine HEIGHT="29" WIDTH="714" VPOS="1125" HPOS="308">
+            <String WC="0.4066666663" CONTENT="AL," HEIGHT="22" WIDTH="70" VPOS="1125" HPOS="308" />
+            <SP HEIGHT="21" WIDTH="13" VPOS="1127" HPOS="379" />
+            <String WC="0.3662500083" CONTENT="r^UOLIOO" HEIGHT="24" WIDTH="246" VPOS="1127" HPOS="393" />
+            <SP HEIGHT="21" WIDTH="21" VPOS="1130" HPOS="640" />
+            <String WC="0.4300000072" CONTENT="LiV" HEIGHT="22" WIDTH="72" VPOS="1131" HPOS="662" />
+            <SP HEIGHT="23" WIDTH="18" VPOS="1130" HPOS="735" />
+            <String WC="0.172999993" CONTENT="OJEINLIiAL" HEIGHT="24" WIDTH="268" VPOS="1130" HPOS="754" />
+          </TextLine>
+          <TextLine HEIGHT="36" WIDTH="1073" VPOS="1162" HPOS="154">
+            <String WC="0.6175000072" CONTENT="Este" HEIGHT="20" WIDTH="49" VPOS="1162" HPOS="154" />
+            <SP HEIGHT="14" WIDTH="8" VPOS="1169" HPOS="204" />
+            <String WC="0.6320000291" CONTENT="establecimiento" HEIGHT="22" WIDTH="177" VPOS="1164" HPOS="213" />
+            <SP HEIGHT="20" WIDTH="8" VPOS="1166" HPOS="391" />
+            <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1166" HPOS="400" />
+            <SP HEIGHT="16" WIDTH="9" VPOS="1171" HPOS="426" />
+            <String WC="0.3208333254" CONTENT="lit&gt;r*er'íaé" HEIGHT="21" WIDTH="162" VPOS="1168" HPOS="436" />
+            <SP HEIGHT="21" WIDTH="11" VPOS="1168" HPOS="599" />
+            <String WC="0.2933333218" CONTENT="impr*enta" HEIGHT="21" WIDTH="167" VPOS="1173" HPOS="611" />
+            <SP HEIGHT="17" WIDTH="9" VPOS="1174" HPOS="779" />
+            <String WC="0.9919999838" CONTENT="tiene" HEIGHT="19" WIDTH="56" VPOS="1171" HPOS="789" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1178" HPOS="846" />
+            <String WC="0.699285686" CONTENT="corresponsales" HEIGHT="27" WIDTH="163" VPOS="1171" HPOS="855" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1178" HPOS="1019" />
+            <String WC="0.625" CONTENT="en" HEIGHT="13" WIDTH="24" VPOS="1178" HPOS="1028" />
+            <SP HEIGHT="17" WIDTH="11" VPOS="1174" HPOS="1053" />
+            <String WC="1." CONTENT="todo" HEIGHT="20" WIDTH="46" VPOS="1171" HPOS="1065" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1178" HPOS="1112" />
+            <String WC="0.7850000262" CONTENT="el" HEIGHT="19" WIDTH="19" VPOS="1172" HPOS="1121" />
+            <SP HEIGHT="20" WIDTH="9" VPOS="1172" HPOS="1141" />
+            <String WC="0.7459999919" CONTENT="mundo" HEIGHT="20" WIDTH="76" VPOS="1172" HPOS="1151" />
+          </TextLine>
+          <TextLine HEIGHT="26" WIDTH="737" VPOS="1192" HPOS="100">
+            <String WC="1." CONTENT="y" HEIGHT="18" WIDTH="14" VPOS="1195" HPOS="100" />
+            <SP HEIGHT="18" WIDTH="8" VPOS="1195" HPOS="115" />
+            <String WC="0.625" CONTENT="se" HEIGHT="13" WIDTH="21" VPOS="1195" HPOS="124" />
+            <SP HEIGHT="14" WIDTH="10" VPOS="1195" HPOS="146" />
+            <String WC="0.7657142878" CONTENT="encarga" HEIGHT="21" WIDTH="89" VPOS="1196" HPOS="157" />
+            <SP HEIGHT="19" WIDTH="8" VPOS="1192" HPOS="247" />
+            <String WC="0.9599999785" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1192" HPOS="256" />
+            <SP HEIGHT="14" WIDTH="8" VPOS="1199" HPOS="282" />
+            <String WC="0.6666666865" CONTENT="servir" HEIGHT="20" WIDTH="69" VPOS="1193" HPOS="291" />
+            <SP HEIGHT="16" WIDTH="8" VPOS="1197" HPOS="361" />
+            <String WC="0.6800000072" CONTENT="todo" HEIGHT="20" WIDTH="47" VPOS="1194" HPOS="370" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1201" HPOS="418" />
+            <String WC="0.7983333468" CONTENT="cuanto" HEIGHT="16" WIDTH="75" VPOS="1199" HPOS="427" />
+            <SP HEIGHT="14" WIDTH="8" VPOS="1202" HPOS="503" />
+            <String WC="0.5550000072" CONTENT="se" HEIGHT="13" WIDTH="22" VPOS="1203" HPOS="512" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1203" HPOS="535" />
+            <String WC="0.878888905" CONTENT="relacione" HEIGHT="21" WIDTH="101" VPOS="1196" HPOS="544" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1204" HPOS="646" />
+            <String WC="1." CONTENT="con" HEIGHT="13" WIDTH="36" VPOS="1204" HPOS="655" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1204" HPOS="692" />
+            <String WC="0.7279999852" CONTENT="estos" HEIGHT="17" WIDTH="53" VPOS="1201" HPOS="702" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1205" HPOS="756" />
+            <String WC="0.7833333611" CONTENT="ramos." HEIGHT="13" WIDTH="71" VPOS="1205" HPOS="766" />
+          </TextLine>
+          <TextLine HEIGHT="35" WIDTH="962" VPOS="1217" HPOS="154">
+            <String WC="0.474999994" CONTENT="8e" HEIGHT="19" WIDTH="25" VPOS="1217" HPOS="154" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1224" HPOS="180" />
+            <String WC="0.8500000238" CONTENT="admiten" HEIGHT="21" WIDTH="90" VPOS="1218" HPOS="190" />
+            <SP HEIGHT="13" WIDTH="13" VPOS="1227" HPOS="281" />
+            <String WC="0.7053846121" CONTENT="suscripciones" HEIGHT="26" WIDTH="151" VPOS="1221" HPOS="295" />
+            <SP HEIGHT="19" WIDTH="9" VPOS="1229" HPOS="447" />
+            <String WC="1." CONTENT="y" HEIGHT="18" WIDTH="14" VPOS="1230" HPOS="457" />
+            <SP HEIGHT="18" WIDTH="8" VPOS="1230" HPOS="472" />
+            <String WC="0.6949999928" CONTENT="encargos" HEIGHT="20" WIDTH="99" VPOS="1230" HPOS="481" />
+            <SP HEIGHT="19" WIDTH="9" VPOS="1231" HPOS="581" />
+            <String WC="0.7674999833" CONTENT="para" HEIGHT="19" WIDTH="50" VPOS="1231" HPOS="591" />
+            <SP HEIGHT="16" WIDTH="8" VPOS="1228" HPOS="642" />
+            <String WC="0.9340000153" CONTENT="todas" HEIGHT="20" WIDTH="58" VPOS="1225" HPOS="651" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1232" HPOS="710" />
+            <String WC="0.8600000143" CONTENT="clases" HEIGHT="20" WIDTH="65" VPOS="1226" HPOS="719" />
+            <SP HEIGHT="20" WIDTH="8" VPOS="1226" HPOS="785" />
+            <String WC="1." CONTENT="de" HEIGHT="19" WIDTH="25" VPOS="1226" HPOS="794" />
+            <SP HEIGHT="12" WIDTH="7" VPOS="1233" HPOS="820" />
+            <String WC="0.7837499976" CONTENT="revistas" HEIGHT="20" WIDTH="90" VPOS="1226" HPOS="828" />
+            <SP HEIGHT="19" WIDTH="8" VPOS="1233" HPOS="919" />
+            <String WC="1." CONTENT="y" HEIGHT="18" WIDTH="15" VPOS="1234" HPOS="928" />
+            <SP HEIGHT="19" WIDTH="10" VPOS="1233" HPOS="944" />
+            <String WC="0.6999999881" CONTENT="publicaciones." HEIGHT="26" WIDTH="161" VPOS="1226" HPOS="955" />
+          </TextLine>
+          <TextLine HEIGHT="35" WIDTH="1077" VPOS="1245" HPOS="151">
+            <String WC="0.75" CONTENT="Esta" HEIGHT="20" WIDTH="50" VPOS="1245" HPOS="151" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1253" HPOS="202" />
+            <String WC="0.8199999928" CONTENT="casa" HEIGHT="14" WIDTH="47" VPOS="1253" HPOS="211" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1254" HPOS="259" />
+            <String WC="0.8416666389" CONTENT="recibe" HEIGHT="20" WIDTH="68" VPOS="1248" HPOS="268" />
+            <SP HEIGHT="13" WIDTH="6" VPOS="1255" HPOS="337" />
+            <String WC="0.6538461447" CONTENT="continuamente" HEIGHT="20" WIDTH="168" VPOS="1250" HPOS="344" />
+            <SP HEIGHT="15" WIDTH="8" VPOS="1256" HPOS="513" />
+            <String WC="0.8000000119" CONTENT="toda" HEIGHT="20" WIDTH="47" VPOS="1251" HPOS="522" />
+            <SP HEIGHT="13" WIDTH="7" VPOS="1258" HPOS="570" />
+            <String WC="0.5749999881" CONTENT="cuanta" HEIGHT="17" WIDTH="76" VPOS="1255" HPOS="578" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1259" HPOS="655" />
+            <String WC="0.895714283" CONTENT="novedad" HEIGHT="20" WIDTH="94" VPOS="1253" HPOS="665" />
+            <SP HEIGHT="20" WIDTH="8" VPOS="1253" HPOS="760" />
+            <String WC="0.6499999762" CONTENT="se" HEIGHT="13" WIDTH="22" VPOS="1260" HPOS="769" />
+            <SP HEIGHT="19" WIDTH="7" VPOS="1260" HPOS="792" />
+            <String WC="0.8657143116" CONTENT="publica" HEIGHT="25" WIDTH="84" VPOS="1254" HPOS="800" />
+            <SP HEIGHT="13" WIDTH="7" VPOS="1260" HPOS="885" />
+            <String WC="1." CONTENT="en" HEIGHT="13" WIDTH="25" VPOS="1260" HPOS="893" />
+            <SP HEIGHT="19" WIDTH="9" VPOS="1254" HPOS="919" />
+            <String WC="0.5600000024" CONTENT="España" HEIGHT="26" WIDTH="84" VPOS="1254" HPOS="929" />
+            <SP HEIGHT="18" WIDTH="6" VPOS="1261" HPOS="1014" />
+            <String WC="1." CONTENT="y" HEIGHT="18" WIDTH="14" VPOS="1261" HPOS="1021" />
+            <SP HEIGHT="18" WIDTH="7" VPOS="1261" HPOS="1036" />
+            <String WC="0.7250000238" CONTENT="en" HEIGHT="13" WIDTH="24" VPOS="1261" HPOS="1044" />
+            <SP HEIGHT="13" WIDTH="4" VPOS="1261" HPOS="1069" />
+            <String WC="0.6850000024" CONTENT="el" HEIGHT="20" WIDTH="18" VPOS="1254" HPOS="1074" />
+            <SP HEIGHT="20" WIDTH="9" VPOS="1254" HPOS="1093" />
+            <String WC="0.7463636398" CONTENT="extranjero." HEIGHT="26" WIDTH="125" VPOS="1254" HPOS="1103" />
+          </TextLine>
+          <TextLine HEIGHT="33" WIDTH="1028" VPOS="1273" HPOS="154">
+            <String WC="0.4280000031" CONTENT="Iiene" HEIGHT="21" WIDTH="60" VPOS="1273" HPOS="154" />
+            <SP HEIGHT="14" WIDTH="9" VPOS="1280" HPOS="215" />
+            <String WC="0.5824999809" CONTENT="numeroso" HEIGHT="15" WIDTH="107" VPOS="1281" HPOS="225" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1283" HPOS="333" />
+            <String WC="0.7457143068" CONTENT="surtido" HEIGHT="20" WIDTH="82" VPOS="1277" HPOS="342" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1284" HPOS="425" />
+            <String WC="0.7149999738" CONTENT="en" HEIGHT="13" WIDTH="24" VPOS="1284" HPOS="434" />
+            <SP HEIGHT="16" WIDTH="10" VPOS="1281" HPOS="459" />
+            <String WC="1." CONTENT="toda" HEIGHT="20" WIDTH="47" VPOS="1278" HPOS="470" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1286" HPOS="518" />
+            <String WC="0.7459999919" CONTENT="clase" HEIGHT="20" WIDTH="53" VPOS="1279" HPOS="528" />
+            <SP HEIGHT="20" WIDTH="9" VPOS="1279" HPOS="582" />
+            <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="24" VPOS="1279" HPOS="592" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1286" HPOS="617" />
+            <String WC="0.621999979" CONTENT="obras" HEIGHT="20" WIDTH="59" VPOS="1280" HPOS="627" />
+            <SP HEIGHT="13" WIDTH="10" VPOS="1287" HPOS="687" />
+            <String WC="0.7699999809" CONTENT="científicas," HEIGHT="25" WIDTH="119" VPOS="1280" HPOS="698" />
+            <SP HEIGHT="17" WIDTH="9" VPOS="1288" HPOS="818" />
+            <String WC="0.6963636279" CONTENT="religiosas," HEIGHT="25" WIDTH="116" VPOS="1281" HPOS="828" />
+            <SP HEIGHT="18" WIDTH="9" VPOS="1288" HPOS="945" />
+            <String WC="0.7483333349" CONTENT="recreativas," HEIGHT="25" WIDTH="133" VPOS="1281" HPOS="955" />
+            <SP HEIGHT="18" WIDTH="9" VPOS="1288" HPOS="1089" />
+            <String WC="1." CONTENT="etc." HEIGHT="16" WIDTH="38" VPOS="1285" HPOS="1099" />
+            <SP HEIGHT="14" WIDTH="6" VPOS="1288" HPOS="1138" />
+            <String WC="0.8475000262" CONTENT="etc." HEIGHT="18" WIDTH="37" VPOS="1284" HPOS="1145" />
+          </TextLine>
+          <TextLine HEIGHT="27" WIDTH="340" VPOS="1301" HPOS="151">
+            <String WC="0.6725000143" CONTENT="Completa" HEIGHT="27" WIDTH="106" VPOS="1301" HPOS="151" />
+            <SP HEIGHT="16" WIDTH="8" VPOS="1306" HPOS="258" />
+            <String WC="0.9175000191" CONTENT="toda" HEIGHT="20" WIDTH="48" VPOS="1303" HPOS="267" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1311" HPOS="316" />
+            <String WC="0.7160000205" CONTENT="clase" HEIGHT="20" WIDTH="55" VPOS="1304" HPOS="325" />
+            <SP HEIGHT="20" WIDTH="8" VPOS="1305" HPOS="381" />
+            <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1305" HPOS="390" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1312" HPOS="416" />
+            <String WC="0.7316666842" CONTENT="obras." HEIGHT="20" WIDTH="65" VPOS="1306" HPOS="426" />
+          </TextLine>
+          <TextLine HEIGHT="35" WIDTH="767" VPOS="1327" HPOS="149">
+            <String WC="0.6791666746" CONTENT="Especialidad" HEIGHT="27" WIDTH="146" VPOS="1327" HPOS="149" />
+            <SP HEIGHT="20" WIDTH="6" VPOS="1331" HPOS="296" />
+            <String WC="1." CONTENT="en" HEIGHT="13" WIDTH="26" VPOS="1338" HPOS="303" />
+            <SP HEIGHT="12" WIDTH="8" VPOS="1339" HPOS="330" />
+            <String WC="0.7839999795" CONTENT="obras" HEIGHT="21" WIDTH="61" VPOS="1332" HPOS="339" />
+            <SP HEIGHT="20" WIDTH="8" VPOS="1333" HPOS="401" />
+            <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1333" HPOS="410" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1340" HPOS="436" />
+            <String WC="0.8460000157" CONTENT="escritores" HEIGHT="21" WIDTH="109" VPOS="1334" HPOS="445" />
+            <SP HEIGHT="19" WIDTH="9" VPOS="1342" HPOS="555" />
+            <String WC="0.8050000072" CONTENT="gallegos" HEIGHT="26" WIDTH="95" VPOS="1335" HPOS="565" />
+            <SP HEIGHT="13" WIDTH="7" VPOS="1342" HPOS="661" />
+            <String WC="0.6875" CONTENT="antiguos" HEIGHT="26" WIDTH="98" VPOS="1336" HPOS="669" />
+            <SP HEIGHT="19" WIDTH="8" VPOS="1343" HPOS="768" />
+            <String WC="1." CONTENT="y" HEIGHT="19" WIDTH="15" VPOS="1343" HPOS="777" />
+            <SP HEIGHT="19" WIDTH="6" VPOS="1343" HPOS="793" />
+            <String WC="0.7533333302" CONTENT="modernos." HEIGHT="20" WIDTH="116" VPOS="1336" HPOS="800" />
+          </TextLine>
+          <TextLine HEIGHT="31" WIDTH="338" VPOS="1356" HPOS="157">
+            <String WC="0.3700000048" CONTENT="Pídanse" HEIGHT="23" WIDTH="143" VPOS="1356" HPOS="157" />
+            <SP HEIGHT="14" WIDTH="14" VPOS="1366" HPOS="301" />
+            <String WC="0.4189999998" CONTENT="catálogos." HEIGHT="27" WIDTH="179" VPOS="1360" HPOS="316" />
+          </TextLine>
+          <TextLine HEIGHT="35" WIDTH="931" VPOS="1383" HPOS="150">
+            <String WC="0.5899999738" CONTENT="Se" HEIGHT="20" WIDTH="25" VPOS="1383" HPOS="150" />
+            <SP HEIGHT="14" WIDTH="9" VPOS="1390" HPOS="176" />
+            <String WC="0.6750000119" CONTENT="sirven" HEIGHT="21" WIDTH="71" VPOS="1384" HPOS="186" />
+            <SP HEIGHT="19" WIDTH="9" VPOS="1386" HPOS="258" />
+            <String WC="0.5299999714" CONTENT="los" HEIGHT="20" WIDTH="30" VPOS="1386" HPOS="268" />
+            <SP HEIGHT="13" WIDTH="11" VPOS="1394" HPOS="299" />
+            <String WC="0.8924999833" CONTENT="encargos" HEIGHT="20" WIDTH="100" VPOS="1394" HPOS="311" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1395" HPOS="412" />
+            <String WC="0.6366666555" CONTENT="con" HEIGHT="14" WIDTH="37" VPOS="1395" HPOS="422" />
+            <SP HEIGHT="16" WIDTH="9" VPOS="1393" HPOS="460" />
+            <String WC="0.9649999738" CONTENT="toda" HEIGHT="20" WIDTH="47" VPOS="1389" HPOS="470" />
+            <SP HEIGHT="20" WIDTH="9" VPOS="1396" HPOS="518" />
+            <String WC="0.7954545617" CONTENT="puntualidad" HEIGHT="26" WIDTH="139" VPOS="1390" HPOS="528" />
+            <SP HEIGHT="20" WIDTH="8" VPOS="1390" HPOS="668" />
+            <String WC="0.8999999762" CONTENT="en" HEIGHT="13" WIDTH="25" VPOS="1397" HPOS="677" />
+            <SP HEIGHT="13" WIDTH="9" VPOS="1398" HPOS="703" />
+            <String WC="0.7649999857" CONTENT="el" HEIGHT="20" WIDTH="19" VPOS="1391" HPOS="713" />
+            <SP HEIGHT="20" WIDTH="7" VPOS="1391" HPOS="733" />
+            <String WC="0.8999999762" CONTENT="tiempo" HEIGHT="26" WIDTH="75" VPOS="1392" HPOS="741" />
+            <SP HEIGHT="20" WIDTH="9" VPOS="1398" HPOS="817" />
+            <String WC="0.7542856932" CONTENT="preciso" HEIGHT="26" WIDTH="80" VPOS="1392" HPOS="827" />
+            <SP HEIGHT="19" WIDTH="9" VPOS="1398" HPOS="908" />
+            <String WC="0.9424999952" CONTENT="para" HEIGHT="19" WIDTH="50" VPOS="1398" HPOS="918" />
+            <SP HEIGHT="13" WIDTH="8" VPOS="1398" HPOS="969" />
+            <String WC="1." CONTENT="el" HEIGHT="20" WIDTH="19" VPOS="1391" HPOS="978" />
+            <SP HEIGHT="20" WIDTH="9" VPOS="1391" HPOS="998" />
+            <String WC="0.928571403" CONTENT="correo." HEIGHT="14" WIDTH="73" VPOS="1397" HPOS="1008" />
+          </TextLine>
+        </TextBlock>
+        <ComposedBlock ID="Page7_Block16" HEIGHT="332" WIDTH="1139" VPOS="1468" HPOS="90" TYPE="container">
+          <TextBlock ID="Page7_Block17" HEIGHT="60" WIDTH="449" VPOS="1468" HPOS="434" LANG="es" STYLEREFS="StyleId-7F8E26E2-C03B-4E71-862A-B7E563B59A2A- font10">
+            <TextLine HEIGHT="34" WIDTH="441" VPOS="1473" HPOS="438">
+              <String WC="0.4099999964" CONTENT="DE" HEIGHT="31" WIDTH="60" VPOS="1473" HPOS="438" />
+              <SP HEIGHT="32" WIDTH="13" VPOS="1473" HPOS="499" />
+              <String WC="0.9350000024" CONTENT="TO" HEIGHT="33" WIDTH="58" VPOS="1473" HPOS="513" />
+              <String STYLE="underline" WC="0.7649999857" CONTENT="DO" HEIGHT="32" WIDTH="60" VPOS="1474" HPOS="577" />
+              <SP HEIGHT="32" WIDTH="22" VPOS="1474" HPOS="638" />
+              <String STYLE="underline" WC="1." CONTENT="UN" HEIGHT="32" WIDTH="64" VPOS="1474" HPOS="661" />
+              <SP HEIGHT="31" WIDTH="23" VPOS="1475" HPOS="726" />
+              <String WC="0.7139999866" CONTENT="POCO." HEIGHT="33" WIDTH="129" VPOS="1474" HPOS="750" />
+            </TextLine>
+          </TextBlock>
+          <TextBlock ID="Page7_Block18" HEIGHT="252" WIDTH="556" VPOS="1542" HPOS="90" LANG="es" STYLEREFS="StyleId-89FC58F4-6DBC-4426-BA95-3EF98D8F1C12- font7">
+            <TextLine HEIGHT="33" WIDTH="516" VPOS="1546" HPOS="124">
+              <String WC="0.2599999905" CONTENT="En" HEIGHT="20" WIDTH="31" VPOS="1546" HPOS="124" />
+              <SP HEIGHT="14" WIDTH="7" VPOS="1553" HPOS="156" />
+              <String WC="0.5950000286" CONTENT="esta" HEIGHT="18" WIDTH="43" VPOS="1550" HPOS="164" />
+              <SP HEIGHT="14" WIDTH="8" VPOS="1555" HPOS="208" />
+              <String WC="0.7762500048" CONTENT="sección," HEIGHT="25" WIDTH="86" VPOS="1550" HPOS="217" />
+              <SP HEIGHT="24" WIDTH="9" VPOS="1551" HPOS="304" />
+              <String WC="0.9499999881" CONTENT="lo" HEIGHT="19" WIDTH="19" VPOS="1551" HPOS="314" />
+              <SP HEIGHT="13" WIDTH="10" VPOS="1557" HPOS="334" />
+              <String WC="0.5159999728" CONTENT="mismo" HEIGHT="20" WIDTH="72" VPOS="1551" HPOS="345" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="1558" HPOS="418" />
+              <String WC="0.8899999857" CONTENT="que" HEIGHT="19" WIDTH="40" VPOS="1558" HPOS="427" />
+              <SP HEIGHT="14" WIDTH="6" VPOS="1558" HPOS="468" />
+              <String WC="0.6499999762" CONTENT="en" HEIGHT="13" WIDTH="24" VPOS="1559" HPOS="475" />
+              <SP HEIGHT="12" WIDTH="21" VPOS="1560" HPOS="500" />
+              <String WC="0.7459999919" CONTENT="otras" HEIGHT="19" WIDTH="55" VPOS="1555" HPOS="522" />
+              <SP HEIGHT="18" WIDTH="22" VPOS="1561" HPOS="578" />
+              <String WC="0.6666666865" CONTENT="que" HEIGHT="18" WIDTH="39" VPOS="1561" HPOS="601" />
+            </TextLine>
+            <TextLine HEIGHT="31" WIDTH="543" VPOS="1572" HPOS="98">
+              <String WC="0.6266666651" CONTENT="iremos" HEIGHT="22" WIDTH="70" VPOS="1572" HPOS="98" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="1575" HPOS="169" />
+              <String WC="0.6681818366" CONTENT="inaugurando" HEIGHT="28" WIDTH="147" VPOS="1575" HPOS="179" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1585" HPOS="327" />
+              <String WC="1." CONTENT="en" HEIGHT="13" WIDTH="25" VPOS="1585" HPOS="336" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="1579" HPOS="362" />
+              <String WC="0.5366666913" CONTENT="los" HEIGHT="19" WIDTH="30" VPOS="1579" HPOS="372" />
+              <SP HEIGHT="13" WIDTH="19" VPOS="1586" HPOS="403" />
+              <String WC="0.7128571272" CONTENT="números" HEIGHT="21" WIDTH="96" VPOS="1579" HPOS="423" />
+              <SP HEIGHT="14" WIDTH="15" VPOS="1587" HPOS="520" />
+              <String WC="0.676666677" CONTENT="sucesivos" HEIGHT="20" WIDTH="105" VPOS="1581" HPOS="536" />
+            </TextLine>
+            <TextLine HEIGHT="29" WIDTH="544" VPOS="1600" HPOS="97">
+              <String WC="0.8399999738" CONTENT="del" HEIGHT="20" WIDTH="31" VPOS="1600" HPOS="97" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="1601" HPOS="129" />
+              <String STYLE="smallcaps" STYLEREFS="font6" WC="0.6842857003" CONTENT="Boletín" HEIGHT="23" WIDTH="106" VPOS="1601" HPOS="139" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="1605" HPOS="246" />
+              <String WC="0.824285686" CONTENT="daremos" HEIGHT="21" WIDTH="94" VPOS="1605" HPOS="255" />
+              <SP HEIGHT="13" WIDTH="14" VPOS="1613" HPOS="350" />
+              <String WC="0.7433333397" CONTENT="cuenta" HEIGHT="16" WIDTH="75" VPOS="1610" HPOS="365" />
+              <SP HEIGHT="20" WIDTH="13" VPOS="1607" HPOS="441" />
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1607" HPOS="455" />
+              <SP HEIGHT="16" WIDTH="18" VPOS="1611" HPOS="481" />
+              <String WC="0.7524999976" CONTENT="todo" HEIGHT="20" WIDTH="46" VPOS="1608" HPOS="500" />
+              <SP HEIGHT="13" WIDTH="18" VPOS="1615" HPOS="547" />
+              <String WC="0.7233333588" CONTENT="cuanto" HEIGHT="17" WIDTH="75" VPOS="1612" HPOS="566" />
+            </TextLine>
+            <TextLine HEIGHT="35" WIDTH="544" VPOS="1627" HPOS="96">
+              <String WC="0.8349999785" CONTENT="de" HEIGHT="20" WIDTH="24" VPOS="1627" HPOS="96" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="1629" HPOS="121" />
+              <String WC="0.7963636518" CONTENT="importancia" HEIGHT="27" WIDTH="134" VPOS="1629" HPOS="131" />
+              <SP HEIGHT="13" WIDTH="6" VPOS="1640" HPOS="266" />
+              <String WC="0.6579999924" CONTENT="sobre" HEIGHT="20" WIDTH="60" VPOS="1634" HPOS="273" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="1634" HPOS="334" />
+              <String WC="0.8636363745" CONTENT="literatura," HEIGHT="26" WIDTH="118" VPOS="1634" HPOS="343" />
+              <SP HEIGHT="25" WIDTH="11" VPOS="1635" HPOS="462" />
+              <String WC="0.825555563" CONTENT="imprenta," HEIGHT="27" WIDTH="108" VPOS="1635" HPOS="474" />
+              <SP HEIGHT="19" WIDTH="13" VPOS="1643" HPOS="583" />
+              <String WC="0.5475000143" CONTENT="ecé-" HEIGHT="21" WIDTH="43" VPOS="1636" HPOS="597" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="453" VPOS="1658" HPOS="97">
+              <String WC="0.6660000086" CONTENT="tera," HEIGHT="23" WIDTH="47" VPOS="1658" HPOS="97" />
+              <SP HEIGHT="17" WIDTH="9" VPOS="1664" HPOS="145" />
+              <String WC="1." CONTENT="etc." HEIGHT="17" WIDTH="37" VPOS="1661" HPOS="155" />
+              <SP HEIGHT="19" WIDTH="10" VPOS="1659" HPOS="193" />
+              <String WC="0.6133333445" CONTENT="llegue" HEIGHT="27" WIDTH="69" VPOS="1659" HPOS="204" />
+              <SP HEIGHT="20" WIDTH="6" VPOS="1661" HPOS="274" />
+              <String WC="0.349999994" CONTENT="á" HEIGHT="20" WIDTH="12" VPOS="1661" HPOS="281" />
+              <SP HEIGHT="20" WIDTH="6" VPOS="1661" HPOS="294" />
+              <String WC="0.6000000238" CONTENT="nuestro" HEIGHT="17" WIDTH="85" VPOS="1664" HPOS="301" />
+              <SP HEIGHT="14" WIDTH="9" VPOS="1668" HPOS="387" />
+              <String WC="0.8769230843" CONTENT="conocimiento." HEIGHT="20" WIDTH="153" VPOS="1663" HPOS="397" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="531" VPOS="1716" HPOS="108">
+              <String WC="0.5299999714" CONTENT="," HEIGHT="7" WIDTH="4" VPOS="1737" HPOS="108" />
+              <SP HEIGHT="24" WIDTH="67" VPOS="1720" HPOS="113" />
+              <String WC="0.5924999714" CONTENT="para" HEIGHT="19" WIDTH="51" VPOS="1720" HPOS="181" />
+              <SP HEIGHT="13" WIDTH="13" VPOS="1722" HPOS="233" />
+              <String WC="0.5920000076" CONTENT="salir" HEIGHT="20" WIDTH="52" VPOS="1716" HPOS="247" />
+              <SP HEIGHT="19" WIDTH="15" VPOS="1717" HPOS="300" />
+              <String WC="0.25" CONTENT="á" HEIGHT="19" WIDTH="12" VPOS="1717" HPOS="316" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="1717" HPOS="329" />
+              <String WC="0.6999999881" CONTENT="luz" HEIGHT="20" WIDTH="34" VPOS="1717" HPOS="338" />
+              <SP HEIGHT="12" WIDTH="9" VPOS="1725" HPOS="373" />
+              <String WC="0.6150000095" CONTENT="un" HEIGHT="12" WIDTH="29" VPOS="1725" HPOS="383" />
+              <SP HEIGHT="19" WIDTH="8" VPOS="1718" HPOS="413" />
+              <String WC="0.6039999723" CONTENT="libro" HEIGHT="20" WIDTH="54" VPOS="1718" HPOS="422" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="1719" HPOS="477" />
+              <String WC="0.8199999928" CONTENT="del" HEIGHT="20" WIDTH="32" VPOS="1719" HPOS="487" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="1719" HPOS="520" />
+              <String WC="0.6420000196" CONTENT="señor" HEIGHT="18" WIDTH="60" VPOS="1721" HPOS="530" />
+              <SP HEIGHT="20" WIDTH="10" VPOS="1719" HPOS="591" />
+              <String WC="0.5049999952" CONTENT="Ca" HEIGHT="20" WIDTH="28" VPOS="1719" HPOS="602" SUBS_TYPE="HypPart1" SUBS_CONTENT="Casas" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="34" WIDTH="545" VPOS="1739" HPOS="94">
+              <String WC="0.4133333266" CONTENT="sas" HEIGHT="14" WIDTH="31" VPOS="1744" HPOS="94" SUBS_TYPE="HypPart2" SUBS_CONTENT="Casas" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="1739" HPOS="126" />
+              <String WC="0.6079999804" CONTENT="Fernández," HEIGHT="30" WIDTH="127" VPOS="1739" HPOS="136" />
+              <SP HEIGHT="19" WIDTH="9" VPOS="1750" HPOS="264" />
+              <String WC="0.4900000095" CONTENT="con" HEIGHT="14" WIDTH="36" VPOS="1750" HPOS="274" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1752" HPOS="311" />
+              <String WC="0.1949999928" CONTENT="un" HEIGHT="13" WIDTH="28" VPOS="1752" HPOS="320" />
+              <SP HEIGHT="21" WIDTH="7" VPOS="1752" HPOS="349" />
+              <String WC="0.5471428633" CONTENT="prólogo" HEIGHT="28" WIDTH="85" VPOS="1745" HPOS="357" />
+              <SP HEIGHT="21" WIDTH="8" VPOS="1746" HPOS="443" />
+              <String WC="0.2300000042" CONTENT="de" HEIGHT="21" WIDTH="25" VPOS="1746" HPOS="452" />
+              <SP HEIGHT="21" WIDTH="9" VPOS="1746" HPOS="478" />
+              <String WC="0.8550000191" CONTENT="doña" HEIGHT="21" WIDTH="53" VPOS="1746" HPOS="488" />
+              <SP HEIGHT="20" WIDTH="7" VPOS="1747" HPOS="542" />
+              <String WC="0.4850000143" CONTENT="E." HEIGHT="20" WIDTH="23" VPOS="1747" HPOS="550" />
+              <SP HEIGHT="19" WIDTH="11" VPOS="1748" HPOS="574" />
+              <String WC="0.603333354" CONTENT="Par" HEIGHT="19" WIDTH="41" VPOS="1748" HPOS="586" SUBS_TYPE="HypPart1" SUBS_CONTENT="Pardo" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="25" WIDTH="101" VPOS="1765" HPOS="93">
+              <String WC="0.1350000054" CONTENT="do" HEIGHT="21" WIDTH="24" VPOS="1765" HPOS="93" SUBS_TYPE="HypPart2" SUBS_CONTENT="Pardo" />
+              <SP HEIGHT="21" WIDTH="8" VPOS="1765" HPOS="118" />
+              <String WC="0.5080000162" CONTENT="Ba^an" HEIGHT="25" WIDTH="67" VPOS="1765" HPOS="127" />
+            </TextLine>
+          </TextBlock>
+          <TextBlock ID="Page7_Block19" HEIGHT="250" WIDTH="555" VPOS="1550" HPOS="674" LANG="es" STYLEREFS="StyleId-89FC58F4-6DBC-4426-BA95-3EF98D8F1C12- font7">
+            <TextLine HEIGHT="26" WIDTH="515" VPOS="1554" HPOS="707">
+              <String WC="0.8799999952" CONTENT="Brevemente" HEIGHT="20" WIDTH="136" VPOS="1554" HPOS="707" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1560" HPOS="844" />
+              <String WC="0.6299999952" CONTENT="se" HEIGHT="13" WIDTH="21" VPOS="1560" HPOS="853" />
+              <SP HEIGHT="20" WIDTH="6" VPOS="1560" HPOS="875" />
+              <String WC="0.7983333468" CONTENT="pondrá" HEIGHT="26" WIDTH="79" VPOS="1554" HPOS="882" />
+              <SP HEIGHT="20" WIDTH="6" VPOS="1554" HPOS="962" />
+              <String WC="1." CONTENT="á" HEIGHT="20" WIDTH="12" VPOS="1554" HPOS="969" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="1554" HPOS="982" />
+              <String WC="1." CONTENT="la" HEIGHT="20" WIDTH="19" VPOS="1555" HPOS="1001" />
+              <SP HEIGHT="14" WIDTH="19" VPOS="1562" HPOS="1021" />
+              <String WC="1." CONTENT="venta" HEIGHT="18" WIDTH="63" VPOS="1558" HPOS="1041" />
+              <SP HEIGHT="13" WIDTH="15" VPOS="1562" HPOS="1105" />
+              <String WC="0.7049999833" CONTENT="un" HEIGHT="13" WIDTH="28" VPOS="1562" HPOS="1121" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="1555" HPOS="1150" />
+              <String WC="0.8019999862" CONTENT="libro" HEIGHT="20" WIDTH="53" VPOS="1555" HPOS="1169" />
+            </TextLine>
+            <TextLine HEIGHT="21" WIDTH="298" VPOS="1581" HPOS="679">
+              <String WC="1." CONTENT="de" HEIGHT="20" WIDTH="24" VPOS="1582" HPOS="679" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="1582" HPOS="704" />
+              <String WC="1." CONTENT="la" HEIGHT="19" WIDTH="19" VPOS="1582" HPOS="714" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1588" HPOS="734" />
+              <String WC="0.8116666675" CONTENT="señora" HEIGHT="17" WIDTH="73" VPOS="1584" HPOS="743" />
+              <SP HEIGHT="20" WIDTH="6" VPOS="1581" HPOS="817" />
+              <String WC="0.7440000176" CONTENT="Pardo" HEIGHT="20" WIDTH="67" VPOS="1581" HPOS="824" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="1581" HPOS="892" />
+              <String WC="0.6999999881" CONTENT="Bazan." HEIGHT="21" WIDTH="75" VPOS="1581" HPOS="902" />
+            </TextLine>
+            <TextLine HEIGHT="28" WIDTH="520" VPOS="1636" HPOS="705">
+              <String WC="0.7950000167" CONTENT="En" HEIGHT="19" WIDTH="32" VPOS="1637" HPOS="705" />
+              <SP HEIGHT="20" WIDTH="10" VPOS="1636" HPOS="738" />
+              <String WC="0.80400002" CONTENT="Pontevedra" HEIGHT="20" WIDTH="131" VPOS="1636" HPOS="749" />
+              <SP HEIGHT="13" WIDTH="7" VPOS="1643" HPOS="881" />
+              <String WC="0.7049999833" CONTENT="se" HEIGHT="13" WIDTH="22" VPOS="1643" HPOS="889" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1643" HPOS="912" />
+              <String WC="0.6650000215" CONTENT="está" HEIGHT="20" WIDTH="44" VPOS="1637" HPOS="921" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="1637" HPOS="966" />
+              <String WC="0.9599999785" CONTENT="terminando" HEIGHT="20" WIDTH="129" VPOS="1638" HPOS="976" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="1638" HPOS="1106" />
+              <String WC="0.9449999928" CONTENT="la" HEIGHT="20" WIDTH="20" VPOS="1638" HPOS="1115" />
+              <SP HEIGHT="20" WIDTH="10" VPOS="1638" HPOS="1136" />
+              <String WC="0.9419999719" CONTENT="impre" HEIGHT="26" WIDTH="65" VPOS="1638" HPOS="1147" />
+              <SP HEIGHT="13" WIDTH="4" VPOS="1644" HPOS="1213" />
+              <String WC="1." CONTENT="-" HEIGHT="2" WIDTH="7" VPOS="1649" HPOS="1218" />
+            </TextLine>
+            <TextLine HEIGHT="22" WIDTH="542" VPOS="1663" HPOS="678">
+              <String WC="0.5950000286" CONTENT="sión" HEIGHT="20" WIDTH="43" VPOS="1664" HPOS="678" />
+              <SP HEIGHT="19" WIDTH="10" VPOS="1664" HPOS="722" />
+              <String WC="0.8949999809" CONTENT="de" HEIGHT="19" WIDTH="24" VPOS="1664" HPOS="733" />
+              <SP HEIGHT="13" WIDTH="7" VPOS="1670" HPOS="758" />
+              <String WC="0.573333323" CONTENT="una" HEIGHT="12" WIDTH="41" VPOS="1671" HPOS="766" />
+              <SP HEIGHT="13" WIDTH="7" VPOS="1670" HPOS="808" />
+              <String WC="0.8455555439" CONTENT="colección" HEIGHT="21" WIDTH="101" VPOS="1663" HPOS="816" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="1664" HPOS="918" />
+              <String WC="0.9850000143" CONTENT="de" HEIGHT="20" WIDTH="25" VPOS="1664" HPOS="927" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1671" HPOS="953" />
+              <String WC="0.6557142735" CONTENT="novelas" HEIGHT="20" WIDTH="85" VPOS="1665" HPOS="962" />
+              <SP HEIGHT="13" WIDTH="8" VPOS="1672" HPOS="1048" />
+              <String WC="0.7583333254" CONTENT="cortas" HEIGHT="17" WIDTH="67" VPOS="1668" HPOS="1057" />
+              <SP HEIGHT="20" WIDTH="20" VPOS="1665" HPOS="1125" />
+              <String WC="0.8833333254" CONTENT="del" HEIGHT="20" WIDTH="33" VPOS="1665" HPOS="1146" />
+              <SP HEIGHT="20" WIDTH="8" VPOS="1665" HPOS="1180" />
+              <String WC="0.5350000262" CONTENT="se" HEIGHT="14" WIDTH="22" VPOS="1671" HPOS="1189" SUBS_TYPE="HypPart1" SUBS_CONTENT="señor" />
+              <HYP CONTENT="­" />
+            </TextLine>
+            <TextLine HEIGHT="20" WIDTH="202" VPOS="1691" HPOS="678">
+              <String WC="0.7366666794" CONTENT="ñor" HEIGHT="17" WIDTH="37" VPOS="1694" HPOS="678" SUBS_TYPE="HypPart2" SUBS_CONTENT="señor" />
+              <SP HEIGHT="20" WIDTH="9" VPOS="1691" HPOS="716" />
+              <String WC="0.7615384459" CONTENT="Valle-Inclan." HEIGHT="20" WIDTH="154" VPOS="1691" HPOS="726" />
+            </TextLine>
+            <TextLine HEIGHT="29" WIDTH="516" VPOS="1746" HPOS="705">
+              <String WC="0.6916666627" CONTENT="Pronto" HEIGHT="20" WIDTH="77" VPOS="1746" HPOS="705" />
+              <SP HEIGHT="13" WIDTH="9" VPOS="1753" HPOS="783" />
+              <String WC="0.6622222066" CONTENT="comenzará" HEIGHT="21" WIDTH="117" VPOS="1746" HPOS="793" />
+              <SP HEIGHT="20" WIDTH="14" VPOS="1746" HPOS="911" />
+              <String WC="0.6349999905" CONTENT="la" HEIGHT="20" WIDTH="19" VPOS="1746" HPOS="926" />
+              <SP HEIGHT="20" WIDTH="18" VPOS="1747" HPOS="946" />
+              <String WC="0.6588888764" CONTENT="impresión" HEIGHT="27" WIDTH="111" VPOS="1747" HPOS="965" />
+              <SP HEIGHT="20" WIDTH="19" VPOS="1748" HPOS="1077" />
+              <String WC="0.8066666722" CONTENT="del" HEIGHT="20" WIDTH="32" VPOS="1748" HPOS="1097" />
+              <SP HEIGHT="27" WIDTH="19" VPOS="1748" HPOS="1130" />
+              <String WC="0.5759999752" CONTENT="poema" HEIGHT="22" WIDTH="71" VPOS="1753" HPOS="1150" />
+            </TextLine>
+            <TextLine HEIGHT="23" WIDTH="330" VPOS="1773" HPOS="677">
+              <String STYLE="italics" WC="0.3249999881" CONTENT="Os" HEIGHT="22" WIDTH="28" VPOS="1773" HPOS="677" />
+              <SP HEIGHT="15" WIDTH="9" VPOS="1780" HPOS="706" />
+              <String STYLE="italics" WC="0.3237499893" CONTENT="Galaicos" HEIGHT="21" WIDTH="89" VPOS="1774" HPOS="716" />
+              <SP HEIGHT="21" WIDTH="9" VPOS="1774" HPOS="806" />
+              <String WC="0.5724999905" CONTENT="deF," HEIGHT="21" WIDTH="55" VPOS="1774" HPOS="816" />
+              <SP HEIGHT="21" WIDTH="11" VPOS="1774" HPOS="872" />
+              <String WC="0.5077777505" CONTENT="Vaamonde." HEIGHT="22" WIDTH="123" VPOS="1774" HPOS="884" />
+            </TextLine>
+          </TextBlock>
+        </ComposedBlock>
+        <GraphicalElement ID="Page7_Block20" HEIGHT="7" WIDTH="312" VPOS="280" HPOS="140" />
+        <GraphicalElement ID="Page7_Block21" HEIGHT="7" WIDTH="508" VPOS="286" HPOS="452" />
+        <GraphicalElement ID="Page7_Block22" HEIGHT="20" WIDTH="1050" VPOS="287" HPOS="110" />
+        <GraphicalElement ID="Page7_Block23" HEIGHT="2" WIDTH="71" VPOS="293" HPOS="1162" />
+        <GraphicalElement ID="Page7_Block24" HEIGHT="6" WIDTH="180" VPOS="368" HPOS="588" />
+        <GraphicalElement ID="Page7_Block25" HEIGHT="19" WIDTH="1121" VPOS="1084" HPOS="105" />
+        <GraphicalElement ID="Page7_Block26" HEIGHT="4" WIDTH="169" VPOS="1101" HPOS="358" />
+        <GraphicalElement ID="Page7_Block27" HEIGHT="2" WIDTH="63" VPOS="1104" HPOS="541" />
+        <GraphicalElement ID="Page7_Block28" HEIGHT="4" WIDTH="604" VPOS="1106" HPOS="621" />
+        <GraphicalElement ID="Page7_Block29" HEIGHT="7" WIDTH="219" VPOS="1431" HPOS="106" />
+        <GraphicalElement ID="Page7_Block30" HEIGHT="8" WIDTH="894" VPOS="1436" HPOS="332" />
+        <GraphicalElement ID="Page7_Block31" HEIGHT="20" WIDTH="976" VPOS="1437" HPOS="104" />
+        <GraphicalElement ID="Page7_Block32" HEIGHT="10" WIDTH="146" VPOS="1446" HPOS="1080" />
+        <GraphicalElement ID="Page7_Block33" HEIGHT="5" WIDTH="172" VPOS="1518" HPOS="573" />
+        <GraphicalElement ID="Page7_Block34" HEIGHT="232" WIDTH="6" VPOS="1568" HPOS="657" />
+        <GraphicalElement ID="Page7_Block35" HEIGHT="179" WIDTH="4" VPOS="417" HPOS="670" />
+      </PrintSpace>
+    </Page>
+  </Layout>
+</alto>

@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.common.params.ModifiableSolrParams;
@@ -336,5 +337,20 @@ public class AltoTest extends SolrTestCaseJ4 {
   public void testEmptyDoc() {
     assertU(adoc("id", "57371"));
     assertU(adoc("id", "57371", "ocr_text", ""));
+  }
+
+  // https://github.com/dbmdz/solr-ocrhighlighting/issues/173
+  public void testEmptySnippetsBug() {
+    String ptr =
+        Stream.of(8, 3, 2, 1, 5, 4, 6, 7)
+            .map(
+                idx ->
+                    String.format(
+                        "src/test/resources/data/issue-173/es-scbg_bblg_18950101_%04d.xml", idx))
+            .collect(Collectors.joining("+"));
+    assertU(adoc("id", "57372", "ocr_text", ptr));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "gallega", "hl.snippets", "50");
+    assertQ(req, "count(//arr[@name='snippets']/lst)='24'", "//int[@name='numTotal']/text()='24'");
   }
 }
