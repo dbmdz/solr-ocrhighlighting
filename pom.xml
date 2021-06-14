@@ -59,7 +59,7 @@
     <version.slf4j>1.7.30</version.slf4j>
     <version.solr>8.8.2</version.solr>
 
-    <version.fmt-maven-plugin>2.9.1</version.fmt-maven-plugin>
+    <version.fmt-maven-plugin>2.11</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.3.0</version.maven-javadoc-plugin>
     <version.maven-shade-plugin>3.2.4</version.maven-shade-plugin>
