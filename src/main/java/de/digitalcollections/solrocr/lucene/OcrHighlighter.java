@@ -39,6 +39,7 @@ import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.model.OcrHighlightResult;
 import de.digitalcollections.solrocr.model.OcrSnippet;
 import de.digitalcollections.solrocr.model.SourcePointer;
+import de.digitalcollections.solrocr.reader.LegacyBaseCompositeReader;
 import de.digitalcollections.solrocr.solr.OcrHighlightParams;
 import de.digitalcollections.solrocr.util.HighlightTimeout;
 import de.digitalcollections.solrocr.util.PageCacheWarmer;
@@ -109,6 +110,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
       Version.LATEST.major < 8 || Version.LATEST.minor < 2;
   private static final boolean VERSION_IS_PRE84 =
       VERSION_IS_PRE82 || (Version.LATEST.major == 8 && Version.LATEST.minor < 4);
+  private static final boolean VERSION_IS_PRE89 =
+      VERSION_IS_PRE82 || (Version.LATEST.major == 8 && Version.LATEST.minor < 9);
   private static final Constructor<UHComponents> hlComponentsConstructorLegacy;
   private static final Method offsetSourceGetterLegacy;
   private static final Method extractAutomataLegacyMethod;
@@ -761,17 +764,31 @@ public class OcrHighlighter extends UnifiedHighlighter {
               .map(LeafReaderContext::reader)
               .map(TermVectorReusingLeafReader::new)
               .toArray(LeafReader[]::new);
-      return new BaseCompositeReader<IndexReader>(leafReaders) {
-        @Override
-        protected void doClose() throws IOException {
-          reader.close();
-        }
+      if (VERSION_IS_PRE89) {
+        return new LegacyBaseCompositeReader<IndexReader>(leafReaders) {
+          @Override
+          protected void doClose() throws IOException {
+            reader.close();
+          }
 
-        @Override
-        public CacheHelper getReaderCacheHelper() {
-          return null;
-        }
-      };
+          @Override
+          public CacheHelper getReaderCacheHelper() {
+            return null;
+          }
+        };
+      } else {
+        return new BaseCompositeReader<IndexReader>(leafReaders, null) {
+          @Override
+          protected void doClose() throws IOException {
+            reader.close();
+          }
+
+          @Override
+          public CacheHelper getReaderCacheHelper() {
+            return null;
+          }
+        };
+      }
     }
 
     private int lastDocId = -1;
