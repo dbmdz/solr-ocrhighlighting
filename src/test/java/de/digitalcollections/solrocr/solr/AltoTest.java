@@ -351,6 +351,19 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("id", "57372", "ocr_text", ptr));
     assertU(commit());
     SolrQueryRequest req = xmlQ("q", "gallega", "hl.snippets", "50");
-    assertQ(req, "count(//arr[@name='snippets']/lst)='24'", "//int[@name='numTotal']/text()='24'");
+    assertQ(
+        req,
+        "count(//lst[@name='57372']//arr[@name='snippets']/lst)='24'",
+        "//int[@name='numTotal']/text()='24'");
+  }
+
+  public void testNamespacedDoc() {
+    Path ocrPath = Paths.get("src/test/resources/data/alto_namespaced.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47378"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:campea");
+    assertQ(
+        req,
+        "contains(((//lst[@name='47378']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>campea</em>')");
   }
 }

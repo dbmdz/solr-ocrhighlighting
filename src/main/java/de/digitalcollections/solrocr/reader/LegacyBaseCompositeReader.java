@@ -48,8 +48,8 @@ import org.apache.lucene.index.Term;
  * synchronization, you should <b>not</b> synchronize on the <code>IndexReader</code> instance; use
  * your own (non-Lucene) objects instead.
  *
- * <p><b>NOTE:</b></p> This is a backport from Lucene 8.8 since the API
- * changed with v8.9, but we still want to support earlier versions.
+ * <p><b>NOTE:</b> This is a backport from Lucene 8.8 since the API changed with v8.9, but we still
+ * want to support earlier versions.
  *
  * @see MultiReader
  * @lucene.internal

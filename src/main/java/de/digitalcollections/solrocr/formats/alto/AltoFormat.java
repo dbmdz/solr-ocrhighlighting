@@ -79,9 +79,11 @@ public class AltoFormat implements OcrFormat {
 
   @Override
   public boolean hasFormat(String ocrChunk) {
-    // Check if the chunk contains any ALTO tags
+    // Check if the chunk contains any ALTO tags, both un-namespaced and namespaced
     return ocrChunk.contains("<alto")
-        || blockTagMapping.values().stream().anyMatch(t -> ocrChunk.contains("<" + t));
+        || ocrChunk.contains(":alto")
+        || blockTagMapping.values().stream()
+            .anyMatch(t -> ocrChunk.contains("<" + t) || ocrChunk.contains(":" + t));
   }
 
   @Override

@@ -179,7 +179,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
         // actually
         boolean illegalTag = tagLen == 0;
         for (int i = 0; i < tagLen; i++) {
-          if (!Character.isLetter(cbuf[startTag + i])) {
+          if (!Character.isLetter(cbuf[startTag + i]) && cbuf[startTag + i] != ':') {
             illegalTag = true;
             break;
           }
