@@ -344,6 +344,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
           int docInIndex = docInIndexes[docIdx]; // original input order
           assert resultByDocIn[docInIndex] == null;
           OcrFormat ocrFormat = getFormat(content);
+          if (ocrFormat == null) {
+            continue;
+          }
           String limitBlockParam = params.get(OcrHighlightParams.LIMIT_BLOCK, "block");
           OcrBlock[] limitBlocks = null;
           if (!limitBlockParam.equalsIgnoreCase("NONE")) {
@@ -498,10 +501,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return FORMATS.stream()
         .filter(fmt -> fmt.hasFormat(sampleChunk))
         .findFirst()
-        .orElseThrow(
-            () ->
-                new RuntimeException(
-                    "Could not determine OCR format for sample '" + sampleChunk + "'"));
+        .orElse(null);
   }
 
   /**
