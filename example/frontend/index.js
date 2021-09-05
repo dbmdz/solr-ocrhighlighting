@@ -150,6 +150,7 @@ const RegionDisplay = ({
       <div class="region-img-container">
         <a href={viewerUrl} target="_blank" title="Open page in viewer">
           <img ref={ref} alt={region.text} src={getImageUrl(region, page)} />
+          <p class="highlightable" dangerouslySetInnerHTML={{ __html: region.text }} />
         </a>
         {scaleFactor &&
           highlights.map((hl) => (
