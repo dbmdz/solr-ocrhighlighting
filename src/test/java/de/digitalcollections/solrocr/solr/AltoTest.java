@@ -366,4 +366,11 @@ public class AltoTest extends SolrTestCaseJ4 {
         req,
         "contains(((//lst[@name='47378']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>campea</em>')");
   }
+
+  // https://github.com/dbmdz/solr-ocrhighlighting/issues/212
+  public void testExcessivelyLongElements() {
+    Path ocrPath = Paths.get("src/test/resources/data/altolongelement.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47379"));
+    assertU(commit());
+  }
 }
