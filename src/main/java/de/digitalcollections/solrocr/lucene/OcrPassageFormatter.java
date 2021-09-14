@@ -268,7 +268,11 @@ public class OcrPassageFormatter extends PassageFormatter {
           }
           currentSpan = new ArrayList<>();
         }
-        currentSpan.add(wordBox);
+        // Only add the word to the span if some of its text actually is in the highlight span,
+        // i.e. don't if the word's text starts with the end-marker.
+        if (!wordBox.getText().startsWith(END_HL)) {
+          currentSpan.add(wordBox);
+        }
       } else if (currentSpan != null && !currentSpan.isEmpty()) {
         hlSpans.add(currentSpan);
         currentSpan = null;

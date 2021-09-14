@@ -366,4 +366,14 @@ public class AltoTest extends SolrTestCaseJ4 {
         req,
         "contains(((//lst[@name='47378']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), '<em>campea</em>')");
   }
+
+  // https://github.com/dbmdz/solr-ocrhighlighting/issues/213
+  public void testBadCoordinates() {
+    Path ocrPath = Paths.get("src/test/resources/data/altobadcoords.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47388"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:ernte", "hl.ocr.absoluteHighlights", "true");
+    assertQ(
+        req, "//lst[@name='47388']//arr[@name='highlights']//int[@name='lrx'][1]/text()='2499'");
+  }
 }
