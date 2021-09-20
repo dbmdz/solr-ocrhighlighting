@@ -498,10 +498,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private OcrFormat getFormat(IterableCharSequence content) {
     // Sample the first 4k characters to determine the format
     String sampleChunk = content.subSequence(0, Math.min(4096, content.length())).toString();
-    return FORMATS.stream()
-        .filter(fmt -> fmt.hasFormat(sampleChunk))
-        .findFirst()
-        .orElse(null);
+    return FORMATS.stream().filter(fmt -> fmt.hasFormat(sampleChunk)).findFirst().orElse(null);
   }
 
   /**
