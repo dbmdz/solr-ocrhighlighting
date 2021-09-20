@@ -108,10 +108,18 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       }
       int endElem = ArrayUtils.indexOf(cbuf, '>', startElem + 1);
       if (endElem < 0 || endElem > (off + numRead)) {
-        // End of element is not part of this buffer, reduce read size so the element is fully part
-        // of the next read
+        // End of element is not part of this buffer, we may have to carry over
+        int carryOverSize = numRead - (startElem - off);
+        if (carryOverSize == numRead) {
+          // Can't carry-over the whole buffer, since the read would return 0
+          // We bail out of validation since there's no way we can force the caller to request
+          // a bigger read, and doing it ourselves and reading ahead would be too complicated
+          idx = (off + numRead);
+          continue;
+        }
+        // Reduce read size and carry over remainder, so the element is fully part of the next read
         truncated = true;
-        this.carryOver = new char[numRead - (startElem - off)];
+        this.carryOver = new char[carryOverSize];
         System.arraycopy(cbuf, startElem, this.carryOver, 0, this.carryOver.length);
         this.carryOverIdx = 0;
         numRead -= this.carryOver.length;

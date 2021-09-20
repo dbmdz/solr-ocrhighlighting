@@ -376,4 +376,11 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertQ(
         req, "//lst[@name='47388']//arr[@name='highlights']//int[@name='lrx'][1]/text()='2499'");
   }
+  
+  // https://github.com/dbmdz/solr-ocrhighlighting/issues/212
+  public void testExcessivelyLongElements() {
+    Path ocrPath = Paths.get("src/test/resources/data/altolongelement.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47379"));
+    assertU(commit());
+  }
 }
