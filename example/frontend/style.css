@@ -62,14 +62,14 @@ main p {
 
 .snippet-display {
 	box-shadow: 1px 2px 8px;
-    	border-radius: 8px;
+	border-radius: 8px;
 	margin: 20px 0;
 }
 
 .snippet-display img {
 	max-width: 100%;
 	border-top-left-radius: 8px;
-    	border-top-right-radius: 8px;
+	border-top-right-radius: 8px;
 }
 
 .region-img-container {
@@ -82,7 +82,7 @@ main p {
 }
 
 .highlightable {
-	padding: 0 5px;
+	padding: 0 5px 0.5em 5px;
 }
 
 .highlightable em {
