@@ -23,6 +23,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -101,9 +102,12 @@ public class OcrPassageFormatter extends PassageFormatter {
       } catch (IndexOutOfBoundsException e) {
         String errorMsg =
             String.format(
+                Locale.US,
                 "Could not create snippet (start=%d, end=%d) from content at '%s' due to an out-of-bounds error.\n"
                     + "\nDoes the file on disk correspond to the document that was used during indexing?",
-                passage.getStartOffset(), passage.getEndOffset(), content.getIdentifier());
+                passage.getStartOffset(),
+                passage.getEndOffset(),
+                content.getIdentifier());
         logger.error(errorMsg, e);
       }
     }
@@ -501,7 +505,7 @@ public class OcrPassageFormatter extends PassageFormatter {
 
     @Override
     public String toString() {
-      return String.format("PassageMatch{start=%d, end=%d}", start, end);
+      return String.format(Locale.US, "PassageMatch{start=%d, end=%d}", start, end);
     }
   }
 }

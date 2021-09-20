@@ -2,6 +2,7 @@ package de.digitalcollections.solrocr.iter;
 
 import de.digitalcollections.solrocr.model.SourcePointer;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.stream.IntStream;
 import org.apache.lucene.index.QueryTimeout;
 
@@ -27,11 +28,16 @@ public class ExitingIterCharSeq implements IterableCharSequence {
     if (timeout.shouldExit()) {
       throw new ExitingIterCharSeqException(
           String.format(
+              Locale.US,
               "The request took to long to highlight the OCR files (pointer: %s, timeout was: %s)",
-              getPointer(), timeout));
+              getPointer(),
+              timeout));
     } else if (Thread.interrupted()) {
       throw new ExitingIterCharSeqException(
-          String.format("Interrupted while reading the file for OCR (pointer: %s).", getPointer()));
+          String.format(
+              Locale.US,
+              "Interrupted while reading the file for OCR (pointer: %s).",
+              getPointer()));
     }
   }
 

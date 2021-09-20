@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,7 +33,12 @@ public class HocrTest extends SolrTestCaseJ4 {
             "1337"));
     Path ocrPath = Paths.get("src/test/resources/data/hocr.html");
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "42"));
-    assertU(adoc("ocr_text", String.format("%s[3001845:3065626]", ocrPath.toString()), "id", "84"));
+    assertU(
+        adoc(
+            "ocr_text",
+            String.format(Locale.US, "%s[3001845:3065626]", ocrPath.toString()),
+            "id",
+            "84"));
     Path multiColPath = Paths.get("src/test/resources/data/multicolumn.hocr");
     assertU(adoc("ocr_text", multiColPath.toString(), "id", "96"));
     String ptr =
@@ -262,11 +268,13 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "fenia", "hl.snippets", "1");
     assertQ(
         req,
-        String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
+        String.format(
+            Locale.US, "//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
     req = xmlQ("q", "fenia", "hl.snippets", "100");
     assertQ(
         req,
-        String.format("//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
+        String.format(
+            Locale.US, "//arr[@name='snippets']/lst[1]//str[@name='text']/text()='%s'", firstSnip));
   }
 
   @Test

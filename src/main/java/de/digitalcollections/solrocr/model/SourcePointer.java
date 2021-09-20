@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -25,12 +26,12 @@ public class SourcePointer {
     public FileSource(Path path, List<Region> regions, boolean isAscii) throws IOException {
       this.path = path;
       if (!path.toFile().exists()) {
-        String msg = String.format("File at %s does not exist, skipping.", path.toString());
+        String msg = String.format(Locale.US, "File at %s does not exist, skipping.", path);
         logger.warn(msg);
         throw new IOException(msg);
       }
       if (path.toFile().length() == 0) {
-        String msg = String.format("File at %s is empty, skipping.", path.toString());
+        String msg = String.format(Locale.US, "File at %s is empty, skipping.", path);
         logger.warn(msg);
         throw new IOException(msg);
       }

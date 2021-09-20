@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import net.byteseek.compiler.CompileException;
 import net.byteseek.compiler.matcher.SequenceMatcherCompiler;
@@ -105,7 +106,7 @@ public class MiniOcrByteOffsetsParser {
       throws IOException {
     for (Pair<String, Integer> pair : parse(ocrBytes, 0, firstId, lastId)) {
       os.write(pair.getLeft().getBytes(StandardCharsets.UTF_8));
-      os.write(String.format("⚑%d ", pair.getRight()).getBytes(StandardCharsets.UTF_8));
+      os.write(String.format(Locale.US, "⚑%d ", pair.getRight()).getBytes(StandardCharsets.UTF_8));
     }
   }
 }
