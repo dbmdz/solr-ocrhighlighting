@@ -22,8 +22,8 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-      - name: Build with Maven
-        run: mvn package
+      - name: Build with Maven and run unit tests
+        run: mvn -B package
       - name: Run integration tests
         run: ./integration-tests/run.sh
   publish:
