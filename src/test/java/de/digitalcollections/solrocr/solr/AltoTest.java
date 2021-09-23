@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -346,7 +347,9 @@ public class AltoTest extends SolrTestCaseJ4 {
             .map(
                 idx ->
                     String.format(
-                        "src/test/resources/data/issue-173/es-scbg_bblg_18950101_%04d.xml", idx))
+                        Locale.US,
+                        "src/test/resources/data/issue-173/es-scbg_bblg_18950101_%04d.xml",
+                        idx))
             .collect(Collectors.joining("+"));
     assertU(adoc("id", "57372", "ocr_text", ptr));
     assertU(commit());
@@ -376,7 +379,7 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertQ(
         req, "//lst[@name='47388']//arr[@name='highlights']//int[@name='lrx'][1]/text()='2499'");
   }
-  
+
   // https://github.com/dbmdz/solr-ocrhighlighting/issues/212
   public void testExcessivelyLongElements() {
     Path ocrPath = Paths.get("src/test/resources/data/altolongelement.xml");

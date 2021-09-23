@@ -7,6 +7,7 @@ import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.model.OcrBox;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import org.apache.lucene.analysis.CharFilter;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
@@ -167,7 +168,11 @@ public class OcrCharFilter extends BaseCharFilter {
     @Override
     public String toString() {
       return String.format(
-          "TokenWithAlternatives{%d@[%d:%d[}", numForms, defaultFormStart, defaultFormEnd);
+          Locale.US,
+          "TokenWithAlternatives{%d@[%d:%d[}",
+          numForms,
+          defaultFormStart,
+          defaultFormEnd);
     }
   }
 }

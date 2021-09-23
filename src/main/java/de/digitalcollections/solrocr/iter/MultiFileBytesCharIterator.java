@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -66,7 +67,9 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
   @Override
   public String getIdentifier() {
     return String.format(
-        "{%s}", this.paths.stream().map(Path::toString).collect(Collectors.joining(", ")));
+        Locale.US,
+        "{%s}",
+        this.paths.stream().map(Path::toString).collect(Collectors.joining(", ")));
   }
 
   @Override

@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -132,6 +133,37 @@ public class OcrHighlighter extends UnifiedHighlighter {
     // For compatibility with older versions, we grab references to deprecated APIs
     // via reflection and store them as static variables.
     try {
+      Method trySetAccessible;
+      try {
+        trySetAccessible =
+            Class.forName("java.lang.reflect.AccessibleObject")
+                .getDeclaredMethod("trySetAccessible");
+      } catch (NoSuchMethodException e) {
+        trySetAccessible = null;
+      }
+
+      // Prefer `trySetAccessible` for making methods accessible, which is only available from
+      // Java 9 on. For older versions, we still use `setAccessible(true)`. Since the package should
+      // be compatible with Java 8, we have to use reflection to call the new API.
+      final Method tsa = trySetAccessible;
+      final Function<Method, Boolean> makeAccessible =
+          (Method m) -> {
+            if (tsa != null) {
+              try {
+                return (boolean) tsa.invoke(m);
+              } catch (IllegalAccessException | InvocationTargetException e) {
+                return false;
+              }
+            } else {
+              try {
+                m.setAccessible(true);
+                return true;
+              } catch (SecurityException e) {
+                return false;
+              }
+            }
+          };
+
       if (VERSION_IS_PRE81) {
         @SuppressWarnings("rawtypes")
         Class multiTermHl =
@@ -139,7 +171,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
         extractAutomataLegacyMethod =
             multiTermHl.getDeclaredMethod(
                 "extractAutomata", Query.class, Predicate.class, boolean.class, Function.class);
-        extractAutomataLegacyMethod.setAccessible(true);
+        if (!makeAccessible.apply(extractAutomataLegacyMethod)) {
+          throw new RuntimeException(
+              "Could not make `extractAutomata` accessible, are you running a SecurityManager?");
+        }
       } else if (VERSION_IS_PRE84) {
         @SuppressWarnings("rawtypes")
         Class multiTermHl =
@@ -147,7 +182,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
         extractAutomataLegacyMethod =
             multiTermHl.getDeclaredMethod(
                 "extractAutomata", Query.class, Predicate.class, boolean.class);
-        extractAutomataLegacyMethod.setAccessible(true);
+        if (!makeAccessible.apply(extractAutomataLegacyMethod)) {
+          throw new RuntimeException(
+              "Could not make `extractAutomata` accessible, are you running a SecurityManager?");
+        }
       } else {
         extractAutomataLegacyMethod = null;
       }
@@ -351,11 +389,12 @@ public class OcrHighlighter extends UnifiedHighlighter {
           OcrBlock[] limitBlocks = null;
           if (!limitBlockParam.equalsIgnoreCase("NONE")) {
             limitBlocks =
-                OcrBlock.getHierarchyFrom(OcrBlock.valueOf(limitBlockParam.toUpperCase()))
+                OcrBlock.getHierarchyFrom(OcrBlock.valueOf(limitBlockParam.toUpperCase(Locale.US)))
                     .toArray(new OcrBlock[0]);
           }
           OcrBlock contextBlock =
-              OcrBlock.valueOf(params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase());
+              OcrBlock.valueOf(
+                  params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase(Locale.US));
           BreakLocator contextLocator = ocrFormat.getBreakLocator(content, contextBlock);
           BreakLocator limitLocator =
               limitBlocks == null ? null : ocrFormat.getBreakLocator(content, limitBlocks);

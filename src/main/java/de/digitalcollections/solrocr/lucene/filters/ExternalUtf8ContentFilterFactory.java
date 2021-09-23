@@ -6,14 +6,17 @@ import de.digitalcollections.solrocr.reader.MultiFileReader;
 import de.digitalcollections.solrocr.util.Utf8;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
@@ -52,6 +55,7 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       if (pointer == null) {
         throw new RuntimeException(
             String.format(
+                Locale.US,
                 "Could not parse source pointer from field, check the format (value was: '%s')!",
                 ptrStr));
       }
@@ -73,7 +77,9 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
             new MultiFileReader(
                 pointer.sources.stream().map(s -> s.path).collect(Collectors.toList()));
       } else {
-        r = new FileReader(pointer.sources.get(0).path.toFile());
+        r =
+            new InputStreamReader(
+                new FileInputStream(pointer.sources.get(0).path.toFile()), StandardCharsets.UTF_8);
       }
 
       List<SourcePointer.Region> charRegions =
@@ -81,7 +87,8 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       return new ExternalUtf8ContentFilter(new BufferedReader(r), charRegions, ptrStr);
     } catch (IOException e) {
       throw new RuntimeException(
-          String.format("Error while reading external content from pointer '%s': %s", ptrStr, e));
+          String.format(
+              Locale.US, "Error while reading external content from pointer '%s': %s", ptrStr, e));
     }
   }
 
@@ -94,7 +101,8 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     if (!f.exists() || !f.canRead()) {
       throw new SolrException(
           ErrorCode.BAD_REQUEST,
-          String.format("File at %s either does not exist or cannot be read.", src.path));
+          String.format(
+              Locale.US, "File at %s either does not exist or cannot be read.", src.path));
     }
   }
 
@@ -118,8 +126,10 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     if (numRead < numBytes) {
       throw new IOException(
           String.format(
+              Locale.US,
               "Read fewer bytes than expected (%d vs %d), check your source pointer!",
-              numRead, numBytes));
+              numRead,
+              numBytes));
     }
     return decodedLength;
   }

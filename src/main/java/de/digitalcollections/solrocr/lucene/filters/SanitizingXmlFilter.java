@@ -82,7 +82,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
           break outer;
         }
         if (cbuf[match] == '<') {
-          // Start of element, no more entitites to check
+          // Start of element, no more entities to check
           break;
         }
         int entityEnd = multiIndexOf(cbuf, match + 1, '<', ';');

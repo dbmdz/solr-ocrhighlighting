@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
@@ -100,13 +101,15 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     xmlInputFactory
         .getConfig()
         .setUndeclaredEntityResolver(
-            (publicID, systemID, baseURI, namespace) -> String.format("&amp;%s;", namespace));
+            (publicID, systemID, baseURI, namespace) ->
+                String.format(Locale.US, "&amp;%s;", namespace));
     this.xmlReader = (XMLStreamReader2) xmlInputFactory.createXMLStreamReader(this.input);
     try {
       this.nextWord = this.readNext(this.xmlReader, this.features);
     } catch (XMLStreamException e) {
       throw new RuntimeException(
           String.format(
+              Locale.US,
               "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on "
                   + "complete tags! (Source was: %s)",
               this.input.getSource().orElse("[unknown]")),
@@ -142,6 +145,7 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     } catch (XMLStreamException | WstxLazyException e) {
       throw new RuntimeException(
           String.format(
+              Locale.US,
               "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on "
                   + "complete tags! (Source was: %s)",
               this.input.getSource().orElse("[unknown]")),
