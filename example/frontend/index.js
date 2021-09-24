@@ -156,7 +156,7 @@ const RegionDisplay = ({
             <HighlightDisplay
               scaleFactor={scaleFactor}
               highlight={hl}
-              key={`${hl.text}-${hl.x}`}
+              key={`${hl.ulx}.${hl.uly}`}
             />
           ))}
       </div>
@@ -397,8 +397,7 @@ export default class App extends Component {
           ...this.state.queryParams,
           "hl.snippets": val,
         },
-      });
-      this.onSubmit();
+      }, () => this.onSubmit());
     }
   }
 
