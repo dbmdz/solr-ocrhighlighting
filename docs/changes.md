@@ -1,4 +1,26 @@
-## 0.6.0 (2021-05-??)
+## 0.7.1 (2021-09-24)
+Another bugfix release, upgrading is recommended.
+
+**Bugfixes:**
+- Fix text display and "number of snippets" slider in demo setup
+- Fix instances where we were using Java SDK methods that relied on a default locale, which led to
+  hard-to-debug issues in some locales
+- Fix an issue where a highlight rectangle would sometimes be oversized
+- Fix issue in XML input validation when encountering very long XML opening tags
+- Really fix handling of documents with no content (at all)
+- Fix issue with namespaced ALTO documents
+
+## 0.7.0 (2021-07-12)
+This is a bugfix release, especially users with ALTO files are encouraged to upgrade. Other than
+bugfixes, this is the first release to support Solr 8.9.
+
+**Bugfixes:**
+
+- Fix handling of documents with no content
+- Fix issue with the handling of unicode-encoded files
+- Fix issue when an hOCR file had empty OCR boxes
+
+## 0.6.0 (2021-05-11)
 This is a major new release with significant improvements in stability, accuracy and most importantly performance.
 Updating is **highly** recommended, especially for ALTO users, who can expect a speed-up in indexing of up to
 **6000% (i.e. 60x as fast)**. We also recommend updating your JVM to at least Java 11 (LTS), since Java 9 introduced
