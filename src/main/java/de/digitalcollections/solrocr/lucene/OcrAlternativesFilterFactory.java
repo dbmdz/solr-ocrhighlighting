@@ -4,6 +4,7 @@ import de.digitalcollections.solrocr.lucene.filters.OcrCharFilter;
 import de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory;
 import de.digitalcollections.solrocr.util.CharBufUtils;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -14,6 +15,8 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Token Filter that indexes alternative readings parsed from OCR files.
@@ -21,8 +24,21 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  * <p>Requires that the {@code expandAlternatives} attribute is set to {@code true} on the {@link
  * OcrCharFilterFactory} in the field type's analysis chain.
  *
+ * <p><strong>Note that alternatives that are split by the tokenizer are ignored.</strong> This
+ * happens e.g. when you have a token like {@code pur-chased} with an alternative {@code pure-based}:
+ * The {@code StandardTokenizer} will split at the hyphen and thus sever the connection between
+ * the alternatives. To avoid this problem, consider using a simpler tokenizer that doesn't split
+ * on hyphens (e.g. {@code UnicodeWhitespaceTokenizer} or {@code WhitespaceTokenizer}) or customize
+ * the {@code StandardTokenizer} to not split inside of tokens that have alternatives.
+ *
  * <p><strong>This filter factory needs to be placed after a {@code TokenizerFactory} whose input is
  * an instance of {@code OcrCharFilterFactory}.</strong>
+ *
+ * <p><strong>Consider increasing {@code maxTokenLength} for your tokenizer.</strong> By default,
+ * many of Solr's built-in tokenizers will truncate tokens to 255 characters, which can lead to
+ * truncated and missing alternatives. You will see a warning in the logs when this happens,
+ * increasing this value to 512 or 1024 in the config will fix this, at the expense of an increase
+ * in memory usage during indexing.
  *
  * <p><strong>You cannot use the {@link org.apache.lucene.analysis.standard.ClassicTokenizer} with
  * this filter</strong>, since it splits tokens on the U+2060 (Word Joiner) codepoint, contrary to
@@ -30,7 +46,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  * org.apache.lucene.analysis.standard.StandardTokenizer}.
  *
  * <p><strong>When using a custom tokenizer, make sure that it also does not split words on the
- * U+2090 (Word Joiner) codepoint, this filter uses it to detect alternatives for a given
+ * U+2060 (Word Joiner) codepoint, this filter uses it to detect alternatives for a given
  * token.</strong>
  *
  * <pre class="prettyprint">
@@ -62,6 +78,7 @@ public class OcrAlternativesFilterFactory extends TokenFilterFactory {
     private static final char[] ALTERNATIVE_MARKER =
         OcrCharFilterFactory.ALTERNATIVE_MARKER.toCharArray();
 
+    private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final CharTermAttribute termAtt = this.addAttribute(CharTermAttribute.class);
     private final PositionIncrementAttribute posIncAtt =
         this.addAttribute(PositionIncrementAttribute.class);
@@ -165,11 +182,16 @@ public class OcrAlternativesFilterFactory extends TokenFilterFactory {
         int closingIdx =
             CharBufUtils.indexOf(
                 this.curTermBuffer, this.curPos, this.curTermLength, ALTERNATIVE_MARKER);
-        String offsetStr = new String(this.curTermBuffer, curPos, (closingIdx - curPos));
-        newOffset = Integer.parseInt(offsetStr);
-        curPos = closingIdx + ALTERNATIVE_MARKER.length;
-        nextAlternativeIdx =
-            CharBufUtils.indexOf(termAtt.buffer(), curPos, this.curTermLength, ALTERNATIVE_MARKER);
+        if (closingIdx - curPos >= 0) {
+          String offsetStr = new String(this.curTermBuffer, curPos, (closingIdx - curPos));
+          newOffset = Integer.parseInt(offsetStr);
+          curPos = closingIdx + ALTERNATIVE_MARKER.length;
+          nextAlternativeIdx =
+              CharBufUtils.indexOf(termAtt.buffer(), curPos, this.curTermLength, ALTERNATIVE_MARKER);
+        } else {
+          log.warn(
+              "Encountered incomplete token with alternatives, check the maximum token length of your tokenizer!");
+        }
       }
       // Change the term attribute to contain the current alternative
       int end = nextAlternativeIdx >= 0 ? nextAlternativeIdx : curTermLength;
