@@ -62,14 +62,33 @@ A full field definition for an OCR field with alternative expansion could look l
 </fieldType>
 ```
 
-!!! caution "Unsupported tokenizers"
-    The `OcrAlternativesFilterFactory` works with almost all tokenizers shipping with Solr, **except for
-    the `ClassicTokenizer`.** This is because we use the `WORD JOINER` (U+2090) character to denote
-    alternative forms in the character stream and the classic tokenizer splits tokens on this character
-    (contrary to Unicode rules). This also means that if you use a custom tokenizer, you need to make
-    sure that it does not split tokens on U+2090.
-
 !!! note "Highlighting matches on alternative forms"
     During highlighting, you will only see the matching alternative form in the snippet if the match
     is on a single word, or if it is at the beginning or the end of a phrase match. This is because we cannot
     get to the offsets of matching terms inside of a phrase match through Lucene's highlighting machinery.
+
+!!! caution "Unsupported tokenizers"
+    The `OcrAlternativesFilterFactory` works with almost all tokenizers shipping with Solr, **except for
+    the `ClassicTokenizer`.** This is because we use the `WORD JOINER` (U+2060) character to denote
+    alternative forms in the character stream and the classic tokenizer splits tokens on this character
+    (contrary to Unicode rules). This also means that if you use a custom tokenizer, you need to make
+    sure that it does not split tokens on U+2060.
+
+!!! caution "Non-alphabetic characters in alternatives"
+    Some of Solr's built-in tokenizers split tokens on special characters like `-` that occur inside
+    of words. When such characters occur within tokens that have alternatives, the alternatives are
+    severed from the original token and the plugin will not index them. To avoid this, either use
+    a tokenizer that doesn't split on these characters (like `WhitespaceTokenizerFactory`) or consider
+    customizing your tokenizer of choice to not split on these characters when a token includes
+    alternative readings. Note that this can lead to less precise results, e.g. when `alpha-numeric`
+    is not split, only a query like `alphanumeric` or `alpha-numeric` will match (depending on the
+    analysis chains), but not `alpha` or `numeric` alone or a `"alpha numeric"` phrase query.
+
+!!! caution "Consider increasing the standard `maxTokenLength` of 255"
+    When your OCR contains a large number of alternatives for tokens, or these alternatives can
+    get quite long, consider increasing the maximum token length in your tokenizer's configuration.
+    For most of Solr's tokenizers this can be done with the `maxTokenLength` parameter that defaults
+    to 255. When the plugin encounters a case where this leads to truncated alternatives, it will
+    print a warning to the Solr log. Consider increasing the value to 512 or 1024. This will come
+    at the expense of an increase in memory usage during indexing, but will preserve as many of your
+    alternative readings as possible.
