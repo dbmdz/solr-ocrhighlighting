@@ -33,8 +33,8 @@ import org.apache.solr.common.SolrException.ErrorCode;
 public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
   public ExternalUtf8ContentFilterFactory(Map<String, String> args) {
     super(args);
-    // TODO: Read whitelisted base directories from config
-    // TODO: Read whitelisted file name patterns from config
+    // TODO: Read allowed base directories from config
+    // TODO: Read allowed filename patterns from config
     // TODO: Warn of security implications if neither is defined
   }
 
@@ -88,15 +88,14 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     } catch (IOException e) {
       throw new RuntimeException(
           String.format(
-              Locale.US, "Error while reading external content from pointer '%s': %s", ptrStr, e));
+              Locale.US, "Error while reading external content from pointer '%s': %s", ptrStr, e),
+          e);
     }
   }
 
   private void validateSource(SourcePointer.FileSource src) {
-    // TODO: Check if sourcePath is located under one of the whitelisted base directories, abort
-    // otherwise
-    // TODO: Check if sourcePath's filename matches one of the whitelisted file name patterns, abort
-    // otherwise
+    // TODO: Check if sourcePath is located under one of the allowed base directories, else abort
+    // TODO: Check if sourcePath's filename matches one of the allowed filename patterns, else abort
     File f = src.path.toFile();
     if (!f.exists() || !f.canRead()) {
       throw new SolrException(
@@ -139,13 +138,24 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     int charOffset = 0;
     ByteBuffer buf = ByteBuffer.allocateDirect(1024 * 1024 /* 1 MiB */);
     // TODO: Use a queue for the file sources so we don't have to read until the end of the last
-    // file every time
+    //       file every time
     // TODO: Think about building the UTF8 -> UTF16 offset map right here if the mapping part should
-    // become a
-    //       bottle neck
+    //       become a bottle neck
     for (SourcePointer.FileSource src : ptr.sources) {
       try (FileChannel fChan = FileChannel.open(src.path, StandardOpenOption.READ)) {
         final int fSize = (int) fChan.size();
+
+        int bomOffset = 0;
+        if (!src.isAscii) {
+          // Check for BOM, we need to skip it as to not break mult-file parsing
+          ByteBuffer bomBuf = ByteBuffer.allocate(3);
+          fChan.read(bomBuf, 0);
+          bomBuf.flip();
+          if (bomBuf.equals(ByteBuffer.wrap(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}))) {
+            bomOffset = 3;
+          }
+          fChan.position(0);
+        }
 
         // Byte offset of the current file from the beginning of the first file
         final int baseOffset = byteOffset;
@@ -158,6 +168,10 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
             region.start += baseOffset;
             region.end = Math.min(region.end + baseOffset, fSize + baseOffset);
             continue;
+          }
+          if (region.start == 0) {
+            // Skip the BOM at the start of a file, if present
+            region.start += bomOffset;
           }
           // Make region offsets relative to the beginning of the first file
           region.start += baseOffset;
