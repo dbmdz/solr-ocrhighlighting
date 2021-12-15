@@ -2,7 +2,9 @@ package de.digitalcollections.solrocr.lucene;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
+import com.google.common.collect.Streams;
 import de.digitalcollections.solrocr.formats.OcrParser;
 import de.digitalcollections.solrocr.lucene.filters.OcrCharFilter;
 import de.digitalcollections.solrocr.reader.PeekingReader;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.Tokenizer;
@@ -22,24 +25,47 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.util.AttributeFactory;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 public class OcrAlternativesFilterTest {
-  public static Stream<Tokenizer> getTokenizers() {
-    int maxTokenLength = 1024;
-    StandardTokenizer std = new StandardTokenizer();
-    std.setMaxTokenLength(maxTokenLength);
+  public static Stream<Arguments> getTestParams() {
+    StandardTokenizer stdTruncated = new StandardTokenizer();
+    StandardTokenizer stdNotTruncated = new StandardTokenizer();
+    stdNotTruncated.setMaxTokenLength(1024);
     return Stream.of(
-        std,
-        new UnicodeWhitespaceTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, maxTokenLength),
-        new WhitespaceTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, maxTokenLength),
-        new ICUTokenizer());
+        Arguments.of(stdTruncated, true, "Truncated StandardTokenizer"),
+        Arguments.of(stdNotTruncated, false, "StandardTokenizer"),
+        Arguments.of(
+            new UnicodeWhitespaceTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY),
+            true,
+            "Truncated UnicodeWhitespaceTokenizer"),
+        Arguments.of(
+            new UnicodeWhitespaceTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, 1024),
+            false,
+            "UnicodeWhitespaceTokenizer"),
+        Arguments.of(
+            new WhitespaceTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY),
+            true,
+            "Truncated WhitespaceTokenizer"),
+        Arguments.of(
+            new WhitespaceTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, 1024),
+            false,
+            "WhitespaceTokenizer"),
+        Arguments.of(new ICUTokenizer(), false, "ICUTokenizer"));
   }
 
-  @ParameterizedTest
-  @MethodSource("getTokenizers")
-  public void testAlternativesSurviveTokenizer(Tokenizer tokenizer) throws Exception {
+  /**
+   * This one is quite the handful, but it simply tests that as many alternatives as possible
+   * survive the tokenizer, depending on the maximum token length that has been configured for it.
+   * For some this means that alternatives are missing (since the input token has been truncated).
+   */
+  @SuppressWarnings("UnstableApiUsage")
+  @ParameterizedTest(name = "{2}")
+  @MethodSource("getTestParams")
+  public void testAlternativesSurviveTokenizer(
+      Tokenizer tokenizer, boolean truncated, String displayName) throws Exception {
     // Increase the maximum token length
     tokenizer.setReader(
         new StubOcrCharFilter(
@@ -53,7 +79,7 @@ public class OcrAlternativesFilterTest {
                 + "\u2060\u20601023\u2060\u2060fivehundredandeighteen\u2060\u20601123\u2060\u2060"
                 + "fivehundredandnineteen\u2060\u20601223\u2060\u2060fivehundredandtwenty\u2060\u20601323"
                 + "\u2060\u2060fivehundredandtwentyone\u2060\u20601423\u2060\u2060fivehundredandtwentytwo"
-                + "\u2060\u20601523\u2060\u2060fivehundredandtwentythree"));
+                + "\u2060\u20601523\u2060\u2060fivehundredandtwentythree a few more tokens"));
     TokenFilter filter = new OcrAlternativesFilterFactory.OcrAlternativesFilter(tokenizer);
     List<String> tokens = new ArrayList<>();
     List<Integer> positionIncrements = new ArrayList<>();
@@ -68,54 +94,125 @@ public class OcrAlternativesFilterTest {
     }
     filter.end();
     filter.close();
+
+    // Assertion values for the various scenarios
+    List<String> tokensFullNoHyphen =
+        ImmutableList.of(
+            "YoB",
+            "OB",
+            "Greene",
+            "pur",
+            "chased",
+            "of",
+            "Ben",
+            "F",
+            "Mark",
+            "40",
+            "cattle",
+            "cattlc",
+            "fivehundredandtwelve",
+            "fivehundredandthirteen",
+            "fivehundredandfourteen",
+            "fivehundredandfifteen",
+            "fivehundredandsixteen",
+            "fivehundredandseventeen",
+            "fivehundredandeighteen",
+            "fivehundredandnineteen",
+            "fivehundredandtwenty",
+            "fivehundredandtwentyone",
+            "fivehundredandtwentytwo",
+            "fivehundredandtwentythree",
+            "a",
+            "few",
+            "more",
+            "tokens");
+    List<Integer> incrementsFullNoHyphen =
+        ImmutableList.of(
+            1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1);
+    List<Integer> offsetsFullNoHyphen =
+        ImmutableList.of(
+            0, 123, 13, 20, 24, 82, 85, 89, 91, 96, 99, 523, 119, 623, 723, 723, 823, 923, 1023,
+            1123, 1223, 1323, 1423, 1523, 467, 469, 473, 478);
+    List<String> tokensFull =
+        ImmutableList.of(
+            "YoB",
+            "OB",
+            "Greene",
+            "pur-chased",
+            "pure-based",
+            "pUl-cohased",
+            "pure.bred",
+            "of",
+            "Ben",
+            "F",
+            "Mark",
+            "40",
+            "cattle",
+            "cattlc",
+            "fivehundredandtwelve",
+            "fivehundredandthirteen",
+            "fivehundredandfourteen",
+            "fivehundredandfifteen",
+            "fivehundredandsixteen",
+            "fivehundredandseventeen",
+            "fivehundredandeighteen",
+            "fivehundredandnineteen",
+            "fivehundredandtwenty",
+            "fivehundredandtwentyone",
+            "fivehundredandtwentytwo",
+            "fivehundredandtwentythree",
+            "a",
+            "few",
+            "more",
+            "tokens");
+    List<Integer> incrementsFull =
+        ImmutableList.of(
+            1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
+            1);
+    List<Integer> offsetsFull =
+        ImmutableList.of(
+            0, 123, 13, 20, 223, 323, 423, 82, 85, 89, 91, 96, 99, 523, 119, 623, 723, 723, 823,
+            923, 1023, 1123, 1223, 1323, 1423, 1523, 467, 469, 473, 478);
+    List<String> tokensTruncatedNoHyphen =
+        Streams.concat(
+                tokensFullNoHyphen.subList(0, 21).stream(),
+                tokensFullNoHyphen.subList(24, 28).stream())
+            .collect(Collectors.toList());
+    List<Integer> incrementsTruncatedNoHyphen =
+        Streams.concat(
+                incrementsFullNoHyphen.subList(0, 21).stream(),
+                incrementsFullNoHyphen.subList(24, 28).stream())
+            .collect(Collectors.toList());
+    List<Integer> offsetsTruncatedNoHyphen =
+        Streams.concat(
+                offsetsFullNoHyphen.subList(0, 21).stream(),
+                offsetsFullNoHyphen.subList(24, 28).stream())
+            .collect(Collectors.toList());
+    List<String> tokensTruncated =
+        Streams.concat(tokensFull.subList(0, 23).stream(), tokensFull.subList(26, 30).stream())
+            .collect(Collectors.toList());
+    List<Integer> incrementsTruncated =
+        Streams.concat(
+                incrementsFull.subList(0, 23).stream(), incrementsFull.subList(26, 30).stream())
+            .collect(Collectors.toList());
+    List<Integer> offsetsTruncated =
+        Streams.concat(offsetsFull.subList(0, 23).stream(), offsetsFull.subList(26, 30).stream())
+            .collect(Collectors.toList());
+
     if (tokenizer instanceof StandardTokenizer || tokenizer instanceof ICUTokenizer) {
       assertThat(tokens)
-          .containsExactly(
-              "YoB", "OB", "Greene", "pur", "chased", "of", "Ben", "F", "Mark", "40", "cattle",
-              "cattlc","fivehundredandtwelve", "fivehundredandthirteen", "fivehundredandfourteen",
-              "fivehundredandfifteen", "fivehundredandsixteen", "fivehundredandseventeen", "fivehundredandeighteen",
-              "fivehundredandnineteen", "fivehundredandtwenty", "fivehundredandtwentyone", "fivehundredandtwentytwo",
-              "fivehundredandtwentythree");
-      assertThat(positionIncrements).containsExactly(
-          1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-      assertThat(startOffsets).containsExactly(
-          0, 123, 13, 20, 24, 82, 85, 89, 91, 96, 99, 523, 119, 623, 723, 723, 823, 923, 1023, 1123,
-          1223, 1323, 1423, 1523);
+          .containsExactlyElementsOf(truncated ? tokensTruncatedNoHyphen : tokensFullNoHyphen);
+      assertThat(positionIncrements)
+          .containsExactlyElementsOf(
+              truncated ? incrementsTruncatedNoHyphen : incrementsFullNoHyphen);
+      assertThat(startOffsets)
+          .containsExactlyElementsOf(truncated ? offsetsTruncatedNoHyphen : offsetsFullNoHyphen);
     } else {
-      assertThat(tokens)
-          .containsExactly(
-              "YoB",
-              "OB",
-              "Greene",
-              "pur-chased",
-              "pure-based",
-              "pUl-cohased",
-              "pure.bred",
-              "of",
-              "Ben",
-              "F",
-              "Mark",
-              "40",
-              "cattle",
-              "cattlc",
-              "fivehundredandtwelve",
-              "fivehundredandthirteen",
-              "fivehundredandfourteen",
-              "fivehundredandfifteen",
-              "fivehundredandsixteen",
-              "fivehundredandseventeen",
-              "fivehundredandeighteen",
-              "fivehundredandnineteen",
-              "fivehundredandtwenty",
-              "fivehundredandtwentyone",
-              "fivehundredandtwentytwo",
-              "fivehundredandtwentythree");
-      assertThat(positionIncrements).containsExactly(
-          1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-      assertThat(startOffsets).containsExactly(
-          0, 123, 13, 20, 223, 323, 423, 82, 85, 89, 91, 96, 99, 523, 119, 623, 723, 723, 823, 923,
-          1023, 1123, 1223, 1323, 1423, 1523
-      );
+      assertThat(tokens).containsExactlyElementsOf(truncated ? tokensTruncated : tokensFull);
+      assertThat(positionIncrements)
+          .containsExactlyElementsOf(truncated ? incrementsTruncated : incrementsFull);
+      assertThat(startOffsets)
+          .containsExactlyElementsOf(truncated ? offsetsTruncated : offsetsFull);
     }
   }
 
