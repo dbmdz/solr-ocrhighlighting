@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory;
  * OcrCharFilterFactory} in the field type's analysis chain.
  *
  * <p><strong>Note that alternatives that are split by the tokenizer are ignored.</strong> This
- * happens e.g. when you have a token like {@code pur-chased} with an alternative {@code pure-based}:
- * The {@code StandardTokenizer} will split at the hyphen and thus sever the connection between
- * the alternatives. To avoid this problem, consider using a simpler tokenizer that doesn't split
- * on hyphens (e.g. {@code UnicodeWhitespaceTokenizer} or {@code WhitespaceTokenizer}) or customize
- * the {@code StandardTokenizer} to not split inside of tokens that have alternatives.
+ * happens e.g. when you have a token like {@code pur-chased} with an alternative {@code
+ * pure-based}: The {@code StandardTokenizer} will split at the hyphen and thus sever the connection
+ * between the alternatives. To avoid this problem, consider using a simpler tokenizer that doesn't
+ * split on hyphens (e.g. {@code UnicodeWhitespaceTokenizer} or {@code WhitespaceTokenizer}) or
+ * customize the {@code StandardTokenizer} to not split inside of tokens that have alternatives.
  *
  * <p><strong>This filter factory needs to be placed after a {@code TokenizerFactory} whose input is
  * an instance of {@code OcrCharFilterFactory}.</strong>
@@ -187,10 +187,16 @@ public class OcrAlternativesFilterFactory extends TokenFilterFactory {
           newOffset = Integer.parseInt(offsetStr);
           curPos = closingIdx + ALTERNATIVE_MARKER.length;
           nextAlternativeIdx =
-              CharBufUtils.indexOf(termAtt.buffer(), curPos, this.curTermLength, ALTERNATIVE_MARKER);
+              CharBufUtils.indexOf(
+                  termAtt.buffer(), curPos, this.curTermLength, ALTERNATIVE_MARKER);
         } else {
           log.warn(
-              "Encountered incomplete token with alternatives, check the maximum token length of your tokenizer!");
+              "Encountered incomplete token with alternatives, skipping it and all further alternatives,"
+                  + "check the maximum token length of your tokenizer!");
+          this.curTermBuffer = null;
+          this.curTermLength = -1;
+          this.curPos = -1;
+          return this.incrementToken();
         }
       }
       // Change the term attribute to contain the current alternative
