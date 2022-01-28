@@ -44,8 +44,8 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
   }
 
   // Named XML character entities that are used in hOCR
-  public static final ImmutableMap<Object, Object> ENTITIES =
-      ImmutableMap.builder()
+  public static final ImmutableMap<String, String> ENTITIES =
+      new ImmutableMap.Builder<String, String>()
           .put("shy", "\u00ad")
           .put("nbsp", "\u00a0")
           .put("ensp", "\u2002")
