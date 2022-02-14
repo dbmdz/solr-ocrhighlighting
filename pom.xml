@@ -60,7 +60,7 @@
     <!-- DO NOT UPDATE THIS, this is the latest version that works with Java 8 -->
     <version.fmt-maven-plugin>2.9.1</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
-    <version.maven-javadoc-plugin>3.3.1</version.maven-javadoc-plugin>
+    <version.maven-javadoc-plugin>3.3.2</version.maven-javadoc-plugin>
     <version.maven-shade-plugin>3.2.4</version.maven-shade-plugin>
     <version.maven-source-plugin>3.2.1</version.maven-source-plugin>
     <version.junit-platform-maven>1.1.6</version.junit-platform-maven>
