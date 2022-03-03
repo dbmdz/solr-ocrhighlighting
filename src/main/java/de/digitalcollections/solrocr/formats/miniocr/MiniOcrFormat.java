@@ -18,7 +18,7 @@ import javax.xml.stream.XMLStreamException;
 public class MiniOcrFormat implements OcrFormat {
   private static final Pattern pagePat =
       Pattern.compile(
-          "<p (?:xml)?:id=\"(?<pageId>.+?)\" ?(?:wh=\"(?<width>\\d+) (?<height>\\d+)\")?>");
+          "<p (?:xml)?:id=(\"|')(?<pageId>.+?)(\"|') ?(?:wh=(\"|')(?<width>\\d+) (?<height>\\d+)(\"|'))?>");
   private static final Map<OcrBlock, String> blockTagMapping =
       ImmutableMap.of(
           OcrBlock.PAGE, "p",
