@@ -1,3 +1,12 @@
+## 0.7.2 (2022-03-22)
+And yet another bugfix release.
+
+**Bugfixes:**
+- Fixed using single-quotes in MiniOCR input, previously these files were not recognized as valid MiniOCR files
+  ([#247](https://github.com/dbmdz/solr-ocrhighlighting/pull/247), thanks @mspalti for the fix!)
+- Fixed `OutOfBoundsException` when using alternatives with very long tokens (
+  [#230](https://github.com/dbmdz/solr-ocrhighlighting/pull/230), thanks @fd17 for the report and review)
+
 ## 0.7.1 (2021-09-24)
 Another bugfix release, upgrading is recommended.
 
