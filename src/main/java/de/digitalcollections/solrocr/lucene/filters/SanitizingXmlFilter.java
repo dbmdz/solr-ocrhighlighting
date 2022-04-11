@@ -175,7 +175,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       }
 
       int startTag = cbuf[startElem + 1] == '/' ? startElem + 2 : startElem + 1;
-      int endTag = ArrayUtils.indexOf(cbuf, ' ', startTag);
+      int endTag = multiIndexOf(cbuf, startTag, ' ', '\n', '\t');
       if (endTag > endElem || endTag < 0) {
         endTag = cbuf[endElem - 1] == '/' ? endElem - 1 : endElem;
       }
