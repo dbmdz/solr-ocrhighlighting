@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 public class HocrFormat implements OcrFormat {
   private static final Pattern pageIdPat =
       Pattern.compile(
-          "(?:id=['\"](?<id>.+?)['\"]|x_source (?<source>.+?)['\";]|ppageno (?<pageno>\\d+))");
+          "(?:id=['\"](?<id>.+?)['\"]|x_source ['\"]?(?<source>.+?)['\"]?['\";]|ppageno (?<pageno>\\d+))");
   private static final Pattern pageBboxPat =
       Pattern.compile("bbox 0 0 (?<width>\\d+) (?<height>\\d+)");
   private static final Pattern pageElemPat =

@@ -124,7 +124,15 @@ public class HocrParser extends OcrParser {
     String[] parts = title.split(";");
     for (String part : parts) {
       int spaceIdx = part.indexOf(' ', 3);
-      props.put(part.substring(0, spaceIdx).trim(), part.substring(spaceIdx + 1).trim());
+      String propertyName = part.substring(0, spaceIdx).trim();
+      String propertyValue = part.substring(spaceIdx + 1).trim();
+      boolean isQuoted =
+          (propertyValue.startsWith("\"") && propertyValue.endsWith("\""))
+              || (propertyValue.startsWith("'") && propertyValue.endsWith("'"));
+      if (isQuoted) {
+        propertyValue = propertyValue.substring(1, propertyValue.length() - 1);
+      }
+      props.put(propertyName, propertyValue);
     }
     return props;
   }
