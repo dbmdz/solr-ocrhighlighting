@@ -24,9 +24,12 @@ import org.apache.lucene.analysis.charfilter.BaseCharFilter;
  */
 public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareReader {
 
-  /** Set of tags that we want to strip from the XML, currently this is mostly for HTML elements
-   *  that can occur without a closing tag and without the self-closing form. */
+  /**
+   * Set of tags that we want to strip from the XML, currently this is mostly for HTML elements that
+   * can occur without a closing tag and without the self-closing form.
+   */
   private static final Set<String> STRIP_TAGS = ImmutableSet.of("br");
+
   private final Deque<char[]> elementStack = new ArrayDeque<>();
   private char[] carryOver = null;
   private int carryOverIdx = -1;
@@ -39,6 +42,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
   private char[] closingTagsTrailer = null;
   /** Tracks how much of the trailer has already been written during previous `read` calls. */
   private int closingTagsTrailerIdx = -1;
+
   private boolean hasDocType = false;
   private final boolean advancedFixing;
 
@@ -252,9 +256,10 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
 
       // There might not be enough room in the output buffer for the whole trailer, so we keep track
       // of how much we've been able to write and continue from there for the next `read` call.
-      int toRead = Math.min(len - Math.max(0, numRead), closingTagsTrailer.length - closingTagsTrailerIdx);
-      System.arraycopy(this.closingTagsTrailer,
-          closingTagsTrailerIdx, cbuf, off + Math.max(0, numRead), toRead);
+      int toRead =
+          Math.min(len - Math.max(0, numRead), closingTagsTrailer.length - closingTagsTrailerIdx);
+      System.arraycopy(
+          this.closingTagsTrailer, closingTagsTrailerIdx, cbuf, off + Math.max(0, numRead), toRead);
       this.closingTagsTrailerIdx += toRead;
       if (numRead < 0) {
         numRead = 0;
