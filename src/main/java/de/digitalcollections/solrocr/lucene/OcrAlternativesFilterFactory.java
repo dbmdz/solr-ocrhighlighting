@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenFilterFactory;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * increasing this value to 512 or 1024 in the config will fix this, at the expense of an increase
  * in memory usage during indexing.
  *
- * <p><strong>You cannot use the {@link org.apache.lucene.analysis.standard.ClassicTokenizer} with
+ * <p><strong>You cannot use the {@link org.apache.lucene.analysis.classic.ClassicTokenizer} with
  * this filter</strong>, since it splits tokens on the U+2060 (Word Joiner) codepoint, contrary to
  * Unicode rules. Please use one of the newer, unicode-compliant tokenizers like {@link
  * org.apache.lucene.analysis.standard.StandardTokenizer}.

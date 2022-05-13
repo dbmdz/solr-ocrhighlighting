@@ -93,7 +93,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
     assertQ(
         req,
         "count(//lst[@name='highlighting']/lst[@name='1337']/arr[@name='some_text']/str)=1",
-        ".//arr[@name='some_text']/str/text()=' aliquip ex ea <em>commodo</em> consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum'",
+        ".//arr[@name='some_text']/str/text()='Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea <em>commodo</em> consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. '",
         "count(//lst[@name='ocrHighlighting']/lst[@name='31337']/lst[@name='ocr_text']/arr/lst)=3");
   }
 

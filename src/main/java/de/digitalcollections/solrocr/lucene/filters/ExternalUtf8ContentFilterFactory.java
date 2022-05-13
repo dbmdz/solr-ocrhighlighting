@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.apache.lucene.analysis.util.CharFilterFactory;
+import org.apache.lucene.analysis.CharFilterFactory;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
 
