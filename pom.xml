@@ -56,7 +56,7 @@
     <version.junit>5.8.2</version.junit>
     <version.mockito>4.5.1</version.mockito>
     <version.slf4j>1.7.36</version.slf4j>
-    <version.solr>8.11.1</version.solr>
+    <version.solr>9.0.0</version.solr>
     <!-- DO NOT UPDATE THIS, this is the latest version that works with Java 8 -->
     <version.fmt-maven-plugin>2.9.1</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
@@ -74,9 +74,34 @@
       <version>${version.commons-text}</version>
     </dependency>
     <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <version>${version.solr}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-highlighter</artifactId>
+      <version>${version.solr}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-analysis-common</artifactId>
+      <version>${version.solr}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+      <version>6.2.8</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>31.1-jre</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -189,6 +214,9 @@
             <includes>
               <include>de.digitalcollections:solr-ocr-plugin</include>
               <include>org.apache.commons:commons-text</include>
+              <include>commons-io:commons-io</include>
+              <include>com.fasterxml.woodstox:woodstox-core</include>
+              <include>com.google.guava:guava</include>
             </includes>
           </artifactSet>
         </configuration>

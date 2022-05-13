@@ -8,7 +8,7 @@ import de.digitalcollections.solrocr.model.OcrFormat;
 import de.digitalcollections.solrocr.reader.PeekingReader;
 import java.io.Reader;
 import java.util.Map;
-import org.apache.lucene.analysis.util.CharFilterFactory;
+import org.apache.lucene.analysis.CharFilterFactory;
 
 /**
  * A CharFilterFactory that detects the OCR format from the input and creates the correct CharFilter

@@ -106,9 +106,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
   public static final String PARTIAL_OCR_HIGHLIGHTS = "partialOcrHighlights";
 
   private static final boolean VERSION_IS_PRE81 =
-      Version.LATEST.major < 8 || Version.LATEST.minor < 1;
+      Version.LATEST.major < 8 || (Version.LATEST.major == 8 && Version.LATEST.minor < 1);
   private static final boolean VERSION_IS_PRE82 =
-      Version.LATEST.major < 8 || Version.LATEST.minor < 2;
+      VERSION_IS_PRE81 || (Version.LATEST.major == 8 && Version.LATEST.minor < 2);
   private static final boolean VERSION_IS_PRE84 =
       VERSION_IS_PRE82 || (Version.LATEST.major == 8 && Version.LATEST.minor < 4);
   private static final boolean VERSION_IS_PRE89 =
