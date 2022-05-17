@@ -83,7 +83,7 @@ def index_documents(solr_port, docs):
 
 def run_query(solr_port, query):
     req = request.Request(
-        'http://{}:{}/solr/ocr/select?fl=id&hl=on&hl.ocr.fl=ocr_text&hl.weightMatches=true&q=ocr_text:"{}"'.format(
+        'http://{}:{}/solr/ocr/select?fl=id&hl=on&hl.fl=id&hl.ocr.fl=ocr_text&hl.weightMatches=true&q=ocr_text:"{}"'.format(
             SOLR_HOST, solr_port, quote(query)
         )
     )

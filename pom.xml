@@ -212,7 +212,7 @@
           </filters>
           <artifactSet>
             <includes>
-              <include>de.digitalcollections:solr-ocr-plugin</include>
+              <include>de.digitalcollections:solr-ocrhighlighting</include>
               <include>org.apache.commons:commons-text</include>
               <include>commons-io:commons-io</include>
               <include>com.fasterxml.woodstox:woodstox-core</include>
