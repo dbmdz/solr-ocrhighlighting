@@ -1,0 +1,18 @@
+<config>
+  <luceneMatchVersion>9.0</luceneMatchVersion>
+  <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
+  <schemaFactory class="ClassicIndexSchemaFactory"/>
+
+  <lib dir="/var/solr/data/plugins" regex=".*\.jar" />
+
+  <searchComponent class="de.digitalcollections.solrocr.solr.OcrHighlightComponent"
+                   name="ocrHighlight" />
+
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <arr name="components">
+      <str>query</str>
+      <str>ocrHighlight</str>
+      <str>highlight</str>
+    </arr>
+  </requestHandler>
+</config>

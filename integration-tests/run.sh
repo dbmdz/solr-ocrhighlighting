@@ -4,13 +4,21 @@ SOLR_HOST="${SOLR_HOST:-localhost}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SOLR7_VERSIONS="7.7 7.6 7.5"
 SOLR8_VERSIONS="8.11 8.10 8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0"
-SOLR9_VERSIONS="9.0.0"
+SOLR9_VERSIONS="9.0"
 SOLR78_PLUGIN_PATH=/tmp/solrocr-solr78
 
 wait_for_solr() {
-    while [[ "$(curl -s -o /dev/null http://$SOLR_HOST:31337/solr/ocr/select -w '%{http_code}')" != "200" ]]; do
+    status="404"
+    while [[ "$status" != "200" ]]; do
+        set +e
+        status="$(curl -s -o /dev/null http://$SOLR_HOST:31337/solr/ocr/select -w '%{http_code}')"
+        if [[ "$status" == "500" ]]; then
+            docker logs $1
+            exit 1
+        fi
         sleep 3;
     done
+    set -e
 }
 
 create_solr78_jar() {
@@ -43,7 +51,7 @@ for version in $SOLR9_VERSIONS; do
         -p "31337:8983" \
         solr:$version \
         solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
-    wait_for_solr
+    wait_for_solr "$container_name"
     if ! python3 test.py; then
         printf " !!!FAIL!!!\n"
         docker logs
@@ -68,7 +76,7 @@ for version in $SOLR8_VERSIONS; do
         -p "31337:8983" \
         solr:$version \
         solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
-    wait_for_solr
+    wait_for_solr "$container_name"
     if ! python3 test.py; then
         printf " !!!FAIL!!!\n"
         docker logs
@@ -92,7 +100,7 @@ for version in $SOLR7_VERSIONS; do
         -p "31337:8983" \
         solr:$version \
         solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
-    wait_for_solr
+    wait_for_solr "$container_name"
     if ! python3 test.py; then
         printf " !!!FAIL!!!\n"
         docker logs
