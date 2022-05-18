@@ -51,14 +51,14 @@ PACKAGE_SUBS = [
 
 def patch_package_paths(bytecode: bytes) -> bytes:
     """With Solr and Lucene 9, package paths have changed, modify
-    the class file so they point to the old locations insteaad.
+    the class file so they point to the old locations instead.
     """
     for src, target in PACKAGE_SUBS:
         if src not in bytecode:
             continue
         idx = bytecode.index(src)
 
-        # Check if we're in the constat pool, i.e. our value is
+        # Check if we're in the constant pool, i.e. our value is
         # preceded by a big-endian short with the length of our value
         length_idx = idx - 2
         length = struct.unpack_from(">H", bytecode, length_idx)[0]
@@ -144,9 +144,6 @@ if __name__ == "__main__":
         sys.exit(1)
     if len(sys.argv) == 3:
         target_path = Path(sys.argv[2])
-        if not source_path.exists():
-            print(f"File at {source_path} does not exist!")
-            sys.exit(1)
         with target_path.open("wb") as fp:
             patch_jar(source_path, fp)
     else:
