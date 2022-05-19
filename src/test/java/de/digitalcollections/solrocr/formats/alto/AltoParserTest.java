@@ -186,4 +186,38 @@ public class AltoParserTest {
     assertThat(boxes).isEmpty();
     assertThat(OcrParser.boxesToString(boxes)).isEmpty();
   }
+
+  /**
+   * 
+   * ALTO from OCR-D Workflow transformed via https://pypi.org/project/ocrd-page-to-alto/
+   * 
+   * @throws XMLStreamException
+   */
+  @Test
+  public void testParseAltoTransformedFromPage() throws XMLStreamException {
+    // arrange
+    Path p = Paths.get("src/test/resources/data/alto_ocrd_from_page_00000006.xml");
+    CharFilter input = (CharFilter) filterFac.create(new StringReader(p.toString()));
+    OcrParser parser = new AltoParser(input);
+  
+    // act
+    List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
+  
+    // assert
+    assertThat(boxes).hasSize(104);
+
+    assertThat(boxes.get(0).getPage().id).isEqualTo("p00000006");
+    assertThat(boxes.get(0).getPage().dimensions)
+        .hasFieldOrPropertyWithValue("width", 2127.0)
+        .hasFieldOrPropertyWithValue("height", 2761.0);
+    
+    OcrBox word_kindern = boxes.get(14);
+    assertThat(word_kindern.getText()).isEqualTo("Kindern");
+    assertThat(input.correctOffset(word_kindern.getTextOffset())).isEqualTo(14728);
+    assertThat(word_kindern)
+        .hasFieldOrPropertyWithValue("ulx", 877.0f)
+        .hasFieldOrPropertyWithValue("uly", 2202.0f)
+        .hasFieldOrPropertyWithValue("lrx", 1053.0f)
+        .hasFieldOrPropertyWithValue("lry", 2258.0f);
+  }
 }
