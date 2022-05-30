@@ -24,7 +24,7 @@ First, you need to enable alternative expansion in the `OcrCharFilterFactory` by
 
 ```xml
 <charFilter
-   class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory"
+   class="solrocr.OcrCharFilterFactory"
    expandAlternatives="true"
 />
 ```
@@ -36,7 +36,7 @@ chain. This component must to be placed **after the tokenizer**:
 <fieldType name="text_ocr" class="solr.TextField">
   <!-- .... -->
   <tokenizer class="solr.StandardTokenizerFactory"/>
-  <filter class="de.digitalcollections.solrocr.lucene.OcrAlternativesFilterFactory"/>
+  <filter class="solrocr.OcrAlternativesFilterFactory"/>
   <!-- .... -->
 </fieldType>
 ```
@@ -46,13 +46,13 @@ A full field definition for an OCR field with alternative expansion could look l
 ```xml
 <fieldType name="text_ocr" class="solr.TextField">
   <analyzer type="index">
-    <charFilter class="de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory"/>
+    <charFilter class="solrocr.ExternalUtf8ContentFilterFactory"/>
     <charFilter
-      class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory"
+      class="solrocr.OcrCharFilterFactory"
       expandAlternatives="true"
     />
     <tokenizer class="solr.StandardTokenizerFactory"/>
-    <filter class="de.digitalcollections.solrocr.lucene.OcrAlternativesFilterFactory"/<
+    <filter class="solrocr.OcrAlternativesFilterFactory"/<
     <filter class="solr.LowerCaseFilterFactory"/>
   </analyzer>
   <analyzer type="query">
