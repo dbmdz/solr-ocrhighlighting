@@ -5,11 +5,12 @@ Why didn't we use ByteBuddy or at least ASM for this? Well, blame Maven.
 Building two JARs from one pom without a ton of ceremony seems to be
 out of scope for it, so this manual approach was chosen instead.
 """
+import os
 import struct
 import sys
 import zipfile
 from pathlib import Path
-from typing import BinaryIO
+from typing import BinaryIO, Callable, Dict, Union
 
 
 def _get_utf8_size(entry: bytes) -> int:
@@ -20,7 +21,7 @@ def _get_utf8_size(entry: bytes) -> int:
 
 #: Mapping from tags used in the constant pool to the size their
 #: associated information takes up in the pool
-CONSTANT_POOL_SIZES = {
+CONSTANT_POOL_SIZES: Dict[int, Union[int, Callable[[bytes], int]]] = {
     7: 3,  # classinfo(u1 tag, u2 name_idx),
     9: 5,  # fieldref(u1 tag, u2 class_idx, u2 name_and_type_idx)
     10: 5,  # methodref(u1 tag, u2 class_idx, u2 name_and_type_idx)
@@ -95,16 +96,17 @@ def patch_close_hook(bytecode: bytes) -> bytes:
             if buf[target_idx] == 7:  # reference to java.lang.Object
                 buf[target_idx] = 8  # change to CloseHook
         # Update the constant pool size
-        if isinstance(CONSTANT_POOL_SIZES[tag], int):
-            constant_pool_size += CONSTANT_POOL_SIZES[tag]
+        pool_size = CONSTANT_POOL_SIZES[tag]
+        if isinstance(pool_size, int):
+            constant_pool_size += pool_size
         else:
-            constant_pool_size += CONSTANT_POOL_SIZES[tag](
+            constant_pool_size += pool_size(
                 buf[constant_pool_start + constant_pool_size :]
             )
     after_pool_idx = constant_pool_start + constant_pool_size
     iface_count = struct.unpack_from(">H", buf, after_pool_idx + 6)[0]
     if iface_count != 1:
-        return bytes
+        return bytes(buf)
 
     # Start of interface pointers
     ifaces_idx = after_pool_idx + 8
@@ -133,18 +135,34 @@ def patch_jar(source_path: Path, target: BinaryIO) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    if len(sys.argv) == 1:
+        build_path = Path(__file__).parent / "../target"
+        source_path = next(
+            p
+            for p in build_path.iterdir()
+            if p.name.endswith(".jar")
+            and p.name.startswith("solr-ocrhighlighting")
+            and not p.stem.split("-")[-1] in ("javadoc", "sources", "solr78")
+        ).resolve()
+    elif sys.argv[1] in ("-h", "--help"):
         print(__doc__)
         print("Usage:")
-        print("$ patch_solr78_bytecode.py <source_jar> [<target_jar>]", file=sys.stderr)
+        print(
+            "$ patch_solr78_bytecode.py [<source_jar>] [<target_jar>]", file=sys.stderr
+        )
         sys.exit(1)
-    source_path = Path(sys.argv[1])
+    else:
+        source_path = Path(sys.argv[1])
     if not source_path.exists():
         print(f"File at {source_path} does not exist!")
         sys.exit(1)
     if len(sys.argv) == 3:
         target_path = Path(sys.argv[2])
-        with target_path.open("wb") as fp:
-            patch_jar(source_path, fp)
     else:
-        patch_jar(source_path, sys.stdout.buffer)
+        target_path = (source_path.parent / f"{source_path.stem}-solr78.jar").resolve()
+
+    print(
+        f"Patching '{source_path.relative_to(os.getcwd())}', writing output to '{target_path.relative_to(os.getcwd())}'"
+    )
+    with target_path.open("wb") as fp:
+        patch_jar(source_path, fp)
