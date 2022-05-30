@@ -21,13 +21,6 @@ wait_for_solr() {
     set -e
 }
 
-create_solr78_jar() {
-    solr9_jar="$(ls ../target/*.jar |egrep -v '(javadoc|sources|original)' |head -n 1)"
-    solr78_jar=$SOLR78_PLUGIN_PATH/$(basename $solr9_jar)
-    mkdir -p $SOLR78_PLUGIN_PATH
-    python3 ../util/patch_solr78_bytecode.py $solr9_jar $solr78_jar
-}
-
 # Make sure we're in the test directory
 cd $SCRIPT_DIR
 
@@ -36,21 +29,28 @@ if [ ! -d "../target" ]; then
     exit 1
 fi
 
-create_solr78_jar
+solr9_jar="$(ls ../target/*.jar |egrep -v '(javadoc|original|source|solr78)')"
+solr78_jar="$(ls ../target/*.jar |egrep 'solr78.jar')"
+if [ -z "$solr78_jar" ]; then
+    echo "No solr78 jar found in ../target, please run 'util/patch_solr78_bytecode.py' in the parent directory first!"
+    exit 1
+fi
 
+plugin_dir="$(mktemp -d)"
+cp $solr9_jar "$plugin_dir"
 for version in $SOLR9_VERSIONS; do
     printf "Testing $version: "
     container_name="ocrhltest-$version"
     docker run \
-        --name "$container_name" \
-        -e SOLR_LOG_LEVEL=ERROR \
-        -v "$(pwd)/solr/install-plugin.sh:/docker-entrypoint-initdb.d/install-plugin.sh" \
-        -v "$(pwd)/solr/core/v9:/opt/core-config" \
-        -v "$(pwd)/data:/ocr-data" \
-        -v "$(realpath ..)/target:/build" \
-        -p "31337:8983" \
-        solr:$version \
-        solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
+    --name "$container_name" \
+    -e SOLR_LOG_LEVEL=ERROR \
+    -v "$(pwd)/solr/install-plugin.sh:/docker-entrypoint-initdb.d/install-plugin.sh" \
+    -v "$(pwd)/solr/core/v9:/opt/core-config" \
+    -v "$(pwd)/data:/ocr-data" \
+    -v "$plugin_dir:/build" \
+    -p "31337:8983" \
+    solr:$version \
+    solr-precreate ocr /opt/core-config & > /dev/null 2>&1 & \
     wait_for_solr "$container_name"
     if ! python3 test.py; then
         printf " !!!FAIL!!!\n"
@@ -62,20 +62,22 @@ for version in $SOLR9_VERSIONS; do
     docker rm "$container_name" > /dev/null
 done
 
+rm -rf "$plugin_dir"/*.jar
+cp $solr78_jar "$plugin_dir"
 # Solr 8 versions, use a different plugin JAR
 for version in $SOLR8_VERSIONS; do
     printf "Testing $version: "
     container_name="ocrhltest-$version"
     docker run \
-        --name "$container_name" \
-        -e SOLR_LOG_LEVEL=ERROR \
-        -v "$(pwd)/solr/install-plugin.sh:/docker-entrypoint-initdb.d/install-plugin.sh" \
-        -v "$(pwd)/solr/core/v8:/opt/core-config" \
-        -v "$(pwd)/data:/ocr-data" \
-        -v "$SOLR78_PLUGIN_PATH:/build" \
-        -p "31337:8983" \
-        solr:$version \
-        solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
+    --name "$container_name" \
+    -e SOLR_LOG_LEVEL=ERROR \
+    -v "$(pwd)/solr/install-plugin.sh:/docker-entrypoint-initdb.d/install-plugin.sh" \
+    -v "$(pwd)/solr/core/v8:/opt/core-config" \
+    -v "$(pwd)/data:/ocr-data" \
+    -v "$plugin_dir:/build" \
+    -p "31337:8983" \
+    solr:$version \
+    solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
     wait_for_solr "$container_name"
     if ! python3 test.py; then
         printf " !!!FAIL!!!\n"
@@ -91,15 +93,15 @@ done
 for version in $SOLR7_VERSIONS; do
     printf "Testing $version: "
     docker run \
-        --name "ocrhltest-$version" \
-        -e SOLR_LOG_LEVEL=ERROR \
-        -v "$(pwd)/solr/install-plugin-v7.sh:/docker-entrypoint-initdb.d/install-plugin-v7.sh" \
-        -v "$(pwd)/solr/core/v7:/opt/core-config" \
-        -v "$(pwd)/data:/ocr-data" \
-        -v "$SOLR78_PLUGIN_PATH:/build" \
-        -p "31337:8983" \
-        solr:$version \
-        solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
+    --name "ocrhltest-$version" \
+    -e SOLR_LOG_LEVEL=ERROR \
+    -v "$(pwd)/solr/install-plugin-v7.sh:/docker-entrypoint-initdb.d/install-plugin-v7.sh" \
+    -v "$(pwd)/solr/core/v7:/opt/core-config" \
+    -v "$(pwd)/data:/ocr-data" \
+    -v "$plugin_dir:/build" \
+    -p "31337:8983" \
+    solr:$version \
+    solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
     wait_for_solr "$container_name"
     if ! python3 test.py; then
         printf " !!!FAIL!!!\n"
@@ -114,3 +116,4 @@ done
 rm -rf /tmp/solrocr-solr78
 
 echo "INTEGRATION TESTS SUCCEEDED"
+rm -rf "$plugin_dir"
