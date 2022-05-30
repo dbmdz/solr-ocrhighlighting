@@ -1,10 +1,10 @@
 <schema name="coordinateHighlight" version="1.0">
   <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
-    <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
+    <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true">
       <analyzer type="index">
-        <charFilter class="de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory" />
-        <charFilter class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory" />
+        <charFilter class="solrocr.ExternalUtf8ContentFilterFactory" />
+        <charFilter class="solrocr.OcrCharFilterFactory" />
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>
