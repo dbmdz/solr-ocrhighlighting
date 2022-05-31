@@ -1,26 +1,20 @@
 version: '2'
 services:
   solr:
-    image: solr:8.7
+    image: solr:9.0
     ports:
       - "1044:1044"  # Debugging port
       - "8983:8983"  # Solr admin interface
     volumes:
       - ./solr/install-plugin.sh:/docker-entrypoint-initdb.d/install-plugin.sh
       - ./solr/core:/opt/core-config
-      - index-data:/var/solr/data
+      - index-data:/var/solr
       - ./data:/data
       - ../target:/build
-      #- /opt/async-profiler:/opt/async-profiler
     environment:
       - ENABLE_REMOTE_JMX_OPTS=true
       - SOLR_HEAP=4g
       - ADDITIONAL_CMD_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:1044
-    # Needed for async profiler
-    #security_opt:
-    #  - seccomp:unconfined
-    #cap_add:
-    #  - SYS_ADMIN
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
@@ -35,7 +29,7 @@ services:
     environment:
       - CFG_SOLR_BASE=http://solr:8983/solr
       - CFG_SERVER_NAME=localhost:8181
-      - CFG_IMAGE_API_BASE=https://ocrhl.jbaiter.de/iiif/image/v2
+      - CFG_IMAGE_API_BASE=https://ocrhl.jbaiter.de/iiif/image/v3
       - CFG_GOOGLE1000_PATH=/data/google1000
       - CFG_BNL_PATH=/data/bnl_lunion
       - CFG_APP_PATH=/iiif/presentation
@@ -44,6 +38,11 @@ services:
     build: frontend
     ports:
       - "8181:80"
+    depends_on:
+      solr:
+        condition: service_started
+      iiif-prezi:
+        condition: service_started
 
 volumes:
   index-data:

@@ -2,7 +2,7 @@
 set -e
 
 RELEASE_URL="https://api.github.com/repos/dbmdz/solr-ocrhighlighting/releases/latest"
-PLUGIN_LIB_DIR="/var/solr/data/plugins"
+PLUGIN_LIB_DIR="/var/solr/plugins"
 
 wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O/tmp/jq
 chmod +x /tmp/jq

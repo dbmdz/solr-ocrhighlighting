@@ -1,9 +1,8 @@
 <config>
-  <luceneMatchVersion>7.6</luceneMatchVersion>
-  <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
-  <schemaFactory class="ClassicIndexSchemaFactory"/>
+  <luceneMatchVersion>9.0</luceneMatchVersion>
 
-  <lib dir="/var/solr/data/plugins" regex=".*\.jar" />
+  <!-- Only used when running a local development build -->
+  <lib dir="/var/solr/plugins" regex=".*\.jar" />
 
   <searchComponent class="solrocr.OcrHighlightComponent"
                    name="ocrHighlight" />
