@@ -43,7 +43,7 @@ chain. This component must to be placed **after the tokenizer**:
 
 A full field definition for an OCR field with alternative expansion could look like this:
 
-```xml
+```xml hl_lines="3 4 5 6 7 9"
 <fieldType name="text_ocr" class="solr.TextField">
   <analyzer type="index">
     <charFilter class="solrocr.ExternalUtf8ContentFilterFactory"/>

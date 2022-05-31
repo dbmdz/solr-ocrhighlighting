@@ -1,10 +1,10 @@
 # Indexing OCR documents
 
-**If you want to store the OCR in the index itself** you can skip this section: Just put the OCR
-content in the field and submit it to Solr for indexing. We recommend using the space-efficient
-[MiniOCR format](./formats.md#miniocr) if you decide to go this way.
+!!! note "If you want to store the OCR in the index itself you can all but _skip this section_"
+    Just put the OCR content in the field and submit it to Solr for indexing. We recommend using the space-efficient
+    [MiniOCR format](./formats.md#miniocr) if you decide to go this way.
 
-Indexing OCR documents without storing the actual content in the index is also relatively simple:
+Indexing OCR documents without storing the actual content in the index is relatively simple:
 When building the index document, instead of putting  the actual OCR content into the field, you use
 a **source pointer**. This pointer will tell the plugin from which location to load the OCR content
 during indexing and highlighting.
@@ -25,6 +25,8 @@ the (again, potentially very large) contents themselves in the index.
     files. This requires less CPU during decoding, since we don't have to take multi-byte sequences into
     account. To signal to the plugin that a given source path is encoded in ASCII, include the `{ascii}`
     string after the path, e.g. `/mnt/data/ocrdoc.xml{ascii}[31337:41337]`.
+
+    For even more advice on performance tuning, refer to the [corresponding documentation section](./performance.md).
 
 The structure of the source pointers depends on how your actual OCR files on disk map to documents in the Solr
 index.
@@ -111,7 +113,7 @@ The format of the regions is inspired by [Python's slicing syntax](https://docs.
 - `start:end` → Everything between the byte offsets `start` (inclusive) and `end` (exclusive)
 - `:end` → Everything from the start of the file to byte offset `end` (exclusive)
 
-!!! caution "Region Requirements""
+!!! caution "Region Requirements"
     - The concatenated content of your regions must be a half-way valid XML structure. While we
       tolerate *unclosed tags or unmatched closing tags* (they often can't be avoided), other
       errors such as partial tags (i.e. a missing `<` or `>`) will lead  to an error during indexing.

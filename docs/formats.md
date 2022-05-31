@@ -56,7 +56,7 @@ You should use this format when:
 
 - you want to store the OCR in the index (to keep the index size as low)
 - reusing the existing OCR files is not possible or practical (to keep occupied disk space low)
-- you want the best possible performance, highlighting MiniOCR is ~25% faster than ALTO and ~50% faster than hOCR
+- you want the best possible performance, highlighting MiniOCR is ~25% faster than ALTO and ~50% faster than hOCR (in an artificial benchmark that is purely CPU-bound)
 
 A basic example looks like this:
 

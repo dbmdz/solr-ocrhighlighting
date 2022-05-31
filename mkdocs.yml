@@ -1,19 +1,29 @@
 site_name: Solr OCR Highlighting Plugin
-theme: readthedocs
+#theme: readthedocs
+theme: material
 nav:
-    - Introduction: index.md
-    - Installation: installation.md
-    - Indexing: indexing.md
-    - Indexing Alternative Terms: alternatives.md
-    - Querying: query.md
-    - Example Setup: example.md
-    - Performance Tuning: performance.md
-    - Supported Formats: formats.md
-    - Change Log: changes.md
+  - Introduction: index.md
+  - Installation: installation.md
+  - Indexing: indexing.md
+  - Indexing Alternative Terms: alternatives.md
+  - Querying: query.md
+  - Example Setup: example.md
+  - Performance Tuning: performance.md
+  - Supported Formats: formats.md
+  - Change Log: changes.md
 markdown_extensions:
-    - def_list
-    - attr_list
-    - fenced_code
-    - admonition
-    - smarty
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - def_list
 repo_url: https://github.com/dbmdz/solr-ocrhighlighting/
+plugins:
+  - mike
+extra:
+  version:
+    provider: mike
