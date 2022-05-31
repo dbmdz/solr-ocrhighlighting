@@ -28,7 +28,7 @@ var PARAMS = {
   "hl.ocr.fl": "ocr_text",
 };
 var BNL_10MM_TO_PIX_FACTOR = 300 / 254;
-var IMAGE_API_BASE = "https://ocrhl.jbaiter.de/iiif/image/v2";
+var IMAGE_API_BASE = "https://ocrhl.jbaiter.de/iiif/image/v3";
 if (typeof window !== "undefined") {
   var APP_BASE = `${window.location.protocol || "http:"}//${
     window.location.host
@@ -204,7 +204,7 @@ class NewspaperResultDocument extends Component {
     const w = parseInt(BNL_10MM_TO_PIX_FACTOR * (region.lrx - region.ulx));
     const h = parseInt(BNL_10MM_TO_PIX_FACTOR * (region.lry - region.uly));
     const regionStr = `${x},${y},${w},${h}`;
-    const widthStr = width ? `${width},` : "full";
+    const widthStr = width ? `${width},` : "max";
     return `${IMAGE_API_BASE}/bnl:${issueId}_${pageNo}/${regionStr}/${widthStr}/0/default.jpg`;
   }
 
@@ -280,7 +280,7 @@ class GoogleResultDocument extends Component {
     const regionStr = `${region.ulx},${region.uly},${region.lrx - region.ulx},${
       region.lry - region.uly
     }`;
-    const widthStr = width ? `${width},` : "full";
+    const widthStr = width ? `${width},` : "max";
     return `${IMAGE_API_BASE}/gbooks:${volId}_${pageId}/${regionStr}/${widthStr}/0/default.jpg`;
   }
 

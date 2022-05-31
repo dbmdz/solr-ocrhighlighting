@@ -179,14 +179,17 @@ def bnl_load_documents(base_path):
             tf = tarfile.open(fileobj=resp, mode='r|gz')
             last_vol = None
             for ti in tf:
-                if ti.isdir() and '/' not in ti.name:
+                sanitized_name = re.sub(r'^\./?', '', ti.name)
+                if not sanitized_name:
+                    continue
+                if ti.isdir() and '/' not in sanitized_name:
                     if last_vol is not None:
                         vol_path = base_path / last_vol
                         mets_path = next(iter(vol_path.glob("*-mets.xml")))
                         vol_id = last_vol.replace("newspaper_lunion_", "")
                         yield from bnl_extract_article_docs(
                             vol_id, mets_path, vol_path / 'text')
-                    last_vol = ti.name
+                    last_vol = sanitized_name
                 if ti.isdir():
                     (base_path / ti.name).mkdir(parents=True, exist_ok=True)
                 else:

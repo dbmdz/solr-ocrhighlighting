@@ -1,11 +1,12 @@
-FROM node:alpine as builder
+FROM node:14-alpine as builder
 
 COPY . /build
 
 RUN apk add git &&\
     cd /build &&\
     npm install &&\
-    npm run build
+    npm run build &&\
+    rm -rf build/sw.js
 
 FROM nginx:alpine
 
