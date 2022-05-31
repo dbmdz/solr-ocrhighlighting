@@ -38,6 +38,7 @@ fi
 
 plugin_dir="$(mktemp -d)"
 cp $solr9_jar "$plugin_dir"
+chmod -R a+rwx "$plugin_dir"
 for version in $SOLR9_VERSIONS; do
     printf "Testing $version: "
     container_name="ocrhltest-$version"
