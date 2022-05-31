@@ -30,8 +30,8 @@ Important factors include:
 - *Number of possible parallel reads* (see below): Does the storage layer support more than one active reader?
 
 Generally speaking, local storage is better than remote storage (like NFS or CIFS), due to the network latency, and
-flash-based storage is better than disk-based storage, due to the lower random read latency. A RAID setup is
-preferred over a JBOD setup, due to the potential for parallel reads.
+flash-based storage is better than disk-based storage, due to the lower random read latency and the possibility to
+do parallel reads. A RAID1/10 setup is preferred over a RAID0/JBOD setup, due to the increased potential for parallel reads.
 
 ## Plugin configuration
 The plugin offers the possibility to perform a **concurrent read-ahead of highlighting target files**. This will perform
@@ -56,8 +56,11 @@ of reads from either the `qtp...` or `solr-ocrhlighight` threads on  the second 
 
 Example configuration tuned for remote NFS storage mounted with `rsize=65536`:
 ```xml
-<searchComponent class="de.digitalcollections.solrocr.solr.OcrHighlightComponent"
-                 name="ocrHighlight" enablePreload="true" preloadReadSize="65536" preloadConcurrency="8"/>
+<searchComponent
+  class="solrocr.OcrHighlightComponent"
+  name="ocrHighlight" enablePreload="true" preloadReadSize="65536"
+  preloadConcurrency="8"
+/>
 ```
 
 

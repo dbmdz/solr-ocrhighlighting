@@ -1,16 +1,67 @@
+## 0.8.0 (2022-05-??)
+The major improvement in this version is compatibility with Solr 9.
+
+Due to a number of API changes in Solr and Lucene, we now have to ship two separate releases,
+one for Solr 7 and 8 and one for Solr 9, so please take extra care when downloading to pick
+the correct release. In the Package Repository, the Solr 7/8 release will always have version
+with the suffix `-solr78`.
+
+We also **changed the package namespaces** for all user-facing components so they are easier
+to identify and write. What this means is that you will need to change the `class="..."`
+attributes in your  `solrconfig.xml` and `schema.xml` to match the new package namespaces.
+Whenever you previously had `de.digitalcollections.solrocr.<other stuff>.ClassName`, you
+now have to simply write `solrocr.ClassName`.
+
+**New Features:**
+
+- For users running Solr in the Solrcloud mode, the plugin can now be installed via Solr's
+  [Package Manager](https://solr.apache.org/guide/solr/latest/configuration-guide/package-manager.html):
+  ```
+  $ bin/solr package add-repo dbmdz.github.io https://dbmdz.github.io/solr
+  $ bin/solr package install ocrhighlighting  # For Solr 9
+  $ bin/solr package install ocrhighlighting:0.8.0-solr78  # For Solr 7 and 8
+  ```
+  Note that Solr 7/8 users need to manually specify the version.
+
+**API changes:**
+
+- Changed deployment process to use two separate packages, one for Solr 9 and later and one for Solr 7/8, with a `-solr78.jar` suffix
+- Changed namespace of all user-facing components to simply `solrocr` and moved all
+  user-facing component classes to it:
+    * `de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory`<br>
+      → `solrocr.OcrCharFilterFactory`
+    * `de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory`<br>
+      → `solrocr.ExternalUtf8ContentFilterFactory`
+    * `de.digitalcollections.solrocr.lucene.OcrAlternativesFilterFactory`<br>
+      → `solrocr.OcrAlternativesFilterFactory`
+    * `de.digitalcollections.solrocr.lucene.OcrHighlightComponent`<br>
+      → `solrocr.OcrHighlightComponent`
+
+**Bugfixes**
+
+- Fix handling of quoted property values in hOCR title tags. We deviate a bit from the spec
+  to be more compatible with existing real-world data: Values like `x_source` can now either
+  be quoted in single- or double-quotes, or not at all, the parser will handle every case.
+
 ## 0.7.2 (2022-03-22)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.2)
+
 And yet another bugfix release.
 
 **Bugfixes:**
+
 - Fixed using single-quotes in MiniOCR input, previously these files were not recognized as valid MiniOCR files
   ([#247](https://github.com/dbmdz/solr-ocrhighlighting/pull/247), thanks @mspalti for the fix!)
 - Fixed `OutOfBoundsException` when using alternatives with very long tokens (
   [#230](https://github.com/dbmdz/solr-ocrhighlighting/pull/230), thanks @fd17 for the report and review)
 
 ## 0.7.1 (2021-09-24)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.1)
+
 Another bugfix release, upgrading is recommended.
 
 **Bugfixes:**
+
 - Fix text display and "number of snippets" slider in demo setup
 - Fix instances where we were using Java SDK methods that relied on a default locale, which led to
   hard-to-debug issues in some locales
@@ -20,6 +71,8 @@ Another bugfix release, upgrading is recommended.
 - Fix issue with namespaced ALTO documents
 
 ## 0.7.0 (2021-07-12)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.0)
+
 This is a bugfix release, especially users with ALTO files are encouraged to upgrade. Other than
 bugfixes, this is the first release to support Solr 8.9.
 
@@ -30,6 +83,8 @@ bugfixes, this is the first release to support Solr 8.9.
 - Fix issue when an hOCR file had empty OCR boxes
 
 ## 0.6.0 (2021-05-11)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.6.0)
+
 This is a major new release with significant improvements in stability, accuracy and most importantly performance.
 Updating is **highly** recommended, especially for ALTO users, who can expect a speed-up in indexing of up to
 **6000% (i.e. 60x as fast)**. We also recommend updating your JVM to at least Java 11 (LTS), since Java 9 introduced
@@ -77,6 +132,7 @@ significantly.
 
 
 **API changes:**
+
 - **No more need for an explicit `hl.fl` parameter for highlighting non-OCR fields.** By default,
   if highlighting is enabled and  no `hl.fl` parameter is passed by the user, Solr falls back to
   highlighting every stored field  in the document. Previously this did not work with the plugin and
@@ -93,6 +149,7 @@ significantly.
     See the above section unter *New Features* for an explanation of this flag.
 
 **Bugfixes:**
+
 - **Improved tolerance for incomplete bounding boxes.** Previously the occurrence of an incomplete
   bounding box in a snippet (i.e. with one or more missing coordinates) would crash the whole query.
   We now simply insert a `0` default value in these cases.
@@ -103,9 +160,12 @@ significantly.
   the OCR parsers would try to either load a file from the empty string or parse OCR markup from it.
 
 ## 0.5.0 (2020-10-07)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.5.0)
+
 No breaking changes this time around, but a few essential bugfixes, more stability and a new feature.
 
 **API changes:**
+
 - **Snippets are now sorted by their descending score/relevancy.** Previously the order was non-deterministic, which
   broke the use case for dynamically fetching more snippets.
 - **Add a new boolean `hl.ocr.alignSpans` parameter to align text and image spans.** This new option (disabled by
@@ -113,6 +173,7 @@ No breaking changes this time around, but a few essential bugfixes, more stabili
   to correspond to actual OCR word boundaries.
 
 **Bugfixes:**
+
 - **Fix regular highlighting in distributed setup.** Regular, non-OCR highlighting was broken in previous versions due
   to a bad check in the shard response collection phase if users only requested regular highlighting, but not for OCR
   fields
@@ -125,9 +186,12 @@ No breaking changes this time around, but a few essential bugfixes, more stabili
 
 
 ## 0.4.1 (2020-06-02)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.4.1)
+
 This is a patch release with a fix for excessive memory usage during indexing.
 
 ## 0.4.0 (2020-05-11)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.4.0)
 
 This is a major release with a focus on compatibility and performance.
 
@@ -136,6 +200,7 @@ This is a major release with a focus on compatibility and performance.
  the future.
 
 **Breaking API changes:**
+
 - **Add new `pages` key to snippet response with page dimensions**. This can be helpful if you need to calculate
   the snippet coordinates relative to the page image dimensions.
 - **Replace `page` key on regions and highlights with `pageIdx`**. That is, instead of a string with the
@@ -146,11 +211,13 @@ This is a major release with a focus on compatibility and performance.
   disjunct parts of the page or even multiple pages.
 
 **Format changes:**
+
 - hocr: Add support for retrieving page identifier from `x_source` an `ppageno` properties
 - hocr: Strip out title tag during indexing and highlighting
 - ALTO: The plugin now supports ALTO files with coordinates expressed as floating point numbers (thanks to @mspalti!)
 
 **Performance:**
+
 - Add concurrent preloading for highlighting target files. This can result in a nice performance boost, since by the
   time the plugin gets to actually highlighting the files, their contents are already in the OS' page cache. See
   the [Performance Tuning section in the docs](https://dbmdz.github.io/solr-ocrhighlighting/performance/) for more
@@ -159,12 +226,14 @@ This is a major release with a focus on compatibility and performance.
   compared to previous versions.
 
 **Miscellaneous:**
+
 - Log warnings during source pointer parsing
 - Filter out empty files during indexing
 - Add new documentation section on performance tuning
 - Empty regions or regions with only whitespace are no longer included in the output
 
 ## 0.3.1 (2019-07-26)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.3.1)
 
 This is patch release that fixes compatibility with Solr/Lucene 8.2.
 

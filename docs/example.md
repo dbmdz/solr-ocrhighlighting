@@ -44,17 +44,17 @@ To run the example setup yourself, you will need:
 ## Solr Configuration Walkthrough
 
 [`solrconfig.xml`](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/solr/cores/ocr/conf/solrconfig.xml)
-```xml
+```xml hl_lines="7 10 11 21"
 <config>
-  <luceneMatchVersion>7.6</luceneMatchVersion>
-  <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
-  <schemaFactory class="ClassicIndexSchemaFactory"/>
+  <luceneMatchVersion>9.0</luceneMatchVersion>
 
-  <!-- Load the plugin JAR from the contrib directory -->
+  <!-- Load the plugin JAR from the contrib directory.
+       NOTE: Not needed when running with Solrcloud and Package Manager.
+  -->
   <lib dir="../../../contrib/ocrsearch/lib" regex=".*\.jar" />
 
   <!-- Define a search component that takes care of OCR highlighting -->
-  <searchComponent class="de.digitalcollections.solrocr.solr.OcrHighlightComponent"
+  <searchComponent class="solrocr.OcrHighlightComponent"
                    name="ocrHighlight" />
 
   <!-- Add the OCR Highlighting component to the request handler -->
@@ -73,11 +73,14 @@ To run the example setup yourself, you will need:
 ```
 
 [`schema.xml`](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/solr/cores/ocr/conf/schema.xml)
-```xml
-<fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
+```xml hl_lines="4 5 6 7"
+<fieldtype
+    name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true">
   <analyzer type="index">
-    <charFilter class="de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory" />
-    <charFilter class="de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory" />
+    <charFilter
+      class="solrocr.ExternalUtf8ContentFilterFactory" />
+    <charFilter
+      class="solrocr.OcrCharFilterFactory" />
     <tokenizer class="solr.StandardTokenizerFactory"/>
     <filter class="solr.LowerCaseFilterFactory"/>
     <filter class="solr.StopFilterFactory"/>

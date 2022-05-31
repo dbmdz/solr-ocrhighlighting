@@ -1,4 +1,4 @@
-# Solr OCR Highlighting
+# Solr OCR Highlighting Plugin
 
 ![Highlighted OCR snippet](img/snippet.png)
 
@@ -21,8 +21,8 @@ and its position on the page at query time:
     { "ulx": 196, "uly": 1703, "lrx": 1232, "lry": 1968, "pageIdx": 0 }
   ],
   "highlights":[
-    [{ "text": "Mason and Jeremiah", "ulx": 675, "uly": 110, "lrx": 1036, "lry": 145,
-       "parentRegionIdx": 0},
+    [{ "text": "Mason and Jeremiah", "ulx": 675, "uly": 110, "lrx": 1036,
+       "lry": 145, "parentRegionIdx": 0},
      { "text": "Dixon,", "ulx": 1, "uly": 167, "lrx": 119, "lry": 204,
        "parentRegionIdx": 0 }]
   ]
@@ -41,7 +41,7 @@ does not interfere with Solr's standard highlighting component, i.e. it works
 transparently with non-OCR fields and just lets the default implementation handle
 those.
 
-The plugin **works with all Solr versions >= 7.x**.
+The plugin **works with all Solr versions >= 7.x up to 9.0**.
 
 ## Features
 - Index various [OCR formats](formats.md) directly without any pre-processing
@@ -49,7 +49,7 @@ The plugin **works with all Solr versions >= 7.x**.
     * [ALTO](formats.md#alto)
     * [MiniOCR](formats.md#miniocr)
 - Retrieve all the information needed to render a highlighted snippet view
-  directly from Solr, without post-processing
+  directly from Solr, without post-processing on the client-side
 - Keep your index size manageable by optionally re-using OCR documents on disk for
   highlighting
 
@@ -62,5 +62,5 @@ If you want to see the **plugin in action**, you can play around with the
 [example setup](example.md) hosted at [https://ocrhl.jbaiter.de](https://ocrhl.jbaiter.de)
 
 Should you want to **run the example on your own computer** and play around with the
-settings, the [Docker-based setup is available on GitHub](https://github.com/dbmdz/solr-ocrhighlighting/tree/master/example)
+settings, the [Docker-based setup is available on GitHub](https://github.com/dbmdz/solr-ocrhighlighting/tree/main/example)
 and instructions for using it are in the [Example Setup chapter](example.md)
