@@ -1,0 +1,4 @@
+mkdocs
+singledispatch
+mkdocs-material
+mike
