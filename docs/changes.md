@@ -1,4 +1,4 @@
-## 0.8.0 (2022-05-??)
+## 0.8.0 (2022-06-01)
 The major improvement in this version is compatibility with Solr 9.
 
 Due to a number of API changes in Solr and Lucene, we now have to ship two separate releases,
