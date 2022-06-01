@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Solr OCR Highlighting Plugin</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Introduction";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> Solr OCR Highlighting Plugin
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Introduction</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#features">Features</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="installation/">Installation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="indexing/">Indexing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="alternatives/">Indexing Alternative Terms</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="query/">Querying</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="example/">Example Setup</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="performance/">Performance Tuning</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="formats/">Supported Formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="changes/">Change Log</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Solr OCR Highlighting Plugin</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Introduction</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/dbmdz/solr-ocrhighlighting/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="solr-ocr-highlighting">Solr OCR Highlighting</h1>
+<p><img alt="Highlighted OCR snippet" src="img/snippet.png" /></p>
+<p>This Solr plugin lets you put word-level OCR text into one or more of you documents&rsquo;
+fields and then allows you to obtain structured highlighting data with the text
+and its position on the page at query time:</p>
+<pre><code class="language-json">{
+  &quot;text&quot;: &quot;to those parts, subject to unreasonable claims from the pro­prietor &quot;
+          &quot;of Maryland, until the year 17C2, when the whole controversy was &quot;
+          &quot;settled by Charles &lt;em&gt;Mason and Jeremiah Dixon&lt;/em&gt;, upon their &quot;
+          &quot;return from an observation of the tran­sit of Venus, at the Cape of &quot;
+          &quot;Good Hope, where they&quot;,
+  &quot;score&quot;: 5555104.5,
+  &quot;pages&quot;: [
+    { &quot;id&quot;: &quot;page_380&quot;, &quot;width&quot;:  1436, &quot;height&quot;:  2427 }
+  ],
+  &quot;regions&quot;: [
+    { &quot;ulx&quot;: 196, &quot;uly&quot;: 1703, &quot;lrx&quot;: 1232, &quot;lry&quot;: 1968, &quot;pageIdx&quot;: 0 }
+  ],
+  &quot;highlights&quot;:[
+    [{ &quot;text&quot;: &quot;Mason and Jeremiah&quot;, &quot;ulx&quot;: 675, &quot;uly&quot;: 110, &quot;lrx&quot;: 1036, &quot;lry&quot;: 145,
+       &quot;parentRegionIdx&quot;: 0},
+     { &quot;text&quot;: &quot;Dixon,&quot;, &quot;ulx&quot;: 1, &quot;uly&quot;: 167, &quot;lrx&quot;: 119, &quot;lry&quot;: 204,
+       &quot;parentRegionIdx&quot;: 0 }]
+  ]
+}
+</code></pre>
+<p>All this is done <strong>without having to store any OCR text in the index itself</strong>:
+The plugin can lazy-load only the parts required for highlighting at both index
+and query time from your original OCR input documents. </p>
+<p>It works by extending Solr&rsquo;s standard <code>UnifiedHighlighter</code> with support for
+loading external field values and determining OCR positions from those field
+values. This means that most options and query types supported by the
+<code>UnifiedHighlighter</code> are also supported for OCR highlighting. The plugin also
+does not interfere with Solr&rsquo;s standard highlighting component, i.e. it works
+transparently with non-OCR fields and just lets the default implementation handle
+those.</p>
+<p>The plugin <strong>works with all Solr versions &gt;= 7.x</strong>.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Index various <a href="formats/">OCR formats</a> directly without any pre-processing<ul>
+<li><a href="formats/#hocr">hOCR</a></li>
+<li><a href="formats/#alto">ALTO</a></li>
+<li><a href="formats/#miniocr">MiniOCR</a></li>
+</ul>
+</li>
+<li>Retrieve all the information needed to render a highlighted snippet view
+  directly from Solr, without post-processing</li>
+<li>Keep your index size manageable by optionally re-using OCR documents on disk for
+  highlighting</li>
+</ul>
+<h2 id="getting-started">Getting Started</h2>
+<p>To <strong>get started setting up</strong> OCR highlighting for your Solr server, head over to
+the <a href="installation/">Installation Instructions</a>.</p>
+<p>If you want to see the <strong>plugin in action</strong>, you can play around with the
+<a href="example/">example setup</a> hosted at <a href="https://ocrhl.jbaiter.de">https://ocrhl.jbaiter.de</a></p>
+<p>Should you want to <strong>run the example on your own computer</strong> and play around with the
+settings, the <a href="https://github.com/dbmdz/solr-ocrhighlighting/tree/master/example">Docker-based setup is available on GitHub</a>
+and instructions for using it are in the <a href="example/">Example Setup chapter</a></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="installation/" class="btn btn-neutral float-right" title="Installation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/dbmdz/solr-ocrhighlighting/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="installation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+      <script src="js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.0
+Build Date UTC : 2022-06-01 08:53:34.596430+00:00
+-->

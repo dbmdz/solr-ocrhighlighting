@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Performance Tuning - Solr OCR Highlighting Plugin</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Performance Tuning";
+        var mkdocs_page_input_path = "performance.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Solr OCR Highlighting Plugin
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../indexing/">Indexing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../alternatives/">Indexing Alternative Terms</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../query/">Querying</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../example/">Example Setup</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Performance Tuning</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#performance-analysis">Performance Analysis</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#storage-layer">Storage Layer</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#plugin-configuration">Plugin configuration</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#runtime-configuration">Runtime configuration</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../formats/">Supported Formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../changes/">Change Log</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Solr OCR Highlighting Plugin</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Performance Tuning</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/dbmdz/solr-ocrhighlighting/edit/master/docs/performance.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="performance-considerations">Performance Considerations</h1>
+<p>Highlighting based on locally stored files can take a long time, depending on the environment. This section gives some
+hints on potential knobs to tune to improve the performance.</p>
+<div class="admonition note">
+<p class="admonition-title">Use JDK &gt;= 9</p>
+<p>Java 9 introduced a feature called <a href="https://openjdk.java.net/jeps/254">String Compaction</a>
+that has a significant impact on several hot code paths used during OCR highlighting.
+<strong>You can expect a reduction in runtime of more than 50% if you use a JVM with string compaction
+enabled compared to one without</strong> (assuming you&rsquo;re running on flash storage).
+We highly recommend using the latest LTS OpenJDK version released after Java 9, which
+as of January 2021 is OpenJDK 11.</p>
+</div>
+<h2 id="performance-analysis">Performance Analysis</h2>
+<p>Before you start tuning the plugin, it is important to spend some time on analyzing the nature of the problems:</p>
+<ul>
+<li>Check Solr queries with <code>debug=timing</code>: How much of the response time is actually spent in the OCR highlighting
+  component?</li>
+<li>On the operating system level (if you&rsquo;re on a Linux system), use <a href="https://github.com/iovisor/bcc">BCC Tools</a>,
+  especially <code>{nfs/xfs/ext/...}slower</code> and <code>{nfs/xfs/ext/...}dist</code> to check if the performance issues are due to I/O
+  latency.</li>
+</ul>
+<h2 id="storage-layer">Storage Layer</h2>
+<p>The plugin spends a lot of time on randomly reading small sections of the target files from disk. This means that
+the performance characteristics of the underlying storage system have a huge effect on the performance of the plugin.</p>
+<p>Important factors include:</p>
+<ul>
+<li><em>Random Read Latency</em>: What is the time required to seek to a random location and read a small chunk?</li>
+<li><em>Number of possible parallel reads</em> (see below): Does the storage layer support more than one active reader?</li>
+</ul>
+<p>Generally speaking, local storage is better than remote storage (like NFS or CIFS), due to the network latency, and
+flash-based storage is better than disk-based storage, due to the lower random read latency. A RAID setup is
+preferred over a JBOD setup, due to the potential for parallel reads.</p>
+<h2 id="plugin-configuration">Plugin configuration</h2>
+<p>The plugin offers the possibility to perform a <strong>concurrent read-ahead of highlighting target files</strong>. This will perform
+&ldquo;dummy&rdquo; reads on multiple parallel threads, with the intent to fill the operating system&rsquo;s page cache with the contents
+of the highlighting targets, so that the actual highlighting process is performed on data read from the cache (which
+resides in main memory). This is mainly useful for storage layers that benefit from parallel reads, since the highlighting
+process is strongly sequential and performing the read-ahead concurrently can reduce latency.</p>
+<p>To enable it, add the <code>enablePreload=true</code> attribute on the OCR highlighting component in your core&rsquo;s <code>solrconfig.xml</code>.
+It is important to accompany this with benchmarking and monitoring, the available settings should be tuned to the
+environment:</p>
+<ul>
+<li><code>preloadReadSize</code>: Size in bytes of read-ahead block reads, should be aligned with file system block size
+  (or <code>rsize</code> for NFS file systems). Defaults to <code>32768</code>.</li>
+<li><code>preloadConcurrency</code>: Number of threads to perform read-ahead. Optimal settings have to be determined via
+  experimentation. Defaults to <code>8</code>.</li>
+</ul>
+<p>This approach relies on the OS-level page cache, so make sure you have enough spare RAM available on your machine to
+actually benefit from this! Use BCC&rsquo;s <code>*slower</code> tools to verify that it&rsquo;s a <code>solr-ocrhighlight</code> thread that performs
+most of the reads and not the actual query thread (<code>qtp....</code>). If you run the same query twice, you shouldn&rsquo;t see a lot
+of reads from either the <code>qtp...</code> or <code>solr-ocrhlighight</code> threads on  the second run.</p>
+<p>Example configuration tuned for remote NFS storage mounted with <code>rsize=65536</code>:</p>
+<pre><code class="language-xml">&lt;searchComponent class=&quot;de.digitalcollections.solrocr.solr.OcrHighlightComponent&quot;
+                 name=&quot;ocrHighlight&quot; enablePreload=&quot;true&quot; preloadReadSize=&quot;65536&quot; preloadConcurrency=&quot;8&quot;/&gt;
+</code></pre>
+<h2 id="runtime-configuration">Runtime configuration</h2>
+<p>Another option to influence the performance of the plugin is to tune some runtime options for highlighting.
+For any of these, refer to the <a href="https://dbmdz.github.io/solr-ocrhighlighting/query/">Querying section</a> for more details.</p>
+<ul>
+<li>If you&rsquo;re storing documents at the page-level in the index, you can set the <code>hl.ocr.trackPages</code> parameter to <code>false</code>
+  (default is <code>true</code>). This will skip seeking backward in the input from the match position to find the containing
+  page, which can be costly.</li>
+<li>Tune the number of candidate passages for ranking with <code>hl.ocr.maxPassages</code>, which defaults to <code>100</code>. Lowering this is
+  better for performance, but means that the resulting snippets might not be the most relevant in the document.</li>
+<li>Change the limit (<code>hl.ocr.limitBlock</code>) and/or context block types (<code>hl.ocr.contextBlock</code>) to something lower in the
+  block hierarchy to reduce the amount of reads in the OCR files. Another knob to tune is the number of context blocks
+  for each hit (<code>hl.ocr.contextSize</code>), with the same effect.</li>
+<li>The last resort if highlighting takes too long is to pass the <code>hl.ocr.timeAllowed</code> parameter, which stops
+  highlighting any further documents if a given timeout is exceeded.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../example/" class="btn btn-neutral float-left" title="Example Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../formats/" class="btn btn-neutral float-right" title="Supported Formats">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/dbmdz/solr-ocrhighlighting/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../example/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../formats/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Indexing - Solr OCR Highlighting Plugin</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Indexing";
+        var mkdocs_page_input_path = "indexing.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Solr OCR Highlighting Plugin
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Indexing</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#one-file-per-solr-document-11">One file per Solr document (1:1)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multiple-files-per-solr-document-n1">Multiple files per Solr document (n:1)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#advanced-one-or-more-partial-files-per-solr-document">Advanced: One or more partial files per Solr document</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../alternatives/">Indexing Alternative Terms</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../query/">Querying</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../example/">Example Setup</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../performance/">Performance Tuning</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../formats/">Supported Formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../changes/">Change Log</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Solr OCR Highlighting Plugin</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Indexing</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/dbmdz/solr-ocrhighlighting/edit/master/docs/indexing.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="indexing-ocr-documents">Indexing OCR documents</h1>
+<p><strong>If you want to store the OCR in the index itself</strong> you can skip this section: Just put the OCR
+content in the field and submit it to Solr for indexing. We recommend using the space-efficient
+<a href="../formats/#miniocr">MiniOCR format</a> if you decide to go this way.</p>
+<p>Indexing OCR documents without storing the actual content in the index is also relatively simple:
+When building the index document, instead of putting  the actual OCR content into the field, you use
+a <strong>source pointer</strong>. This pointer will tell the plugin from which location to load the OCR content
+during indexing and highlighting.</p>
+<p>The advantage of this approach is a <em>significant</em> reduction in the amount of memory required for both the client
+and the Solr server, since neither of them has to keep the (potentially very large) OCR document in memory at
+any time. The client just has a very short pointer, and the plugin will load the contents <em>lazily</em>. Additionally,
+the index size is kept comparatively small, since Solr only needs to store the locations of the contents and not
+the (again, potentially very large) contents themselves in the index.</p>
+<div class="admonition note">
+<p class="admonition-title">Performance</p>
+<p>When using external files for highlighting, the performance depends to a large degree on
+how fast the underlying storage is able to perform random I/O. This is why <strong>we highly recommend
+using flash storage for the documents</strong>.</p>
+<p>Another option to increase highlighting performance is
+to <strong>switch from UTF8 to ASCII</strong> (with XML-escaped Unicode codepoints) for the encoding of the OCR
+files. This requires less CPU during decoding, since we don&rsquo;t have to take multi-byte sequences into
+account. To signal to the plugin that a given source path is encoded in ASCII, include the <code>{ascii}</code>
+string after the path, e.g. <code>/mnt/data/ocrdoc.xml{ascii}[31337:41337]</code>.</p>
+</div>
+<p>The structure of the source pointers depends on how your actual OCR files on disk map to documents in the Solr
+index.</p>
+<div class="admonition caution">
+<p class="admonition-title">Encoding</p>
+<p>The files pointed at by the source pointers <strong>need to be UTF-8 or ASCII encoded</strong>. Other encodings will lead
+to unexpected errors and weird behaviour, so make sure the files are in the correct encoding before you
+index them.</p>
+</div>
+<h2 id="one-file-per-solr-document-11">One file per Solr document (<code>1:1</code>)</h2>
+<p>This is the simplest case: The contents of the OCR field in a Solr document correspond exactly to the contents
+of a single OCR file on disk. The source pointer is simply <strong>the path to the file</strong>:</p>
+<pre><code class="language-json">POST http://solrhost:8983/solr/corename/update
+{
+    &quot;id&quot;: &quot;ocrdoc-1&quot;,
+    &quot;ocr_text&quot;: &quot;/mnt/data/ocrdoc-1.xml&quot;
+}
+</code></pre>
+<p>That&rsquo;s it, during indexing and highlighting Solr will use the OCR file at <code>/mnt/data/ocrdoc-1.xml</code> to get the
+text for indexing and highlighting.</p>
+<h2 id="multiple-files-per-solr-document-n1">Multiple files per Solr document (<code>n:1</code>)</h2>
+<p>Frequently the OCR text for a single document (e.g. a book) is stored in one file per page in the document.
+So, if we want our search results to be these documents and not individual pages from them, we need to
+instruct the plugin to load the OCR content from multiple files.</p>
+<p>In this case, the source pointer is the <strong>list of all file paths, joined with the <code>+</code> character</strong>:</p>
+<pre><code class="language-json">POST http://solrhost:8983/solr/corename/update
+{
+    &quot;id&quot;: &quot;ocrdoc-1&quot;,
+    &quot;ocr_text&quot;: &quot;/mnt/data/ocrdoc-1_1.xml+/mnt/data/ocrdoc-1_2.xml+/mnt/data/ocrdoc-1_3.xml
+}
+</code></pre>
+<p>For indexing and highlighting, Solr will load the contents of the <code>ocrdoc-1_1.xml</code>, <code>ocrdoc-1_2.xml</code> and 
+<code>ocrdoc-1_2.xml</code> as a single continuous text.</p>
+<h2 id="advanced-one-or-more-partial-files-per-solr-document">Advanced: One or more <em>partial</em> files per Solr document</h2>
+<p>A more complicated situation arises if the Solr documents need to refer to <em>parts</em> of one or more files on
+disk. This happens for example when you have scans of bound newspaper volumes, which frequently consist
+of more than 1000 pages. For search purposes, you want to map <em>single articles</em> from issues in this newspaper
+volume to single Solr documents.</p>
+<p>If the volume OCR is stored as one file per page, these articles can span multiple files, often in a
+non-contiguous manner, so you need to refer to <em>regions</em> of these files.</p>
+<p>For these cases, the source pointer can include <strong>one or more byte regions per file</strong>:</p>
+<pre><code class="language-json">POST http://solrhost:8983/solr/corename/update
+[
+  {
+    &quot;id&quot;: &quot;article_1863-03-14_8&quot;,
+    &quot;title&quot;: &quot;Contiguous article on a single page&quot;,
+    &quot;ocr_text&quot;: &quot;/mnt/data/1863_185[216343:331347]&quot;
+  },
+  {
+    &quot;id&quot;: &quot;article_1863-03-15_12&quot;,
+    &quot;title&quot;: &quot;Article spanning from the end of one file to the first part of a second file&quot;,
+    &quot;ocr_text&quot;: &quot;/mnt/data/1863_187.xml[76306:]+/mnt/data/1863_188.xml[:196896]&quot;
+  },
+  {
+    &quot;id&quot;: &quot;article_1863-03-16_2&quot;,
+    &quot;title&quot;: &quot;Article split between two pages, with the content on the first page split by an advertisement.&quot;,
+    &quot;ocr_text&quot;: &quot;/mnt/data/1863_191.xml[1578:8937,12478:17621]+/mnt/data/1863_192.xml[837:28432]&quot;
+  }
+]
+</code></pre>
+<p>As before, we concatenate multiple file paths with the <code>+</code> character. The source regions for each file are
+listed as <strong>comma-separated byte-regions</strong> inside of square brackets.</p>
+<p>The format of the regions is inspired by <a href="https://docs.python.org/3/reference/expressions.html#slicings">Python&rsquo;s slicing syntax</a> and can take these forms:</p>
+<ul>
+<li><code>start:</code> → Everything from byte offset <code>start</code> to the end of the file</li>
+<li><code>start:end</code> → Everything between the byte offsets <code>start</code> (inclusive) and <code>end</code> (exclusive)</li>
+<li><code>:end</code> → Everything from the start of the file to byte offset <code>end</code> (exclusive)</li>
+</ul>
+<div class="admonition caution">
+<p class="admonition-title">Region Requirements&rdquo;</p>
+<ul>
+<li>The concatenated content of your regions must be a half-way valid XML structure. While we
+  tolerate <em>unclosed tags or unmatched closing tags</em> (they often can&rsquo;t be avoided), other
+  errors such as partial tags (i.e. a missing <code>&lt;</code> or <code>&gt;</code>) will lead  to an error during indexing.</li>
+<li>To get correct page numbers in your responses, make sure that you include any and all page
+  openings for your content in the set of regions. For example, if your document is an article
+  that spans from the bottom of one page to the top of the next, you will have to include a region
+  for the opening element of the first page so we can determine the page for the first part of the
+  article during highlighting</li>
+</ul>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Byte Offsets</p>
+<p>The region offsets are expected as <strong>byte offsets</strong>. Take care that the start and end of each region
+fall on the start of a valid unicode byte sequence, and not in the middle of a multi-byte sequence.
+Care needs to be taken when determining the offsets, since obtaining byte offsets for UTF8-encoded
+text files is difficult in some programming languages (most notoriously Java, use the
+<a href="https://github.com/nishihatapalmer/byteseek"><code>net.byteseek:byteseek</code></a> package)</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Example Implementation</p>
+<p>The <a href="https://github.com/dbmdz/solr-ocrhighlighting/tree/master/example">example setup on GitHub</a>
+uses a <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py">Python script</a>
+to index articles from multi-page newspaper scans into Solr. It works by <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py#L141-L147">first extracting the OCR
+block ids for each article from a METS file</a>
+and then <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py#L108-L123">finds the byte regions these OCR blocks are located in</a>
+to build the source pointer for each article.</p>
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../installation/" class="btn btn-neutral float-left" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../alternatives/" class="btn btn-neutral float-right" title="Indexing Alternative Terms">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/dbmdz/solr-ocrhighlighting/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../installation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../alternatives/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

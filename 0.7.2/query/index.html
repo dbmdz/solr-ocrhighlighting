@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Querying - Solr OCR Highlighting Plugin</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Querying";
+        var mkdocs_page_input_path = "query.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Solr OCR Highlighting Plugin
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../indexing/">Indexing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../alternatives/">Indexing Alternative Terms</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Querying</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../example/">Example Setup</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../performance/">Performance Tuning</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../formats/">Supported Formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../changes/">Change Log</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Solr OCR Highlighting Plugin</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Querying</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/dbmdz/solr-ocrhighlighting/edit/master/docs/query.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="enabling-highlighting-for-ocr-fields">Enabling Highlighting for OCR Fields</h2>
+<p>To enable highlighting, make sure you set <code>hl=true</code> in you query. Additionally, you need to pass the OCR fields that
+you want to have highlighted in the <code>hl.ocr.fl</code> parameter.</p>
+<h2 id="response-format">Response Format</h2>
+<p>With OCR highlighting enabled, your Solr response will now include a new item <code>ocrHighlighting</code>, mapping all
+highlighted OCR fields to their highlighting snippets:</p>
+<p><code>GET</code> <a href="https://ocrhl.jbaiter.de/solr/ocr/select?q=ocr_text:%22Mason%20Dixon%22~10&amp;hl=true&amp;hl.ocr.fl=ocr_text"><code>https://ocrhl.jbaiter.de/solr/ocr/select?q=ocr_text:%22Mason%20Dixon%22~10&amp;hl=true&amp;hl.ocr.fl=ocr_text</code></a></p>
+<pre><code class="language-json">{
+  &quot;responseHeader&quot;: {
+    &quot;status&quot;: 0,
+    &quot;QTime&quot;: 111,
+  },
+  &quot;response&quot;: {
+    &quot;numFound&quot;: 1,
+    &quot;start&quot;: 0,
+    &quot;docs&quot;: [{ &quot;id&quot;: &quot;doc_id&quot; }]
+  },
+  &quot;ocrHighlighting&quot;: {
+    &quot;ident&quot;: {
+      &quot;ocr_text&quot;: {
+        &quot;numTotal&quot;: 4,
+        &quot;snippets&quot;: [/* see below */]
+      }
+    }
+  }
+}
+</code></pre>
+<p>The <code>numTotal</code> key will specify how many highlighting snippets were found in the document for the query.
+How many of these are actually contained in the response under the <code>snippets</code> key depends on the value
+for the <code>hl.snippets</code> parameter, which defaults to <code>1</code>.</p>
+<p>The objects contained under the <code>snippets</code> key are structured like this:</p>
+<pre><code class="language-json">{
+  &quot;text&quot;: &quot;to those parts, subject to unreasonable claims from the proprietor &quot;
+          &quot;of Maryland, until the year 17C2, when the whole controversy was &quot;
+          &quot;settled by Charles &lt;em&gt;Mason and Jeremiah Dixon&lt;/em&gt;, upon their &quot;
+          &quot;return from an observation of the transit of Venus, at the Cape of &quot;
+          &quot;Good Hope, where they&quot;,
+  &quot;score&quot;: 5555104.5,
+  &quot;pages&quot;: [
+    { &quot;id&quot;: &quot;page_380&quot;, &quot;width&quot;: 1436, &quot;height&quot;: 2427 }
+  ],
+  &quot;regions&quot;: [
+    { &quot;ulx&quot;: 196, &quot;uly&quot;: 1703, &quot;lrx&quot;: 1232, &quot;lry&quot;: 1968, &quot;pageIdx&quot;: 0 }
+  ],
+  &quot;highlights&quot;:[
+    [{ &quot;text&quot;: &quot;Mason and Jeremiah&quot;, &quot;ulx&quot;: 675, &quot;uly&quot;: 110, &quot;lrx&quot;: 1036, &quot;lry&quot;: 145,
+       &quot;parentRegionIdx&quot;: 0},
+     { &quot;text&quot;: &quot;Dixon,&quot;, &quot;ulx&quot;: 1, &quot;uly&quot;: 167, &quot;lrx&quot;: 119, &quot;lry&quot;: 204,
+       &quot;parentRegionIdx&quot;: 0 }]
+  ]
+}
+</code></pre>
+<ul>
+<li><code>text</code> contains the plain text of the region containing one or more matches. The matches themselves are wrapped
+  in <code>&lt;em&gt;</code> tags (this can be customized with the <code>hl.tag.pre</code> and <code>hl.tag.post</code> parameters).</li>
+<li><code>score</code> contains the numerical score (relative to the whole document) that Solr assigned to the snippet</li>
+<li><code>pages</code> contains a list of pages the snippet appears on along with their pixel dimensions. This can be useful
+  for rendering highlights, e.g. if the highlighting target image is scaled down from the source image.</li>
+<li><code>regions</code> contains a list of regions that the snippet is located on. Usually this will contain only one item,
+  but in cases where a phrase spans multiple pages, it will contain a region for every page involved in the match.
+  The object includes coordinates for all four corners it is defined by, as well as the identifier of the <code>page</code> the
+  region is located on.</li>
+<li><code>highlights</code> contains a list of regions that contain the actual matches for the query as well as the <code>text</code> that
+  matched the query and the page the match occurred on. <strong>Note that the coordinates are relative to the containing
+  region, not the page</strong> (this can be changed with the <code>hl.ocr.absoluteHighlights</code> parameter). To find the
+  corresponding region for a match, use the <code>regionIdx</code> value, which refers to the index in the <code>regions</code> array that
+  the surrounding region is located at.</li>
+</ul>
+<h2 id="generation-of-snippet-regions">Generation of Snippet Regions</h2>
+<p>To determine how to build regions from a set of matches, the plugin takes into account the structure of the OCR
+document surrounding each match. Consider the following page from a document, with two matches on two adjacent
+lines.</p>
+<p><img alt="" src="../img/query_params.png" /></p>
+<p>First, the plugin will determine the <strong>context</strong> of each match, starting with the first match. For this, it searches
+for a fixed number of <strong>context blocks</strong> before and after the block it is in. The type of context block is configured
+with the <code>hl.ocr.contextBlock</code> parameter and it defaults to <code>line</code> (for a list of all possible block types, refer
+to the full list of parameters). The number of context blocks to use for the
+snippet context is set with the <code>hl.ocr.contextSize</code> parameter and defaults to <code>2</code>. So for our first match, the context
+will be the two lines above and below the line of the match.</p>
+<p>It then proceeds to the next match, which happens to be located on the next line block. If the new match is part of
+the previous match&rsquo;s context, it will be <strong>merged</strong> into the previous snippet and the snippet will be updated.
+In the example, the snippet would grow by two lines (since the context is two line blocks below the last match).</p>
+<p>However, the plugin will not expand the context beyond the limits of certain blocks. In our example, we decided that
+we don&rsquo;t want contexts to cross <strong>block</strong> elements. This <strong>limit block</strong> can be configured with the <code>hl.ocr.limitBlock</code>
+parameter and defaults to <code>block</code> (which is format-dependent, but usually refers to a group of one or more paragraphs
+). If, during context building, a block is encountered that is of this type (or an even higher level), the context
+building will be stopped. In the example, the context of the snippet is only one line below the last match, since
+this is the last line in the containing <code>block</code>. <strong>Note that you will still occasionally get snippets that span multiple
+blocks</strong>, in the case when you searched for a phrase and the phrase match crosses multiple blocks.</p>
+<h2 id="available-highlighting-parameters">Available highlighting parameters</h2>
+<p>Since the OCR highlighter builds upon Solr&rsquo;s <code>UnifiedHighlighter</code>, you can use most of the
+<a href="https://lucene.apache.org/solr/guide/8_1/highlighting.html#common-highlighter-parameters">Common Highlighter parameters</a>
+and the
+<a href="https://lucene.apache.org/solr/guide/8_1/highlighting.html#the-unified-highlighter">Unified Highlighter parameters</a>.</p>
+<p>Of special interest for purposes of OCR highlighting are these:</p>
+<dl>
+<dt><code>hl</code></dt>
+<dd>Enable highlighting with <code>on</code>. <strong>Required</strong> if you want highlighting of any kind. Defaults to <code>off</code>.</dd>
+<dt><code>hl.snippets</code></dt>
+<dd>Number of snippets per document to include in the response, defaults to <code>1</code>.</dd>
+<dt><code>hl.tag.pre</code>/<code>hl.tag.post</code></dt>
+<dd>Strings to wrap matches in the plaintext version of the snippet with, defaults to <code>&lt;em&gt;</code>/<code>&lt;/em&gt;</code>.</dd>
+<dt><code>hl.weightMatches</code></dt>
+<dd>Uses a new and improved highlighting algorithm that is much more precise than the old approach.
+For example, with this set to <code>true</code>, results for a phrase query <code>"foo bar baz"</code> will actually be
+highlighted as <code>&lt;em&gt;foo bar baz&lt;/em&gt;</code> and not as <code>&lt;em&gt;foo&lt;/em&gt; &lt;em&gt;bar&lt;/em&gt; &lt;em&gt;baz&lt;/em&gt;</code>. Defaults to
+<code>off</code> in Solr versions &lt; 8.0, <code>on</code> for all versions &gt; 8.0.</dd>
+</dl>
+<p>Additionally, the plugin allows you to customize various OCR-specific parameters:</p>
+<dl>
+<dt><code>hl.ocr.fl</code></dt>
+<dd>Fields to enable OCR highlighting for. This is <strong>required</strong> if you want to have OCR highlighting.</dd>
+<dt><code>hl.ocr.contextBlock</code></dt>
+<dd>Select which block type should be considered for determining the context. Valid values are
+<code>word</code>, <code>line</code>, <code>paragraph</code>, <code>block</code> or <code>page</code> and defaults to <code>line</code>.</dd>
+<dt><code>hl.ocr.contextSize</code></dt>
+<dd>Set the number of blocks above and below the matching block to be included in the passage.
+Defaults to <code>2</code>.</dd>
+<dt><code>hl.ocr.limitBlock</code></dt>
+<dd>Set the block type that the passage context may not exceed. Valid values are <code>none</code> <code>word</code>, <code>line</code>,
+<code>paragraph</code>, <code>block</code> or <code>page</code>. This value defaults to <code>block</code>.</dd>
+<dt><code>hl.ocr.alignSpans</code></dt>
+<dd>Ensure that the spans in the highlighted text match the text of the highlighted image parts exactly.
+By default (<code>false</code>), text spans will be more precise than image spans, since they can be defined at the
+character-level, while image spans can only be as precise as the word boundaries in the OCR.</dd>
+<dt><code>hl.ocr.pageId</code>:</dt>
+<dd>Only show passages from the page with this identifier. Useful in combination with a <code>fq</code> for a specific document
+if you want to implement a &ldquo;Search on this page&rdquo; feature (e.g. for the
+<a href="https://iiif.io/api/search/1.0/">IIIF Content Search API</a>).</dd>
+<dt><code>hl.ocr.absoluteHighlights</code>:</dt>
+<dd>When <code>on</code>, return the coordinates of highlighted regions as absolute coordinates, i.e. relative to the containing page,
+not the containing snippet region. Defaults to <code>off</code>.</dd>
+<dt><code>hl.ocr.maxPassages</code>:</dt>
+<dd>Only score and rank at most this many passages to get the final list of snippets. This parameter can be used to tweak
+the performance. If you notice that highlighting takes a long time, you might consider lowering this value.
+The default is <code>100</code>. The practical result is that only the first <code>n</code> matches in a document will be considered
+for highlighting, i.e. if a more relevant passage occurs at the end of the document, it is more likely to not be
+considered if the total number of matches in the document exceeds this number.</dd>
+<dt><code>hl.ocr.timeAllowed</code>:</dt>
+<dd>Due to the fact that generating highlighting snippets from disk can take a very long time, depending on the
+number of documents and snippets, you can limit the time OCR highlighting should take. The parameter takes the
+maximum allowed time in <strong>milliseconds</strong>. If the timeout is exceeded during highlighting, the document currently
+being highlighted and any other remaining documents will be skipped. The highlighting response will then only
+include snippets from documents that were highlighted before the timeout. The presence of partial results will be
+indicated by the <code>partialOcrHighlights</code> key in the <code>responseHeader</code>.</dd>
+<dt><code>hl.ocr.trackPages</code>:</dt>
+<dd>When <code>off</code> (defaults to <code>on</code>), you will not get information the containing page of a given snippet.
+This can improve highlighting performance, since less of the input file needs to be read and should
+be disabled when you index your documents at the page-level, i.e. when the identify of the page is
+encoded elsewhere in the document.</dd>
+<dt><code>hl.ocr.scorePassages</code>:</dt>
+<dd>When <code>off</code> (defaults to <code>on</code>), the snippets are returned in order of their occurrence in the document. Otherwise,
+it will follow Solr&rsquo;s default strategy for scoring highlighting snippets, which treats each candidate snippet as
+a &lsquo;mini-document&rsquo; that is scored using TF-IDF/BM25, treating the parent document as the corpus. This results in
+a relevance score in relation to the parent document, i.e. the first snippet should be the most relevant snippet
+in the document.</dd>
+</dl>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../alternatives/" class="btn btn-neutral float-left" title="Indexing Alternative Terms"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../example/" class="btn btn-neutral float-right" title="Example Setup">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/dbmdz/solr-ocrhighlighting/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../alternatives/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../example/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

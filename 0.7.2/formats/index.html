@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Supported Formats - Solr OCR Highlighting Plugin</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Supported Formats";
+        var mkdocs_page_input_path = "formats.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Solr OCR Highlighting Plugin
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../indexing/">Indexing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../alternatives/">Indexing Alternative Terms</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../query/">Querying</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../example/">Example Setup</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../performance/">Performance Tuning</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Supported Formats</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../changes/">Change Log</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Solr OCR Highlighting Plugin</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Supported Formats</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/dbmdz/solr-ocrhighlighting/edit/master/docs/formats.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>In general the plugin assumes that all OCR formats encode their documents
+in a hierarchy of <strong>blocks</strong>. For all supported formats, we map their
+block types to these general types:</p>
+<ul>
+<li><strong>Page</strong>: optional if there is only a single page in a document</li>
+<li><strong>Block</strong>: optional if <a href="../query/#available-highlighting-parameters"><code>hl.ocr.limitBlock</code></a> is set to a different value at
+  query time</li>
+<li><strong>Section</strong>: optional</li>
+<li><strong>Paragraph</strong>: optional</li>
+<li><strong>Line</strong>: (optional if <a href="../query/#available-highlighting-parameters"><code>hl.ocr.contextBlock</code></a> is set to a different value
+  at query time)</li>
+<li><strong>Word</strong>: <em>required</em></li>
+</ul>
+<p>These block types can be used in the <a href="../query/#available-highlighting-parameters"><code>hl.ocr.limitBlock</code> and <code>hl.ocr.contextBlock</code>
+query parameters</a> to control how the plugin generates snippets.</p>
+<h2 id="hocr">hOCR</h2>
+<p><strong>Block type mapping:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>hOCR class</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Word</td>
+<td><code>ocrx_word</code></td>
+<td>needs to have a <code>bbox</code> attribute with the coordinates on the page</td>
+</tr>
+<tr>
+<td>Page</td>
+<td><code>ocr_page</code></td>
+<td>needs to have a page identifier, either in <code>id</code> attribute or in the <code>ppageno</code> or <code>x_source</code> entry in the <code>title</code> attribute</td>
+</tr>
+<tr>
+<td>Block</td>
+<td><code>ocr_carea</code>/<code>ocrx_block</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Section</td>
+<td><code>ocr_chapter</code>/<code>ocr_section</code>/<br><code>ocr_subsection</code>/<code>ocr_subsubsection</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Paragraph</td>
+<td><code>ocr_par</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Line</td>
+<td><code>ocr_line</code> or <code>ocrx_line</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="alto">ALTO</h2>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>The coordinates returned by the plugin are <strong>not always pixel values</strong>, since ALTO supports a variety
+of different reference units for the coordinates. Check the <code>&lt;MeasurementUnit&gt;</code> value in your ALTO
+files, if its value is anything other than <code>pixel</code>, you will have to do some additional calculations
+on the client side to convert to pixel coordinates.</p>
+</div>
+<p><strong>Block type mapping:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>ALTO tag</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Word</td>
+<td><code>&lt;String /&gt;</code></td>
+<td>needs to have <code>CONTENT</code>, <code>HPOS</code>, <code>VPOS</code>, <code>WIDTH</code> and <code>HEIGHT</code> attributes</td>
+</tr>
+<tr>
+<td>Line</td>
+<td><code>&lt;TextLine /&gt;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Block</td>
+<td><code>&lt;TextBlock /&gt;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Page</td>
+<td><code>&lt;Page /&gt;</code></td>
+<td>needs to have an <code>ID</code> attribute with a page identifier</td>
+</tr>
+<tr>
+<td>Section</td>
+<td><em>not mapped</em></td>
+<td></td>
+</tr>
+<tr>
+<td>Paragraph</td>
+<td><em>not mapped</em></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="miniocr">MiniOCR</h2>
+<p>This plugin also includes support for a custom non-standard OCR format that we dubbed <em>MiniOCR</em>, designed
+to be very simple (and thus performant) to parse and to occupy the least space possible.</p>
+<p>You should use this format when:</p>
+<ul>
+<li>you want to store the OCR in the index (to keep the index size as low)</li>
+<li>reusing the existing OCR files is not possible or practical (to keep occupied disk space low)</li>
+<li>you want the best possible performance, highlighting MiniOCR is ~25% faster than ALTO and ~50% faster than hOCR</li>
+</ul>
+<p>A basic example looks like this:</p>
+<pre><code class="language-xml">&lt;ocr&gt;
+  &lt;p xml:id=&quot;page_identifier&quot;&gt;
+    &lt;b&gt;
+      &lt;l&gt;&lt;w x=&quot;50 50 100 100&quot;&gt;A&lt;/w&gt; &lt;w x=&quot;150 50 100 100&quot;&gt;Line&lt;/w&gt;&lt;/l&gt;
+    &lt;/b&gt;
+  &lt;/p&gt;
+&lt;/ocr&gt;
+</code></pre>
+<p>Alternatives for words can be encoded with the <code>⇿</code> (<code>U+21FF</code>) marker. For example, this is how you would
+encode a word with the default form <code>clistrias</code> and two alternatives <code>christmas</code> and <code>christrias</code>:</p>
+<pre><code class="language-xml">&lt;w x=&quot;50 50 100 100&quot;&gt;clistrias⇿christmas⇿christrias&lt;/w&gt;
+</code></pre>
+<p><strong>Block type mapping:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>MiniOCR tag</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Word</td>
+<td><code>&lt;w/&gt;</code></td>
+<td>needs to have <code>box</code> attribute with <code>{x} {y} {width} {height}</code>. <br>Values can be integers or floats between 0 and 1, <strong>with the leading <code>0.</code> omitted</strong></td>
+</tr>
+<tr>
+<td>Line</td>
+<td><code>&lt;l/&gt;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Block</td>
+<td><code>&lt;b/&gt;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Page</td>
+<td><code>&lt;p/&gt;</code></td>
+<td>needs to have an <code>xml:id</code> attribute with a page identifier. Optionally can have a <code>wh</code> attribute with the <code>{width} {height}</code> values for the page</td>
+</tr>
+<tr>
+<td>Section</td>
+<td><em>not mapped</em></td>
+<td></td>
+</tr>
+<tr>
+<td>Paragraph</td>
+<td><em>not mapped</em></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../performance/" class="btn btn-neutral float-left" title="Performance Tuning"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../changes/" class="btn btn-neutral float-right" title="Change Log">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/dbmdz/solr-ocrhighlighting/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../performance/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../changes/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

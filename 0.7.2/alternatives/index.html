@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Indexing Alternative Terms - Solr OCR Highlighting Plugin</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Indexing Alternative Terms";
+        var mkdocs_page_input_path = "alternatives.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Solr OCR Highlighting Plugin
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../indexing/">Indexing</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Indexing Alternative Terms</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../query/">Querying</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../example/">Example Setup</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../performance/">Performance Tuning</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../formats/">Supported Formats</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../changes/">Change Log</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Solr OCR Highlighting Plugin</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Indexing Alternative Terms</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/dbmdz/solr-ocrhighlighting/edit/master/docs/alternatives.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="support-for-alternative-forms">Support for alternative forms</h1>
+<p>All OCR formats supported by this plugin have the possibility of encoding <em>alternative readings</em> for
+a given word. These can either come from the OCR engine itself and consist of other high-confidence
+readings for a given sequence of characters, or they could come from an manual or semi-automatic
+OCR correction system.</p>
+<div class="admonition note expressing alternatives in ocr files">
+<p class="admonition-title">Note</p>
+<ul>
+<li>For <strong>hOCR</strong>, use <code>&lt;span class="alternatives"&gt;&lt;ins class="alt"&gt;...&lt;/ins&gt;&lt;del class="alt"&gt;...&lt;/del&gt;&lt;/span&gt;</code> (see <a href="http://kba.cloud/hocr-spec/1.2/#segmentation">hOCR specification</a>)</li>
+<li>For <strong>ALTO</strong>, use <code>&lt;String …&gt;&lt;ALTERNATIVE&gt;...&lt;/ALTERNATIVE&gt;&lt;/String&gt;</code> (see <code>AlternativeType</code> in the <a href="https://www.loc.gov/standards/alto/v4/alto-4-2.xsd">ALTO schema</a>)</li>
+<li>For <strong>MiniOCR</strong>, delimit alternative forms with <code>⇿</code> (U+21FF) (see <a href="../formats#miniocr">MiniOCR documentation</a>)</li>
+</ul>
+</div>
+<p>In any case, these alternative readings can improve your user&rsquo;s search experience, by allowing us to
+index <em>multiple forms for a given text position</em>. This enables users to find more matching passages
+for a given query than if only a single form was indexed for every word. This is a form of
+<em>index-time term expansion</em>, similar in concept to e.g. the <a href="https://lucene.apache.org/solr/guide/8_7/filter-descriptions.html#synonym-graph-filter">Synonym Graph Filter</a>
+that ships with Solr.</p>
+<p><strong>To enable the indexing of alternative readings</strong>, you have to make some modifications to your OCR field&rsquo;s
+<strong>index analysis chain</strong>.</p>
+<p>First, you need to enable alternative expansion in the <code>OcrCharFilterFactory</code> by setting the
+<code>expandAlternatives</code> attribute to <code>true</code>:</p>
+<pre><code class="language-xml">&lt;charFilter
+   class=&quot;de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory&quot;
+   expandAlternatives=&quot;true&quot;
+/&gt;
+</code></pre>
+<p>Next, you need  to add a new <code>OcrAlternativesFilterFactory</code> token filter component to your analysis
+chain. This component must to be placed <strong>after the tokenizer</strong>:</p>
+<pre><code class="language-xml">&lt;fieldType name=&quot;text_ocr&quot; class=&quot;solr.TextField&quot;&gt;
+  &lt;!-- .... --&gt;
+  &lt;tokenizer class=&quot;solr.StandardTokenizerFactory&quot;/&gt;
+  &lt;filter class=&quot;de.digitalcollections.solrocr.lucene.OcrAlternativesFilterFactory&quot;/&gt;
+  &lt;!-- .... --&gt;
+&lt;/fieldType&gt;
+</code></pre>
+<p>A full field definition for an OCR field with alternative expansion could look like this:</p>
+<pre><code class="language-xml">&lt;fieldType name=&quot;text_ocr&quot; class=&quot;solr.TextField&quot;&gt;
+  &lt;analyzer type=&quot;index&quot;&gt;
+    &lt;charFilter class=&quot;de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory&quot;/&gt;
+    &lt;charFilter
+      class=&quot;de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory&quot;
+      expandAlternatives=&quot;true&quot;
+    /&gt;
+    &lt;tokenizer class=&quot;solr.StandardTokenizerFactory&quot;/&gt;
+    &lt;filter class=&quot;de.digitalcollections.solrocr.lucene.OcrAlternativesFilterFactory&quot;/&lt;
+    &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;
+  &lt;/analyzer&gt;
+  &lt;analyzer type=&quot;query&quot;&gt;
+    &lt;tokenizer class=&quot;solr.StandardTokenizerFactory&quot;/&gt;
+    &lt;filter class=&quot;solr.LowerCaseFilterFactory&quot;/&gt;
+  &lt;/analyzer&gt;
+&lt;/fieldType&gt;
+</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Highlighting matches on alternative forms</p>
+<p>During highlighting, you will only see the matching alternative form in the snippet if the match
+is on a single word, or if it is at the beginning or the end of a phrase match. This is because we cannot
+get to the offsets of matching terms inside of a phrase match through Lucene&rsquo;s highlighting machinery.</p>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Unsupported tokenizers</p>
+<p>The <code>OcrAlternativesFilterFactory</code> works with almost all tokenizers shipping with Solr, <strong>except for
+the <code>ClassicTokenizer</code>.</strong> This is because we use the <code>WORD JOINER</code> (U+2060) character to denote
+alternative forms in the character stream and the classic tokenizer splits tokens on this character
+(contrary to Unicode rules). This also means that if you use a custom tokenizer, you need to make
+sure that it does not split tokens on U+2060.</p>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Non-alphabetic characters in alternatives</p>
+<p>Some of Solr&rsquo;s built-in tokenizers split tokens on special characters like <code>-</code> that occur inside
+of words. When such characters occur within tokens that have alternatives, the alternatives are
+severed from the original token and the plugin will not index them. To avoid this, either use
+a tokenizer that doesn&rsquo;t split on these characters (like <code>WhitespaceTokenizerFactory</code>) or consider
+customizing your tokenizer of choice to not split on these characters when a token includes
+alternative readings. Note that this can lead to less precise results, e.g. when <code>alpha-numeric</code>
+is not split, only a query like <code>alphanumeric</code> or <code>alpha-numeric</code> will match (depending on the
+analysis chains), but not <code>alpha</code> or <code>numeric</code> alone or a <code>"alpha numeric"</code> phrase query.</p>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Consider increasing the standard <code>maxTokenLength</code> of 255</p>
+<p>When your OCR contains a large number of alternatives for tokens, or these alternatives can
+get quite long, consider increasing the maximum token length in your tokenizer&rsquo;s configuration.
+For most of Solr&rsquo;s tokenizers this can be done with the <code>maxTokenLength</code> parameter that defaults
+to 255. When the plugin encounters a case where this leads to truncated alternatives, it will
+print a warning to the Solr log. Consider increasing the value to 512 or 1024. This will come
+at the expense of an increase in memory usage during indexing, but will preserve as many of your
+alternative readings as possible.</p>
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../indexing/" class="btn btn-neutral float-left" title="Indexing"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../query/" class="btn btn-neutral float-right" title="Querying">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/dbmdz/solr-ocrhighlighting/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../indexing/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../query/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
