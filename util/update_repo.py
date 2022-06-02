@@ -7,6 +7,7 @@ Needs the following secrets passed via environment variables:
   repository's public key.
 """
 import base64
+import itertools
 import json
 import os
 import shutil
@@ -15,15 +16,17 @@ import sys
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, TypedDict
+from typing import Any, Iterable, List, Tuple, TypedDict
 from urllib import request
 
-VERSION_CONSTRAINTS = [
+VERSION_CONSTRAINTS_78 = [
     ((0, 1, 0), ("7.5", "8.0")),
     ((0, 3, 1), ("7.5", "8.2")),
     ((0, 4, 0), ("7.5", "8.8")),
     ((0, 7, 0), ("7.5", "8.11")),
 ]
+VERSION_CONSTRAINTS_9 = [((0, 8, 0), ("9.0",))]
+SPLIT_START_VERSION = (0, 8, 0)
 REPOSITORY_NAME = "ocrhighlighting"
 REPOSITORY_DESCRIPTION = "Highlight various OCR formats directly in Solr."
 REPOSITORY_GIT_REPO = "github.com/dbmdz/dbmdz.github.io.git"
@@ -55,8 +58,8 @@ class Plugin(TypedDict):
 def fetch_releases() -> List[Any]:
     req = request.Request(RELEASES_URL)
     req.add_header("Accept", "application/vnd.github.v3+json")
-    resp = request.urlopen(req)
-    return json.loads(resp.read().decode("utf-8"))
+    with request.urlopen(req) as resp:
+        return json.loads(resp.read().decode("utf-8"))
 
 
 def build_repository() -> List[Plugin]:
@@ -65,18 +68,57 @@ def build_repository() -> List[Plugin]:
         {
             "name": REPOSITORY_NAME,
             "description": REPOSITORY_DESCRIPTION,
-            "versions": [
-                build_version(
-                    r["tag_name"], datetime.fromisoformat(r["published_at"][:-1])
+            "versions": list(
+                itertools.chain.from_iterable(
+                    build_versions(
+                        r["tag_name"], datetime.fromisoformat(r["published_at"][:-1])
+                    )
+                    for r in all_releases
                 )
-                for r in all_releases
-            ],
+            ),
         }
     ]
 
 
-def build_version(version_str: str, date: datetime) -> Version:
+def build_split_versions(
+    version: Tuple[int, int, int], date: datetime
+) -> Iterable[Version]:
+    version_str = ".".join(str(x) for x in version)
+
+    artifact_v9 = (
+        f"{RELEASE_DOWNLOAD_URL}/{version_str}/solr-ocrhighlighting-{version_str}.jar"
+    )
+    constraint_v9 = next(
+        constraint
+        for min_vers, constraint in reversed(VERSION_CONSTRAINTS_9)
+        if version >= min_vers
+    )
+    yield dict(
+        version=version_str,
+        date=date.strftime("%Y-%m-%d"),
+        artifacts=[dict(url=artifact_v9, sig=sign_artifact(artifact_v9))],
+        manifest={"version-constraint": " - ".join(constraint_v9)},
+    )
+
+    artifact_v78 = f"{RELEASE_DOWNLOAD_URL}/{version_str}/solr-ocrhighlighting-{version_str}-solr78.jar"
+    constraint_v78 = next(
+        constraint
+        for min_vers, constraint in reversed(VERSION_CONSTRAINTS_78)
+        if version >= min_vers
+    )
+    yield dict(
+        version=version_str + "-solr78",
+        date=date.strftime("%Y-%m-%d"),
+        artifacts=[dict(url=artifact_v78, sig=sign_artifact(artifact_v78))],
+        manifest={"version-constraint": " - ".join(constraint_v78)},
+    )
+
+
+def build_versions(version_str: str, date: datetime) -> Iterable[Version]:
     version = tuple(int(x) for x in version_str.split("."))
+    if version >= SPLIT_START_VERSION:
+        yield from build_split_versions(version, date)
+        return
     artifact_url = (
         f"{RELEASE_DOWNLOAD_URL}/{version_str}/solr-ocrhighlighting-{version_str}.jar"
     )
@@ -86,11 +128,11 @@ def build_version(version_str: str, date: datetime) -> Version:
         version_str = ".".join(str(p) for p in version)
     constraint = next(
         constraint
-        for min_vers, constraint in reversed(VERSION_CONSTRAINTS)
+        for min_vers, constraint in reversed(VERSION_CONSTRAINTS_78)
         if version >= min_vers
     )
     artifact_signature = sign_artifact(artifact_url)
-    return dict(
+    yield dict(
         version=version_str,
         date=date.strftime("%Y-%m-%d"),
         artifacts=[dict(url=artifact_url, sig=artifact_signature)],
@@ -99,7 +141,8 @@ def build_version(version_str: str, date: datetime) -> Version:
 
 
 def sign_artifact(artifact_url: str) -> str:
-    artifact_data = request.urlopen(artifact_url).read()
+    with request.urlopen(artifact_url) as resp:
+        artifact_data = resp.read()
     with tempfile.NamedTemporaryFile("wt") as key_path:
         key_path.write(os.environ["CERTIFICATE"])
         key_path.flush()
@@ -110,8 +153,11 @@ def sign_artifact(artifact_url: str) -> str:
         return base64.b64encode(signature).decode("utf-8")
 
 
-def publish_repository() -> None:
+def publish_repository(dry_run=False) -> None:
     repository = build_repository()
+    if dry_run:
+        print(json.dumps(repository, indent=2))
+        return
     git_repo_path = Path(tempfile.mkdtemp())
     github_token = os.environ["GH_DEPLOY_TOKEN"]
     repo_url = f"https://{github_token}@{REPOSITORY_GIT_REPO}"
@@ -144,7 +190,8 @@ def publish_repository() -> None:
 
 
 if __name__ == "__main__":
-    if "GH_DEPLOY_TOKEN" not in os.environ:
+    dry_run = "--dry-run" in sys.argv
+    if not dry_run and "GH_DEPLOY_TOKEN" not in os.environ:
         print(
             f"Please provide a GitHub Personal Access Token with permissions for  "
             f"{REPOSITORY_GIT_REPO} via the GH_DEPLOY_TOKEN environment variable."
@@ -156,4 +203,4 @@ if __name__ == "__main__":
             f"{REPOSITORY_GIT_REPO}/solr/publickey.der via the CERTIFICATE environment variable."
         )
         sys.exit(1)
-    publish_repository()
+    publish_repository(dry_run)
