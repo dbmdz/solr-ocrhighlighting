@@ -139,9 +139,7 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
     }
     OcrBox out = this.nextWord;
     try {
-      do {
-        this.nextWord = readNext(xmlReader, features);
-      } while (hasNext() && this.nextWord == null);
+      this.nextWord = readNext(xmlReader, features);
     } catch (XMLStreamException | WstxLazyException e) {
       throw new RuntimeException(
           String.format(

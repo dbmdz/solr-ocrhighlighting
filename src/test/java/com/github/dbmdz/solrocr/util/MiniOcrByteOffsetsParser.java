@@ -88,7 +88,7 @@ public class MiniOcrByteOffsetsParser {
     int start = offsets.getLeft().intValue();
     int end = offsets.getRight().intValue();
     int startTerm = ArrayUtils.indexOf(ocrBytes, (byte) '>', start) + 1;
-    assert startTerm < end;
+    assert startTerm <= end;
     int termWidth = (end - startTerm);
     return ImmutablePair.of(
         new String(ocrBytes, startTerm, termWidth, StandardCharsets.UTF_8), startTerm);
@@ -105,6 +105,9 @@ public class MiniOcrByteOffsetsParser {
   public static void parse(byte[] ocrBytes, OutputStream os, String firstId, String lastId)
       throws IOException {
     for (Pair<String, Integer> pair : parse(ocrBytes, 0, firstId, lastId)) {
+      if (pair.getLeft().isEmpty()) {
+        continue;
+      }
       os.write(pair.getLeft().getBytes(StandardCharsets.UTF_8));
       os.write(String.format(Locale.US, "⚑%d ", pair.getRight()).getBytes(StandardCharsets.UTF_8));
     }

@@ -212,7 +212,7 @@ public class AltoParser extends OcrParser {
             || (features.contains(ParsingFeature.COORDINATES)
                 && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
     if (ignoreBox) {
-      return null;
+      return this.readNext(xmlReader, features);
     }
     return box;
   }

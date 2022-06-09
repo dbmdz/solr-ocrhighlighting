@@ -68,7 +68,7 @@ class TagBreakLocatorTest {
   void previous() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
     TagBreakLocator it = new TagBreakLocator(seq, "w");
-    int end = 2872135;
+    int end = 2872126;
     int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
     assertThat(tag).startsWith("<w");
