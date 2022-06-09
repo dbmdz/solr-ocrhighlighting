@@ -203,7 +203,7 @@ public class AltoParserTest {
     List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
 
     // assert
-    assertThat(boxes).hasSize(104);
+    assertThat(boxes).hasSize(169);
 
     assertThat(boxes.get(0).getPage().id).isEqualTo("p00000006");
     assertThat(boxes.get(0).getPage().dimensions)

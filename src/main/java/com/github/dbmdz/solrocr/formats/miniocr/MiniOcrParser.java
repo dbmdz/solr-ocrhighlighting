@@ -87,7 +87,7 @@ public class MiniOcrParser extends OcrParser {
     }
 
     boolean isHyphenated = false;
-    if (box.getText().endsWith("\u00ad")) {
+    if (box.getText() != null && box.getText().endsWith("\u00ad")) {
       isHyphenated = true;
       String boxText = box.getText();
       box.setText(boxText.substring(0, boxText.length() - 1));
@@ -114,15 +114,14 @@ public class MiniOcrParser extends OcrParser {
     }
 
     // Boxes without text or coordinates (if either is requested with a feature flag) are ignored
-    // since they break
-    // things downstream
+    // since they break things downstream
     boolean ignoreBox =
         (features.contains(ParsingFeature.TEXT)
                 && (box.getText() == null || box.getText().isEmpty()))
             || (features.contains(ParsingFeature.COORDINATES)
                 && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
     if (ignoreBox) {
-      return null;
+      box = this.readNext(xmlReader, features);
     }
     return box;
   }
@@ -134,8 +133,16 @@ public class MiniOcrParser extends OcrParser {
       boolean withOffsets,
       boolean withAlternatives)
       throws XMLStreamException {
+    org.codehaus.stax2.LocationInfo loc = xmlReader.getLocationInfo();
     if (xmlReader.next() != XMLStreamConstants.CHARACTERS) {
-      throw new IllegalStateException("A word element must have text content.");
+      log.warn(
+          "<w> element at line {}, column {} in {} has no text!",
+          loc.getStartLocation().getLineNumber(),
+          loc.getStartLocation().getColumnNumber(),
+          input.getSource().orElse("<unknown>"));
+      box.setText(null);
+      box.setTextOffset(-1);
+      return;
     }
     if (withOffsets) {
       box.setTextOffset(Math.toIntExact(xmlReader.getLocationInfo().getStartingCharOffset()));
