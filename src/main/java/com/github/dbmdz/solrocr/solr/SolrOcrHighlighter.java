@@ -26,6 +26,7 @@ package com.github.dbmdz.solrocr.solr;
 
 import com.github.dbmdz.solrocr.model.OcrHighlightResult;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -39,9 +40,13 @@ import org.apache.solr.highlight.UnifiedSolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.DocList;
 import org.apache.solr.util.SolrPluginUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import solrocr.OcrHighlighter;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
   public NamedList<Object> doHighlighting(
       DocList docs, Query query, SolrQueryRequest req, Map<String, Object> respHeader)
       throws IOException {
@@ -115,6 +120,11 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
       for (String field : fields) {
         expandWildcardsInHighlightFields(
             expandedFields, storedHighlightFieldNames, SolrPluginUtils.split(field));
+      }
+      if (expandedFields.isEmpty()) {
+        log.warn(
+            "Requested to highlight fields '{}', but no matching stored fields were found, check your query and schema!",
+            String.join(",", fields));
       }
       fields = expandedFields.toArray(new String[] {});
       // Trim them now in case they haven't been yet.  Not needed for all code-paths above but do it
