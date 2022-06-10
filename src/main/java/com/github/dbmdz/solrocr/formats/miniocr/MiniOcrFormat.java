@@ -52,10 +52,14 @@ public class MiniOcrFormat implements OcrFormat {
     if (!m.find()) {
       return null;
     }
-    int width = Integer.parseInt(m.group("width"));
-    int height = Integer.parseInt(m.group("height"));
+    Dimension dims = null;
+    if (m.group("width") != null && m.group("height") != null) {
+      dims = new Dimension(
+          Integer.parseInt(m.group("width")),
+          Integer.parseInt(m.group("height")));
+    }
     String pageId = m.group("pageId");
-    return new OcrPage(pageId, new Dimension(width, height));
+    return new OcrPage(pageId, dims);
   }
 
   @Override
