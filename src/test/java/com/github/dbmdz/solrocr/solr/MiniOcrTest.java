@@ -327,4 +327,18 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
         req,
         "//lst[@name='47371']//arr[@name='snippets']/lst/str[@name='text']/text()=\"Notice of 3Iecting of <em>Assessors in Sewer</em> District No. 1. Notice is hereby given that the undersigned board cf assessors of bene-\"");
   }
+
+  public void testPagesWithoutDimensions() {
+    Path ocrPath = Paths.get("src/test/resources/data/miniocr_nopagedims.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "57371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:Augsburg", "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "count(//lst[@name='57371']//arr[@name='snippets']/lst)='10'",
+        "(//lst[@name='57371']//arr[@name='snippets']/lst)[1]/arr[@name='pages']/lst/str[@name='id']/text()='716'"
+        );
+    assertU(delI("57371"));
+    assertU(commit());
+  }
 }
