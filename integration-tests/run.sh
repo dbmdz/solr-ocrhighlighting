@@ -51,7 +51,7 @@ for version in $SOLR9_VERSIONS; do
     -v "$plugin_dir:/build" \
     -p "31337:8983" \
     solr:$version \
-    solr-precreate ocr /opt/core-config & > /dev/null 2>&1 & \
+    solr-precreate ocr /opt/core-config > /dev/null 2>&1 & \
     wait_for_solr "$container_name"
     if ! python3 test.py; then
         printf " !!!FAIL!!!\n"

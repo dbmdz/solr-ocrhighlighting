@@ -1,4 +1,29 @@
+## 0.8.1 (2022-06-10)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.1)
+
+This is a bugfix release targeting mainly the MiniOCR and ALTO
+implementations.
+
+**Bufgfixes:**
+
+- ALTO: Fix handling of empty words. Previously any words after a word element
+  with no text **would be skipped entirely during indexing** 😱😱.
+- MiniOCR: Fix handling of empty words, Previously a word element with no text
+  would make the parser crash.
+- MiniOCR: Make the `wh` attribute on `<p>` page elements actually optional.
+  The documentation said it was optional, but the parser would crash when
+  attempting to handle elements without the attribute
+
+**Other Changes:**
+
+- A warning will now be logged if none of the fields requested with `hl.ocr.fl`
+  exist or are defined as stored fields. Previously highlighting would just
+  not work, with no indications to users as to why this was the case.
+
+
 ## 0.8.0 (2022-06-01)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.0)
+
 The major improvement in this version is compatibility with Solr 9.
 
 Due to a number of API changes in Solr and Lucene, we now have to ship two separate releases,

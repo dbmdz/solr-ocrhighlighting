@@ -54,9 +54,7 @@ public class MiniOcrFormat implements OcrFormat {
     }
     Dimension dims = null;
     if (m.group("width") != null && m.group("height") != null) {
-      dims = new Dimension(
-          Integer.parseInt(m.group("width")),
-          Integer.parseInt(m.group("height")));
+      dims = new Dimension(Integer.parseInt(m.group("width")), Integer.parseInt(m.group("height")));
     }
     String pageId = m.group("pageId");
     return new OcrPage(pageId, dims);

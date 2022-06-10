@@ -336,8 +336,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
     assertQ(
         req,
         "count(//lst[@name='57371']//arr[@name='snippets']/lst)='10'",
-        "(//lst[@name='57371']//arr[@name='snippets']/lst)[1]/arr[@name='pages']/lst/str[@name='id']/text()='716'"
-        );
+        "(//lst[@name='57371']//arr[@name='snippets']/lst)[1]/arr[@name='pages']/lst/str[@name='id']/text()='716'");
     assertU(delI("57371"));
     assertU(commit());
   }
