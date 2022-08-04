@@ -90,8 +90,7 @@ public class SourcePointer {
                   if (!m.find()) {
                     throw new RuntimeException(
                         "Could not parse source pointer from '"
-                            + ptr
-                            + "', cannot index document.");
+                            + ptr + ".");
                   }
                   Path sourcePath = Paths.get(m.group("path"));
                   List<Region> regions = ImmutableList.of();
@@ -107,13 +106,13 @@ public class SourcePointer {
                   } catch (FileNotFoundException e) {
                     throw new RuntimeException(
                         "Could not locate file at '"
-                            + sourcePath.toString()
-                            + "', cannot index document.");
+                            + sourcePath
+                            + ".");
                   } catch (IOException e) {
                     throw new RuntimeException(
                         "Could not read file at '"
-                            + sourcePath.toString()
-                            + "', cannot index document.");
+                            + sourcePath
+                            + ".");
                   }
                 })
             .collect(Collectors.toList());
