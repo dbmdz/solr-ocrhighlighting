@@ -56,12 +56,14 @@ public class OcrHighlightComponent extends SearchComponent
   @Override
   public void prepare(ResponseBuilder rb) throws IOException {
     SolrParams params = rb.req.getParams();
-    rb.doHighlights = params.getBool(HighlightParams.HIGHLIGHT, false);
+    rb.doHighlights = OcrHighlightParams.getBool(params, OcrHighlightParams.HIGHLIGHT, false);
     if (rb.doHighlights) {
       rb.setNeedDocList(true);
-      String hlq = params.get(HighlightParams.Q);
+      String hlq = OcrHighlightParams.get(params, OcrHighlightParams.Q);
       String hlparser =
-          Stream.of(params.get(HighlightParams.QPARSER), params.get(QueryParsing.DEFTYPE))
+          Stream.of(
+                  OcrHighlightParams.get(params, OcrHighlightParams.QPARSER),
+                  params.get(QueryParsing.DEFTYPE))
               .filter(Objects::nonNull)
               .findFirst()
               .orElse(QParserPlugin.DEFAULT_QTYPE);

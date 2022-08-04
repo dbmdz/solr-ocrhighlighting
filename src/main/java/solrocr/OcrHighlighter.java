@@ -406,8 +406,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
                   contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
           OcrPassageFormatter formatter =
               ocrFormat.getPassageFormatter(
-                  params.get(HighlightParams.TAG_PRE, "<em>"),
-                  params.get(HighlightParams.TAG_POST, "</em>"),
+                  OcrHighlightParams.get(params, OcrHighlightParams.TAG_PRE, "<em>"),
+                  OcrHighlightParams.get(params, OcrHighlightParams.TAG_POST, "</em>"),
                   params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false),
                   params.getBool(OcrHighlightParams.ALIGN_SPANS, false),
                   params.getBool(OcrHighlightParams.TRACK_PAGES, true));
