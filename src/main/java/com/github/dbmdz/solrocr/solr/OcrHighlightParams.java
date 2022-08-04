@@ -7,7 +7,7 @@ public interface OcrHighlightParams {
   String QPARSER = "hl.ocr.qparser";
   String Q = "hl.ocr.q";
   String TAG_PRE = "hl.ocr.tag.pre";
-  String TAG_POST = "hl.ocr.tag.pre";
+  String TAG_POST = "hl.ocr.tag.post";
   String OCR_FIELDS = "hl.ocr.fl";
   String CONTEXT_BLOCK = "hl.ocr.contextBlock";
   String CONTEXT_SIZE = "hl.ocr.contextSize";
