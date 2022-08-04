@@ -2,6 +2,15 @@
 To enable highlighting, make sure you set `hl=true` in you query. Additionally, you need to pass the OCR fields that
 you want to have highlighted in the `hl.ocr.fl` parameter.
 
+!!! caution "Setting highlighting fields for regular highlighting"
+
+    In some circumstances you need to set the `hl.fl` parameter for the list of fields to use for regular
+    highlighting explicitly. It suffices to set this to an empty string (i.e. `hl.fl=`).
+    You will know you're affected by this problem if highlighting fails, and you see an error message
+    `undefined field null` in your Solr logs. This is probably due to a bug in Solr itself that has
+    yet to be investigated. Setting `hl.fl` explicitly avoids the problem.
+
+
 ## Response Format
 With OCR highlighting enabled, your Solr response will now include a new item `ocrHighlighting`, mapping all
 highlighted OCR fields to their highlighting snippets:

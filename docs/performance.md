@@ -9,7 +9,7 @@ hints on potential knobs to tune to improve the performance.
     **You can expect a reduction in runtime of more than 50% if you use a JVM with string compaction
     enabled compared to one without** (assuming you're running on flash storage).
     We highly recommend using the latest LTS OpenJDK version released after Java 9, which
-    as of January 2021 is OpenJDK 11.
+    as of September 2021 is OpenJDK 17.
 
 ## Performance Analysis
 Before you start tuning the plugin, it is important to spend some time on analyzing the nature of the problems:
