@@ -113,15 +113,30 @@ Of special interest for purposes of OCR highlighting are these:
 
 `hl.snippets`
 :   Number of snippets per document to include in the response, defaults to `1`.
+    Use `f.<ocr_field>.hl.snippets` if you want a different number of snippets between regular highlighting
+    and OCR highlighting.
 
 `hl.tag.pre`/`hl.tag.post`
 :   Strings to wrap matches in the plaintext version of the snippet with, defaults to `<em>`/`</em>`.
+    Use `hl.ocr.tag.pre` / `hl.ocr.tag.post` if you want different tags for regular highlighting
+    and OCR highlighting.
 
 `hl.weightMatches`
 :   Uses a new and improved highlighting algorithm that is much more precise than the old approach.
     For example, with this set to `true`, results for a phrase query `"foo bar baz"` will actually be
     highlighted as `<em>foo bar baz</em>` and not as `<em>foo</em> <em>bar</em> <em>baz</em>`. Defaults to
     `off` in Solr versions < 8.0, `on` for all versions > 8.0.
+    Use `f.<ocr_field>.hl.weightMatches` if you want to set this differently from regular highlighting.
+
+`hl.qparser`:
+:   Allows you to customize the query parser used for analyzing the query for highlighting.
+    See the [`hl.qparser` documentation in the Solr guide for more details](https://solr.apache.org/guide/solr/latest/query-guide/highlighting.html).
+    Use `hl.ocr.qparser` if you want to set this differently between OCR highlighting and regular highlighting.
+
+`hl.q`:
+:   Allows you to customize the query used for highlighting the documents in the result set.
+    See the [`hl.q` documentation in the Solr guide for more details](https://solr.apache.org/guide/solr/latest/query-guide/highlighting.html).
+    Use `hl.ocr.q` if you want to set this differently between OCR highlighting and regular highlighting.
 
 Additionally, the plugin allows you to customize various OCR-specific parameters:
 

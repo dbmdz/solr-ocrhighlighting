@@ -88,9 +88,7 @@ public class SourcePointer {
                 ptr -> {
                   Matcher m = POINTER_PAT.matcher(ptr);
                   if (!m.find()) {
-                    throw new RuntimeException(
-                        "Could not parse source pointer from '"
-                            + ptr + ".");
+                    throw new RuntimeException("Could not parse source pointer from '" + ptr + ".");
                   }
                   Path sourcePath = Paths.get(m.group("path"));
                   List<Region> regions = ImmutableList.of();
@@ -104,15 +102,9 @@ public class SourcePointer {
                   try {
                     return new FileSource(sourcePath, regions, m.group("isAscii") != null);
                   } catch (FileNotFoundException e) {
-                    throw new RuntimeException(
-                        "Could not locate file at '"
-                            + sourcePath
-                            + ".");
+                    throw new RuntimeException("Could not locate file at '" + sourcePath + ".");
                   } catch (IOException e) {
-                    throw new RuntimeException(
-                        "Could not read file at '"
-                            + sourcePath
-                            + ".");
+                    throw new RuntimeException("Could not read file at '" + sourcePath + ".");
                   }
                 })
             .collect(Collectors.toList());
