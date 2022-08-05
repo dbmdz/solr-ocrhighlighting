@@ -436,6 +436,14 @@
 <h2 id="enabling-highlighting-for-ocr-fields">Enabling Highlighting for OCR Fields</h2>
 <p>To enable highlighting, make sure you set <code>hl=true</code> in you query. Additionally, you need to pass the OCR fields that
 you want to have highlighted in the <code>hl.ocr.fl</code> parameter.</p>
+<div class="admonition caution">
+<p class="admonition-title">Setting highlighting fields for regular highlighting</p>
+<p>In some circumstances you need to set the <code>hl.fl</code> parameter for the list of fields to use for regular
+highlighting explicitly. It suffices to set this to an empty string (i.e. <code>hl.fl=</code>).
+You will know you're affected by this problem if highlighting fails, and you see an error message
+<code>undefined field null</code> in your Solr logs. This is probably due to a bug in Solr itself that has
+yet to be investigated. Setting <code>hl.fl</code> explicitly avoids the problem.</p>
+</div>
 <h2 id="response-format">Response Format</h2>
 <p>With OCR highlighting enabled, your Solr response will now include a new item <code>ocrHighlighting</code>, mapping all
 highlighted OCR fields to their highlighting snippets:</p>
@@ -532,14 +540,27 @@ and the
 <dt><code>hl</code></dt>
 <dd>Enable highlighting with <code>on</code>. <strong>Required</strong> if you want highlighting of any kind. Defaults to <code>off</code>.</dd>
 <dt><code>hl.snippets</code></dt>
-<dd>Number of snippets per document to include in the response, defaults to <code>1</code>.</dd>
+<dd>Number of snippets per document to include in the response, defaults to <code>1</code>.
+Use <code>f.&lt;ocr_field&gt;.hl.snippets</code> if you want a different number of snippets between regular highlighting
+and OCR highlighting.</dd>
 <dt><code>hl.tag.pre</code>/<code>hl.tag.post</code></dt>
-<dd>Strings to wrap matches in the plaintext version of the snippet with, defaults to <code>&lt;em&gt;</code>/<code>&lt;/em&gt;</code>.</dd>
+<dd>Strings to wrap matches in the plaintext version of the snippet with, defaults to <code>&lt;em&gt;</code>/<code>&lt;/em&gt;</code>.
+Use <code>hl.ocr.tag.pre</code> / <code>hl.ocr.tag.post</code> if you want different tags for regular highlighting
+and OCR highlighting.</dd>
 <dt><code>hl.weightMatches</code></dt>
 <dd>Uses a new and improved highlighting algorithm that is much more precise than the old approach.
 For example, with this set to <code>true</code>, results for a phrase query <code>"foo bar baz"</code> will actually be
 highlighted as <code>&lt;em&gt;foo bar baz&lt;/em&gt;</code> and not as <code>&lt;em&gt;foo&lt;/em&gt; &lt;em&gt;bar&lt;/em&gt; &lt;em&gt;baz&lt;/em&gt;</code>. Defaults to
-<code>off</code> in Solr versions &lt; 8.0, <code>on</code> for all versions &gt; 8.0.</dd>
+<code>off</code> in Solr versions &lt; 8.0, <code>on</code> for all versions &gt; 8.0.
+Use <code>f.&lt;ocr_field&gt;.hl.weightMatches</code> if you want to set this differently from regular highlighting.</dd>
+<dt><code>hl.qparser</code>:</dt>
+<dd>Allows you to customize the query parser used for analyzing the query for highlighting.
+See the <a href="https://solr.apache.org/guide/solr/latest/query-guide/highlighting.html"><code>hl.qparser</code> documentation in the Solr guide for more details</a>.
+Use <code>hl.ocr.qparser</code> if you want to set this differently between OCR highlighting and regular highlighting.</dd>
+<dt><code>hl.q</code>:</dt>
+<dd>Allows you to customize the query used for highlighting the documents in the result set.
+See the <a href="https://solr.apache.org/guide/solr/latest/query-guide/highlighting.html"><code>hl.q</code> documentation in the Solr guide for more details</a>.
+Use <code>hl.ocr.q</code> if you want to set this differently between OCR highlighting and regular highlighting.</dd>
 </dl>
 <p>Additionally, the plugin allows you to customize various OCR-specific parameters:</p>
 <dl>
