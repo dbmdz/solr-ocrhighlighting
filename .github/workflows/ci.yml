@@ -84,3 +84,22 @@ jobs:
           git config user.email mkdocs-mike@nowhere.tld
           git fetch origin gh-pages
           mike deploy -p --rebase wip
+
+  pre-release:
+    name: "Pre Release"
+    if: github.event_name == 'push' && contains(github.ref, 'main')
+    runs-on: "ubuntu-latest"
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "wip"
+          prerelease: true
+          title: "WIP build (use at own risk)"
+          files: |
+            solr-ocrhighlighting-*.jar
