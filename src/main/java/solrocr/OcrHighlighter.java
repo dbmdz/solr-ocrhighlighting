@@ -438,7 +438,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
             // This catch-all prevents OCR highlighting from failing the complete query, instead
             // users
             // get an error message in their Solr log.
-            log.error("Could not highlight OCR content for document", e);
+            String docContent = content != null ? content.toString() : "n.a.";
+            log.error("For document: " +docId + " could not highlight OCR: " + docContent, e);
           } finally {
             if (content instanceof AutoCloseable) {
               try {
