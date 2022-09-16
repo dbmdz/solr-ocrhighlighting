@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alto xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.loc.gov/standards/alto/ns-v4#" SCHEMAVERSION="4.1" xsi:schemaLocation="http://www.loc.gov/standards/alto/ns-v4# http://www.loc.gov/standards/alto/v4/alto-4-1.xsd">
+  <Description>
+    <MeasurementUnit>pixel</MeasurementUnit>
+    <sourceImageInformation>
+      <fileName>00000014.jpg</fileName>
+    </sourceImageInformation>
+    <Processing ID="pro1">
+      <processingStepDescription>preprocessing/optimization/binarization ocrd-olena-binarize</processingStepDescription>
+    </Processing>
+    <Processing ID="pro2">
+      <processingStepDescription>preprocessing/optimization/cropping ocrd-anybaseocr-crop</processingStepDescription>
+    </Processing>
+    <Processing ID="pro3">
+      <processingStepDescription>preprocessing/optimization/despeckling ocrd-cis-ocropy-denoise</processingStepDescription>
+    </Processing>
+    <Processing ID="pro4">
+      <processingStepDescription>preprocessing/optimization/deskewing ocrd-cis-ocropy-deskew</processingStepDescription>
+    </Processing>
+    <Processing ID="pro5">
+      <processingStepDescription>layout/segmentation/region ocrd-tesserocr-segment-region</processingStepDescription>
+    </Processing>
+    <Processing ID="pro6">
+      <processingStepDescription>layout/segmentation/region ocrd-segment-repair</processingStepDescription>
+    </Processing>
+    <Processing ID="pro7">
+      <processingStepDescription>layout/segmentation/region ocrd-cis-ocropy-clip</processingStepDescription>
+    </Processing>
+    <Processing ID="pro8">
+      <processingStepDescription>layout/segmentation/region ocrd-cis-ocropy-segment</processingStepDescription>
+    </Processing>
+    <Processing ID="pro9">
+      <processingStepDescription>preprocessing/optimization/dewarping ocrd-cis-ocropy-dewarp</processingStepDescription>
+    </Processing>
+    <Processing ID="pro10">
+      <processingStepDescription>recognition/text-recognition ocrd-tesserocr-recognize</processingStepDescription>
+    </Processing>
+  </Description>
+  <Layout>
+    <Page HEIGHT="2310" ID="p00000014" PAGECLASS="content" PHYSICAL_IMG_NR="0" WIDTH="1513">
+      <PrintSpace ID="PageSpaceTypeID0">
+        <TextBlock HEIGHT="46" HPOS="435" ID="region0000" IDNEXT="region0001" VPOS="300" WIDTH="718">
+          <TextLine HEIGHT="46" HPOS="435" ID="region0000_line" VPOS="300" WIDTH="718">
+            <String CONTENT="5" HEIGHT="33" HPOS="439" ID="region0000_line_word0000" VPOS="316" WIDTH="29"/>
+            <SP/>
+            <String CONTENT="u" HEIGHT="52" HPOS="754" ID="region0000_line_word0001" VPOS="309" WIDTH="69"/>
+            <SP/>
+            <String CONTENT="“" HEIGHT="9" HPOS="1132" ID="region0000_line_word0002" VPOS="314" WIDTH="16"/>
+          </TextLine>
+        </TextBlock>
+        <TextBlock HEIGHT="803" HPOS="435" ID="region0001" IDNEXT="region0002" VPOS="381" WIDTH="841">
+          <TextLine HEIGHT="64" HPOS="435" ID="region0001_line0000" VPOS="382" WIDTH="841">
+            <String CONTENT="„wird" HEIGHT="40" HPOS="440" ID="region0001_line0000_word0000" VPOS="392" WIDTH="95"/>
+            <SP/>
+            <String CONTENT="es" HEIGHT="29" HPOS="551" ID="region0001_line0000_word0001" VPOS="399" WIDTH="31"/>
+            <SP/>
+            <String CONTENT="fahl," HEIGHT="43" HPOS="595" ID="region0001_line0000_word0002" VPOS="394" WIDTH="76"/>
+            <SP/>
+            <String CONTENT="im" HEIGHT="35" HPOS="696" ID="region0001_line0000_word0003" VPOS="394" WIDTH="42"/>
+            <SP/>
+            <String CONTENT="fuͤnf" HEIGHT="47" HPOS="751" ID="region0001_line0000_word0004" VPOS="392" WIDTH="68"/>
+            <SP/>
+            <String CONTENT="und" HEIGHT="31" HPOS="829" ID="region0001_line0000_word0005" VPOS="399" WIDTH="58"/>
+            <SP/>
+            <String CONTENT="vierzigſten" HEIGHT="45" HPOS="904" ID="region0001_line0000_word0006" VPOS="394" WIDTH="156"/>
+            <SP/>
+            <String CONTENT="Jahr" HEIGHT="45" HPOS="1079" ID="region0001_line0000_word0007" VPOS="396" WIDTH="83"/>
+            <SP/>
+            <String CONTENT="Pech⸗" HEIGHT="43" HPOS="1174" ID="region0001_line0000_word0008" VPOS="397" WIDTH="89"/>
+          </TextLine>
+          <TextLine HEIGHT="65" HPOS="435" ID="region0001_line0001" VPOS="443" WIDTH="840">
+            <String CONTENT="„ſchwarz," HEIGHT="43" HPOS="440" ID="region0001_line0001_word0000" VPOS="449" WIDTH="152"/>
+            <SP/>
+            <String CONTENT="und" HEIGHT="32" HPOS="624" ID="region0001_line0001_word0001" VPOS="453" WIDTH="58"/>
+            <SP/>
+            <String CONTENT="von" HEIGHT="27" HPOS="700" ID="region0001_line0001_word0002" VPOS="458" WIDTH="56"/>
+            <SP/>
+            <String CONTENT="der" HEIGHT="32" HPOS="776" ID="region0001_line0001_word0003" VPOS="455" WIDTH="47"/>
+            <SP/>
+            <String CONTENT="Zeit" HEIGHT="41" HPOS="850" ID="region0001_line0001_word0004" VPOS="452" WIDTH="61"/>
+            <SP/>
+            <String CONTENT="an" HEIGHT="25" HPOS="931" ID="region0001_line0001_word0005" VPOS="463" WIDTH="38"/>
+            <SP/>
+            <String CONTENT="veraͤndert" HEIGHT="37" HPOS="995" ID="region0001_line0001_word0006" VPOS="451" WIDTH="148"/>
+            <SP/>
+            <String CONTENT="es" HEIGHT="34" HPOS="1159" ID="region0001_line0001_word0007" VPOS="456" WIDTH="33"/>
+            <SP/>
+            <String CONTENT="ſich" HEIGHT="42" HPOS="1211" ID="region0001_line0001_word0008" VPOS="455" WIDTH="50"/>
+          </TextLine>
+          <TextLine HEIGHT="64" HPOS="435" ID="region0001_line0002" VPOS="504" WIDTH="840">
+            <String CONTENT="„nicht" HEIGHT="40" HPOS="440" ID="region0001_line0002_word0000" VPOS="511" WIDTH="98"/>
+            <SP/>
+            <String CONTENT="mehr." HEIGHT="42" HPOS="554" ID="region0001_line0002_word0001" VPOS="512" WIDTH="90"/>
+            <SP/>
+            <String CONTENT="Leute" HEIGHT="36" HPOS="695" ID="region0001_line0002_word0002" VPOS="511" WIDTH="79"/>
+            <SP/>
+            <String CONTENT="von" HEIGHT="26" HPOS="791" ID="region0001_line0002_word0003" VPOS="521" WIDTH="58"/>
+            <SP/>
+            <String CONTENT="der" HEIGHT="32" HPOS="866" ID="region0001_line0002_word0004" VPOS="516" WIDTH="46"/>
+            <SP/>
+            <String CONTENT="Art," HEIGHT="41" HPOS="931" ID="region0001_line0002_word0005" VPOS="514" WIDTH="71"/>
+            <SP/>
+            <String CONTENT="leben" HEIGHT="35" HPOS="1037" ID="region0001_line0002_word0006" VPOS="514" WIDTH="76"/>
+            <SP/>
+            <String CONTENT="bis" HEIGHT="34" HPOS="1132" ID="region0001_line0002_word0007" VPOS="515" WIDTH="45"/>
+            <SP/>
+            <String CONTENT="zum" HEIGHT="31" HPOS="1199" ID="region0001_line0002_word0008" VPOS="524" WIDTH="64"/>
+          </TextLine>
+          <TextLine HEIGHT="66" HPOS="436" ID="region0001_line0003" VPOS="566" WIDTH="840">
+            <String CONTENT="»dreißigſten" HEIGHT="41" HPOS="440" ID="region0001_line0003_word0000" VPOS="574" WIDTH="183"/>
+            <SP/>
+            <String CONTENT="Jahr" HEIGHT="42" HPOS="637" ID="region0001_line0003_word0001" VPOS="574" WIDTH="82"/>
+            <SP/>
+            <String CONTENT="gleich" HEIGHT="41" HPOS="733" ID="region0001_line0003_word0002" VPOS="576" WIDTH="81"/>
+            <SP/>
+            <String CONTENT="andern;" HEIGHT="36" HPOS="830" ID="region0001_line0003_word0003" VPOS="579" WIDTH="120"/>
+            <SP/>
+            <String CONTENT="-von" HEIGHT="26" HPOS="961" ID="region0001_line0003_word0004" VPOS="584" WIDTH="69"/>
+            <SP/>
+            <String CONTENT="dem" HEIGHT="35" HPOS="1042" ID="region0001_line0003_word0005" VPOS="580" WIDTH="61"/>
+            <SP/>
+            <String CONTENT="Zeitpunkt" HEIGHT="43" HPOS="1118" ID="region0001_line0003_word0006" VPOS="577" WIDTH="147"/>
+          </TextLine>
+          <TextLine HEIGHT="69" HPOS="435" ID="region0001_line0004" VPOS="628" WIDTH="841">
+            <String CONTENT="„an" HEIGHT="26" HPOS="440" ID="region0001_line0004_word0000" VPOS="643" WIDTH="65"/>
+            <SP/>
+            <String CONTENT="empfinden" HEIGHT="39" HPOS="526" ID="region0001_line0004_word0001" VPOS="636" WIDTH="156"/>
+            <SP/>
+            <String CONTENT="ſie" HEIGHT="41" HPOS="707" ID="region0001_line0004_word0002" VPOS="637" WIDTH="35"/>
+            <SP/>
+            <String CONTENT="eine" HEIGHT="34" HPOS="760" ID="region0001_line0004_word0003" VPOS="636" WIDTH="60"/>
+            <SP/>
+            <String CONTENT="ungewöhnliche" HEIGHT="53" HPOS="840" ID="region0001_line0004_word0004" VPOS="632" WIDTH="219"/>
+            <SP/>
+            <String CONTENT="Bangigkeit," HEIGHT="44" HPOS="1082" ID="region0001_line0004_word0005" VPOS="636" WIDTH="182"/>
+          </TextLine>
+          <TextLine HEIGHT="64" HPOS="435" ID="region0001_line0005" VPOS="690" WIDTH="840">
+            <String CONTENT="„die" HEIGHT="37" HPOS="438" ID="region0001_line0005_word0000" VPOS="697" WIDTH="69"/>
+            <SP/>
+            <String CONTENT="immer" HEIGHT="35" HPOS="527" ID="region0001_line0005_word0001" VPOS="697" WIDTH="98"/>
+            <SP/>
+            <String CONTENT="zunimmt," HEIGHT="41" HPOS="643" ID="region0001_line0005_word0002" VPOS="698" WIDTH="153"/>
+            <SP/>
+            <String CONTENT="und" HEIGHT="31" HPOS="823" ID="region0001_line0005_word0003" VPOS="702" WIDTH="58"/>
+            <SP/>
+            <String CONTENT="wenn" HEIGHT="29" HPOS="898" ID="region0001_line0005_word0004" VPOS="706" WIDTH="84"/>
+            <SP/>
+            <String CONTENT="ſie" HEIGHT="40" HPOS="1002" ID="region0001_line0005_word0005" VPOS="701" WIDTH="34"/>
+            <SP/>
+            <String CONTENT="das" HEIGHT="31" HPOS="1055" ID="region0001_line0005_word0006" VPOS="703" WIDTH="53"/>
+            <SP/>
+            <String CONTENT="achtzigſte" HEIGHT="41" HPOS="1127" ID="region0001_line0005_word0007" VPOS="701" WIDTH="136"/>
+          </TextLine>
+          <TextLine HEIGHT="65" HPOS="435" ID="region0001_line0006" VPOS="752" WIDTH="841">
+            <String CONTENT="„Jahr" HEIGHT="44" HPOS="440" ID="region0001_line0006_word0000" VPOS="759" WIDTH="108"/>
+            <SP/>
+            <String CONTENT="erreicht," HEIGHT="41" HPOS="566" ID="region0001_line0006_word0001" VPOS="762" WIDTH="124"/>
+            <SP/>
+            <String CONTENT="empfinden" HEIGHT="39" HPOS="718" ID="region0001_line0006_word0002" VPOS="765" WIDTH="158"/>
+            <SP/>
+            <String CONTENT="ſie" HEIGHT="39" HPOS="893" ID="region0001_line0006_word0003" VPOS="767" WIDTH="36"/>
+            <SP/>
+            <String CONTENT="alle" HEIGHT="34" HPOS="946" ID="region0001_line0006_word0004" VPOS="766" WIDTH="53"/>
+            <SP/>
+            <String CONTENT="Gebrechen" HEIGHT="43" HPOS="1011" ID="region0001_line0006_word0005" VPOS="764" WIDTH="158"/>
+            <SP/>
+            <String CONTENT="dieſes" HEIGHT="43" HPOS="1183" ID="region0001_line0006_word0006" VPOS="765" WIDTH="82"/>
+          </TextLine>
+          <TextLine HEIGHT="66" HPOS="436" ID="region0001_line0007" VPOS="814" WIDTH="840">
+            <String CONTENT="„Alters." HEIGHT="37" HPOS="439" ID="region0001_line0007_word0000" VPOS="825" WIDTH="133"/>
+            <SP/>
+            <String CONTENT="Die" HEIGHT="43" HPOS="623" ID="region0001_line0007_word0001" VPOS="825" WIDTH="61"/>
+            <SP/>
+            <String CONTENT="gewiſſe" HEIGHT="44" HPOS="696" ID="region0001_line0007_word0002" VPOS="824" WIDTH="105"/>
+            <SP/>
+            <String CONTENT="Ueberzeugung" HEIGHT="40" HPOS="813" ID="region0001_line0007_word0003" VPOS="827" WIDTH="209"/>
+            <SP/>
+            <String CONTENT="von" HEIGHT="28" HPOS="1034" ID="region0001_line0007_word0004" VPOS="834" WIDTH="57"/>
+            <SP/>
+            <String CONTENT="ihrer" HEIGHT="45" HPOS="1101" ID="region0001_line0007_word0005" VPOS="827" WIDTH="73"/>
+            <SP/>
+            <String CONTENT="Fort⸗" HEIGHT="40" HPOS="1185" ID="region0001_line0007_word0006" VPOS="828" WIDTH="91"/>
+          </TextLine>
+          <TextLine HEIGHT="62" HPOS="435" ID="region0001_line0008" VPOS="877" WIDTH="840">
+            <String CONTENT="„dauer" HEIGHT="33" HPOS="439" ID="region0001_line0008_word0000" VPOS="887" WIDTH="112"/>
+            <SP/>
+            <String CONTENT="vermehrt" HEIGHT="42" HPOS="567" ID="region0001_line0008_word0001" VPOS="886" WIDTH="139"/>
+            <SP/>
+            <String CONTENT="ihren" HEIGHT="43" HPOS="729" ID="region0001_line0008_word0002" VPOS="887" WIDTH="79"/>
+            <SP/>
+            <String CONTENT="Mißmuth," HEIGHT="43" HPOS="835" ID="region0001_line0008_word0003" VPOS="887" WIDTH="170"/>
+            <SP/>
+            <String CONTENT="bringt" HEIGHT="39" HPOS="1042" ID="region0001_line0008_word0004" VPOS="888" WIDTH="93"/>
+            <SP/>
+            <String CONTENT="ſie" HEIGHT="38" HPOS="1162" ID="region0001_line0008_word0005" VPOS="890" WIDTH="35"/>
+            <SP/>
+            <String CONTENT="zur" HEIGHT="31" HPOS="1215" ID="region0001_line0008_word0006" VPOS="897" WIDTH="49"/>
+          </TextLine>
+          <TextLine HEIGHT="61" HPOS="435" ID="region0001_line0009" VPOS="937" WIDTH="841">
+            <String CONTENT="„Verzweifelung," HEIGHT="43" HPOS="439" ID="region0001_line0009_word0000" VPOS="943" WIDTH="264"/>
+            <SP/>
+            <String CONTENT="und" HEIGHT="31" HPOS="729" ID="region0001_line0009_word0001" VPOS="946" WIDTH="58"/>
+            <SP/>
+            <String CONTENT="macht," HEIGHT="43" HPOS="807" ID="region0001_line0009_word0002" VPOS="941" WIDTH="105"/>
+            <SP/>
+            <String CONTENT="daß" HEIGHT="38" HPOS="940" ID="region0001_line0009_word0003" VPOS="948" WIDTH="54"/>
+            <SP/>
+            <String CONTENT="fie" HEIGHT="39" HPOS="1007" ID="region0001_line0009_word0004" VPOS="948" WIDTH="44"/>
+            <SP/>
+            <String CONTENT="ſich" HEIGHT="45" HPOS="1072" ID="region0001_line0009_word0005" VPOS="941" WIDTH="59"/>
+            <SP/>
+            <String CONTENT="und" HEIGHT="32" HPOS="1141" ID="region0001_line0009_word0006" VPOS="949" WIDTH="58"/>
+            <SP/>
+            <String CONTENT="ans" HEIGHT="40" HPOS="1214" ID="region0001_line0009_word0007" VPOS="943" WIDTH="50"/>
+          </TextLine>
+          <TextLine HEIGHT="63" HPOS="436" ID="region0001_line0010" VPOS="995" WIDTH="840">
+            <String CONTENT="„bern" HEIGHT="36" HPOS="439" ID="region0001_line0010_word0000" VPOS="1005" WIDTH="93"/>
+            <SP/>
+            <String CONTENT="zur" HEIGHT="32" HPOS="545" ID="region0001_line0010_word0001" VPOS="1013" WIDTH="49"/>
+            <SP/>
+            <String CONTENT="Laſt" HEIGHT="41" HPOS="606" ID="region0001_line0010_word0002" VPOS="1004" WIDTH="60"/>
+            <SP/>
+            <String CONTENT="leben.»" HEIGHT="34" HPOS="678" ID="region0001_line0010_word0003" VPOS="1006" WIDTH="114"/>
+            <SP/>
+            <String CONTENT="«Dieſes" HEIGHT="46" HPOS="835" ID="region0001_line0010_word0004" VPOS="1003" WIDTH="110"/>
+            <SP/>
+            <String CONTENT="Geſchlechts" HEIGHT="43" HPOS="953" ID="region0001_line0010_word0005" VPOS="1006" WIDTH="170"/>
+            <SP/>
+            <String CONTENT="bin" HEIGHT="34" HPOS="1133" ID="region0001_line0010_word0006" VPOS="1008" WIDTH="49"/>
+            <SP/>
+            <String CONTENT="auch" HEIGHT="40" HPOS="1196" ID="region0001_line0010_word0007" VPOS="1008" WIDTH="67"/>
+          </TextLine>
+          <TextLine HEIGHT="76" HPOS="435" ID="region0001_line0011" VPOS="1047" WIDTH="841">
+            <String CONTENT="ich," HEIGHT="42" HPOS="440" ID="region0001_line0011_word0000" VPOS="1056" WIDTH="59"/>
+            <SP/>
+            <String CONTENT="der" HEIGHT="33" HPOS="526" ID="region0001_line0011_word0001" VPOS="1057" WIDTH="47"/>
+            <SP/>
+            <String CONTENT="ich" HEIGHT="40" HPOS="592" ID="region0001_line0011_word0002" VPOS="1055" WIDTH="38"/>
+            <SP/>
+            <String CONTENT="mir-" HEIGHT="36" HPOS="643" ID="region0001_line0011_word0003" VPOS="1055" WIDTH="64"/>
+            <SP/>
+            <String CONTENT="vorgenommen" HEIGHT="58" HPOS="727" ID="region0001_line0011_word0004" VPOS="1047" WIDTH="199"/>
+            <SP/>
+            <String CONTENT="habe," HEIGHT="54" HPOS="949" ID="region0001_line0011_word0005" VPOS="1048" WIDTH="86"/>
+            <SP/>
+            <String CONTENT="die" HEIGHT="36" HPOS="1068" ID="region0001_line0011_word0006" VPOS="1057" WIDTH="42"/>
+            <SP/>
+            <String CONTENT="Begeben⸗" HEIGHT="44" HPOS="1122" ID="region0001_line0011_word0007" VPOS="1058" WIDTH="142"/>
+          </TextLine>
+          <TextLine HEIGHT="60" HPOS="435" ID="region0001_line0012" VPOS="1122" WIDTH="672">
+            <String CONTENT="heiten" HEIGHT="44" HPOS="438" ID="region0001_line0012_word0000" VPOS="1131" WIDTH="93"/>
+            <SP/>
+            <String CONTENT="meines" HEIGHT="33" HPOS="545" ID="region0001_line0012_word0001" VPOS="1132" WIDTH="106"/>
+            <SP/>
+            <String CONTENT="Lebens" HEIGHT="37" HPOS="664" ID="region0001_line0012_word0002" VPOS="1131" WIDTH="101"/>
+            <SP/>
+            <String CONTENT="niederzuſchreiben." HEIGHT="46" HPOS="790" ID="region0001_line0012_word0003" VPOS="1131" WIDTH="264"/>
+          </TextLine>
+        </TextBlock>
+        <TextBlock HEIGHT="676" HPOS="435" ID="region0002" VPOS="1245" WIDTH="838">
+          <TextLine HEIGHT="62" HPOS="455" ID="region0002_line0000" VPOS="1245" WIDTH="817">
+            <String CONTENT="Ich" HEIGHT="42" HPOS="516" ID="region0002_line0000_word0000" VPOS="1255" WIDTH="61"/>
+            <SP/>
+            <String CONTENT="ward" HEIGHT="32" HPOS="590" ID="region0002_line0000_word0001" VPOS="1257" WIDTH="79"/>
+            <SP/>
+            <String CONTENT="gebohren" HEIGHT="43" HPOS="684" ID="region0002_line0000_word0002" VPOS="1256" WIDTH="134"/>
+            <SP/>
+            <String CONTENT="im" HEIGHT="34" HPOS="837" ID="region0002_line0000_word0003" VPOS="1257" WIDTH="41"/>
+            <SP/>
+            <String CONTENT="Lande" HEIGHT="38" HPOS="898" ID="region0002_line0000_word0004" VPOS="1256" WIDTH="91"/>
+            <SP/>
+            <String CONTENT="der" HEIGHT="34" HPOS="1002" ID="region0002_line0000_word0005" VPOS="1259" WIDTH="48"/>
+            <SP/>
+            <String CONTENT="Lugnagianer," HEIGHT="44" HPOS="1062" ID="region0002_line0000_word0006" VPOS="1255" WIDTH="200"/>
+          </TextLine>
+          <TextLine HEIGHT="63" HPOS="435" ID="region0002_line0001" VPOS="1305" WIDTH="837">
+            <String CONTENT="in" HEIGHT="33" HPOS="436" ID="region0002_line0001_word0000" VPOS="1315" WIDTH="35"/>
+            <SP/>
+            <String CONTENT="der" HEIGHT="31" HPOS="489" ID="region0002_line0001_word0001" VPOS="1318" WIDTH="48"/>
+            <SP/>
+            <String CONTENT="Stadt" HEIGHT="36" HPOS="554" ID="region0002_line0001_word0002" VPOS="1313" WIDTH="100"/>
+            <SP/>
+            <String CONTENT="Gangnap," HEIGHT="41" HPOS="671" ID="region0002_line0001_word0003" VPOS="1312" WIDTH="165"/>
+            <SP/>
+            <String CONTENT="und" HEIGHT="32" HPOS="861" ID="region0002_line0001_word0004" VPOS="1317" WIDTH="59"/>
+            <SP/>
+            <String CONTENT="ſobald" HEIGHT="42" HPOS="938" ID="region0002_line0001_word0005" VPOS="1315" WIDTH="91"/>
+            <SP/>
+            <String CONTENT="meine" HEIGHT="36" HPOS="1047" ID="region0002_line0001_word0006" VPOS="1315" WIDTH="91"/>
+            <SP/>
+            <String CONTENT="Eltern" HEIGHT="35" HPOS="1163" ID="region0002_line0001_word0007" VPOS="1318" WIDTH="101"/>
+          </TextLine>
+          <TextLine HEIGHT="65" HPOS="435" ID="region0002_line0002" VPOS="1367" WIDTH="836">
+            <String CONTENT="das" HEIGHT="35" HPOS="438" ID="region0002_line0002_word0000" VPOS="1380" WIDTH="54"/>
+            <SP/>
+            <String CONTENT="mein" HEIGHT="36" HPOS="506" ID="region0002_line0002_word0001" VPOS="1378" WIDTH="75"/>
+            <SP/>
+            <String CONTENT="Schifſal" HEIGHT="44" HPOS="594" ID="region0002_line0002_word0002" VPOS="1378" WIDTH="127"/>
+            <SP/>
+            <String CONTENT="deutende" HEIGHT="33" HPOS="742" ID="region0002_line0002_word0003" VPOS="1382" WIDTH="131"/>
+            <SP/>
+            <String CONTENT="Mahl" HEIGHT="45" HPOS="887" ID="region0002_line0002_word0004" VPOS="1380" WIDTH="94"/>
+            <SP/>
+            <String CONTENT="erblikten," HEIGHT="42" HPOS="991" ID="region0002_line0002_word0005" VPOS="1381" WIDTH="150"/>
+            <SP/>
+            <String CONTENT="betruͤb⸗" HEIGHT="39" HPOS="1155" ID="region0002_line0002_word0006" VPOS="1379" WIDTH="108"/>
+          </TextLine>
+          <TextLine HEIGHT="63" HPOS="435" ID="region0002_line0003" VPOS="1431" WIDTH="836">
+            <String CONTENT="ten" HEIGHT="30" HPOS="438" ID="region0002_line0003_word0000" VPOS="1444" WIDTH="48"/>
+            <SP/>
+            <String CONTENT="ſie" HEIGHT="40" HPOS="505" ID="region0002_line0003_word0001" VPOS="1440" WIDTH="34"/>
+            <SP/>
+            <String CONTENT="ſich" HEIGHT="41" HPOS="554" ID="region0002_line0003_word0002" VPOS="1440" WIDTH="49"/>
+            <SP/>
+            <String CONTENT="ſehr," HEIGHT="42" HPOS="615" ID="region0002_line0003_word0003" VPOS="1440" WIDTH="74"/>
+            <SP/>
+            <String CONTENT="daß" HEIGHT="40" HPOS="713" ID="region0002_line0003_word0004" VPOS="1440" WIDTH="54"/>
+            <SP/>
+            <String CONTENT="ſie" HEIGHT="42" HPOS="781" ID="region0002_line0003_word0005" VPOS="1440" WIDTH="36"/>
+            <SP/>
+            <String CONTENT="mich" HEIGHT="43" HPOS="834" ID="region0002_line0003_word0006" VPOS="1440" WIDTH="69"/>
+            <SP/>
+            <String CONTENT="unglükliches" HEIGHT="45" HPOS="925" ID="region0002_line0003_word0007" VPOS="1439" WIDTH="183"/>
+            <SP/>
+            <String CONTENT="Geſchöpf" HEIGHT="47" HPOS="1130" ID="region0002_line0003_word0008" VPOS="1439" WIDTH="137"/>
+          </TextLine>
+          <TextLine HEIGHT="64" HPOS="436" ID="region0002_line0004" VPOS="1494" WIDTH="835">
+            <String CONTENT="zur" HEIGHT="36" HPOS="436" ID="region0002_line0004_word0000" VPOS="1510" WIDTH="51"/>
+            <SP/>
+            <String CONTENT="Welt" HEIGHT="36" HPOS="508" ID="region0002_line0004_word0001" VPOS="1504" WIDTH="79"/>
+            <SP/>
+            <String CONTENT="gebracht." HEIGHT="41" HPOS="605" ID="region0002_line0004_word0002" VPOS="1505" WIDTH="131"/>
+            <SP/>
+            <String CONTENT="Bis" HEIGHT="37" HPOS="816" ID="region0002_line0004_word0003" VPOS="1505" WIDTH="63"/>
+            <SP/>
+            <String CONTENT="zu" HEIGHT="35" HPOS="898" ID="region0002_line0004_word0004" VPOS="1514" WIDTH="34"/>
+            <SP/>
+            <String CONTENT="meinem" HEIGHT="35" HPOS="957" ID="region0002_line0004_word0005" VPOS="1506" WIDTH="120"/>
+            <SP/>
+            <String CONTENT="achtzigſten" HEIGHT="45" HPOS="1106" ID="region0002_line0004_word0006" VPOS="1505" WIDTH="157"/>
+          </TextLine>
+          <TextLine HEIGHT="64" HPOS="435" ID="region0002_line0005" VPOS="1556" WIDTH="835">
+            <String CONTENT="Jahr" HEIGHT="44" HPOS="436" ID="region0002_line0005_word0000" VPOS="1563" WIDTH="84"/>
+            <SP/>
+            <String CONTENT="lebte" HEIGHT="35" HPOS="538" ID="region0002_line0005_word0001" VPOS="1565" WIDTH="68"/>
+            <SP/>
+            <String CONTENT="ich" HEIGHT="40" HPOS="630" ID="region0002_line0005_word0002" VPOS="1565" WIDTH="39"/>
+            <SP/>
+            <String CONTENT="in" HEIGHT="35" HPOS="696" ID="region0002_line0005_word0003" VPOS="1566" WIDTH="32"/>
+            <SP/>
+            <String CONTENT="meinem" HEIGHT="35" HPOS="754" ID="region0002_line0005_word0004" VPOS="1566" WIDTH="120"/>
+            <SP/>
+            <String CONTENT="Vaterlande" HEIGHT="37" HPOS="901" ID="region0002_line0005_word0005" VPOS="1566" WIDTH="175"/>
+            <SP/>
+            <String CONTENT="wie" HEIGHT="45" HPOS="1094" ID="region0002_line0005_word0006" VPOS="1565" WIDTH="53"/>
+            <SP/>
+            <String CONTENT="andre." HEIGHT="33" HPOS="1166" ID="region0002_line0005_word0007" VPOS="1570" WIDTH="96"/>
+          </TextLine>
+          <TextLine HEIGHT="64" HPOS="435" ID="region0002_line0006" VPOS="1617" WIDTH="835">
+            <String CONTENT="Ich" HEIGHT="42" HPOS="436" ID="region0002_line0006_word0000" VPOS="1624" WIDTH="60"/>
+            <SP/>
+            <String CONTENT="heiratete" HEIGHT="41" HPOS="516" ID="region0002_line0006_word0001" VPOS="1627" WIDTH="129"/>
+            <SP/>
+            <String CONTENT="im" HEIGHT="35" HPOS="667" ID="region0002_line0006_word0002" VPOS="1626" WIDTH="39"/>
+            <SP/>
+            <String CONTENT="fuͤnf" HEIGHT="45" HPOS="721" ID="region0002_line0006_word0003" VPOS="1624" WIDTH="68"/>
+            <SP/>
+            <String CONTENT="und" HEIGHT="32" HPOS="800" ID="region0002_line0006_word0004" VPOS="1629" WIDTH="57"/>
+            <SP/>
+            <String CONTENT="zwanzigſten" HEIGHT="42" HPOS="868" ID="region0002_line0006_word0005" VPOS="1627" WIDTH="177"/>
+            <SP/>
+            <String CONTENT="Jahr" HEIGHT="45" HPOS="1058" ID="region0002_line0006_word0006" VPOS="1626" WIDTH="83"/>
+            <SP/>
+            <String CONTENT="meines" HEIGHT="37" HPOS="1155" ID="region0002_line0006_word0007" VPOS="1629" WIDTH="108"/>
+          </TextLine>
+          <TextLine HEIGHT="67" HPOS="435" ID="region0002_line0007" VPOS="1678" WIDTH="835">
+            <String CONTENT="Alters," HEIGHT="41" HPOS="437" ID="region0002_line0007_word0000" VPOS="1686" WIDTH="114"/>
+            <SP/>
+            <String CONTENT="zum" HEIGHT="32" HPOS="573" ID="region0002_line0007_word0001" VPOS="1696" WIDTH="63"/>
+            <SP/>
+            <String CONTENT="Gluͤk" HEIGHT="39" HPOS="657" ID="region0002_line0007_word0002" VPOS="1686" WIDTH="79"/>
+            <SP/>
+            <String CONTENT="aber" HEIGHT="33" HPOS="749" ID="region0002_line0007_word0003" VPOS="1690" WIDTH="65"/>
+            <SP/>
+            <String CONTENT="war" HEIGHT="26" HPOS="832" ID="region0002_line0007_word0004" VPOS="1696" WIDTH="62"/>
+            <SP/>
+            <String CONTENT="meine" HEIGHT="35" HPOS="912" ID="region0002_line0007_word0005" VPOS="1688" WIDTH="91"/>
+            <SP/>
+            <String CONTENT="Frau" HEIGHT="42" HPOS="1025" ID="region0002_line0007_word0006" VPOS="1687" WIDTH="79"/>
+            <SP/>
+            <String CONTENT="unfrucht⸗" HEIGHT="44" HPOS="1124" ID="region0002_line0007_word0007" VPOS="1689" WIDTH="140"/>
+          </TextLine>
+          <TextLine HEIGHT="62" HPOS="435" ID="region0002_line0008" VPOS="1742" WIDTH="835">
+            <String CONTENT="bar," HEIGHT="40" HPOS="436" ID="region0002_line0008_word0000" VPOS="1749" WIDTH="62"/>
+            <SP/>
+            <String CONTENT="und" HEIGHT="29" HPOS="531" ID="region0002_line0008_word0001" VPOS="1752" WIDTH="58"/>
+            <SP/>
+            <String CONTENT="erſparte" HEIGHT="39" HPOS="610" ID="region0002_line0008_word0002" VPOS="1751" WIDTH="114"/>
+            <SP/>
+            <String CONTENT="mir" HEIGHT="34" HPOS="744" ID="region0002_line0008_word0003" VPOS="1751" WIDTH="56"/>
+            <SP/>
+            <String CONTENT="alſo" HEIGHT="43" HPOS="822" ID="region0002_line0008_word0004" VPOS="1751" WIDTH="56"/>
+            <SP/>
+            <String CONTENT="die" HEIGHT="35" HPOS="896" ID="region0002_line0008_word0005" VPOS="1752" WIDTH="43"/>
+            <SP/>
+            <String CONTENT="Bitterkeit," HEIGHT="41" HPOS="957" ID="region0002_line0008_word0006" VPOS="1751" WIDTH="166"/>
+            <SP/>
+            <String CONTENT="meiner" HEIGHT="38" HPOS="1156" ID="region0002_line0008_word0007" VPOS="1751" WIDTH="107"/>
+          </TextLine>
+          <TextLine HEIGHT="67" HPOS="435" ID="region0002_line0009" VPOS="1803" WIDTH="834">
+            <String CONTENT="Nachkommen" HEIGHT="46" HPOS="436" ID="region0002_line0009_word0000" VPOS="1814" WIDTH="210"/>
+            <SP/>
+            <String CONTENT="Verluſt" HEIGHT="45" HPOS="663" ID="region0002_line0009_word0001" VPOS="1815" WIDTH="117"/>
+            <SP/>
+            <String CONTENT="bedauren" HEIGHT="42" HPOS="799" ID="region0002_line0009_word0002" VPOS="1815" WIDTH="137"/>
+            <SP/>
+            <String CONTENT="zu" HEIGHT="37" HPOS="953" ID="region0002_line0009_word0003" VPOS="1823" WIDTH="35"/>
+            <SP/>
+            <String CONTENT="müſſen," HEIGHT="48" HPOS="1007" ID="region0002_line0009_word0004" VPOS="1813" WIDTH="116"/>
+            <SP/>
+            <String CONTENT="Sie" HEIGHT="36" HPOS="1192" ID="region0002_line0009_word0005" VPOS="1819" WIDTH="70"/>
+          </TextLine>
+          <TextLine HEIGHT="51" HPOS="1123" ID="region0002_line0010" VPOS="1869" WIDTH="146">
+            <String CONTENT="ſtarb" HEIGHT="43" HPOS="1186" ID="region0002_line0010_word0000" VPOS="1881" WIDTH="72"/>
+          </TextLine>
+        </TextBlock>
+      </PrintSpace>
+    </Page>
+  </Layout>
+</alto>
