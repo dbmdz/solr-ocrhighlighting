@@ -294,7 +294,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
           "This method requires that an indexSearcher was passed in the "
               + "constructor.  Perhaps you mean to call highlightWithoutSearcher?");
     }
-
+    log.debug(
+        "highlightOcrFiels names:{}, query:{}, docIDs:{}, maxPassagesOcr:{}, respHeader:{}",
+        ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader);
     Long timeAllowed = params.getLong(OcrHighlightParams.TIME_ALLOWED);
     if (timeAllowed != null) {
       HighlightTimeout.set(timeAllowed);
@@ -441,8 +443,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
             if (content.getPointer() != null && content.getPointer().sources != null) {
               nSourcePtr = String.valueOf(content.getPointer().sources.size());
             }
-            String docContent = content != null ? content.subSequence(0, 1024).toString() : "n.a.";
-            log.error("Could not highlight in '{}' for ocr-doc '{}'", nSourcePtr, docContent, e);
+            log.error("Could not highlight ocr in '{}' sourceFiles", nSourcePtr, e);
           } finally {
             if (content instanceof AutoCloseable) {
               try {
