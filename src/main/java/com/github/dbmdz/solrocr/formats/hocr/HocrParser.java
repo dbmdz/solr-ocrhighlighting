@@ -178,6 +178,10 @@ public class HocrParser extends OcrParser {
           inAlternatives = false;
           continue;
         }
+        // Ignore empty words
+        if (txt == null) {
+          return;
+        }
         // We assume that we're dealing with valid hOCR, and in this case this is the event for the
         // end of the ocrx_word span, i.e. we have all the text we needed from the box and can
         // terminate and return
