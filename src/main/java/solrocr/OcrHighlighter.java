@@ -294,7 +294,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
           "This method requires that an indexSearcher was passed in the "
               + "constructor.  Perhaps you mean to call highlightWithoutSearcher?");
     }
-
+    log.debug(
+        "Highlighting OCR fields={} for query={} in docIDs={} with maxPassagesOcr={}",
+        ocrFieldNames, query, docIDs, maxPassagesOcr);
     Long timeAllowed = params.getLong(OcrHighlightParams.TIME_ALLOWED);
     if (timeAllowed != null) {
       HighlightTimeout.set(timeAllowed);
@@ -435,10 +437,17 @@ public class OcrHighlighter extends UnifiedHighlighter {
             // Stop highlighting
             break docLoop;
           } catch (RuntimeException e) {
-            // This catch-all prevents OCR highlighting from failing the complete query, instead
-            // users
-            // get an error message in their Solr log.
-            log.error("Could not highlight OCR content for document", e);
+            // This catch-all prevents OCR highlighting from failing the complete query,
+            // instead users get an error message in their Solr log.
+            if (content.getPointer() != null) {
+              log.error(
+                  "Could not highlight OCR content for document {} at '{}'",
+                  docId, content.getPointer(), e);
+            } else {
+              log.error(
+                  "Could not highlight OCR for document {} with OCR markup '{}...'",
+                  docId, content.subSequence(0, 256), e);
+            }
           } finally {
             if (content instanceof AutoCloseable) {
               try {
