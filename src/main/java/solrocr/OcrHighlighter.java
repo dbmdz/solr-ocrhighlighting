@@ -440,11 +440,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
             // This catch-all prevents OCR highlighting from failing the complete query,
             // instead users get an error message in their Solr log.
             if (content.getPointer() != null) {
-              List<SourcePointer.FileSource> fSource = content.getPointer().sources;
-              if (fSource != null && fSource.get(docId) != null) {
-                log.warn(
-                  "Propably problematic file at '{}'", fSource.get(docId).path);
-              } 
               log.error(
                   "Could not highlight OCR content for document {} at '{}'",
                   docId, content.getPointer(), e);
