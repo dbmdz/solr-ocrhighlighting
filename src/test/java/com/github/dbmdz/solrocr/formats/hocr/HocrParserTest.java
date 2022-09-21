@@ -208,4 +208,13 @@ public class HocrParserTest {
     List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
     assertThat(boxes).hasSize(22);
   }
+
+  @Test
+  public void testEmptyWord() throws FileNotFoundException, XMLStreamException {
+    Path p = Paths.get("src/test/resources/data/empty_words_bug.html");
+    CharFilter input = (CharFilter) filterFac.create(new StringReader(p.toString()));
+    OcrParser parser = new HocrParser(input);
+    List<OcrBox> boxes = parser.stream().collect(Collectors.toList());
+    assertThat(boxes).hasSize(7);
+  }
 }
