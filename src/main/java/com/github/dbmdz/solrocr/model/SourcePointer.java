@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -66,15 +65,13 @@ public class SourcePointer {
   static final Pattern POINTER_PAT =
       Pattern.compile("^(?<path>.+?)(?<isAscii>\\{ascii})?(?:\\[(?<regions>[0-9:,]+)])?$");
 
-  static Function<String, SourcePointer.FileSource> toFileSource = new ToFileSource();
-
   public final List<FileSource> sources;
 
   public static boolean isPointer(String pointer) {
     if (pointer.startsWith("<")) {
       return false;
     }
-    return Arrays.stream(pointer.split("\\+")).allMatch(p -> POINTER_PAT.matcher(p).matches());
+    return Arrays.stream(pointer.split("\\+")).allMatch(SourcePointer::fitsPattern);
   }
 
   public static SourcePointer parse(String pointer) {
@@ -83,11 +80,46 @@ public class SourcePointer {
     }
     String[] sourceTokens = pointer.split("\\+");
     List<FileSource> fileSources =
-        Arrays.stream(sourceTokens).map(toFileSource).collect(Collectors.toList());
+        Arrays.stream(sourceTokens).map(SourcePointer::toFileSource).collect(Collectors.toList());
     if (fileSources.isEmpty()) {
       return null;
     } else {
       return new SourcePointer(fileSources);
+    }
+  }
+
+  static boolean fitsPattern(String pointerToken) {
+    Matcher matcher = POINTER_PAT.matcher(pointerToken);
+    if (!matcher.matches()) {
+      logger.error("No match from pointer '{}' for '{}'!", pointerToken, POINTER_PAT);
+      return false;
+    }
+    return true;
+  }
+
+  static FileSource toFileSource(String pointerToken) {
+    Matcher m = POINTER_PAT.matcher(pointerToken);
+    if (!m.find()) {
+      logger.error("Pointer '{}' not matching pattern '{}'!", pointerToken, POINTER_PAT);
+      throw new RuntimeException("Could not parse source pointer from '" + pointerToken + ".");
+    }
+    Path sourcePath = Paths.get(m.group("path"));
+    List<SourcePointer.Region> regions = ImmutableList.of();
+    if (m.group("regions") != null) {
+      regions =
+          Arrays.stream(m.group("regions").split(","))
+              .map(SourcePointer::parseRegion)
+              .sorted(Comparator.comparingInt(r -> r.start))
+              .collect(Collectors.toList());
+    }
+    try {
+      return new SourcePointer.FileSource(sourcePath, regions, m.group("isAscii") != null);
+    } catch (FileNotFoundException e) {
+      logger.error("SourcePath '{}' not existing!", sourcePath);
+      throw new RuntimeException("Could not locate file at '" + sourcePath + ".");
+    } catch (IOException e) {
+      logger.error("SourcePath '{}' unreadable!", sourcePath);
+      throw new RuntimeException("Could not read file at '" + sourcePath + ".");
     }
   }
 
@@ -135,33 +167,5 @@ public class SourcePointer {
       }
     }
     return sb.toString();
-  }
-}
-
-/** Explicite Mapper Implementation */
-class ToFileSource implements Function<String, SourcePointer.FileSource> {
-
-  @Override
-  public SourcePointer.FileSource apply(String pointerStr) {
-    Matcher m = SourcePointer.POINTER_PAT.matcher(pointerStr);
-    if (!m.find()) {
-      throw new RuntimeException("Could not parse source pointer from '" + pointerStr + ".");
-    }
-    Path sourcePath = Paths.get(m.group("path"));
-    List<SourcePointer.Region> regions = ImmutableList.of();
-    if (m.group("regions") != null) {
-      regions =
-          Arrays.stream(m.group("regions").split(","))
-              .map(SourcePointer::parseRegion)
-              .sorted(Comparator.comparingInt(r -> r.start))
-              .collect(Collectors.toList());
-    }
-    try {
-      return new SourcePointer.FileSource(sourcePath, regions, m.group("isAscii") != null);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException("Could not locate file at '" + sourcePath + ".");
-    } catch (IOException e) {
-      throw new RuntimeException("Could not read file at '" + sourcePath + ".");
-    }
   }
 }

@@ -439,7 +439,15 @@ public class OcrHighlighter extends UnifiedHighlighter {
           } catch (RuntimeException e) {
             // This catch-all prevents OCR highlighting from failing the complete query,
             // instead users get an error message in their Solr log.
-            log.error("Could not highlight ocr in source '{}'", content.getPointer(), e);
+            if (content.getPointer() != null) {
+              log.error(
+                  "Could not highlight OCR content for document {} at '{}'",
+                  docId, content.getPointer(), e);
+            } else {
+              log.error(
+                  "Could not highlight OCR for document {} with OCR markup '{}...'",
+                  docId, content.subSequence(0, 256), e);
+            }
           } finally {
             if (content instanceof AutoCloseable) {
               try {
