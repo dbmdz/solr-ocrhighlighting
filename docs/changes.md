@@ -1,10 +1,28 @@
+## 0.8.2 (unreleased)
+
+**Bugfixes:**
+
+- hOCR: Fix stack overflow when handling empty words in combination with a partially
+  hyphenated word
+
+**Other Changes:**
+
+- Improved error message in case of errors during highlighting, the message now
+  includes the source pointer of the failed document, or if storing OCR in the index,
+  the beginning of the broken content. Also included is the internal Lucene document
+  identifier.  [By adding the `[docid]` field to the returned fields for the failing
+  query](https://solr.apache.org/guide/solr/latest/query-guide/document-transformers.html#docid-docidaugmenterfactory),
+  the internal id is added to very document in the result set for a failing query,
+  which should allow quick identification of the documents that cause issues during
+  highlighting.
+
 ## 0.8.1 (2022-06-10)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.1)
 
 This is a bugfix release targeting mainly the MiniOCR and ALTO
 implementations.
 
-**Bufgfixes:**
+**Bugfixes:**
 
 - ALTO: Fix handling of empty words. Previously any words after a word element
   with no text **would be skipped entirely during indexing** 😱😱.
