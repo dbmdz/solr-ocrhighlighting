@@ -9,7 +9,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.5.2">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.5.3">
     
     
       
@@ -17,7 +17,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.9f9400aa.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.7a952b86.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#081-2022-06-10" class="md-skip">
+        <a href="#082-unreleased" class="md-skip">
           Skip to content
         </a>
       
@@ -326,6 +326,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#082-unreleased" class="md-nav__link">
+    0.8.2 (unreleased)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#081-2022-06-10" class="md-nav__link">
     0.8.1 (2022-06-10)
   </a>
@@ -449,6 +456,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#082-unreleased" class="md-nav__link">
+    0.8.2 (unreleased)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#081-2022-06-10" class="md-nav__link">
     0.8.1 (2022-06-10)
   </a>
@@ -561,11 +575,28 @@
 
   <h1>Change Log</h1>
 
+<h2 id="082-unreleased">0.8.2 (unreleased)</h2>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li>hOCR: Fix stack overflow when handling empty words in combination with a partially
+  hyphenated word</li>
+</ul>
+<p><strong>Other Changes:</strong></p>
+<ul>
+<li>Improved error message in case of errors during highlighting, the message now
+  includes the source pointer of the failed document, or if storing OCR in the index,
+  the beginning of the broken content. Also included is the internal Lucene document
+  identifier.  <a href="https://solr.apache.org/guide/solr/latest/query-guide/document-transformers.html#docid-docidaugmenterfactory">By adding the <code>[docid]</code> field to the returned fields for the failing
+  query</a>,
+  the internal id is added to very document in the result set for a failing query,
+  which should allow quick identification of the documents that cause issues during
+  highlighting.</li>
+</ul>
 <h2 id="081-2022-06-10">0.8.1 (2022-06-10)</h2>
 <p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.1">GitHub Release</a></p>
 <p>This is a bugfix release targeting mainly the MiniOCR and ALTO
 implementations.</p>
-<p><strong>Bufgfixes:</strong></p>
+<p><strong>Bugfixes:</strong></p>
 <ul>
 <li>ALTO: Fix handling of empty words. Previously any words after a word element
   with no text <strong>would be skipped entirely during indexing</strong> 😱😱.</li>
@@ -921,10 +952,10 @@ to your setup.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.39f04ddb.min.js"></script>
+      <script src="../assets/javascripts/bundle.37e9125f.min.js"></script>
       
     
   </body>
