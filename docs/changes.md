@@ -1,4 +1,7 @@
-## 0.8.2 (unreleased)
+## 0.8.2 (2022-09-22)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.2)
+
+Bugfix release for an edge-case in hOCR parsing.
 
 **Bugfixes:**
 
