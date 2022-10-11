@@ -106,7 +106,7 @@ public interface OcrFormat {
    * Get the range of positions contained by the word containing the given position.
    *
    * <p>This default implementation is valid for OCR formats that encode word text as character
-   * nodes inside of a containing element (like hOCR and MiniOCR). For other formats, override. *
+   * nodes inside a containing element (like hOCR and MiniOCR). For other formats, override.
    */
   default Range<Integer> getContainingWordLimits(String fragment, int position) {
     return Range.closedOpen(
