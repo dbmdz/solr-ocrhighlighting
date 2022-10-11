@@ -1,6 +1,8 @@
 package com.github.dbmdz.solrocr.solr;
 
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -502,5 +504,13 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertU(adoc("id", "57371"));
     assertU(adoc("id", "57371", "ocr_text", ""));
     assertU(commit());
+  }
+
+  public void testIssue288() throws IOException {
+    Path ocrPath = Paths.get("src/test/resources/data/issue_288.hocr");
+    assertU(adoc("ocr_text_stored", new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8), "id", "87371"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "il", "hl.snippets", "4096", "hl.weightMatches", "true", "df", "ocr_text_stored", "hl.ocr.fl", "ocr_text_stored");
+    assertQ(req, "count(.//lst[@name=\"87371\"]//arr[@name='snippets']/lst)=19");
   }
 }

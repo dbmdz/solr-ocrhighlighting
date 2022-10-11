@@ -24,6 +24,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
   public int getFollowing(int offset) {
     int start = Math.min(offset + 1, this.text.getEndIndex());
     int end = Math.min(start + blockSize, this.text.getEndIndex());
+    boolean needsMoreData = end == start + blockSize;
     while (start < this.text.getEndIndex()) {
       String block = text.subSequence(start, end, true).toString();
       // Truncate block to last '>' to avoid splitting element openings across blocks
@@ -36,8 +37,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
       }
 
       // In hOCR, there can be multiple options for expressing the same level in the block
-      // hierarchy,
-      // so we need to check for all of them.
+      // hierarchy, so we need to check for all of them.
       int idx = blockEnd;
       int closeIdx = blockEnd - 1;
       outer:
@@ -69,6 +69,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
           if (elemOpen < idx) {
             // Found match
             idx = elemOpen;
+            needsMoreData = false;
             break outer;
           } else {
             // Try next class
@@ -76,7 +77,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
           }
         }
       }
-      if (idx != block.length()) {
+      if (!needsMoreData) {
         if (closeIdx < idx) {
           closeIdx = block.length();
         }

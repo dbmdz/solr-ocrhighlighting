@@ -296,7 +296,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }
     log.debug(
         "Highlighting OCR fields={} for query={} in docIDs={} with maxPassagesOcr={}",
-        ocrFieldNames, query, docIDs, maxPassagesOcr);
+        ocrFieldNames,
+        query,
+        docIDs,
+        maxPassagesOcr);
     Long timeAllowed = params.getLong(OcrHighlightParams.TIME_ALLOWED);
     if (timeAllowed != null) {
       HighlightTimeout.set(timeAllowed);
@@ -442,11 +445,15 @@ public class OcrHighlighter extends UnifiedHighlighter {
             if (content.getPointer() != null) {
               log.error(
                   "Could not highlight OCR content for document {} at '{}'",
-                  docId, content.getPointer(), e);
+                  docId,
+                  content.getPointer(),
+                  e);
             } else {
               log.error(
                   "Could not highlight OCR for document {} with OCR markup '{}...'",
-                  docId, content.subSequence(0, 256), e);
+                  docId,
+                  content.subSequence(0, 256),
+                  e);
             }
           } finally {
             if (content instanceof AutoCloseable) {
