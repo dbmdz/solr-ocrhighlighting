@@ -28,9 +28,9 @@ public abstract class BaseBreakLocator implements BreakLocator {
    * block hierarchy, i.e. we often run into the situation there is no match. These cases are the
    * absolute worst case for both {@link String#lastIndexOf(String, int)} and {@link
    * String#indexOf(String, int)}. So why is the latter faster? Well, in recent Hotspot versions, it
-   * is SIMD-accelerated via compiler intrinsics. And the speed-up we get from these worst cases
-   * is significant enough to completely make up for the slightly worse performance in more ideal
-   * cases (~25% slower).
+   * is SIMD-accelerated via compiler intrinsics. And the speed-up we get from these worst cases is
+   * significant enough to completely make up for the slightly worse performance in more ideal cases
+   * (~25% slower).
    */
   protected static int optimizedLastIndexOf(String haystack, String needle, int fromIdx) {
     int from = -1;
