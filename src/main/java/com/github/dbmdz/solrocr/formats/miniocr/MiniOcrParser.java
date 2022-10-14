@@ -112,17 +112,6 @@ public class MiniOcrParser extends OcrParser {
         box.setHyphenInfo(null, null);
       }
     }
-
-    // Boxes without text or coordinates (if either is requested with a feature flag) are ignored
-    // since they break things downstream
-    boolean ignoreBox =
-        (features.contains(ParsingFeature.TEXT)
-                && (box.getText() == null || box.getText().isEmpty()))
-            || (features.contains(ParsingFeature.COORDINATES)
-                && (box.getLrx() < 0 && box.getLry() < 0 && box.getUlx() < 0 && box.getUly() < 0));
-    if (ignoreBox) {
-      box = this.readNext(xmlReader, features);
-    }
     return box;
   }
 

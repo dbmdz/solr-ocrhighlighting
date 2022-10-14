@@ -508,9 +508,25 @@ public class HocrTest extends SolrTestCaseJ4 {
 
   public void testIssue288() throws IOException {
     Path ocrPath = Paths.get("src/test/resources/data/issue_288.hocr");
-    assertU(adoc("ocr_text_stored", new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8), "id", "87371"));
+    assertU(
+        adoc(
+            "ocr_text_stored",
+            new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
+            "id",
+            "87371"));
     assertU(commit());
-    SolrQueryRequest req = xmlQ("q", "il", "hl.snippets", "4096", "hl.weightMatches", "true", "df", "ocr_text_stored", "hl.ocr.fl", "ocr_text_stored");
+    SolrQueryRequest req =
+        xmlQ(
+            "q",
+            "il",
+            "hl.snippets",
+            "4096",
+            "hl.weightMatches",
+            "true",
+            "df",
+            "ocr_text_stored",
+            "hl.ocr.fl",
+            "ocr_text_stored");
     assertQ(req, "count(.//lst[@name=\"87371\"]//arr[@name='snippets']/lst)=19");
   }
 }

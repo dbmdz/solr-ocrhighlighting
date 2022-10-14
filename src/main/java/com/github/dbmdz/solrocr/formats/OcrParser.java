@@ -1,7 +1,6 @@
 package com.github.dbmdz.solrocr.formats;
 
 import com.ctc.wstx.api.WstxInputProperties;
-import com.ctc.wstx.exc.WstxLazyException;
 import com.ctc.wstx.stax.WstxInputFactory;
 import com.github.dbmdz.solrocr.model.OcrBox;
 import com.github.dbmdz.solrocr.reader.PeekingReader;
@@ -104,17 +103,7 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
             (publicID, systemID, baseURI, namespace) ->
                 String.format(Locale.US, "&amp;%s;", namespace));
     this.xmlReader = (XMLStreamReader2) xmlInputFactory.createXMLStreamReader(this.input);
-    try {
-      this.nextWord = this.readNext(this.xmlReader, this.features);
-    } catch (XMLStreamException e) {
-      throw new RuntimeException(
-          String.format(
-              Locale.US,
-              "Failed to parse the OCR markup, make sure your files are well-formed and your regions start/end on "
-                  + "complete tags! (Source was: %s)",
-              this.input.getSource().orElse("[unknown]")),
-          e);
-    }
+    this.nextWord = prepareNext();
   }
 
   @Override
@@ -138,9 +127,33 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
       throw new IllegalStateException("No more words in input");
     }
     OcrBox out = this.nextWord;
+    this.nextWord = prepareNext();
+    return out;
+  }
+
+  private OcrBox prepareNext() {
     try {
-      this.nextWord = readNext(xmlReader, features);
-    } catch (XMLStreamException | WstxLazyException e) {
+      while (xmlReader.hasNext()) {
+        OcrBox box = this.readNext(this.xmlReader, this.features);
+        if (box == null) {
+          continue;
+        }
+        // Boxes without text or coordinates (if either is requested with a feature flag) are
+        // ignored since they break things downstream. Skip the current box and continue with next
+        // one.
+        boolean ignoreBox =
+            (this.features.contains(ParsingFeature.TEXT)
+                    && (box.getText() == null || box.getText().isEmpty()))
+                || (this.features.contains(ParsingFeature.COORDINATES)
+                    && (box.getLrx() < 0
+                        && box.getLry() < 0
+                        && box.getUlx() < 0
+                        && box.getUly() < 0));
+        if (!ignoreBox) {
+          return box;
+        }
+      }
+    } catch (XMLStreamException e) {
       throw new RuntimeException(
           String.format(
               Locale.US,
@@ -149,7 +162,7 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
               this.input.getSource().orElse("[unknown]")),
           e);
     }
-    return out;
+    return null;
   }
 
   /**
