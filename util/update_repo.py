@@ -10,6 +10,7 @@ import base64
 import itertools
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -19,6 +20,7 @@ from pathlib import Path
 from typing import Any, Iterable, List, Tuple, TypedDict
 from urllib import request
 
+VERSION_PAT = re.compile(r"^\d+\.\d+(?:\.\d+)?$")
 VERSION_CONSTRAINTS_78 = [
     ((0, 1, 0), ("7.5", "8.0")),
     ((0, 3, 1), ("7.5", "8.2")),
@@ -55,6 +57,11 @@ class Plugin(TypedDict):
     versions: List[Version]
 
 
+class Asset(TypedDict):
+    browser_download_url: str
+    name: str
+
+
 def fetch_releases() -> List[Any]:
     req = request.Request(RELEASES_URL)
     req.add_header("Accept", "application/vnd.github.v3+json")
@@ -71,7 +78,9 @@ def build_repository() -> List[Plugin]:
             "versions": list(
                 itertools.chain.from_iterable(
                     build_versions(
-                        r["tag_name"], datetime.fromisoformat(r["published_at"][:-1])
+                        r["tag_name"],
+                        datetime.fromisoformat(r["published_at"][:-1]),
+                        r["assets"],
                     )
                     for r in all_releases
                 )
@@ -80,64 +89,46 @@ def build_repository() -> List[Plugin]:
     ]
 
 
-def build_split_versions(
-    version: Tuple[int, int, int], date: datetime
+def build_versions(
+    tag_name: str, publish_date: datetime, assets: List[Asset]
 ) -> Iterable[Version]:
-    version_str = ".".join(str(x) for x in version)
+    relevant_assets = [
+        a
+        for a in assets
+        if a["name"].endswith(".jar")
+        and not any(a["name"].endswith(x) for x in ("-sources.jar", "-javadoc.jar"))
+    ]
+    for asset in relevant_assets:
+        is_v78 = "-solr78" in asset["name"]
+        version_str = next(
+            p
+            for p in asset["name"].replace(".jar", "").split("-")
+            if VERSION_PAT.match(p)
+        )
+        version = tuple(int(x) for x in version_str.split("."))
+        all_constraints = (
+            VERSION_CONSTRAINTS_9 if version >= (0, 8, 0) else VERSION_CONSTRAINTS_78
+        )
+        if len(version) == 2:
+            # Force semantic versioning
+            version = version + (0,)
+            version_str = ".".join(str(p) for p in version)
+        if tag_name == "wip":
+            version_str = f'{version_str}-pre{publish_date.strftime("%Y%M%d%H%M%S")}'
+        if is_v78:
+            version_str = f"{version_str}-solr78"
+            all_constraints = VERSION_CONSTRAINTS_78
+        constraint = next(
+            c for min_vers, c in reversed(all_constraints) if version >= min_vers
+        )
 
-    artifact_v9 = (
-        f"{RELEASE_DOWNLOAD_URL}/{version_str}/solr-ocrhighlighting-{version_str}.jar"
-    )
-    constraint_v9 = next(
-        constraint
-        for min_vers, constraint in reversed(VERSION_CONSTRAINTS_9)
-        if version >= min_vers
-    )
-    yield dict(
-        version=version_str,
-        date=date.strftime("%Y-%m-%d"),
-        artifacts=[dict(url=artifact_v9, sig=sign_artifact(artifact_v9))],
-        manifest={"version-constraint": " - ".join(constraint_v9)},
-    )
-
-    artifact_v78 = f"{RELEASE_DOWNLOAD_URL}/{version_str}/solr-ocrhighlighting-{version_str}-solr78.jar"
-    constraint_v78 = next(
-        constraint
-        for min_vers, constraint in reversed(VERSION_CONSTRAINTS_78)
-        if version >= min_vers
-    )
-    yield dict(
-        version=version_str + "-solr78",
-        date=date.strftime("%Y-%m-%d"),
-        artifacts=[dict(url=artifact_v78, sig=sign_artifact(artifact_v78))],
-        manifest={"version-constraint": " - ".join(constraint_v78)},
-    )
-
-
-def build_versions(version_str: str, date: datetime) -> Iterable[Version]:
-    version = tuple(int(x) for x in version_str.split("."))
-    if version >= SPLIT_START_VERSION:
-        yield from build_split_versions(version, date)
-        return
-    artifact_url = (
-        f"{RELEASE_DOWNLOAD_URL}/{version_str}/solr-ocrhighlighting-{version_str}.jar"
-    )
-    if len(version) == 2:
-        # Force semantic versioning
-        version = version + (0,)
-        version_str = ".".join(str(p) for p in version)
-    constraint = next(
-        constraint
-        for min_vers, constraint in reversed(VERSION_CONSTRAINTS_78)
-        if version >= min_vers
-    )
-    artifact_signature = sign_artifact(artifact_url)
-    yield dict(
-        version=version_str,
-        date=date.strftime("%Y-%m-%d"),
-        artifacts=[dict(url=artifact_url, sig=artifact_signature)],
-        manifest={"version-constraint": " - ".join(constraint)},
-    )
+        asset_url = asset["browser_download_url"]
+        yield dict(
+            version=version_str,
+            date=publish_date.strftime("%Y-%m-%d"),
+            artifacts=[dict(url=asset_url, sig=sign_artifact(asset_url))],
+            manifest={"version-constraint": " - ".join(constraint)},
+        )
 
 
 def sign_artifact(artifact_url: str) -> str:
@@ -190,10 +181,18 @@ def publish_repository(dry_run=False) -> None:
 
 
 if __name__ == "__main__":
+    if "--help" in sys.argv:
+        print(
+            f"update_repo.py [--dry-run]\n\n"
+            f"Required environment variables if not using --dry-run:\n"
+            f"- GH_DEPLOY_TOKEN: GitHub Personal Access Token with permissions for {REPOSITORY_GIT_REPO}\n"
+            f"- CERTIFICATE: PEM-encoded private key  corresponding to public key in {REPOSITORY_GIT_REPO}/solr/publickey.der\n"
+        )
+        sys.exit(0)
     dry_run = "--dry-run" in sys.argv
     if not dry_run and "GH_DEPLOY_TOKEN" not in os.environ:
         print(
-            f"Please provide a GitHub Personal Access Token with permissions for  "
+            f"Please provide a GitHub Personal Access Token with permissions for "
             f"{REPOSITORY_GIT_REPO} via the GH_DEPLOY_TOKEN environment variable."
         )
         sys.exit(1)
