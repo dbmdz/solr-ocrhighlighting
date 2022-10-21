@@ -114,7 +114,7 @@ def build_versions(
             version = version + (0,)
             version_str = ".".join(str(p) for p in version)
         if tag_name == "wip":
-            version_str = f'{version_str}-pre{publish_date.strftime("%Y%M%d%H%M%S")}'
+            version_str = f'{version_str}-pre{publish_date.strftime("%Y%m%d%H%M%S")}'
         if is_v78:
             version_str = f"{version_str}-solr78"
             all_constraints = VERSION_CONSTRAINTS_78
