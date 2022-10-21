@@ -1,3 +1,22 @@
+## 0.8.3 (2022-10-21)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.3)
+
+Another bugfix release, fixing some edge cases with 'odd' OCR files.
+
+**Bugfixes:**
+
+- hOCR: Fix truncated passages during highlighting due to incomplete forward
+  passes while parsing candidate passages.
+- All Formats: Use an iterative solution for skipping empty words instead of
+  a recursive strategy, which could lead to stack overflows when encountering
+  OCR files with many empty words.
+
+**Other Changes:**
+- We now have pre-releases in the Solr repository that can be used to experiment
+  with the latest changes in the plugin before the official release. For users not
+  using the repository, a pre-release build is also pushed to the GitHub Releases
+  page on every update to the repository.
+
 ## 0.8.2 (2022-09-22)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.2)
 
