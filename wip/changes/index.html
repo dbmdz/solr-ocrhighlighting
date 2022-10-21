@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#082-2022-09-22" class="md-skip">
+        <a href="#083-2022-10-21" class="md-skip">
           Skip to content
         </a>
       
@@ -326,6 +326,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#083-2022-10-21" class="md-nav__link">
+    0.8.3 (2022-10-21)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#082-2022-09-22" class="md-nav__link">
     0.8.2 (2022-09-22)
   </a>
@@ -456,6 +463,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#083-2022-10-21" class="md-nav__link">
+    0.8.3 (2022-10-21)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#082-2022-09-22" class="md-nav__link">
     0.8.2 (2022-09-22)
   </a>
@@ -575,6 +589,22 @@
 
   <h1>Change Log</h1>
 
+<h2 id="083-2022-10-21">0.8.3 (2022-10-21)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.3">GitHub Release</a></p>
+<p>Another bugfix release, fixing some edge cases with 'odd' OCR files.</p>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li>hOCR: Fix truncated passages during highlighting due to incomplete forward
+  passes while parsing candidate passages.</li>
+<li>All Formats: Use an iterative solution for skipping empty words instead of
+  a recursive strategy, which could lead to stack overflows when encountering
+  OCR files with many empty words.</li>
+</ul>
+<p><strong>Other Changes:</strong>
+- We now have pre-releases in the Solr repository that can be used to experiment
+  with the latest changes in the plugin before the official release. For users not
+  using the repository, a pre-release build is also pushed to the GitHub Releases
+  page on every update to the repository.</p>
 <h2 id="082-2022-09-22">0.8.2 (2022-09-22)</h2>
 <p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.2">GitHub Release</a></p>
 <p>Bugfix release for an edge-case in hOCR parsing.</p>
