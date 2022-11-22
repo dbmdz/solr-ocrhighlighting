@@ -74,6 +74,10 @@ def patch_package_paths(bytecode: bytes) -> bytes:
     return bytecode
 
 
+# FIXME: This is currently closely tied to implementation details of the OpenJDK
+#        11 Java bytecode compiler. We should probably make it more robust so
+#        it doesn't break with future versions or other implementations of the
+#        compiler.
 def patch_close_hook(bytecode: bytes) -> bytes:
     """With Solr 9, `org.apache.solr.core.CloseHook` became an interface,
     this function will patch the resulting byte code to use it as
