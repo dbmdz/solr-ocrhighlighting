@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 SOLR_HOST="${SOLR_HOST:-localhost}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SOLR7_VERSIONS="7.7 7.6 7.5"
