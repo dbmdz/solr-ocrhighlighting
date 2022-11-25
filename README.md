@@ -18,7 +18,7 @@ works transparently with non-OCR fields and just lets the default
 implementation handle those.
 
 In addition to improved highlighting for OCR, the plugin is able to [index
-alternative readings](https://dbmdz.github.io/solr-ocrhighlighting/alternatives/)
+alternative readings](https://dbmdz.github.io/solr-ocrhighlighting/latest/alternatives/)
 listed in the markup. For example, if you OCR file
 has the alternatives `christmas` and `christrias` for the token
 `clistrias` in the span `presents on clistrias eve`, users would be able
@@ -28,7 +28,7 @@ get the correct match in both cases, both with full highlighting.
 The plugin **works with all Solr versions >= 7.5**.
 
 ## Features
-- Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/formats/) directly without preprocessing
+- Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/latet/formats/) directly without preprocessing
 - Retrieve all the information needed to render a highlighted snippet view directly from Solr, without postprocessing
 - Keeps your index size manageable by not storing the OCR in the index
 
@@ -72,7 +72,7 @@ To run:
 3. `./ingest.py`
 4. Access `http://localhost:8181` in your browser
 
-For more information about the example setup, refer to the [documentation](https://dbmdz.github.io/solr-ocrhighlighting/example/).
+For more information about the example setup, refer to the [documentation](https://dbmdz.github.io/solr-ocrhighlighting/latest/example/).
 
 
 ## Limitations
