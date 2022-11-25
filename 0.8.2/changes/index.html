@@ -1,0 +1,986 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.3.9">
+    
+    
+      
+        <title>Change Log - Solr OCR Highlighting Plugin</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.1d29e8d0.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#083-2022-10-21" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+          
+        </aside>
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Solr OCR Highlighting Plugin" class="md-header__button md-logo" aria-label="Solr OCR Highlighting Plugin" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Solr OCR Highlighting Plugin
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Change Log
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dbmdz/solr-ocrhighlighting/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Solr OCR Highlighting Plugin" class="md-nav__button md-logo" aria-label="Solr OCR Highlighting Plugin" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Solr OCR Highlighting Plugin
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dbmdz/solr-ocrhighlighting/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../indexing/" class="md-nav__link">
+        Indexing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alternatives/" class="md-nav__link">
+        Indexing Alternative Terms
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../query/" class="md-nav__link">
+        Querying
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example/" class="md-nav__link">
+        Example Setup
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance/" class="md-nav__link">
+        Performance Tuning
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../formats/" class="md-nav__link">
+        Supported Formats
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Change Log
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Change Log
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#083-2022-10-21" class="md-nav__link">
+    0.8.3 (2022-10-21)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#082-2022-09-22" class="md-nav__link">
+    0.8.2 (2022-09-22)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#081-2022-06-10" class="md-nav__link">
+    0.8.1 (2022-06-10)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080-2022-06-01" class="md-nav__link">
+    0.8.0 (2022-06-01)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#072-2022-03-22" class="md-nav__link">
+    0.7.2 (2022-03-22)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#071-2021-09-24" class="md-nav__link">
+    0.7.1 (2021-09-24)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#070-2021-07-12" class="md-nav__link">
+    0.7.0 (2021-07-12)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060-2021-05-11" class="md-nav__link">
+    0.6.0 (2021-05-11)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050-2020-10-07" class="md-nav__link">
+    0.5.0 (2020-10-07)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#041-2020-06-02" class="md-nav__link">
+    0.4.1 (2020-06-02)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040-2020-05-11" class="md-nav__link">
+    0.4.0 (2020-05-11)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#031-2019-07-26" class="md-nav__link">
+    0.3.1 (2019-07-26)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#03-2019-07-25" class="md-nav__link">
+    0.3 (2019-07-25)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#02-2019-07-16" class="md-nav__link">
+    0.2 (2019-07-16)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#01-2019-06-06" class="md-nav__link">
+    0.1 (2019-06-06)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#083-2022-10-21" class="md-nav__link">
+    0.8.3 (2022-10-21)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#082-2022-09-22" class="md-nav__link">
+    0.8.2 (2022-09-22)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#081-2022-06-10" class="md-nav__link">
+    0.8.1 (2022-06-10)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080-2022-06-01" class="md-nav__link">
+    0.8.0 (2022-06-01)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#072-2022-03-22" class="md-nav__link">
+    0.7.2 (2022-03-22)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#071-2021-09-24" class="md-nav__link">
+    0.7.1 (2021-09-24)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#070-2021-07-12" class="md-nav__link">
+    0.7.0 (2021-07-12)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060-2021-05-11" class="md-nav__link">
+    0.6.0 (2021-05-11)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050-2020-10-07" class="md-nav__link">
+    0.5.0 (2020-10-07)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#041-2020-06-02" class="md-nav__link">
+    0.4.1 (2020-06-02)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040-2020-05-11" class="md-nav__link">
+    0.4.0 (2020-05-11)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#031-2019-07-26" class="md-nav__link">
+    0.3.1 (2019-07-26)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#03-2019-07-25" class="md-nav__link">
+    0.3 (2019-07-25)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#02-2019-07-16" class="md-nav__link">
+    0.2 (2019-07-16)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#01-2019-06-06" class="md-nav__link">
+    0.1 (2019-06-06)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+  <a href="https://github.com/dbmdz/solr-ocrhighlighting/edit/master/docs/changes.md" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+  <h1>Change Log</h1>
+
+<h2 id="083-2022-10-21">0.8.3 (2022-10-21)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.3">GitHub Release</a></p>
+<p>Another bugfix release, fixing some edge cases with 'odd' OCR files.</p>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li>hOCR: Fix truncated passages during highlighting due to incomplete forward
+  passes while parsing candidate passages.</li>
+<li>All Formats: Use an iterative solution for skipping empty words instead of
+  a recursive strategy, which could lead to stack overflows when encountering
+  OCR files with many empty words.</li>
+</ul>
+<p><strong>Other Changes:</strong>
+- We now have pre-releases in the Solr repository that can be used to experiment
+  with the latest changes in the plugin before the official release. For users not
+  using the repository, a pre-release build is also pushed to the GitHub Releases
+  page on every update to the repository.</p>
+<h2 id="082-2022-09-22">0.8.2 (2022-09-22)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.2">GitHub Release</a></p>
+<p>Bugfix release for an edge-case in hOCR parsing.</p>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li>hOCR: Fix stack overflow when handling empty words in combination with a partially
+  hyphenated word</li>
+</ul>
+<p><strong>Other Changes:</strong></p>
+<ul>
+<li>Improved error message in case of errors during highlighting, the message now
+  includes the source pointer of the failed document, or if storing OCR in the index,
+  the beginning of the broken content. Also included is the internal Lucene document
+  identifier.  <a href="https://solr.apache.org/guide/solr/latest/query-guide/document-transformers.html#docid-docidaugmenterfactory">By adding the <code>[docid]</code> field to the returned fields for the failing
+  query</a>,
+  the internal id is added to very document in the result set for a failing query,
+  which should allow quick identification of the documents that cause issues during
+  highlighting.</li>
+</ul>
+<h2 id="081-2022-06-10">0.8.1 (2022-06-10)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.1">GitHub Release</a></p>
+<p>This is a bugfix release targeting mainly the MiniOCR and ALTO
+implementations.</p>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li>ALTO: Fix handling of empty words. Previously any words after a word element
+  with no text <strong>would be skipped entirely during indexing</strong> 😱😱.</li>
+<li>MiniOCR: Fix handling of empty words, Previously a word element with no text
+  would make the parser crash.</li>
+<li>MiniOCR: Make the <code>wh</code> attribute on <code>&lt;p&gt;</code> page elements actually optional.
+  The documentation said it was optional, but the parser would crash when
+  attempting to handle elements without the attribute</li>
+</ul>
+<p><strong>Other Changes:</strong></p>
+<ul>
+<li>A warning will now be logged if none of the fields requested with <code>hl.ocr.fl</code>
+  exist or are defined as stored fields. Previously highlighting would just
+  not work, with no indications to users as to why this was the case.</li>
+</ul>
+<h2 id="080-2022-06-01">0.8.0 (2022-06-01)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.0">GitHub Release</a></p>
+<p>The major improvement in this version is compatibility with Solr 9.</p>
+<p>Due to a number of API changes in Solr and Lucene, we now have to ship two separate releases,
+one for Solr 7 and 8 and one for Solr 9, so please take extra care when downloading to pick
+the correct release. In the Package Repository, the Solr 7/8 release will always have version
+with the suffix <code>-solr78</code>.</p>
+<p>We also <strong>changed the package namespaces</strong> for all user-facing components so they are easier
+to identify and write. What this means is that you will need to change the <code>class="..."</code>
+attributes in your  <code>solrconfig.xml</code> and <code>schema.xml</code> to match the new package namespaces.
+Whenever you previously had <code>de.digitalcollections.solrocr.&lt;other stuff&gt;.ClassName</code>, you
+now have to simply write <code>solrocr.ClassName</code>.</p>
+<p><strong>New Features:</strong></p>
+<ul>
+<li>For users running Solr in the Solrcloud mode, the plugin can now be installed via Solr's
+  <a href="https://solr.apache.org/guide/solr/latest/configuration-guide/package-manager.html">Package Manager</a>:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$ bin/solr package add-repo dbmdz.github.io https://dbmdz.github.io/solr
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>$ bin/solr package install ocrhighlighting  # For Solr 9
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>$ bin/solr package install ocrhighlighting:0.8.0-solr78  # For Solr 7 and 8
+</code></pre></div>
+  Note that Solr 7/8 users need to manually specify the version.</li>
+</ul>
+<p><strong>API changes:</strong></p>
+<ul>
+<li>Changed deployment process to use two separate packages, one for Solr 9 and later and one for Solr 7/8, with a <code>-solr78.jar</code> suffix</li>
+<li>Changed namespace of all user-facing components to simply <code>solrocr</code> and moved all
+  user-facing component classes to it:<ul>
+<li><code>de.digitalcollections.solrocr.lucene.filters.OcrCharFilterFactory</code><br>
+  → <code>solrocr.OcrCharFilterFactory</code></li>
+<li><code>de.digitalcollections.solrocr.lucene.filters.ExternalUtf8ContentFilterFactory</code><br>
+  → <code>solrocr.ExternalUtf8ContentFilterFactory</code></li>
+<li><code>de.digitalcollections.solrocr.lucene.OcrAlternativesFilterFactory</code><br>
+  → <code>solrocr.OcrAlternativesFilterFactory</code></li>
+<li><code>de.digitalcollections.solrocr.lucene.OcrHighlightComponent</code><br>
+  → <code>solrocr.OcrHighlightComponent</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>Bugfixes</strong></p>
+<ul>
+<li>Fix handling of quoted property values in hOCR title tags. We deviate a bit from the spec
+  to be more compatible with existing real-world data: Values like <code>x_source</code> can now either
+  be quoted in single- or double-quotes, or not at all, the parser will handle every case.</li>
+</ul>
+<h2 id="072-2022-03-22">0.7.2 (2022-03-22)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.2">GitHub Release</a></p>
+<p>And yet another bugfix release.</p>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li>Fixed using single-quotes in MiniOCR input, previously these files were not recognized as valid MiniOCR files
+  (<a href="https://github.com/dbmdz/solr-ocrhighlighting/pull/247">#247</a>, thanks @mspalti for the fix!)</li>
+<li>Fixed <code>OutOfBoundsException</code> when using alternatives with very long tokens (
+  <a href="https://github.com/dbmdz/solr-ocrhighlighting/pull/230">#230</a>, thanks @fd17 for the report and review)</li>
+</ul>
+<h2 id="071-2021-09-24">0.7.1 (2021-09-24)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.1">GitHub Release</a></p>
+<p>Another bugfix release, upgrading is recommended.</p>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li>Fix text display and "number of snippets" slider in demo setup</li>
+<li>Fix instances where we were using Java SDK methods that relied on a default locale, which led to
+  hard-to-debug issues in some locales</li>
+<li>Fix an issue where a highlight rectangle would sometimes be oversized</li>
+<li>Fix issue in XML input validation when encountering very long XML opening tags</li>
+<li>Really fix handling of documents with no content (at all)</li>
+<li>Fix issue with namespaced ALTO documents</li>
+</ul>
+<h2 id="070-2021-07-12">0.7.0 (2021-07-12)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.7.0">GitHub Release</a></p>
+<p>This is a bugfix release, especially users with ALTO files are encouraged to upgrade. Other than
+bugfixes, this is the first release to support Solr 8.9.</p>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li>Fix handling of documents with no content</li>
+<li>Fix issue with the handling of unicode-encoded files</li>
+<li>Fix issue when an hOCR file had empty OCR boxes</li>
+</ul>
+<h2 id="060-2021-05-11">0.6.0 (2021-05-11)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.6.0">GitHub Release</a></p>
+<p>This is a major new release with significant improvements in stability, accuracy and most importantly performance.
+Updating is <strong>highly</strong> recommended, especially for ALTO users, who can expect a speed-up in indexing of up to
+<strong>6000% (i.e. 60x as fast)</strong>. We also recommend updating your JVM to at least Java 11 (LTS), since Java 9 introduced
+<a href="https://arnaudroger.github.io/blog/2017/06/14/CompactStrings.html">a feature</a> that speeds up highlighting
+significantly.</p>
+<p><strong>Performance:</strong></p>
+<ul>
+<li><strong>Indexing performance drastically improved for ALTO, slightly worse for hOCR and MiniOCR.</strong> Under the
+  hood we switched from Regular Expression and Automaton-based parsing to a proper XML parser to support
+  more features and improve correctness.
+  This drastically improved indexing performance for ALTO (6000% speedup, the previous
+  implementation was pathologically slow), but caused a big hit for hOCR (~57% slower) and a slight hit
+  for MiniOCR (~15% slower). These numbers are based on benchmarks done on a ramdisk, so the changes are very
+  likely to be less pronounced in practice, depending on the choice of storage.
+  <strong>Note that this makes the parser also more strict in regard to whitespace.</strong> If you were indexing OCR documents
+  without any whitespace between word elements before, you will run into problems
+  (see <a href="https://github.com/dbmdz/solr-ocrhighlighting/issues/147#issuecomment-800452975">#147</a>).</li>
+<li><strong>Highlighting performance significantly improved for all formats.</strong>
+  The time for highlighting a single snippet has gone down for all formats
+  (ALTO 12x as fast, hOCR 10x as fast, MiniOCR 6x as fast). Again, these numbers are based on benchmarks
+  performed on a ramdisk and might be less pronounced in practice, depending on the storage layer.</li>
+</ul>
+<p><strong>New Features:</strong></p>
+<ul>
+<li><strong>Indexing alternative forms encoded in the source OCR files.</strong>
+  All supported formats offer a way to encode alternative readings for recognized words. The plugin can now
+  parse these from the input files and index them at the same position as the default form. This is a form
+  of index-time term expansion (much like the <a href="https://lucene.apache.org/solr/guide/8_7/filter-descriptions.html#synonym-graph-filter">Synonym Graph Filter</a>
+  shipping with Solr). For example, if you OCR file has the alternatives <code>christmas</code> and <code>christrias</code> for the token
+  <code>clistrias</code> in the span <code>presents on clistrias eve</code>, users would be able to search for <code>"presents christmas"</code> and
+  <code>"presents clistrias"</code> and would get the correct match in both cases, both with full highlighting.
+  Refer to the corresponding <a href="../alternatives">section in the documentation</a> for instructions on setting it up.</li>
+<li><strong>On-the-fly repair of 'broken' markup.</strong>
+  <code>OcrCharFilterFactory</code> has a new option <code>fixMarkup</code> that enables on-the-fly repair of invalid XML in OCR input documents,
+  namely problems that can arise when the markup contains unescaped instances of <code>&lt;</code>, <code>&gt;</code> and <code>&amp;</code>.
+  This option is disabled by default, we recommend enabling it when your OCR engine exhibits this problem and you
+  are unable to fix the files on disk, since it incurs a bit of a performance hit during indexing.</li>
+<li><strong>Return snippets in order of appearance</strong>.
+  By default, Solr scores each highlighted passage as a "mini-document" and returns the passages
+  ordered by their decreasing score. While this is a good match for a lot of use cases, there are
+  many other that are better suited with a simple by-appearance order. This can now be controlled
+  with the new <code>hl.ocr.scorePassages</code> parameter, which will switch to the by-appearance sort order
+  if set to <code>off</code> (it is set to <code>on</code> by default)</li>
+</ul>
+<p><strong>API changes:</strong></p>
+<ul>
+<li><strong>No more need for an explicit <code>hl.fl</code> parameter for highlighting non-OCR fields.</strong> By default,
+  if highlighting is enabled and  no <code>hl.fl</code> parameter is passed by the user, Solr falls back to
+  highlighting every stored field  in the document. Previously this did not work with the plugin and
+  users had to always explicitly specify which fields they wanted to have highlighted. <em>This is no
+  longer neccessary</em>, the default behavior now works as expected.</li>
+<li><strong>Add a new <code>hl.ocr.trackPages</code> parameter to disable page tracking during highlighting.</strong>
+  This is intended for users who index one page per document, in these cases seeking backwards to determine
+  the page identifier a match is not needed, since the containing document contains enough information to
+  identify the page, improving highlighting performance due to the need for less backwards-seeking in the
+  input files.</li>
+<li><strong>Add new <code>expandAlternatives</code> attribute to <code>OcrCharFilterFactory</code>.</strong> This enables the parsing of
+   alternative readings from input files (see above and the <a href="../alternatives">corresponding section in the documentation</a>)</li>
+<li><strong>Add new <code>hl.ocr.scorePassages</code> parameter to disable sorting of passages by their score.</strong>
+    See the above section unter <em>New Features</em> for an explanation of this flag.</li>
+</ul>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li><strong>Improved tolerance for incomplete bounding boxes.</strong> Previously the occurrence of an incomplete
+  bounding box in a snippet (i.e. with one or more missing coordinates) would crash the whole query.
+  We now simply insert a <code>0</code> default value in these cases.</li>
+<li><strong>Improvements in the handling of hyphenated terms.</strong> This release fixes a
+  few bugs in edge cases when handling hyphenated words during indexing,
+  highlighting and snippet text generation.</li>
+<li><strong>Handle empty field values during indexing.</strong> This would previously lead to an exception since
+  the OCR parsers would try to either load a file from the empty string or parse OCR markup from it.</li>
+</ul>
+<h2 id="050-2020-10-07">0.5.0 (2020-10-07)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.5.0">GitHub Release</a></p>
+<p>No breaking changes this time around, but a few essential bugfixes, more stability and a new feature.</p>
+<p><strong>API changes:</strong></p>
+<ul>
+<li><strong>Snippets are now sorted by their descending score/relevancy.</strong> Previously the order was non-deterministic, which
+  broke the use case for dynamically fetching more snippets.</li>
+<li><strong>Add a new boolean <code>hl.ocr.alignSpans</code> parameter to align text and image spans.</strong> This new option (disabled by
+  default) ensures that the spans in text and image match, i.e. it forces the <code>&lt;em&gt;...&lt;/em&gt;</code> in the highlighted text
+  to correspond to actual OCR word boundaries.</li>
+</ul>
+<p><strong>Bugfixes:</strong></p>
+<ul>
+<li><strong>Fix regular highlighting in distributed setup.</strong> Regular, non-OCR highlighting was broken in previous versions due
+  to a bad check in the shard response collection phase if users only requested regular highlighting, but not for OCR
+  fields</li>
+<li><strong>Highlight spans are now always consistent with the spans designated in text.</strong> Due to a bug, it would sometimes
+  happen that the number of spans was inconsistent between the two.</li>
+<li><strong>Fix de-hyphenation in ALTO region texts.</strong> Previously only the complete snippet text would be de-hyphenated, but not
+  the individual regions.</li>
+<li><strong>Fix post-match content detection in ALTO.</strong> A bug in this part of the code resulted in crashes when highlighting
+  certain ALTO documents.</li>
+</ul>
+<h2 id="041-2020-06-02">0.4.1 (2020-06-02)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.4.1">GitHub Release</a></p>
+<p>This is a patch release with a fix for excessive memory usage during indexing.</p>
+<h2 id="040-2020-05-11">0.4.0 (2020-05-11)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.4.0">GitHub Release</a></p>
+<p>This is a major release with a focus on compatibility and performance.</p>
+<ul>
+<li><strong>Fixes compatibility with Solr/Lucene 8.4 and 7.6</strong>. We now also have an integration test suite that checks for
+ compatibility with all Solr versions &gt;= 7.5 on every change, so compatibility breakage should be kept to a minimum in
+ the future.</li>
+</ul>
+<p><strong>Breaking API changes:</strong></p>
+<ul>
+<li><strong>Add new <code>pages</code> key to snippet response with page dimensions</strong>. This can be helpful if you need to calculate
+  the snippet coordinates relative to the page image dimensions.</li>
+<li><strong>Replace <code>page</code> key on regions and highlights with <code>pageIdx</code></strong>. That is, instead of a string with the
+  corresponding page identifier, we have a numerical index into the <code>pages</code> array of the snippett. This reduces
+  the redundancy introduced by the new <code>pages</code> parameter at the cost of having to do some pointer chasing in clients.</li>
+<li><strong>Add new <code>parentRegionIdx</code> key on highlights.</strong> This is a numerical index into the <code>regions</code> array and allows for
+  multi-column/multi-page highlighting, where a single highlighting span can be composed of regions on multiple
+  disjunct parts of the page or even multiple pages.</li>
+</ul>
+<p><strong>Format changes:</strong></p>
+<ul>
+<li>hocr: Add support for retrieving page identifier from <code>x_source</code> an <code>ppageno</code> properties</li>
+<li>hocr: Strip out title tag during indexing and highlighting</li>
+<li>ALTO: The plugin now supports ALTO files with coordinates expressed as floating point numbers (thanks to @mspalti!)</li>
+</ul>
+<p><strong>Performance:</strong></p>
+<ul>
+<li>Add concurrent preloading for highlighting target files. This can result in a nice performance boost, since by the
+  time the plugin gets to actually highlighting the files, their contents are already in the OS' page cache. See
+  the <a href="https://dbmdz.github.io/solr-ocrhighlighting/performance/">Performance Tuning section in the docs</a> for more
+   context.</li>
+<li>This release changes the way we handle UTF-8 during context generation, resulting in an additional ~25% speed up
+  compared to previous versions.</li>
+</ul>
+<p><strong>Miscellaneous:</strong></p>
+<ul>
+<li>Log warnings during source pointer parsing</li>
+<li>Filter out empty files during indexing</li>
+<li>Add new documentation section on performance tuning</li>
+<li>Empty regions or regions with only whitespace are no longer included in the output</li>
+</ul>
+<h2 id="031-2019-07-26">0.3.1 (2019-07-26)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.3.1">GitHub Release</a></p>
+<p>This is patch release that fixes compatibility with Solr/Lucene 8.2.</p>
+<h2 id="03-2019-07-25">0.3 (2019-07-25)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.3">GitHub Release</a></p>
+<p>This release brings some sweeping changes across the codebase, all aimed at making
+the plugin much simpler to use and less complicated to maintain. However, this also
+means <strong>a lot of breaking changes</strong>. It's best to go through
+<a href="https://dbmdz.github.com/solr-ocrhighlighting">the documentation</a> (which has been
+simplified and was largely rewritten) again and see what changes you need to apply
+to your setup.</p>
+<ul>
+<li><strong>Specifying path resolving is no longer neccessary.</strong> You now pass a pointer to one
+  or more files (or regions thereof) directly in the index document. The pointer
+  will be stored with the document and used to locate the input file(s) during
+  highlighting. Refer to the <a href="https://dbmdz.github.com/solr-ocrhighlighting/indexing.md">documentation</a>
+  for more details. This should also <strong>increase indexing performance</strong> and <strong>decrease
+  the memory requirements</strong>, since at no point does the complete OCR document need
+  to be held in memory.</li>
+<li><strong><code>hl.weightMatches</code> now works with UTF8</strong>. You no longer need to ASCII-encode
+  your OCR files to be able to use Solr's superior highlighting approach. Due to the
+  first change, the plugin now takes care of mapping UTF8 byte-offsets to character
+  offsets by itself. This also means all code related to storing byte offsets in
+  payloads is gone.</li>
+<li><strong>Specifying the OCR format is no longer neccessary.</strong> The plugin now offers a
+  single <code>OcrFormatCharFilter</code> that will auto-detect the OCR format used for a given
+  document and select the correct analysis chain. This means that <strong>using multiple
+  OCR formats for the same field is now possible!</strong></li>
+<li><strong>Performance improvements.</strong> Some optimizations were done to the way the plugin
+  seeks through the OCR files. You should see a substantial performance improvement
+  for documents with a low density of multi-byte codepoints, especially English.
+  Also included is a new <code>hl.ocr.maxPassages</code> parameter to control how many passages
+  are looked at for building the response, which can have an enormous impact on
+  performance.</li>
+</ul>
+<p><strong>Major Breaking Changes</strong>:</p>
+<ul>
+<li><code>HighlightComponent</code> is now called <code>OcrHighlightComponent</code> for more clarity</li>
+<li>OCR fields to be highlighted now need to be passed with the <code>hl.ocr.fl</code> parameter</li>
+<li>Auto-detection of highlightable fields is no longer possible with the standard
+  highlighter, fields to be highlighted need to be passed explicitely with the
+  <code>hl.fl</code> parameter</li>
+<li>In the order of components, the OCR highlighting component needs to come <em>before</em>
+  the standard highlighter to avoid conflicts.</li>
+</ul>
+<h2 id="02-2019-07-16">0.2 (2019-07-16)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.2">GitHub Release</a></p>
+<ul>
+<li><strong>Breaking Change</strong>: ALTO and hOCR now have custom <code>CharFilter</code> implementations
+  that should be used instead of <code>HTMLStripCharFilterFactory</code>.
+  Refer to <a href="https://dbmdz.github.io/solr-ocrhighlighting/formats/">the documentation</a>
+  for more details.</li>
+<li><strong>Feature:</strong> Resolve Hyphenation at indexing time for all supported formats. If a
+  word is broken across multiple lines, it will be indexed as the dehyphenated form.
+  During highlighting, the parts on both lines will be highlighted appropriately.</li>
+<li><strong>Fix</strong> calculation of passages with matches spanning multiple lines, in previous
+  versions some passages would be too small</li>
+<li><strong>Fix</strong> <code>hl.fl</code> parameter handling, a bug in 0.1 made this parameter not have any effect</li>
+</ul>
+<h2 id="01-2019-06-06">0.1 (2019-06-06)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.1">GitHub Release</a></p>
+<ul>
+<li>Initial Release</li>
+</ul>
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../formats/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Supported Formats" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Supported Formats
+            </div>
+          </div>
+        </a>
+      
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b97dbffb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.6c7ad80a.min.js"></script>
+      
+    
+  </body>
+</html>
