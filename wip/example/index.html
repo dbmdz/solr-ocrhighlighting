@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="../query/">
+      
+      
+        <link rel="next" href="../performance/">
+      
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
     
     
       
@@ -17,11 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.558e4712.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
-        
       
       
 
@@ -52,7 +57,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="None" data-md-color-accent="None">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
   
     
     
@@ -455,10 +460,9 @@
                 
                   
 
-  <a href="https://github.com/dbmdz/solr-ocrhighlighting/edit/master/docs/example.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
+
 
 
   <h1>Example Setup</h1>
@@ -498,50 +502,50 @@ that allows viewing the documents and searching for text within them.</p>
 <h2 id="solr-configuration-walkthrough">Solr Configuration Walkthrough</h2>
 <p><a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/solr/cores/ocr/conf/solrconfig.xml"><code>solrconfig.xml</code></a>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&lt;config&gt;</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  <span class="nt">&lt;luceneMatchVersion&gt;</span>9.0<span class="nt">&lt;/luceneMatchVersion&gt;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&lt;luceneMatchVersion&gt;</span>9.0<span class="nt">&lt;/luceneMatchVersion&gt;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  <span class="cm">&lt;!-- Load the plugin JAR from the contrib directory.</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="cm">&lt;!-- Load the plugin JAR from the contrib directory.</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="cm">       NOTE: Not needed when running with Solrcloud and Package Manager.</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="cm">  --&gt;</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="hll">  <span class="nt">&lt;lib</span> <span class="na">dir=</span><span class="s">&quot;../../../contrib/ocrsearch/lib&quot;</span> <span class="na">regex=</span><span class="s">&quot;.*\.jar&quot;</span> <span class="nt">/&gt;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="hll"><span class="w">  </span><span class="nt">&lt;lib</span><span class="w"> </span><span class="na">dir=</span><span class="s">&quot;../../../contrib/ocrsearch/lib&quot;</span><span class="w"> </span><span class="na">regex=</span><span class="s">&quot;.*\.jar&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
 </span><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>  <span class="cm">&lt;!-- Define a search component that takes care of OCR highlighting --&gt;</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="hll">  <span class="nt">&lt;searchComponent</span> <span class="na">class=</span><span class="s">&quot;solrocr.OcrHighlightComponent&quot;</span>
-</span><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="hll">                   <span class="na">name=</span><span class="s">&quot;ocrHighlight&quot;</span> <span class="nt">/&gt;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="cm">&lt;!-- Define a search component that takes care of OCR highlighting --&gt;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="hll"><span class="w">  </span><span class="nt">&lt;searchComponent</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solrocr.OcrHighlightComponent&quot;</span>
+</span><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="hll"><span class="w">                   </span><span class="na">name=</span><span class="s">&quot;ocrHighlight&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
 </span><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>  <span class="cm">&lt;!-- Add the OCR Highlighting component to the request handler --&gt;</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>  <span class="nt">&lt;requestHandler</span> <span class="na">name=</span><span class="s">&quot;/select&quot;</span> <span class="na">class=</span><span class="s">&quot;solr.SearchHandler&quot;</span><span class="nt">&gt;</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="nt">&lt;arr</span> <span class="na">name=</span><span class="s">&quot;components&quot;</span><span class="nt">&gt;</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>      <span class="nt">&lt;str&gt;</span>query<span class="nt">&lt;/str&gt;</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>      <span class="cm">&lt;!--</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="cm">&lt;!-- Add the OCR Highlighting component to the request handler --&gt;</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="nt">&lt;requestHandler</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;/select&quot;</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.SearchHandler&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="nt">&lt;arr</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;components&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">      </span><span class="nt">&lt;str&gt;</span>query<span class="nt">&lt;/str&gt;</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">      </span><span class="cm">&lt;!--</span>
 <a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="cm">        Note that the OCR highlighting component comes **before**</span>
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="cm">        the default highlighting component!</span>
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="cm">      --&gt;</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="hll">      <span class="nt">&lt;str&gt;</span>ocrHighlight<span class="nt">&lt;/str&gt;</span>
-</span><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>      <span class="nt">&lt;str&gt;</span>highlight<span class="nt">&lt;/str&gt;</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="nt">&lt;/arr&gt;</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>  <span class="nt">&lt;/requestHandler&gt;</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="hll"><span class="w">      </span><span class="nt">&lt;str&gt;</span>ocrHighlight<span class="nt">&lt;/str&gt;</span>
+</span><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">      </span><span class="nt">&lt;str&gt;</span>highlight<span class="nt">&lt;/str&gt;</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="nt">&lt;/arr&gt;</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">  </span><span class="nt">&lt;/requestHandler&gt;</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="nt">&lt;/config&gt;</span>
 </code></pre></div></p>
 <p><a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/solr/cores/ocr/conf/schema.xml"><code>schema.xml</code></a>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">&lt;fieldtype</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="na">name=</span><span class="s">&quot;text_ocr&quot;</span> <span class="na">class=</span><span class="s">&quot;solr.TextField&quot;</span> <span class="na">storeOffsetsWithPositions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  <span class="nt">&lt;analyzer</span> <span class="na">type=</span><span class="s">&quot;index&quot;</span><span class="nt">&gt;</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="hll">    <span class="nt">&lt;charFilter</span>
-</span><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="hll">      <span class="na">class=</span><span class="s">&quot;solrocr.ExternalUtf8ContentFilterFactory&quot;</span> <span class="nt">/&gt;</span>
-</span><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="hll">    <span class="nt">&lt;charFilter</span>
-</span><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="hll">      <span class="na">class=</span><span class="s">&quot;solrocr.OcrCharFilterFactory&quot;</span> <span class="nt">/&gt;</span>
-</span><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="nt">&lt;tokenizer</span> <span class="na">class=</span><span class="s">&quot;solr.StandardTokenizerFactory&quot;</span><span class="nt">/&gt;</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="nt">&lt;filter</span> <span class="na">class=</span><span class="s">&quot;solr.LowerCaseFilterFactory&quot;</span><span class="nt">/&gt;</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="nt">&lt;filter</span> <span class="na">class=</span><span class="s">&quot;solr.StopFilterFactory&quot;</span><span class="nt">/&gt;</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="nt">&lt;filter</span> <span class="na">class=</span><span class="s">&quot;solr.PorterStemFilterFactory&quot;</span><span class="nt">/&gt;</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>  <span class="nt">&lt;/analyzer&gt;</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>  <span class="nt">&lt;analyzer</span> <span class="na">type=</span><span class="s">&quot;query&quot;</span><span class="nt">&gt;</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="nt">&lt;tokenizer</span> <span class="na">class=</span><span class="s">&quot;solr.StandardTokenizerFactory&quot;</span><span class="nt">/&gt;</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="nt">&lt;filter</span> <span class="na">class=</span><span class="s">&quot;solr.LowerCaseFilterFactory&quot;</span><span class="nt">/&gt;</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="nt">&lt;filter</span> <span class="na">class=</span><span class="s">&quot;solr.StopFilterFactory&quot;</span><span class="nt">/&gt;</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    <span class="nt">&lt;filter</span> <span class="na">class=</span><span class="s">&quot;solr.PorterStemFilterFactory&quot;</span><span class="nt">/&gt;</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>  <span class="nt">&lt;/analyzer&gt;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="na">name=</span><span class="s">&quot;text_ocr&quot;</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.TextField&quot;</span><span class="w"> </span><span class="na">storeOffsetsWithPositions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&lt;analyzer</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;index&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="hll"><span class="w">    </span><span class="nt">&lt;charFilter</span>
+</span><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="hll"><span class="w">      </span><span class="na">class=</span><span class="s">&quot;solrocr.ExternalUtf8ContentFilterFactory&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+</span><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="hll"><span class="w">    </span><span class="nt">&lt;charFilter</span>
+</span><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="hll"><span class="w">      </span><span class="na">class=</span><span class="s">&quot;solrocr.OcrCharFilterFactory&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+</span><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">&lt;tokenizer</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.StandardTokenizerFactory&quot;</span><span class="nt">/&gt;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">&lt;filter</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.LowerCaseFilterFactory&quot;</span><span class="nt">/&gt;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">&lt;filter</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.StopFilterFactory&quot;</span><span class="nt">/&gt;</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="nt">&lt;filter</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.PorterStemFilterFactory&quot;</span><span class="nt">/&gt;</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="nt">&lt;/analyzer&gt;</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">&lt;analyzer</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;query&quot;</span><span class="nt">&gt;</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="nt">&lt;tokenizer</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.StandardTokenizerFactory&quot;</span><span class="nt">/&gt;</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span><span class="nt">&lt;filter</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.LowerCaseFilterFactory&quot;</span><span class="nt">/&gt;</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="nt">&lt;filter</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.StopFilterFactory&quot;</span><span class="nt">/&gt;</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="nt">&lt;filter</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;solr.PorterStemFilterFactory&quot;</span><span class="nt">/&gt;</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">  </span><span class="nt">&lt;/analyzer&gt;</span>
 <a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="nt">&lt;/fieldtype&gt;</span>
 </code></pre></div></p>
 
@@ -559,42 +563,6 @@ that allows viewing the documents and searching for text within them.</p>
       </main>
       
         <footer class="md-footer">
-  
-    
-    <nav class="md-footer__inner md-grid" aria-label="Footer" >
-      
-        
-        <a href="../query/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Querying" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Querying
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../performance/" class="md-footer__link md-footer__link--next" aria-label="Next: Performance Tuning" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Performance Tuning
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -617,12 +585,11 @@ that allows viewing the documents and searching for text within them.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../assets/javascripts/bundle.51d95adb.min.js"></script>
       
-    
     
   </body>
 </html>
