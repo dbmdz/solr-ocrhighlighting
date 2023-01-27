@@ -28,7 +28,7 @@ get the correct match in both cases, both with full highlighting.
 The plugin **works with all Solr versions >= 7.5**.
 
 ## Features
-- Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/latet/formats/) directly without preprocessing
+- Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/latest/formats/#miniocr) directly without preprocessing
 - Retrieve all the information needed to render a highlighted snippet view directly from Solr, without postprocessing
 - Keeps your index size manageable by not storing the OCR in the index
 
