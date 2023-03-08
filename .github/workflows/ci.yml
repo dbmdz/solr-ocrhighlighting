@@ -94,14 +94,14 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: build-artifacts
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: ncipollo/release-action@v1
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "wip"
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          tag: "wip"
           prerelease: true
-          title: "WIP build (use at own risk)"
-          files: |
-            solr-ocrhighlighting-*.jar
+          name: "WIP build (use at own risk)"
+          artifacts: solr-ocrhighlighting-*.jar
+          allowUpdates: true
 
   update_wip_repository:
     if: github.event_name == 'push' && contains(github.ref, 'main')
