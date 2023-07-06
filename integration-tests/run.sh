@@ -4,7 +4,7 @@ SOLR_HOST="${SOLR_HOST:-localhost}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SOLR7_VERSIONS="7.7 7.6 7.5"
 SOLR8_VERSIONS="8.11 8.10 8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0"
-SOLR9_VERSIONS="9.1 9.0"
+SOLR9_VERSIONS="9.2 9.1 9.0"
 SOLR78_PLUGIN_PATH=/tmp/solrocr-solr78
 
 wait_for_solr() {
@@ -45,6 +45,7 @@ for version in $SOLR9_VERSIONS; do
     docker run \
     --name "$container_name" \
     -e SOLR_LOG_LEVEL=ERROR \
+    -e SOLR_SECURITY_MANAGER_ENABLED=false \
     -v "$(pwd)/solr/install-plugin.sh:/docker-entrypoint-initdb.d/install-plugin.sh" \
     -v "$(pwd)/solr/core/v9:/opt/core-config" \
     -v "$(pwd)/data:/ocr-data" \
