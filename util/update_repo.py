@@ -69,7 +69,7 @@ def fetch_releases() -> List[Any]:
         return json.loads(resp.read().decode("utf-8"))
 
 
-def build_repository() -> List[Plugin]:
+def build_repository(build_v78: bool = False) -> List[Plugin]:
     all_releases = fetch_releases()
     return [
         {
@@ -81,6 +81,7 @@ def build_repository() -> List[Plugin]:
                         r["tag_name"],
                         datetime.fromisoformat(r["published_at"][:-1]),
                         r["assets"],
+                        build_v78,
                     )
                     for r in all_releases
                 )
@@ -90,7 +91,7 @@ def build_repository() -> List[Plugin]:
 
 
 def build_versions(
-    tag_name: str, publish_date: datetime, assets: List[Asset]
+    tag_name: str, publish_date: datetime, assets: List[Asset], build_v78: bool = False
 ) -> Iterable[Version]:
     relevant_assets = [
         a
@@ -100,6 +101,8 @@ def build_versions(
     ]
     for asset in relevant_assets:
         is_v78 = "-solr78" in asset["name"]
+        if not (build_v78 == is_v78):
+            continue
         version_str = next(
             p
             for p in asset["name"].replace(".jar", "").split("-")
@@ -144,25 +147,39 @@ def sign_artifact(artifact_url: str) -> str:
         return base64.b64encode(signature).decode("utf-8")
 
 
+def add_solr_repository(
+    git_repo: Path, repository: List[Plugin], directory: str
+) -> None:
+    solr_repo_path = git_repo / directory
+    if not solr_repo_path.exists():
+        solr_repo_path.mkdir()
+    with (solr_repo_path / "repository.json").open("wt") as fp:
+        json.dump(repository, fp, indent=2)
+
+
 def publish_repository(dry_run=False) -> None:
     repository = build_repository()
+    repository_v78 = build_repository(build_v78=True)
     if dry_run:
         print(json.dumps(repository, indent=2))
+        print(json.dumps(repository_v78, indent=2))
         return
     git_repo_path = Path(tempfile.mkdtemp())
     github_token = os.environ["GH_DEPLOY_TOKEN"]
     repo_url = f"https://{github_token}@{REPOSITORY_GIT_REPO}"
     subprocess.check_call(("git", "clone", "-q", repo_url, git_repo_path))
-    solr_repo_path = git_repo_path / "solr"
-    if not solr_repo_path.exists():
-        solr_repo_path.mkdir()
-    with (solr_repo_path / "repository.json").open("wt") as fp:
-        json.dump(repository, fp, indent=2)
+
+    add_solr_repository(git_repo_path, repository, "solr")
+    add_solr_repository(git_repo_path, repository_v78, "solr78")
+
     was_modified = (
         len(subprocess.check_output(("git", "ls-files", "-mo"), cwd=git_repo_path)) > 0
     )
     if was_modified:
         subprocess.check_call(("git", "add", "solr/repository.json"), cwd=git_repo_path)
+        subprocess.check_call(
+            ("git", "add", "solr78/repository.json"), cwd=git_repo_path
+        )
         subprocess.check_call(
             (
                 "git",
