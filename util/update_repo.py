@@ -147,10 +147,7 @@ def sign_artifact(artifact_url: str) -> str:
         return base64.b64encode(signature).decode("utf-8")
 
 
-def add_solr_repository(
-    git_repo: Path, repository: List[Plugin], directory: str
-) -> None:
-    solr_repo_path = git_repo / directory
+def add_solr_repository(solr_repo_path: Path, repository: List[Plugin]) -> None:
     solr_repo_path.mkdir(parents=True, exist_ok=True)
     with (solr_repo_path / "repository.json").open("wt") as fp:
         json.dump(repository, fp, indent=2)
@@ -159,17 +156,22 @@ def add_solr_repository(
 def publish_repository(dry_run=False) -> None:
     repository = build_repository()
     repository_v78 = build_repository(build_v78=True)
+    
+    print("Content to write to solr/repository.json")
+    print(json.dumps(repository, indent=2))
+    print("Content to write to solr78/repository.json")
+    print(json.dumps(repository_v78, indent=2))
+
     if dry_run:
-        print(json.dumps(repository, indent=2))
-        print(json.dumps(repository_v78, indent=2))
         return
+    
     git_repo_path = Path(tempfile.mkdtemp())
     github_token = os.environ["GH_DEPLOY_TOKEN"]
     repo_url = f"https://{github_token}@{REPOSITORY_GIT_REPO}"
     subprocess.check_call(("git", "clone", "-q", repo_url, git_repo_path))
 
-    add_solr_repository(git_repo_path, repository, "solr")
-    add_solr_repository(git_repo_path, repository_v78, "solr78")
+    add_solr_repository(git_repo_path / "solr", repository)
+    add_solr_repository(git_repo_path / "solr78", repository_v78)
 
     was_modified = (
         len(subprocess.check_output(("git", "ls-files", "-mo"), cwd=git_repo_path)) > 0
