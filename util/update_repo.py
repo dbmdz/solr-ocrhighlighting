@@ -101,7 +101,7 @@ def build_versions(
     ]
     for asset in relevant_assets:
         is_v78 = "-solr78" in asset["name"]
-        if not (build_v78 == is_v78):
+        if build_v78 != is_v78:
             continue
         version_str = next(
             p
