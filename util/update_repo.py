@@ -157,12 +157,9 @@ def publish_repository(dry_run=False) -> None:
     repository = build_repository()
     repository_v78 = build_repository(build_v78=True)
     
-    print("Content to write to solr/repository.json")
-    print(json.dumps(repository, indent=2))
-    print("Content to write to solr78/repository.json")
-    print(json.dumps(repository_v78, indent=2))
-
     if dry_run:
+        print(json.dumps(repository, indent=2))
+        print(json.dumps(repository_v78, indent=2))
         return
     
     git_repo_path = Path(tempfile.mkdtemp())
