@@ -151,8 +151,7 @@ def add_solr_repository(
     git_repo: Path, repository: List[Plugin], directory: str
 ) -> None:
     solr_repo_path = git_repo / directory
-    if not solr_repo_path.exists():
-        solr_repo_path.mkdir()
+    solr_repo_path.mkdir(parents=True, exist_ok=True)
     with (solr_repo_path / "repository.json").open("wt") as fp:
         json.dump(repository, fp, indent=2)
 
