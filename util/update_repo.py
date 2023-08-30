@@ -152,16 +152,18 @@ def add_solr_repository(solr_repo_path: Path, repository: List[Plugin]) -> None:
     with (solr_repo_path / "repository.json").open("wt") as fp:
         json.dump(repository, fp, indent=2)
 
+def git(cmd, *args, cwd: Path):
+    return subprocess.check_call(("git", cmd) + args, cwd=cwd)
 
 def publish_repository(dry_run=False) -> None:
     repository = build_repository()
     repository_v78 = build_repository(build_v78=True)
-    
+
     if dry_run:
         print(json.dumps(repository, indent=2))
         print(json.dumps(repository_v78, indent=2))
         return
-    
+
     git_repo_path = Path(tempfile.mkdtemp())
     github_token = os.environ["GH_DEPLOY_TOKEN"]
     repo_url = f"https://{github_token}@{REPOSITORY_GIT_REPO}"
@@ -174,25 +176,14 @@ def publish_repository(dry_run=False) -> None:
         len(subprocess.check_output(("git", "ls-files", "-mo"), cwd=git_repo_path)) > 0
     )
     if was_modified:
-        subprocess.check_call(("git", "add", "solr/repository.json"), cwd=git_repo_path)
-        subprocess.check_call(
-            ("git", "add", "solr78/repository.json"), cwd=git_repo_path
-        )
-        subprocess.check_call(
-            (
-                "git",
-                "commit",
-                "-q",
-                "solr/repository.json",
-                "-m",
-                "Update solr/repository.json",
-            ),
-            cwd=git_repo_path,
-        )
-        subprocess.check_call(
-            ("git", "push", "-q", "-u", "origin", "main"), cwd=git_repo_path
-        )
+        git("add", "solr/repository.json", cwd=git_repo_path)
+        git("add", "solr78/repository.json", cwd=git_repo_path)
+        git("commit", "-q", "-m", "Update Solr repositories", cwd=git_repo_path)
+        git("push", "-q", "-u", "origin", "main", cwd=git_repo_path)
+
     shutil.rmtree(git_repo_path)
+
+
 
 
 if __name__ == "__main__":
