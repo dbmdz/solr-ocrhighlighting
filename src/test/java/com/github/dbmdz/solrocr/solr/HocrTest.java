@@ -559,4 +559,25 @@ public class HocrTest extends SolrTestCaseJ4 {
         req,
         "contains(.//lst[@name='87372']//arr[@name='snippets']/lst/str[@name='text']/text(), 'dt_HiFi-i?cBßflpedx1ttonI-iii;_;ikW')");
   }
+
+  public void testHlQParam() {
+    SolrQueryRequest req = xmlQ("q", "ocr_text:\"nathanael brush\"", "hl.q", "nathanael");
+    assertQ(
+        req,
+        "count(//arr[@name='snippets']/lst)='1'",
+        "contains(//arr[@name='snippets']/lst/str[@name='text'], '<em>Nathanael</em> Brush')");
+  }
+
+  public void testHlQParserParam() {
+    SolrQueryRequest req = xmlQ(
+        "defType", "lucene", "q", "ocr_text:\"nathanael brush\"",
+        "df", "ocr_text_stored", // should break hl.q if hl.qparser is not working properly
+        "hl.ocr.qparser", "edismax", "hl.ocr.q", "\"nathanael brush\"",
+        "qf", "ocr_text",  // needed for hl.ocr.qparser to match the hl.ocr.q query
+        "hl.weightMatches", "true");
+    assertQ(
+        req,
+        "count(//arr[@name='snippets']/lst)='1'",
+        "contains(//arr[@name='snippets']/lst/str[@name='text'], '<em>Nathanael Brush</em>')");
+  }
 }
