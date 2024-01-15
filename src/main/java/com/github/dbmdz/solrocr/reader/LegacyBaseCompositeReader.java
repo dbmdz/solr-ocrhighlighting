@@ -27,7 +27,9 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.ReaderUtil;
 import org.apache.lucene.index.StoredFieldVisitor;
+import org.apache.lucene.index.StoredFields;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermVectors;
 
 /**
  * Base class for implementing {@link CompositeReader}s based on an array of sub-readers. The
@@ -48,8 +50,8 @@ import org.apache.lucene.index.Term;
  * synchronization, you should <b>not</b> synchronize on the <code>IndexReader</code> instance; use
  * your own (non-Lucene) objects instead.
  *
- * <p><b>NOTE:</b> This is a backport from Lucene 8.8 since the API changed with v8.9, but we still
- * want to support earlier versions.
+ * <p><b>NOTE:</b> This is a backport from Lucene 9.8 since the API changed with v8.9 and 9.8, but
+ * we still want to support earlier versions.
  *
  * @see MultiReader
  * @lucene.internal
@@ -74,7 +76,7 @@ public abstract class LegacyBaseCompositeReader<R extends IndexReader> extends C
    *     methods. <b>Please note:</b> This array is <b>not</b> cloned and not protected for
    *     modification, the subclass is responsible to do this.
    */
-  protected LegacyBaseCompositeReader(R[] subReaders) throws IOException {
+  protected LegacyBaseCompositeReader(R[] subReaders) {
     this.subReaders = subReaders;
     this.subReadersList = Collections.unmodifiableList(Arrays.asList(subReaders));
     starts = new int[subReaders.length + 1]; // build starts array
@@ -95,6 +97,40 @@ public abstract class LegacyBaseCompositeReader<R extends IndexReader> extends C
     ensureOpen();
     final int i = readerIndex(docID); // find subreader num
     return subReaders[i].getTermVectors(docID - starts[i]); // dispatch to subreader
+  }
+
+  @Override
+  public final TermVectors termVectors() throws IOException {
+    ensureOpen();
+    TermVectors[] subVectors = new TermVectors[subReaders.length];
+    return new TermVectors() {
+      @Override
+      public Fields get(int docID) throws IOException {
+        final int i = readerIndex(docID); // find subreader num
+        // dispatch to subreader, reusing if possible
+        if (subVectors[i] == null) {
+          subVectors[i] = subReaders[i].termVectors();
+        }
+        return subVectors[i].get(docID - starts[i]);
+      }
+    };
+  }
+
+  @Override
+  public final StoredFields storedFields() throws IOException {
+    ensureOpen();
+    StoredFields[] subFields = new StoredFields[subReaders.length];
+    return new StoredFields() {
+      @Override
+      public void document(int docID, StoredFieldVisitor visitor) throws IOException {
+        final int i = readerIndex(docID); // find subreader num
+        // dispatch to subreader, reusing if possible
+        if (subFields[i] == null) {
+          subFields[i] = subReaders[i].storedFields();
+        }
+        subFields[i].document(docID - starts[i], visitor);
+      }
+    };
   }
 
   @Override

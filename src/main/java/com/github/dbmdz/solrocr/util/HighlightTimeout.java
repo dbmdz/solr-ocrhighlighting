@@ -36,7 +36,6 @@ public class HighlightTimeout implements QueryTimeout {
     return timeoutAt - System.nanoTime() < 0L;
   }
 
-  @Override
   public boolean isTimeoutEnabled() {
     return get() != null;
   }
