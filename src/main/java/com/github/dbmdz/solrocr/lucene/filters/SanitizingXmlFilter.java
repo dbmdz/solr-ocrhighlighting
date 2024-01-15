@@ -1,5 +1,6 @@
 package com.github.dbmdz.solrocr.lucene.filters;
 
+import com.ctc.wstx.io.WstxInputData;
 import com.github.dbmdz.solrocr.util.SourceAwareReader;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -99,8 +100,30 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
           break;
         }
         int entityEnd = multiIndexOf(cbuf, match + 1, '<', ';');
-        if (entityEnd < 0 || entityEnd == match + 1 || cbuf[entityEnd] == '<') {
-          // Illegal entity declaration (doesn't end before next element opening), mask
+
+        if (entityEnd < match + 1) {
+          // Not enough data to determine entity end, we may have to carry over
+          // FIXME: This code is largely identical to the carry-over case below, find a way to
+          //        deduplicate
+          int carryOverSize = numRead - (match + 1);
+          if (carryOverSize == numRead) {
+            // Can't carry-over the whole buffer, since the read would return 0
+            // We bail out of validation since there's no way we can force the caller to request
+            // a bigger read, and doing it ourselves and reading ahead would be too complicated
+            idx = (off + numRead);
+            continue outer;
+          }
+          // Reduce read size and carry over remainder, so the element is fully part of the next read
+          truncated = true;
+          this.carryOver = new char[carryOverSize];
+          System.arraycopy(cbuf, match + 1, this.carryOver, 0, this.carryOver.length);
+          this.carryOverIdx = 0;
+          numRead -= this.carryOver.length;
+          break outer;
+        }
+
+        if (!isLegalEntity(cbuf, match, entityEnd)) {
+          // Illegal entity, mask
           cbuf[match] = '_';
         }
         idx = match + 1;
@@ -288,6 +311,54 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       }
     }
     return -1;
+  }
+
+  private static boolean isLegalEntity(char[] cbuf, int startIdx, int endIdx) {
+    if (cbuf[startIdx + 1] == '#') {
+      // Check if we have a valid hexadecimal/decimal entity
+      if (cbuf[startIdx + 2] == 'x') {
+        // Hexadecimal entity
+        for (int i = startIdx + 3; i < endIdx; i++) {
+          char c = cbuf[i];
+          if (!Character.isDigit(c) && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F')) {
+            return false;
+          }
+        }
+        long value = Long.parseLong(new String(cbuf, startIdx + 3, endIdx - startIdx - 3), 16);
+        if (value > 0x10FFFF) {
+          // Not a legal unicode codepoint
+          return false;
+        }
+      } else {
+        // Numeric entity
+        for (int i = startIdx + 2; i < endIdx; i++) {
+          char c = cbuf[i];
+          if (!Character.isDigit(c)) {
+            return false;
+          }
+        }
+      }
+      // Legal numeric/hexadecimal entity if it's terminated correctly
+      return cbuf[endIdx] == ';';
+    } else if (!Character.isLetter(cbuf[startIdx + 1])) {
+      // Only numeric/hexadecimal entities can start with a non-letter character
+      return false;
+    }
+
+    // If the entity candidate doesn't end on a semicolon, it was terminated by a tag, i.e. not a
+    // legal entity
+    if (cbuf[endIdx] != ';') {
+      return false;
+    }
+
+    // Use the same logic Woodstox uses to validate entity names
+    for (int i = startIdx + 1; i < endIdx; i++) {
+      char c = cbuf[i];
+      if (!WstxInputData.isNameChar(c, false, false)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

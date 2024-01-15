@@ -531,4 +531,32 @@ public class HocrTest extends SolrTestCaseJ4 {
             "ocr_text_stored");
     assertQ(req, "count(.//lst[@name=\"87371\"]//arr[@name='snippets']/lst)=19");
   }
+
+  public void testBrokenEntities() throws IOException {
+    Path ocrPath = Paths.get("src/test/resources/data/hocr_broken_entities.html");
+    assertU(
+        adoc(
+            "ocr_text_stored",
+            new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
+            "id",
+            "87372"));
+    assertU(commit());
+    SolrQueryRequest req =
+        xmlQ(
+            "q",
+            "Gerichtsvollzieher",
+            "hl.snippets",
+            "4096",
+            "hl.weightMatches",
+            "true",
+            "hl.ocr.contextSize",
+            "4",
+            "df",
+            "ocr_text_stored",
+            "hl.ocr.fl",
+            "ocr_text_stored");
+    assertQ(
+        req,
+        "contains(.//lst[@name='87372']//arr[@name='snippets']/lst/str[@name='text']/text(), 'dt_HiFi-i?cBßflpedx1ttonI-iii;_;ikW')");
+  }
 }

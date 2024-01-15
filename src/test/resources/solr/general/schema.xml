@@ -12,7 +12,7 @@
     </fieldType>
     <fieldtype name="text_ocr_stored" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
       <analyzer type="index">
-        <charFilter class="solrocr.OcrCharFilterFactory" />
+        <charFilter class="solrocr.OcrCharFilterFactory" fixMarkup="true" />
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory"/>
@@ -31,6 +31,7 @@
         <charFilter
           class="solrocr.OcrCharFilterFactory"
           expandAlternatives="true"
+          fixMarkup="true"
         />
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solrocr.OcrAlternativesFilterFactory"/>
