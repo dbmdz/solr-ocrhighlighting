@@ -7,13 +7,14 @@ verify_ssl = true
 ipython = "*"
 
 [packages]
-sanic = "*"
+sanic = "21.9.3"
+websockets = "10.0"
 aiohttp = "*"
 monsterurl = "*"
 lxml = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"
 
 [scripts]
 dev = "python3 main.py 8008 debug"
