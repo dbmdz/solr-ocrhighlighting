@@ -113,7 +113,8 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
             idx = (off + numRead);
             continue outer;
           }
-          // Reduce read size and carry over remainder, so the element is fully part of the next read
+          // Reduce read size and carry over remainder, so the element is fully part of the next
+          // read
           truncated = true;
           this.carryOver = new char[carryOverSize];
           System.arraycopy(cbuf, match + 1, this.carryOver, 0, this.carryOver.length);

@@ -41,7 +41,7 @@ RESPONSE_TEMPLATE = {
 }
 
 
-app = Sanic(load_env="CFG_")
+app = Sanic(load_env="CFG_", name="ocrhl-iiif-prezi")
 
 
 async def query_solr(query: str, fq: str):
