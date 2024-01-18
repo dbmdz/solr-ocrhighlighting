@@ -560,6 +560,35 @@ public class HocrTest extends SolrTestCaseJ4 {
         "contains(.//lst[@name='87372']//arr[@name='snippets']/lst/str[@name='text']/text(), 'dt_HiFi-i?cBßflpedx1ttonI-iii;_;ikW')");
   }
 
+
+  public void testBrokenPIs() throws IOException {
+    Path ocrPath = Paths.get("src/test/resources/data/hocr_broken_pis.html");
+    assertU(
+        adoc(
+            "ocr_text_stored",
+            new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
+            "id",
+            "87373"));
+    assertU(commit());
+    SolrQueryRequest req =
+        xmlQ(
+            "q",
+            "\"junger mensch\"",
+            "hl.snippets",
+            "4096",
+            "hl.weightMatches",
+            "true",
+            "hl.ocr.contextSize",
+            "4",
+            "df",
+            "ocr_text_stored",
+            "hl.ocr.fl",
+            "ocr_text_stored");
+    assertQ(
+        req,
+        "contains(.//lst[@name='87373']//arr[@name='snippets']/lst/str[@name='text']/text(), '_?«»«?_i_5t»_?».')");
+  }
+
   public void testHlQParam() {
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"nathanael brush\"", "hl.q", "nathanael");
     assertQ(
