@@ -186,15 +186,13 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
           }
         }
 
-        if (cbuf[startElem + 1] == '?'
-            || (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-')
+        if (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-'
                 && cbuf[startElem + 3] == '-') {
-          // XML Declaration or comment, nothing to do
+          // Comment, nothing to do
           continue;
         }
-      } else if (cbuf[startElem + 1] == '?'
-          || (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-')) {
-        // XML Declaration or comment, nothing to do
+      } else if (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-' && cbuf[startElem + 3] == '-') {
+        // Comment, nothing to do
         continue;
       }
 
@@ -211,7 +209,10 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
         continue;
       }
 
-      int startTag = cbuf[startElem + 1] == '/' ? startElem + 2 : startElem + 1;
+      int startTag =
+          (cbuf[startElem + 1] == '/' || cbuf[startElem + 1] == '?')
+              ? startElem + 2
+              : startElem + 1;
       int endTag = multiIndexOf(cbuf, startTag, ' ', '\n', '\t');
       if (endTag > endElem || endTag < 0) {
         endTag = cbuf[endElem - 1] == '/' ? endElem - 1 : endElem;
@@ -250,7 +251,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
         } else {
           elementStack.pop();
         }
-      } else if (cbuf[endElem - 1] != '/') {
+      } else if (cbuf[endElem - 1] != '/' && cbuf[startElem + 1] != '?') {
         // New open tag, add to stack
         char[] newTag = new char[tagLen];
         System.arraycopy(cbuf, startTag, newTag, 0, newTag.length);
