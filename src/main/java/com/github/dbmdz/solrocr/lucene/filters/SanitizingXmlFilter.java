@@ -171,28 +171,20 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
         }
 
         if (cbuf[startElem + 1] == '!') {
-          boolean illegal = (
-              // Comment?
-              (cbuf[startElem + 2] == '-' && cbuf[startElem + 3] != '-')
-                  // Doctype?
-                  || ((cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd')
-                      && (endElem - startElem) < 12)
-                  // CDATA?
-                  || (cbuf[startElem + 2] == '[' && (endElem - startElem) < 10));
-          if (illegal) {
+          boolean isComment = isLegalComment(cbuf, startElem, endElem);
+          boolean isDoctype =
+              (cbuf[startElem + 2] == 'D' || cbuf[startElem + 2] == 'd')
+                  && ((endElem - startElem) >= 12);
+          boolean isCdata = (cbuf[startElem + 2] == '[') && ((endElem - startElem) >= 10);
+          if (!isComment && !isDoctype && !isCdata) {
             cbuf[startElem] = '_';
-            cbuf[endElem] = '-';
+            cbuf[endElem] = '_';
             continue;
           }
         }
+      }
 
-        if (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-'
-                && cbuf[startElem + 3] == '-') {
-          // Comment, nothing to do
-          continue;
-        }
-      } else if (cbuf[startElem + 1] == '!' && cbuf[startElem + 2] == '-' && cbuf[startElem + 3] == '-') {
-        // Comment, nothing to do
+      if (isLegalComment(cbuf, startElem, endElem)) {
         continue;
       }
 
@@ -361,6 +353,13 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
       }
     }
     return true;
+  }
+
+  private static boolean isLegalComment(char[] cbuf, int startIdx, int endIdx) {
+    if (cbuf[startIdx + 1] != '!' || cbuf[startIdx + 2] != '-' || cbuf[startIdx + 3] != '-') {
+      return false;
+    }
+    return cbuf[endIdx - 2] == '-' && cbuf[endIdx - 1] == '-';
   }
 
   @Override
