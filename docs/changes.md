@@ -1,3 +1,14 @@
+## 0.8.4 (2024-01-29)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.4)
+
+**Changed:**
+- Add support for Solr 9.4
+- Improved sanitization of broken OCR XML during parsing
+
+**Fixed:**
+- More robust bytecode patching for Solr 7/8
+- Frontend in example setup is working again
+
 ## 0.8.3 (2022-10-21)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.3)
 
