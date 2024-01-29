@@ -9,6 +9,16 @@ When building the index document, instead of putting  the actual OCR content int
 a **source pointer**. This pointer will tell the plugin from which location to load the OCR content
 during indexing and highlighting.
 
+!!! caution "When running under Solr >= 9 make sure to disable the security manager!"
+    Solr 9 introduced the option to run inside a sandboxed JVM that limits access to various security-critical resources.
+    While this is generally a good idea, it unfortunately breaks this feature.
+    If you want to allow the plugin to access OCR files on the file system, you need to disable the sandboxing.
+    To do so, simply edit your `solr.in.sh` file and add the following line:
+    ```
+    SOLR_SECURITY_MANAGER_ENABLED=false
+    ```
+
+
 The advantage of this approach is a *significant* reduction in the amount of memory required for both the client
 and the Solr server, since neither of them has to keep the (potentially very large) OCR document in memory at
 any time. The client just has a very short pointer, and the plugin will load the contents *lazily*. Additionally,
