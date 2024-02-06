@@ -2,7 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: solr-ocrhighlighting
-  description: An extension for Solr for flexible highlighting in arbitrary fields, direct indexing of common formats and optional out-of-index storage of OCR data.
+  description: An extension for Solr for indexing and highlighting OCR from common markup formats, with support for re-using existing external storage.
   annotations:
     github.com/project-slug: dbmdz/solr-ocrhighlighting
 spec:
