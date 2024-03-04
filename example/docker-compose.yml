@@ -1,7 +1,7 @@
 version: '2'
 services:
   solr:
-    image: solr:9.0
+    image: solr:9.5
     ports:
       - "1044:1044"  # Debugging port
       - "8983:8983"  # Solr admin interface
@@ -15,6 +15,7 @@ services:
       - ENABLE_REMOTE_JMX_OPTS=true
       - SOLR_HEAP=4g
       - ADDITIONAL_CMD_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:1044
+      - SOLR_SECURITY_MANAGER_ENABLED=false
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
