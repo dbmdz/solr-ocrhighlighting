@@ -167,7 +167,7 @@ public class OcrHighlightComponent extends SearchComponent
         params.set(
             "hl.fl",
             Arrays.stream(defaultHighlightFields)
-                .filter(fl -> !ocrHlFields.contains(fl))
+                .filter(fl -> fl != null && !ocrHlFields.contains(fl))
                 .collect(Collectors.joining(",")));
       }
       if (Strings.isNullOrEmpty(params.get("hl.fl"))) {
