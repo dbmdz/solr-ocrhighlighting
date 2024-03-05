@@ -26,9 +26,11 @@ updates:
           - "version-update:semver-major"
 
   - package-ecosystem: "npm"
+    directory: "/example"
     ignore:
       - dependency-name: "*"
 
   - package-ecosystem: "pip"
+    directory: "/example"
     ignore:
       - dependency-name: "*"
