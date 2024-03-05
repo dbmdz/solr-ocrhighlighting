@@ -126,12 +126,16 @@ def build_versions(
         )
 
         asset_url = asset["browser_download_url"]
-        yield dict(
-            version=version_str,
-            date=publish_date.strftime("%Y-%m-%d"),
-            artifacts=[dict(url=asset_url, sig=sign_artifact(asset_url))],
-            manifest={"version-constraint": " - ".join(constraint)},
-        )
+        try:
+            yield dict(
+                version=version_str,
+                date=publish_date.strftime("%Y-%m-%d"),
+                artifacts=[dict(url=asset_url, sig=sign_artifact(asset_url))],
+                manifest={"version-constraint": " - ".join(constraint)},
+            )
+        except Exception as e:
+            print(f"Failed to build  version {version_str} from asset {asset_url}, skipping.", file=sys.stderr)
+            print(f"Reason was: {e}", file=sys.stderr)
 
 
 def sign_artifact(artifact_url: str) -> str:
