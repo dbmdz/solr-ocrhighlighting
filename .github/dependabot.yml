@@ -5,32 +5,21 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
-      - dependency-type: "test"
-      - dependency-type: "provided"
-      - dependency-type: "optional"
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
     allow:
-      - dependency-type: "compile"
-      - dependency-type: "runtime"
-      - update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-major"
-          - "security:patch"
-
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    allow:
-      - update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-major"
+      - dependency-type: "production"
 
   - package-ecosystem: "npm"
     directory: "/example"
+    schedule:
+      interval: "weekly"
     ignore:
       - dependency-name: "*"
 
   - package-ecosystem: "pip"
     directory: "/example"
+    schedule:
+      interval: "weekly"
     ignore:
       - dependency-name: "*"
