@@ -1,8 +1,34 @@
 version: 2
 updates:
-  - directory: "/"
-    open-pull-requests-limit: 10
-    package-ecosystem: maven
+  - package-ecosystem: "maven"
+    directory: "/"
     schedule:
-      interval: daily
-      time: "04:00"
+      interval: "weekly"
+    ignore:
+      - dependency-type: "test"
+      - dependency-type: "provided"
+      - dependency-type: "optional"
+    allow:
+      - dependency-type: "compile"
+      - dependency-type: "runtime"
+      - update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-major"
+          - "security:patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-major"
+
+  - package-ecosystem: "npm"
+    ignore:
+      - dependency-name: "*"
+
+  - package-ecosystem: "pip"
+    ignore:
+      - dependency-name: "*"
