@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "preact": "^10.4.0",
-    "preact-cli": "^2.2.1",
+    "preact-cli": "^3.5.1",
     "preact-compat": "^3.19.0",
     "preact-material-components": "^1.6.1",
     "resize-observer-polyfill": "^1.5.1"
