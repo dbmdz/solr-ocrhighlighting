@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alto xmlns="http://www.loc.gov/standards/alto/ns-v3#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/standards/alto/ns-v3# http://www.loc.gov/standards/alto/v3/alto-3-1.xsd">
+  <Description>
+    <MeasurementUnit>pixel</MeasurementUnit>
+    <sourceImageInformation>
+      <fileIdentifier>MAX/00000008.jpg</fileIdentifier>
+    </sourceImageInformation>
+  </Description>
+  <Layout>
+    <Page WIDTH="1951" PHYSICAL_IMG_NR="1" ID="p00000008" HEIGHT="2654">
+      <PrintSpace WIDTH="1951" HPOS="0" VPOS="0" ID="ps912905" HEIGHT="2654">
+        <TextBlock WIDTH="1951" HPOS="0" VPOS="0" ID="tb912905" HEIGHT="2654">
+          <TextLine HPOS="442" VPOS="258" ID="tl0" WIDTH="1219" HEIGHT="31">
+            <String HEIGHT="32" CONTENT="herangezogen" WIDTH="241" HPOS="442" VPOS="258" ID="st0"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="worden" WIDTH="119" HPOS="708" VPOS="260" ID="st1"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="836" VPOS="279" ID="st2"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="auch" WIDTH="75" HPOS="873" VPOS="263" ID="st3"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="fehlen" WIDTH="116" HPOS="975" VPOS="262" ID="st4"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="bisher" WIDTH="116" HPOS="1118" VPOS="262" ID="st5"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="noch" WIDTH="75" HPOS="1260" VPOS="265" ID="st6"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="Dokumentationen" WIDTH="300" HPOS="1361" VPOS="264" ID="st7"/>
+          </TextLine>
+          <TextLine HPOS="442" VPOS="316" ID="tl1" WIDTH="1219" HEIGHT="24">
+            <String HEIGHT="16" CONTENT="zu" WIDTH="34" HPOS="442" VPOS="316" ID="st8"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="den" WIDTH="55" HPOS="503" VPOS="311" ID="st9"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="angegebenen" WIDTH="220" HPOS="585" VPOS="311" ID="st10"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="Daten" WIDTH="96" HPOS="831" VPOS="313" ID="st11"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="6" HPOS="937" VPOS="332" ID="st12"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Aber" WIDTH="76" HPOS="974" VPOS="314" ID="st13"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="bereits" WIDTH="136" HPOS="1077" VPOS="314" ID="st14"/>
+            <SP/>
+            <String HEIGHT="19" CONTENT="aus" WIDTH="54" HPOS="1240" VPOS="320" ID="st15"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="diesen" WIDTH="116" HPOS="1321" VPOS="316" ID="st16"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="können" WIDTH="115" HPOS="1465" VPOS="314" ID="st17"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="er" WIDTH="36" HPOS="1607" VPOS="323" ID="st18" SUBS_TYPE="HypPart1" SUBS_CONTENT="erste"/>
+            <HYP CONTENT="-" WIDTH="18" HPOS="1643" VPOS="323" HEIGHT="17"/>
+          </TextLine>
+          <TextLine HPOS="442" VPOS="363" ID="tl2" WIDTH="1133" HEIGHT="28">
+            <String HEIGHT="21" CONTENT="ste" WIDTH="54" HPOS="442" VPOS="363" ID="st19" SUBS_TYPE="HypPart2" SUBS_CONTENT="erste"/>
+            <SP/>
+            <String HEIGHT="32" CONTENT="Schlußfolgerungen" WIDTH="343" HPOS="523" VPOS="362" ID="st20"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="für" WIDTH="55" HPOS="893" VPOS="364" ID="st21"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="die" WIDTH="55" HPOS="974" VPOS="366" ID="st22"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="Geschichte" WIDTH="199" HPOS="1055" VPOS="364" ID="st23"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="gezogen" WIDTH="137" HPOS="1280" VPOS="371" ID="st24"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="werden" WIDTH="117" HPOS="1442" VPOS="366" ID="st25"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="5" HPOS="1570" VPOS="386" ID="st26"/>
+          </TextLine>
+          <TextLine HPOS="441" VPOS="463" ID="tl3" WIDTH="1220" HEIGHT="31">
+            <String HEIGHT="23" CONTENT="So" WIDTH="34" HPOS="441" VPOS="463" ID="st27"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="erscheint" WIDTH="178" HPOS="502" VPOS="465" ID="st28"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="die" WIDTH="55" HPOS="727" VPOS="468" ID="st29"/>
+            <SP/>
+            <String HEIGHT="29" CONTENT="Vorstellung" WIDTH="218" HPOS="830" VPOS="469" ID="st30"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="einer" WIDTH="96" HPOS="1096" VPOS="469" ID="st31"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="durch" WIDTH="95" HPOS="1239" VPOS="470" ID="st32"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="elende" WIDTH="116" HPOS="1382" VPOS="469" ID="st33"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="Wüsten" WIDTH="118" HPOS="1543" VPOS="472" ID="st34"/>
+          </TextLine>
+          <TextLine HPOS="440" VPOS="514" ID="tl4" WIDTH="1220" HEIGHT="32">
+            <String HEIGHT="24" CONTENT="führenden" WIDTH="178" HPOS="440" VPOS="514" ID="st35"/>
+            <SP/>
+            <String HEIGHT="10" CONTENT="&quot;" WIDTH="10" HPOS="667" VPOS="518" ID="st36"/>
+            <String HEIGHT="24" CONTENT="Seidenstraße" WIDTH="240" HPOS="686" VPOS="518" ID="st37"/>
+            <String HEIGHT="10" CONTENT="&quot;" WIDTH="10" HPOS="934" VPOS="520" ID="st38"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="als" WIDTH="55" HPOS="993" VPOS="520" ID="st39"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="völlig" WIDTH="115" HPOS="1096" VPOS="520" ID="st40"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="verfehlt" WIDTH="155" HPOS="1260" VPOS="520" ID="st41"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="1426" VPOS="539" ID="st42"/>
+            <SP/>
+            <String HEIGHT="18" CONTENT="wenn" WIDTH="76" HPOS="1482" VPOS="527" ID="st43"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="die" WIDTH="54" HPOS="1606" VPOS="523" ID="st44"/>
+          </TextLine>
+          <TextLine HPOS="439" VPOS="565" ID="tl5" WIDTH="1221" HEIGHT="32">
+            <String HEIGHT="24" CONTENT="Dünenzone" WIDTH="179" HPOS="439" VPOS="565" ID="st45"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="der" WIDTH="55" HPOS="645" VPOS="567" ID="st46"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Taklamakan" WIDTH="199" HPOS="726" VPOS="569" ID="st47"/>
+            <SP/>
+            <String HEIGHT="19" CONTENT="zur" WIDTH="55" HPOS="953" VPOS="576" ID="st48"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="Hanzeit" WIDTH="137" HPOS="1033" VPOS="572" ID="st49"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="noch" WIDTH="75" HPOS="1197" VPOS="572" ID="st50"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="nicht" WIDTH="96" HPOS="1299" VPOS="572" ID="st51"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="ein" WIDTH="55" HPOS="1421" VPOS="572" ID="st52"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Drittel" WIDTH="137" HPOS="1523" VPOS="573" ID="st53"/>
+          </TextLine>
+          <TextLine HPOS="440" VPOS="616" ID="tl6" WIDTH="1220" HEIGHT="31">
+            <String HEIGHT="24" CONTENT="ihrer" WIDTH="96" HPOS="440" VPOS="616" ID="st54"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="heutigen" WIDTH="158" HPOS="562" VPOS="617" ID="st55"/>
+            <SP/>
+            <String HEIGHT="31" CONTENT="Ausdehnung" WIDTH="199" HPOS="746" VPOS="619" ID="st56"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="einnahm" WIDTH="137" HPOS="972" VPOS="621" ID="st57"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="5" HPOS="1119" VPOS="641" ID="st58"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Es" WIDTH="34" HPOS="1156" VPOS="623" ID="st59"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="sollte" WIDTH="116" HPOS="1217" VPOS="624" ID="st60"/>
+            <SP/>
+            <String HEIGHT="29" CONTENT="geradezu" WIDTH="157" HPOS="1380" VPOS="624" ID="st61"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="eine" WIDTH="76" HPOS="1584" VPOS="625" ID="st62"/>
+          </TextLine>
+          <TextLine HPOS="438" VPOS="668" ID="tl7" WIDTH="1217" HEIGHT="30">
+            <String HEIGHT="25" CONTENT="Provokation" WIDTH="220" HPOS="438" VPOS="668" ID="st63"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="für" WIDTH="55" HPOS="686" VPOS="669" ID="st64"/>
+            <SP/>
+            <String HEIGHT="32" CONTENT="Archäologen" WIDTH="219" HPOS="787" VPOS="670" ID="st65"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="sein" WIDTH="74" HPOS="1054" VPOS="674" ID="st66"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="6" HPOS="1139" VPOS="692" ID="st67"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="zu" WIDTH="33" HPOS="1198" VPOS="681" ID="st68"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="sehen" WIDTH="96" HPOS="1278" VPOS="674" ID="st69"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="1385" VPOS="693" ID="st70"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="daß" WIDTH="54" HPOS="1442" VPOS="675" ID="st71"/>
+            <SP/>
+            <String HEIGHT="16" CONTENT="z" WIDTH="12" HPOS="1545" VPOS="683" ID="st72"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="5" HPOS="1568" VPOS="694" ID="st73"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="B" WIDTH="14" HPOS="1625" VPOS="676" ID="st74"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="5" HPOS="1650" VPOS="693" ID="st75"/>
+          </TextLine>
+          <TextLine HPOS="437" VPOS="719" ID="tl8" WIDTH="1222" HEIGHT="24">
+            <String HEIGHT="24" CONTENT="während" WIDTH="139" HPOS="437" VPOS="719" ID="st76"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="des" WIDTH="55" HPOS="603" VPOS="721" ID="st77"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="Atlantikums" WIDTH="220" HPOS="684" VPOS="721" ID="st78"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="915" VPOS="741" ID="st79"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="des" WIDTH="55" HPOS="951" VPOS="724" ID="st80"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="zweiten" WIDTH="135" HPOS="1034" VPOS="726" ID="st81"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Klimaoptimums" WIDTH="259" HPOS="1196" VPOS="726" ID="st82"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="des" WIDTH="54" HPOS="1483" VPOS="727" ID="st83"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="Holo" WIDTH="76" HPOS="1564" VPOS="728" ID="st84"/>
+            <String HEIGHT="4" CONTENT="-" WIDTH="12" HPOS="1647" VPOS="739" ID="st85"/>
+          </TextLine>
+          <TextLine HPOS="438" VPOS="772" ID="tl9" WIDTH="1221" HEIGHT="30">
+            <String HEIGHT="24" CONTENT="zäns" WIDTH="75" HPOS="438" VPOS="772" ID="st86"/>
+            <SP/>
+            <String HEIGHT="27" CONTENT="(" WIDTH="9" HPOS="543" VPOS="773" ID="st87"/>
+            <String HEIGHT="23" CONTENT="des" WIDTH="56" HPOS="560" VPOS="773" ID="st88"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="6" HPOS="625" VPOS="791" ID="st89"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="6" WIDTH="15" HPOS="663" VPOS="773" ID="st90"/>
+            <String HEIGHT="6" CONTENT="." WIDTH="6" HPOS="687" VPOS="791" ID="st91"/>
+            <SP/>
+            <String HEIGHT="4" CONTENT="-" WIDTH="13" HPOS="725" VPOS="785" ID="st92"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="5" WIDTH="15" HPOS="766" VPOS="773" ID="st93"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="6" HPOS="790" VPOS="791" ID="st94"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="Jahrtausend" WIDTH="220" HPOS="847" VPOS="774" ID="st95"/>
+            <SP/>
+            <String HEIGHT="16" CONTENT="v" WIDTH="13" HPOS="1114" VPOS="784" ID="st96"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="5" HPOS="1138" VPOS="795" ID="st97"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="Chr" WIDTH="58" HPOS="1194" VPOS="778" ID="st98"/>
+            <String HEIGHT="6" CONTENT="." WIDTH="6" HPOS="1260" VPOS="795" ID="st99"/>
+            <String HEIGHT="27" CONTENT=")" WIDTH="8" HPOS="1279" VPOS="778" ID="st100"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="6" HPOS="1301" VPOS="796" ID="st101"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="die" WIDTH="56" HPOS="1358" VPOS="778" ID="st102"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="Taklamakan" WIDTH="199" HPOS="1460" VPOS="777" ID="st103"/>
+          </TextLine>
+          <TextLine HPOS="435" VPOS="824" ID="tl10" WIDTH="442" HEIGHT="25">
+            <String HEIGHT="24" CONTENT="weithin" WIDTH="139" HPOS="435" VPOS="824" ID="st104"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="bewohnbar" WIDTH="179" HPOS="601" VPOS="825" ID="st105"/>
+            <SP/>
+            <String HEIGHT="18" CONTENT="war" WIDTH="57" HPOS="805" VPOS="831" ID="st106"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="6" HPOS="871" VPOS="844" ID="st107"/>
+          </TextLine>
+          <TextLine HPOS="435" VPOS="928" ID="tl11" WIDTH="1224" HEIGHT="34">
+            <String HEIGHT="24" CONTENT="Dieses" WIDTH="117" HPOS="435" VPOS="928" ID="st108"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Ergebnis" WIDTH="158" HPOS="579" VPOS="929" ID="st109"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="der" WIDTH="56" HPOS="764" VPOS="930" ID="st110"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Geographen" WIDTH="201" HPOS="845" VPOS="930" ID="st111"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="läßt" WIDTH="76" HPOS="1072" VPOS="931" ID="st112"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="die" WIDTH="55" HPOS="1174" VPOS="933" ID="st113"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="so" WIDTH="35" HPOS="1276" VPOS="938" ID="st114"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="oft" WIDTH="55" HPOS="1358" VPOS="933" ID="st115"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="behauptete" WIDTH="199" HPOS="1460" VPOS="932" ID="st116"/>
+          </TextLine>
+          <TextLine HPOS="435" VPOS="980" ID="tl12" WIDTH="1222" HEIGHT="33">
+            <String HEIGHT="30" CONTENT="Isolierung" WIDTH="198" HPOS="435" VPOS="980" ID="st117"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Chinas" WIDTH="118" HPOS="660" VPOS="981" ID="st118"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="im" WIDTH="35" HPOS="805" VPOS="982" ID="st119"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="Neolithikum" WIDTH="220" HPOS="866" VPOS="982" ID="st120"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="und" WIDTH="55" HPOS="1113" VPOS="983" ID="st121"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="der" WIDTH="56" HPOS="1194" VPOS="984" ID="st122"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Bronzezeit" WIDTH="198" HPOS="1276" VPOS="983" ID="st123"/>
+            <SP/>
+            <String HEIGHT="29" CONTENT="fragwür" WIDTH="137" HPOS="1501" VPOS="984" ID="st124" SUBS_TYPE="HypPart1" SUBS_CONTENT="fragwürdig"/>
+            <HYP CONTENT="-" WIDTH="19" HPOS="1638" VPOS="984" HEIGHT="29"/>
+          </TextLine>
+          <TextLine HPOS="434" VPOS="1032" ID="tl13" WIDTH="1223" HEIGHT="27">
+            <String HEIGHT="30" CONTENT="dig" WIDTH="55" HPOS="434" VPOS="1032" ID="st125" SUBS_TYPE="HypPart2" SUBS_CONTENT="fragwürdig"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="erscheinen" WIDTH="199" HPOS="516" VPOS="1032" ID="st126"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="6" HPOS="725" VPOS="1051" ID="st127"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Sinkiang" WIDTH="157" HPOS="784" VPOS="1033" ID="st128"/>
+            <SP/>
+            <String HEIGHT="19" CONTENT="war" WIDTH="57" HPOS="988" VPOS="1039" ID="st129"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="noch" WIDTH="75" HPOS="1092" VPOS="1034" ID="st130"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="zur" WIDTH="55" HPOS="1215" VPOS="1041" ID="st131"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Mingzeit" WIDTH="158" HPOS="1315" VPOS="1035" ID="st132"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="relativ" WIDTH="137" HPOS="1520" VPOS="1036" ID="st133"/>
+          </TextLine>
+          <TextLine HPOS="434" VPOS="1083" ID="tl14" WIDTH="1223" HEIGHT="28">
+            <String HEIGHT="24" CONTENT="leicht" WIDTH="116" HPOS="434" VPOS="1083" ID="st134"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="zu" WIDTH="34" HPOS="578" VPOS="1090" ID="st135"/>
+            <SP/>
+            <String HEIGHT="29" CONTENT="passieren" WIDTH="179" HPOS="639" VPOS="1084" ID="st136"/>
+            <SP/>
+            <String HEIGHT="3" CONTENT="-" WIDTH="12" HPOS="846" VPOS="1098" ID="st137"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="und" WIDTH="55" HPOS="886" VPOS="1086" ID="st138"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="da" WIDTH="34" HPOS="968" VPOS="1085" ID="st139"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="erinnert" WIDTH="157" HPOS="1050" VPOS="1085" ID="st140"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="man" WIDTH="56" HPOS="1254" VPOS="1092" ID="st141"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="sich" WIDTH="75" HPOS="1357" VPOS="1087" ID="st142"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="an" WIDTH="34" HPOS="1480" VPOS="1092" ID="st143"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="Daten" WIDTH="96" HPOS="1561" VPOS="1088" ID="st144"/>
+          </TextLine>
+          <TextLine HPOS="431" VPOS="1135" ID="tl15" WIDTH="1225" HEIGHT="27">
+            <String HEIGHT="24" CONTENT="Aurel" WIDTH="97" HPOS="431" VPOS="1135" ID="st145"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="Steins" WIDTH="117" HPOS="555" VPOS="1135" ID="st146"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="684" VPOS="1153" ID="st147"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="daß" WIDTH="56" HPOS="720" VPOS="1135" ID="st148"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="die" WIDTH="55" HPOS="823" VPOS="1136" ID="st149"/>
+            <SP/>
+            <String HEIGHT="29" CONTENT="heutigen" WIDTH="157" HPOS="926" VPOS="1136" ID="st150"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Ruinen" WIDTH="117" HPOS="1130" VPOS="1136" ID="st151"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="im" WIDTH="35" HPOS="1295" VPOS="1138" ID="st152"/>
+            <SP/>
+            <String HEIGHT="28" CONTENT="Lop" WIDTH="54" HPOS="1377" VPOS="1139" ID="st153"/>
+            <String HEIGHT="4" CONTENT="-" WIDTH="13" HPOS="1438" VPOS="1150" ID="st154"/>
+            <String HEIGHT="18" CONTENT="nor" WIDTH="56" HPOS="1458" VPOS="1143" ID="st155"/>
+            <String HEIGHT="4" CONTENT="-" WIDTH="13" HPOS="1520" VPOS="1150" ID="st156"/>
+            <String HEIGHT="24" CONTENT="Gebiet" WIDTH="117" HPOS="1539" VPOS="1138" ID="st157"/>
+          </TextLine>
+          <TextLine HPOS="433" VPOS="1186" ID="tl16" WIDTH="1218" HEIGHT="27">
+            <String HEIGHT="24" CONTENT="zwischen" WIDTH="157" HPOS="433" VPOS="1186" ID="st158"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="300" WIDTH="56" HPOS="617" VPOS="1186" ID="st159"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="und" WIDTH="55" HPOS="700" VPOS="1187" ID="st160"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="800" WIDTH="56" HPOS="781" VPOS="1187" ID="st161"/>
+            <SP/>
+            <String HEIGHT="16" CONTENT="n" WIDTH="14" HPOS="864" VPOS="1194" ID="st162"/>
+            <String HEIGHT="4" CONTENT="." WIDTH="6" HPOS="888" VPOS="1206" ID="st163"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="Chr" WIDTH="56" HPOS="925" VPOS="1188" ID="st164"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="5" HPOS="991" VPOS="1205" ID="st165"/>
+            <SP/>
+            <String HEIGHT="29" CONTENT="aufgegeben" WIDTH="199" HPOS="1028" VPOS="1188" ID="st166"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="worden" WIDTH="117" HPOS="1253" VPOS="1190" ID="st167"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="sind" WIDTH="75" HPOS="1397" VPOS="1190" ID="st168"/>
+            <String HEIGHT="9" CONTENT="," WIDTH="5" HPOS="1483" VPOS="1208" ID="st169"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="d" WIDTH="14" HPOS="1540" VPOS="1191" ID="st170"/>
+            <String HEIGHT="4" CONTENT="." WIDTH="4" HPOS="1565" VPOS="1209" ID="st171"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="h" WIDTH="13" HPOS="1622" VPOS="1191" ID="st172"/>
+            <String HEIGHT="4" CONTENT="." WIDTH="5" HPOS="1646" VPOS="1209" ID="st173"/>
+          </TextLine>
+          <TextLine HPOS="432" VPOS="1238" ID="tl17" WIDTH="1224" HEIGHT="28">
+            <String HEIGHT="23" CONTENT="in" WIDTH="34" HPOS="432" VPOS="1238" ID="st174"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="einer" WIDTH="97" HPOS="493" VPOS="1239" ID="st175"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Phase" WIDTH="97" HPOS="616" VPOS="1238" ID="st176"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="zwischen" WIDTH="157" HPOS="741" VPOS="1238" ID="st177"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="den" WIDTH="56" HPOS="925" VPOS="1239" ID="st178"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="beiden" WIDTH="116" HPOS="1008" VPOS="1239" ID="st179"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="hier" WIDTH="76" HPOS="1151" VPOS="1239" ID="st180"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="erfaßten" WIDTH="157" HPOS="1253" VPOS="1241" ID="st181"/>
+            <SP/>
+            <String HEIGHT="29" CONTENT="Etappen" WIDTH="136" HPOS="1438" VPOS="1242" ID="st182"/>
+            <SP/>
+            <String HEIGHT="18" CONTENT="von" WIDTH="55" HPOS="1601" VPOS="1248" ID="st183"/>
+          </TextLine>
+          <TextLine HPOS="431" VPOS="1296" ID="tl18" WIDTH="1225" HEIGHT="20">
+            <String HEIGHT="18" CONTENT="vor" WIDTH="56" HPOS="431" VPOS="1296" ID="st184"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="400" WIDTH="57" HPOS="512" VPOS="1290" ID="st185"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="und" WIDTH="56" HPOS="595" VPOS="1291" ID="st186"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="2000" WIDTH="78" HPOS="677" VPOS="1291" ID="st187"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Jahren" WIDTH="118" HPOS="780" VPOS="1290" ID="st188"/>
+            <String HEIGHT="9" CONTENT="," WIDTH="6" HPOS="908" VPOS="1308" ID="st189"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="die" WIDTH="56" HPOS="945" VPOS="1289" ID="st190"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="auch" WIDTH="77" HPOS="1027" VPOS="1290" ID="st191"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="in" WIDTH="35" HPOS="1130" VPOS="1290" ID="st192"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="anderen" WIDTH="137" HPOS="1212" VPOS="1293" ID="st193"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Regionen" WIDTH="159" HPOS="1395" VPOS="1293" ID="st194"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="als" WIDTH="56" HPOS="1600" VPOS="1294" ID="st195"/>
+          </TextLine>
+          <TextLine HPOS="429" VPOS="1341" ID="tl19" WIDTH="1224" HEIGHT="27">
+            <String HEIGHT="24" CONTENT="Pessimum" WIDTH="159" HPOS="429" VPOS="1341" ID="st196"/>
+            <SP/>
+            <String HEIGHT="4" CONTENT="-" WIDTH="13" HPOS="615" VPOS="1353" ID="st197"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="als" WIDTH="55" HPOS="656" VPOS="1342" ID="st198"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="Kaltzeit" WIDTH="159" HPOS="738" VPOS="1339" ID="st199"/>
+            <SP/>
+            <String HEIGHT="4" CONTENT="-" WIDTH="13" HPOS="924" VPOS="1351" ID="st200"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="bekannt" WIDTH="136" HPOS="965" VPOS="1340" ID="st201"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="ist" WIDTH="54" HPOS="1129" VPOS="1341" ID="st202"/>
+            <String HEIGHT="6" CONTENT="." WIDTH="6" HPOS="1193" VPOS="1360" ID="st203"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="So" WIDTH="34" HPOS="1231" VPOS="1343" ID="st204"/>
+            <SP/>
+            <String HEIGHT="21" CONTENT="nennt" WIDTH="96" HPOS="1292" VPOS="1346" ID="st205"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="c" WIDTH="13" HPOS="1416" VPOS="1350" ID="st206"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="5" HPOS="1440" VPOS="1362" ID="st207"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="o" WIDTH="14" HPOS="1476" VPOS="1350" ID="st208"/>
+            <String HEIGHT="6" CONTENT="." WIDTH="5" HPOS="1501" VPOS="1361" ID="st209"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="Schön" WIDTH="96" HPOS="1538" VPOS="1345" ID="st210" SUBS_TYPE="HypPart1" SUBS_CONTENT="Schönwiese"/>
+            <HYP CONTENT="-" WIDTH="19" HPOS="1634" VPOS="1345" HEIGHT="23"/>
+          </TextLine>
+          <TextLine HPOS="428" VPOS="1393" ID="tl20" WIDTH="1226" HEIGHT="27">
+            <String HEIGHT="24" CONTENT="wiese" WIDTH="98" HPOS="428" VPOS="1393" ID="st211" SUBS_TYPE="HypPart2" SUBS_CONTENT="Schönwiese"/>
+            <SP/>
+            <String HEIGHT="28" CONTENT="(" WIDTH="7" HPOS="557" VPOS="1393" ID="st212"/>
+            <String HEIGHT="24" CONTENT="1979" WIDTH="75" HPOS="574" VPOS="1392" ID="st213"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="6" HPOS="660" VPOS="1411" ID="st214"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="S" WIDTH="14" HPOS="697" VPOS="1393" ID="st215"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="6" HPOS="721" VPOS="1410" ID="st216"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="79" WIDTH="35" HPOS="759" VPOS="1391" ID="st217"/>
+            <String HEIGHT="27" CONTENT=")" WIDTH="8" HPOS="802" VPOS="1391" ID="st218"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="die" WIDTH="56" HPOS="841" VPOS="1391" ID="st219"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Phase" WIDTH="97" HPOS="943" VPOS="1391" ID="st220"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="zwischen" WIDTH="157" HPOS="1088" VPOS="1394" ID="st221"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="400" WIDTH="57" HPOS="1291" VPOS="1396" ID="st222"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="und" WIDTH="55" HPOS="1395" VPOS="1396" ID="st223"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="750" WIDTH="55" HPOS="1497" VPOS="1395" ID="st224"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="das" WIDTH="55" HPOS="1599" VPOS="1397" ID="st225"/>
+          </TextLine>
+          <TextLine HPOS="431" VPOS="1444" ID="tl21" WIDTH="1223" HEIGHT="27">
+            <String HEIGHT="11" CONTENT="&quot;" WIDTH="11" HPOS="431" VPOS="1444" ID="st226"/>
+            <String HEIGHT="25" CONTENT="Pessimum" WIDTH="160" HPOS="449" VPOS="1443" ID="st227"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="der" WIDTH="56" HPOS="636" VPOS="1444" ID="st228"/>
+            <SP/>
+            <String HEIGHT="32" CONTENT="Völkerwanderungszeit" WIDTH="403" HPOS="718" VPOS="1441" ID="st229"/>
+            <String HEIGHT="11" CONTENT="&quot;" WIDTH="10" HPOS="1130" VPOS="1445" ID="st230"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="6" HPOS="1152" VPOS="1464" ID="st231"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="das" WIDTH="54" HPOS="1190" VPOS="1447" ID="st232"/>
+            <SP/>
+            <String HEIGHT="19" CONTENT="von" WIDTH="54" HPOS="1293" VPOS="1452" ID="st233"/>
+            <SP/>
+            <String HEIGHT="10" CONTENT="&quot;" WIDTH="11" HPOS="1396" VPOS="1447" ID="st234"/>
+            <String HEIGHT="24" CONTENT="verbreiteten" WIDTH="238" HPOS="1416" VPOS="1447" ID="st235"/>
+          </TextLine>
+          <TextLine HPOS="428" VPOS="1491" ID="tl22" WIDTH="852" HEIGHT="30">
+            <String HEIGHT="29" CONTENT="Gletschervorstößen" WIDTH="366" HPOS="428" VPOS="1491" ID="st236"/>
+            <String HEIGHT="11" CONTENT="&quot;" WIDTH="11" HPOS="801" VPOS="1492" ID="st237"/>
+            <SP/>
+            <String HEIGHT="29" CONTENT="begleitet" WIDTH="177" HPOS="841" VPOS="1494" ID="st238"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="gewesen" WIDTH="138" HPOS="1045" VPOS="1502" ID="st239"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="sei" WIDTH="55" HPOS="1210" VPOS="1499" ID="st240"/>
+            <String HEIGHT="5" CONTENT="." WIDTH="6" HPOS="1274" VPOS="1516" ID="st241"/>
+          </TextLine>
+          <TextLine HPOS="427" VPOS="1596" ID="tl23" WIDTH="1226" HEIGHT="29">
+            <String HEIGHT="24" CONTENT="Dies" WIDTH="76" HPOS="427" VPOS="1596" ID="st242"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="stellt" WIDTH="117" HPOS="531" VPOS="1595" ID="st243"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="die" WIDTH="55" HPOS="675" VPOS="1594" ID="st244"/>
+            <SP/>
+            <String HEIGHT="31" CONTENT="Frage" WIDTH="95" HPOS="758" VPOS="1594" ID="st245"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="nach" WIDTH="75" HPOS="880" VPOS="1598" ID="st246"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="der" WIDTH="56" HPOS="982" VPOS="1599" ID="st247"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Herkunft" WIDTH="159" HPOS="1063" VPOS="1601" ID="st248"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="des" WIDTH="55" HPOS="1249" VPOS="1601" ID="st249"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Wassers" WIDTH="138" HPOS="1330" VPOS="1599" ID="st250"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="in" WIDTH="34" HPOS="1516" VPOS="1602" ID="st251"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="den" WIDTH="56" HPOS="1597" VPOS="1602" ID="st252"/>
+          </TextLine>
+          <TextLine HPOS="426" VPOS="1644" ID="tl24" WIDTH="1222" HEIGHT="37">
+            <String HEIGHT="30" CONTENT="weitgehend" WIDTH="201" HPOS="426" VPOS="1644" ID="st253"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="nach" WIDTH="75" HPOS="675" VPOS="1645" ID="st254"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="außen" WIDTH="96" HPOS="798" VPOS="1647" ID="st255"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="abgeschlossenen" WIDTH="301" HPOS="941" VPOS="1651" ID="st256"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Kessel" WIDTH="116" HPOS="1290" VPOS="1649" ID="st257"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Sinkiang" WIDTH="157" HPOS="1474" VPOS="1652" ID="st258"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="6" HPOS="1642" VPOS="1671" ID="st259"/>
+          </TextLine>
+          <TextLine HPOS="428" VPOS="1697" ID="tl25" WIDTH="1225" HEIGHT="31">
+            <String HEIGHT="23" CONTENT="dessen" WIDTH="117" HPOS="428" VPOS="1697" ID="st260"/>
+            <SP/>
+            <String HEIGHT="27" CONTENT="fortschreitende" WIDTH="300" HPOS="573" VPOS="1696" ID="st261"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Aridisierung" WIDTH="240" HPOS="899" VPOS="1702" ID="st262"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="schon" WIDTH="96" HPOS="1167" VPOS="1702" ID="st263"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="aft" WIDTH="55" HPOS="1290" VPOS="1700" ID="st264"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="beobachtet" WIDTH="198" HPOS="1372" VPOS="1702" ID="st265"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="und" WIDTH="56" HPOS="1597" VPOS="1704" ID="st266"/>
+          </TextLine>
+          <TextLine HPOS="429" VPOS="1746" ID="tl26" WIDTH="1224" HEIGHT="33">
+            <String HEIGHT="25" CONTENT="kommentiert" WIDTH="219" HPOS="429" VPOS="1746" ID="st267"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="wurde" WIDTH="98" HPOS="673" VPOS="1749" ID="st268"/>
+            <String HEIGHT="6" CONTENT="." WIDTH="5" HPOS="781" VPOS="1767" ID="st269"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="Verwiesen" WIDTH="179" HPOS="817" VPOS="1751" ID="st270"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="sei" WIDTH="55" HPOS="1023" VPOS="1755" ID="st271"/>
+            <SP/>
+            <String HEIGHT="18" CONTENT="nur" WIDTH="56" HPOS="1105" VPOS="1760" ID="st272"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="auf" WIDTH="56" HPOS="1188" VPOS="1753" ID="st273"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Sven" WIDTH="76" HPOS="1269" VPOS="1751" ID="st274"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Hedin" WIDTH="96" HPOS="1392" VPOS="1754" ID="st275"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="1499" VPOS="1773" ID="st276"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="Aurel" WIDTH="98" HPOS="1555" VPOS="1756" ID="st277"/>
+          </TextLine>
+          <TextLine HPOS="427" VPOS="1798" ID="tl27" WIDTH="1225" HEIGHT="32">
+            <String HEIGHT="24" CONTENT="Stein" WIDTH="97" HPOS="427" VPOS="1798" ID="st278"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="und" WIDTH="57" HPOS="550" VPOS="1799" ID="st279"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="den" WIDTH="56" HPOS="632" VPOS="1799" ID="st280"/>
+            <SP/>
+            <String HEIGHT="33" CONTENT="Geographen" WIDTH="200" HPOS="713" VPOS="1800" ID="st281"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="Huntington" WIDTH="202" HPOS="938" VPOS="1806" ID="st282"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="6" HPOS="1149" VPOS="1824" ID="st283"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="der" WIDTH="57" HPOS="1186" VPOS="1806" ID="st284"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="1905" WIDTH="76" HPOS="1269" VPOS="1802" ID="st285"/>
+            <SP/>
+            <String HEIGHT="18" CONTENT="vom" WIDTH="56" HPOS="1371" VPOS="1811" ID="st286"/>
+            <SP/>
+            <String HEIGHT="11" CONTENT="&quot;" WIDTH="11" HPOS="1455" VPOS="1807" ID="st287"/>
+            <String HEIGHT="24" CONTENT="Puls" WIDTH="77" HPOS="1472" VPOS="1807" ID="st288"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="von" WIDTH="55" HPOS="1597" VPOS="1813" ID="st289"/>
+          </TextLine>
+          <TextLine HPOS="426" VPOS="1849" ID="tl28" WIDTH="1226" HEIGHT="33">
+            <String HEIGHT="23" CONTENT="Asien" WIDTH="97" HPOS="426" VPOS="1849" ID="st290"/>
+            <String HEIGHT="10" CONTENT="&quot;" WIDTH="10" HPOS="531" VPOS="1850" ID="st291"/>
+            <SP/>
+            <String HEIGHT="30" CONTENT="sprach" WIDTH="116" HPOS="571" VPOS="1850" ID="st292"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="6" HPOS="697" VPOS="1870" ID="st293"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="den" WIDTH="55" HPOS="734" VPOS="1853" ID="st294"/>
+            <SP/>
+            <String HEIGHT="18" CONTENT="man" WIDTH="56" HPOS="815" VPOS="1861" ID="st295"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="in" WIDTH="34" HPOS="898" VPOS="1857" ID="st296"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="dem" WIDTH="56" HPOS="959" VPOS="1857" ID="st297"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="Wechsel" WIDTH="140" HPOS="1040" VPOS="1856" ID="st298"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="der" WIDTH="56" HPOS="1207" VPOS="1855" ID="st299"/>
+            <SP/>
+            <String HEIGHT="36" CONTENT="Wasserführung" WIDTH="261" HPOS="1287" VPOS="1853" ID="st300"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="der" WIDTH="56" HPOS="1596" VPOS="1859" ID="st301"/>
+          </TextLine>
+          <TextLine HPOS="426" VPOS="1900" ID="tl29" WIDTH="667" HEIGHT="32">
+            <String HEIGHT="25" CONTENT="Taklamkan" WIDTH="179" HPOS="426" VPOS="1900" ID="st302"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="fühle" WIDTH="96" HPOS="632" VPOS="1902" ID="st303"/>
+            <SP/>
+            <String HEIGHT="28" CONTENT="(" WIDTH="8" HPOS="758" VPOS="1905" ID="st304"/>
+            <String HEIGHT="32" CONTENT="Chappell" WIDTH="158" HPOS="774" VPOS="1905" ID="st305"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="943" VPOS="1927" ID="st306"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="1970" WIDTH="75" HPOS="981" VPOS="1908" ID="st307"/>
+            <String HEIGHT="28" CONTENT=")" WIDTH="8" HPOS="1064" VPOS="1909" ID="st308"/>
+            <String HEIGHT="6" CONTENT="." WIDTH="6" HPOS="1087" VPOS="1926" ID="st309"/>
+          </TextLine>
+          <TextLine HPOS="425" VPOS="2004" ID="tl30" WIDTH="1227" HEIGHT="33">
+            <String HEIGHT="24" CONTENT="Das" WIDTH="56" HPOS="425" VPOS="2004" ID="st310"/>
+            <SP/>
+            <String HEIGHT="31" CONTENT="Wasserangebot" WIDTH="261" HPOS="506" VPOS="2006" ID="st311"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="kommt" WIDTH="96" HPOS="795" VPOS="2010" ID="st312"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="aus" WIDTH="56" HPOS="917" VPOS="2018" ID="st313"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="den" WIDTH="55" HPOS="1000" VPOS="2014" ID="st314"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="Bergen" WIDTH="117" HPOS="1103" VPOS="2012" ID="st315"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="des" WIDTH="55" HPOS="1268" VPOS="2008" ID="st316"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="Umlandes" WIDTH="158" HPOS="1369" VPOS="2011" ID="st317"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="1538" VPOS="2033" ID="st318"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="vor" WIDTH="56" HPOS="1596" VPOS="2020" ID="st319"/>
+          </TextLine>
+          <TextLine HPOS="426" VPOS="2056" ID="tl31" WIDTH="1225" HEIGHT="34">
+            <String HEIGHT="25" CONTENT="allem" WIDTH="96" HPOS="426" VPOS="2056" ID="st320"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="des" WIDTH="55" HPOS="548" VPOS="2058" ID="st321"/>
+            <SP/>
+            <String HEIGHT="28" CONTENT="tibetanischen" WIDTH="262" HPOS="629" VPOS="2059" ID="st322"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="Hochlandes" WIDTH="201" HPOS="937" VPOS="2062" ID="st323"/>
+            <String HEIGHT="9" CONTENT="," WIDTH="5" HPOS="1149" VPOS="2079" ID="st324"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="mit" WIDTH="56" HPOS="1205" VPOS="2059" ID="st325"/>
+            <SP/>
+            <String HEIGHT="26" CONTENT="einer" WIDTH="96" HPOS="1309" VPOS="2060" ID="st326"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Reihe" WIDTH="97" HPOS="1451" VPOS="2066" ID="st327"/>
+            <SP/>
+            <String HEIGHT="18" CONTENT="von" WIDTH="55" HPOS="1596" VPOS="2072" ID="st328"/>
+          </TextLine>
+          <TextLine HPOS="426" VPOS="2109" ID="tl32" WIDTH="1225" HEIGHT="32">
+            <String HEIGHT="25" CONTENT="Flüssen" WIDTH="136" HPOS="426" VPOS="2109" ID="st329"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="573" VPOS="2129" ID="st330"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="unter" WIDTH="96" HPOS="610" VPOS="2114" ID="st331"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="denen" WIDTH="96" HPOS="732" VPOS="2114" ID="st332"/>
+            <SP/>
+            <String HEIGHT="17" CONTENT="von" WIDTH="55" HPOS="856" VPOS="2122" ID="st333"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="West" WIDTH="78" HPOS="936" VPOS="2116" ID="st334"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="nach" WIDTH="76" HPOS="1041" VPOS="2114" ID="st335"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Ost" WIDTH="56" HPOS="1144" VPOS="2112" ID="st336"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="der" WIDTH="56" HPOS="1226" VPOS="2111" ID="st337"/>
+            <SP/>
+            <String HEIGHT="31" CONTENT="Yarkantfluß" WIDTH="218" HPOS="1309" VPOS="2111" ID="st338"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="1538" VPOS="2137" ID="st339"/>
+            <SP/>
+            <String HEIGHT="22" CONTENT="der" WIDTH="56" HPOS="1595" VPOS="2119" ID="st340"/>
+          </TextLine>
+          <TextLine HPOS="423" VPOS="2161" ID="tl33" WIDTH="1227" HEIGHT="32">
+            <String HEIGHT="26" CONTENT="Khotanfluß" WIDTH="200" HPOS="423" VPOS="2161" ID="st341"/>
+            <String HEIGHT="10" CONTENT="," WIDTH="5" HPOS="633" VPOS="2182" ID="st342"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="der" WIDTH="56" HPOS="669" VPOS="2165" ID="st343"/>
+            <SP/>
+            <String HEIGHT="32" CONTENT="Konyafluß" WIDTH="179" HPOS="751" VPOS="2166" ID="st344"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="und" WIDTH="55" HPOS="958" VPOS="2167" ID="st345"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="der" WIDTH="56" HPOS="1040" VPOS="2167" ID="st346"/>
+            <SP/>
+            <String HEIGHT="28" CONTENT="Qarqan" WIDTH="118" HPOS="1122" VPOS="2164" ID="st347"/>
+            <SP/>
+            <String HEIGHT="25" CONTENT="neben" WIDTH="97" HPOS="1267" VPOS="2163" ID="st348"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="dem" WIDTH="56" HPOS="1389" VPOS="2168" ID="st349"/>
+            <SP/>
+            <String HEIGHT="24" CONTENT="Tarim" WIDTH="97" HPOS="1471" VPOS="2170" ID="st350"/>
+            <SP/>
+            <String HEIGHT="23" CONTENT="im" WIDTH="34" HPOS="1616" VPOS="2170" ID="st351"/>
+          </TextLine>
+          <TextLine HPOS="1055" VPOS="2275" ID="tl34" WIDTH="14" HEIGHT="22">
+            <String HEIGHT="22" CONTENT="6" WIDTH="14" HPOS="1055" VPOS="2275" ID="st352"/>
+          </TextLine>
+        </TextBlock>
+      </PrintSpace>
+    </Page>
+  </Layout>
+</alto>
