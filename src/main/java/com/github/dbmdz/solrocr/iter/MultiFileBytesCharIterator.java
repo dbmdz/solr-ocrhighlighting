@@ -60,7 +60,8 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
     return it;
   }
 
-  private int adjustOffset(int offset) {
+  /** Given an absolute offset, return the relative offset in the file the offset resides in. */
+  private int getFileRelativeOffset(int offset) {
     return offset - offsetMap.floorKey(offset);
   }
 
@@ -98,7 +99,7 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
       throw new IndexOutOfBoundsException();
     }
     IterableCharSequence seq = getCharSeq(offset);
-    int adjustedOffset = adjustOffset(offset);
+    int adjustedOffset = getFileRelativeOffset(offset);
     return seq.charAt(adjustedOffset);
   }
 
@@ -110,15 +111,19 @@ public class MultiFileBytesCharIterator implements IterableCharSequence, AutoClo
     if (offsetMap.floorKey(start).equals(offsetMap.floorKey(end))) {
       // Easy mode, start and end are in the same file
       IterableCharSequence seq = getCharSeq(start);
-      return seq.subSequence(adjustOffset(start), adjustOffset(end), forceAscii);
+      return seq.subSequence(getFileRelativeOffset(start), getFileRelativeOffset(end), forceAscii);
     } else {
-      IterableCharSequence seq = getCharSeq(start);
-      int adjustedStart = adjustOffset(start);
-      StringBuilder sb =
-          new StringBuilder(seq.subSequence(adjustedStart, seq.length(), forceAscii));
-      seq = getCharSeq(end);
-      int adjustedEnd = adjustOffset(end);
-      sb.append(seq.subSequence(0, adjustedEnd, forceAscii));
+      // Hard mode, start and end span multiple files
+      final int targetLength = end - start;
+      StringBuilder sb = new StringBuilder(targetLength);
+      for (int charsRead = 0; charsRead < targetLength; ) {
+        IterableCharSequence seq = getCharSeq(start + charsRead);
+        int fileOffsetStart = getFileRelativeOffset(start + charsRead);
+        int fileOffsetEnd = Math.min(seq.length(), fileOffsetStart + (targetLength - charsRead));
+
+        sb.append(seq.subSequence(fileOffsetStart, fileOffsetEnd, forceAscii));
+        charsRead += fileOffsetEnd - fileOffsetStart;
+      }
       return sb.toString();
     }
   }

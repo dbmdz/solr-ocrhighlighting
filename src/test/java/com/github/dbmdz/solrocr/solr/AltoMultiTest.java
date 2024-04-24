@@ -37,6 +37,15 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
             + "[2223:25803,25808:32247,32252:38770,38775:85408,85413:88087,88092:120911,120916:149458,"
             + "149463:178686,178691:220893,220898:231618,231623:242459]";
     assertU(adoc("ocr_text", debugPtr, "id", "84"));
+
+    ocrBasePath = Paths.get("src/test/resources/data/alto_concat_421");
+    ptr =
+        Files.list(ocrBasePath)
+            .filter(p -> p.getFileName().toString().endsWith(".xml"))
+            .map(p -> p.toAbsolutePath().toString())
+            .sorted()
+            .collect(Collectors.joining("+"));
+    assertU(adoc("ocr_text", ptr, "id", "126"));
     assertU(commit());
   }
 
@@ -126,5 +135,15 @@ public class AltoMultiTest extends SolrTestCaseJ4 {
         "count(//arr[@name='snippets']/lst)=1",
         "contains(//arr[@name='snippets']/lst/str[@name='text']/text(), '<em>kalifat</em>')",
         "count(//arr[@name='highlights']/arr/lst)=2");
+  }
+
+  @Test
+  public void testLargeConcatenatedOcr() {
+    SolrQueryRequest req = xmlQ("q", "china", "fq", "id:126");
+    assertQ(
+        req,
+        "count(//arr[@name='snippets']/lst)=7",
+        "count(//arr[@name='highlights']/arr/lst)=7",
+        "//arr[@name='snippets']/lst[1]/str[@name='text']/text()='die Annahme, die Sogder seien aus Wohnsitzen in Ostturkistan ins obere Industal gezogen, um dort wichtige Positionen im Handel zwischen <em>China</em> und Indien einnehmen zu können. Dieser 45'");
   }
 }

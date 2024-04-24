@@ -123,8 +123,7 @@ public class OcrPassageFormatter extends PassageFormatter {
           mergeMatches(passage.getNumMatches(), passage.getMatchStarts(), passage.getMatchEnds());
       for (PassageMatch match : matches) {
         // Can't just do match.start - passage.getStartOffset(), since both offsets are relative to
-        // **UTF-8 bytes**, but
-        // we need **UTF-16 codepoint** offsets in the code.
+        // **UTF-8 bytes**, but we need **UTF-16 codepoint** offsets in the code.
         String preMatchContent =
             content.subSequence(passage.getStartOffset(), match.start).toString();
         int matchStart = preMatchContent.length();
