@@ -229,13 +229,12 @@ public class HocrTest extends SolrTestCaseJ4 {
   @Test
   public void testHighlightingTimeout() {
     // This test can only check for the worst case, since checking for partial results is unlikely
-    // to be stable across
-    // multiple environments due to timing issues.
+    // to be stable across multiple environments due to timing issues.
     SolrQueryRequest req = xmlQ("q", "Vögelchen", "hl.ocr.timeAllowed", "1");
     assertQ(
         req,
         "//bool[@name='partialOcrHighlights']='true'",
-        "count(//lst[@name='ocrHighlighting']/lst)=2",
+        "count(//lst[@name='ocrHighlighting']/lst)=0",
         "count(//arr[@name='snippets'])=0");
   }
 
@@ -645,5 +644,30 @@ public class HocrTest extends SolrTestCaseJ4 {
         req,
         "count(//arr[@name='snippets']/lst)='1'",
         "contains(//arr[@name='snippets']/lst/str[@name='text'], '<em>Nathanael Brush</em>')");
+  }
+
+  public void testMissingFileDoesNotFailWholeQuery() throws IOException {
+    // Create a copy of of a document, with the OCR residing in a temporary directory
+    Path tmpDir = createTempDir();
+    Files.copy(Paths.get("src/test/resources/data/hocr.html"), tmpDir.resolve("hocr.html"));
+    assertU(
+        adoc("ocr_text", tmpDir.resolve("hocr.html").toAbsolutePath().toString(), "id", "999999"));
+    assertU(commit());
+
+    // With indexing complete, we delete the referenced hOCR in order to cause an error during
+    // highlighting
+    Files.delete(tmpDir.resolve("hocr.html"));
+    Files.delete(tmpDir);
+
+    try {
+      SolrQueryRequest req = xmlQ("q", "ocr_text:Nedereien");
+      assertQ(
+          req,
+          "count(//lst[@name='ocrHighlighting']/lst)=1",
+          "count(//lst[@name='ocrHighlighting']/lst[@name='999999'])=0");
+    } finally {
+      assertU(delI("999999"));
+      assertU(commit());
+    }
   }
 }
