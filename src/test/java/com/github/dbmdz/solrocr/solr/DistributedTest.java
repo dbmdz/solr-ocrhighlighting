@@ -140,7 +140,7 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
         "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea <em>commodo consequat</em>. Duis aute irure dolor in "
             + "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. ");
     NamedList<?> ocrHls = (NamedList<?>) resp.getResponse().get("ocrHighlighting");
-    assertEquals(2, ocrHls.size());
+    assertEquals(1, ocrHls.size());
     assertEquals(1, ((NamedList<?>) ocrHls.get("31337")).size());
   }
 }

@@ -528,14 +528,20 @@ public class OcrHighlighter extends UnifiedHighlighter {
           ocrVals[fieldIdx] = IterableCharSequence.fromString(fieldValue);
           continue;
         }
-        SourcePointer sourcePointer = SourcePointer.parse(fieldValue);
+        SourcePointer sourcePointer = null;
+        try {
+          sourcePointer = SourcePointer.parse(fieldValue);
+        } catch (RuntimeException e) {
+          log.error("Could not parse OCR pointer for document {}: {}", docId, fieldValue, e);
+        }
         if (sourcePointer == null) {
           // None of the files in the pointer exist or were readable, log should have warnings
           ocrVals[fieldIdx] = null;
           continue;
         }
         // If preloading is enabled, start warming the cache for the pointer
-        PageCacheWarmer.getInstance().ifPresent(w -> w.preload(sourcePointer));
+        final SourcePointer finalPtr = sourcePointer;
+        PageCacheWarmer.getInstance().ifPresent(w -> w.preload(finalPtr));
         if (sourcePointer.sources.size() == 1) {
           ocrVals[fieldIdx] =
               new FileBytesCharIterator(

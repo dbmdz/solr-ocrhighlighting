@@ -100,12 +100,14 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
       SimpleOrderedMap<Object> docMap = (SimpleOrderedMap<Object>) out.get(docId);
       if (docMap == null) {
         docMap = new SimpleOrderedMap<>();
-        out.add(docId, docMap);
       }
       if (ocrSnippets[k] == null) {
         continue;
       }
       docMap.addAll(ocrSnippets[k].toNamedList());
+      if (docMap.size() > 0) {
+        out.add(docId, docMap);
+      }
     }
   }
 
