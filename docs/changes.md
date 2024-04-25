@@ -1,3 +1,17 @@
+## 0.8.5 (2024-04-25)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.5)
+
+**Changed:**
+- Missing files no longer fail the complete search request, instead the OCR
+  highlighting for the document is skipped
+- Add support for Solr 9.5
+- Updated documentation with warning for Solr 9 users to disable security sandboxing
+  when using pointers to external files
+
+**Fixed:**
+- Regular highlighting in case no hl field can be determined works again (#404)
+- Passage building across more than two concatenated files works now (#422)
+
 ## 0.8.4 (2024-01-29)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.4)
 

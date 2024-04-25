@@ -6,7 +6,7 @@
 
   <groupId>de.digitalcollections</groupId>
   <artifactId>solr-ocrhighlighting</artifactId>
-  <version>0.8.5-SNAPSHOT</version>
+  <version>0.8.5</version>
 
   <name>Solr OCR Highlighting Plugin</name>
   <description>
@@ -30,8 +30,8 @@
       <organizationUrl>https://github.com/dbmdz</organizationUrl>
     </developer>
     <developer>
-      <name>Christoph Lorenz</name>
-      <email>christoph.lorenz@bsb-muenchen.de</email>
+      <name>Katharina Schmid</name>
+      <email>katharina.schmid@bsb-muenchen.de</email>
       <organization>Bavarian State Library</organization>
       <organizationUrl>https://github.com/dbmdz</organizationUrl>
     </developer>
