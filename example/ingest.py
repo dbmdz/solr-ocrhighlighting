@@ -9,7 +9,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from urllib import request
 from argparse import ArgumentParser
-from logging import DEBUG, INFO, Formatter, Logger, StreamHandler
+import logging
 from urllib.error import (
     URLError,
 )
@@ -32,9 +32,8 @@ NSMAP = {
     'mods': 'http://www.loc.gov/mods/v3'
 }
 DEFAULT_N_WORKERS = 2
-DEFAULT_LOG_LEVEL = INFO
+DEFAULT_LOG_LEVEL = logging.INFO
 LOGGER_NAME = 'ingest'
-LOGGER = None
 
 
 class SolrException(Exception):
@@ -93,22 +92,22 @@ def load_documents(the_url, base_path: Path, transform_func: Callable):
                     if doc_path is None:
                         continue
                     if not doc_path.exists():
-                        LOGGER.debug("Download %s", doc_path)
+                        logging.debug("Download %s", doc_path)
                         try:
                             local_file = tf.extractfile(ti).read()
                             with doc_path.open('wb') as fp:
                                 fp.write(local_file)
                         except tarfile.ReadError as _entry_read_error:
-                            LOGGER.error("Fail process %s: %s",
+                            logging.error("Fail process %s: %s",
                                          ti, _entry_read_error.args[0])
                             continue
-                    LOGGER.debug("Extract metadata from %s", doc_path)
+                    logging.debug("Extract metadata from %s", doc_path)
                     yield transform_func(doc_path)
             except tarfile.ReadError as _tar_read_error:
-                LOGGER.error("Processing %s: %s",
+                logging.error("Processing %s: %s",
                              tf, _tar_read_error.args[0])
     except URLError as url_error:
-        LOGGER.error("Fail request %s: %s", the_url, url_error.args[0])
+        logging.error("Fail request %s: %s", the_url, url_error.args[0])
 
 
 def bnl_get_metadata(mods_tree):
@@ -199,7 +198,7 @@ def bnl_are_volumes_missing(base_path):
 
 def bnl_load_documents(base_path: Path):
     if bnl_are_volumes_missing(base_path):
-        LOGGER.debug("Download missing BNL/L'Union issues to %s", base_path)
+        logging.debug("Download missing BNL/L'Union issues to %s", base_path)
         with request.urlopen(LUNION_TEXTS_URL) as resp:
             tf = tarfile.open(fileobj=resp, mode='r|gz')
             last_vol = None
@@ -242,7 +241,7 @@ def bnl_load_documents(base_path: Path):
 def index_documents(docs):
     req_url = f"http://{SOLR_HOST}/solr/ocr/update?softCommit=true"
     try:
-        LOGGER.debug("Push %d documents to %s", len(docs), req_url)
+        logging.debug("Push %d documents to %s", len(docs), req_url)
         req = request.Request(req_url,
                               data=json.dumps(docs).encode('utf8'),
                               headers={'Content-Type': 'application/json'})
@@ -250,7 +249,7 @@ def index_documents(docs):
         if resp.status >= 400:
             raise SolrException(json.loads(resp.read()), docs)
     except URLError as _url_err:
-        LOGGER.error("Fail indexing %d documents: %s", len(docs), _url_err)
+        logging.error("Fail indexing %d documents: %s", len(docs), _url_err)
 
 
 def generate_batches(it, chunk_size):
@@ -268,7 +267,7 @@ def _calculate_log_level(the_level) -> int:
     if isinstance(the_level, str):
         _level_str = str(the_level).lower()
         if 'debug' in _level_str:
-            return DEBUG
+            return logging.DEBUG
     return DEFAULT_LOG_LEVEL
 
 
@@ -281,16 +280,12 @@ if __name__ == '__main__':
     arg_parser.add_argument('--books-only', help="if only interested in book corpus (default: False)",
                         required=False, action='store_true')
     args = arg_parser.parse_args()
-    LOGGER = Logger(LOGGER_NAME, _calculate_log_level(args.log_level))
-    stdout_handler = StreamHandler(sys.stdout)
-    stdout_handler.setFormatter(Formatter(
-        "%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%dT%H:%M:%S"))
-    LOGGER.addHandler(stdout_handler)
+    logging.basicConfig(level=_calculate_log_level(args.log_level))
     max_workers = args.num_workers
     is_books_only = args.books_only
     gbooks_base_path = Path(GOOGLE1000_PATH).absolute()
     gbooks_base_path.mkdir(parents=True, exist_ok=True)
-    LOGGER.info("Indexing Google %s Books", GOOGLE1000_NUM_VOLUMES)
+    logging.info("Indexing Google %s Books", GOOGLE1000_NUM_VOLUMES)
 
     futs = []
     with ProcessPoolExecutor(max_workers=max_workers) as pool_exec:
@@ -298,24 +293,24 @@ if __name__ == '__main__':
             GOOGLE1000_URL, gbooks_base_path, transform_gbook_to_document)
         for idx, batch in enumerate(generate_batches(gbooks_iter, GOOGLE1000_BATCH_SIZE)):
             futs.append(pool_exec.submit(index_documents, batch))
-            LOGGER.debug("%04d/%d", ((idx+1)*GOOGLE1000_BATCH_SIZE),
+            logging.debug("%04d/%d", ((idx+1)*GOOGLE1000_BATCH_SIZE),
                          GOOGLE1000_NUM_VOLUMES)
         for fut in as_completed(futs):
             fut.result()
     if is_books_only:
-        LOGGER.info("Only Google Books requested, ingest done.")
+        logging.info("Only Google Books requested, ingest done.")
         sys.exit(0)
 
     lunion_base_path = Path(LUNION_PATH).absolute()
     lunion_base_path.mkdir(parents=True, exist_ok=True)
-    LOGGER.info("Indexing BNL/L'Union articles")
+    logging.info("Indexing BNL/L'Union articles")
     futs = []
     with ProcessPoolExecutor(max_workers=max_workers) as pool_exec:
         bnl_iter = bnl_load_documents(lunion_base_path)
         for idx, batch in enumerate(generate_batches(bnl_iter, LUNION_BATCH_SIZE)):
             futs.append(pool_exec.submit(index_documents, batch))
-            LOGGER.debug("process %05d/%d",
+            logging.debug("process %05d/%d",
                          (idx+1)*LUNION_BATCH_SIZE, LUNION_NUM_ARTICLES)
         for fut in as_completed(futs):
             fut.result()
-    LOGGER.info("Ingest done.")
+    logging.info("Ingest done.")
