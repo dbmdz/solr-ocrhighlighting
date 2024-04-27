@@ -272,15 +272,16 @@ def _calculate_log_level(the_level) -> int:
 
 
 if __name__ == '__main__':
-    arg_parser = ArgumentParser(description='ingest example data into SOLR')
-    arg_parser.add_argument('--log-level', help='like "debug", "info", "error" (default:info)', required=False,
-                        default=DEFAULT_LOG_LEVEL)
-    arg_parser.add_argument('--num-workers', help="how many concurrent processes to start (default:4)", required=False,
+    arg_parser = ArgumentParser(description='Ingest example data into SOLR')
+    arg_parser.add_argument('--num-workers', help="How many worker processes to start (default:4)", required=False,
                         default=DEFAULT_N_WORKERS, type=int)
-    arg_parser.add_argument('--books-only', help="if only interested in book corpus (default: False)",
+    arg_parser.add_argument('--debug', help='Print additional debug information (default:False)',
+                        required=False, action='store_true')
+    arg_parser.add_argument('--books-only', help="If only interested in book corpus (default: False)",
                         required=False, action='store_true')
     args = arg_parser.parse_args()
-    logging.basicConfig(level=_calculate_log_level(args.log_level))
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(level=log_level)
     max_workers = args.num_workers
     is_books_only = args.books_only
     gbooks_base_path = Path(GOOGLE1000_PATH).absolute()
