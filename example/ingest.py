@@ -8,11 +8,9 @@ import xml.etree.ElementTree as etree
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from urllib import request
+from urllib.error import URLError
 from argparse import ArgumentParser
 import logging
-from urllib.error import (
-    URLError,
-)
 from typing import Callable, Dict
 
 
