@@ -73,7 +73,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
     // Highlight OCR fields
     OcrHighlighter ocrHighlighter =
-        new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer(), req.getParams());
+        new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer(), req);
     OcrHighlightResult[] ocrSnippets =
         ocrHighlighter.highlightOcrFields(ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader);
 

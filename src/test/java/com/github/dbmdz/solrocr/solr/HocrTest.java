@@ -230,7 +230,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   public void testHighlightingTimeout() {
     // This test can only check for the worst case, since checking for partial results is unlikely
     // to be stable across multiple environments due to timing issues.
-    SolrQueryRequest req = xmlQ("q", "Vögelchen", "hl.ocr.timeAllowed", "1");
+    SolrQueryRequest req = xmlQ("q", "Vögelchen", "hl.ocr.timeAllowed", "0");
     assertQ(
         req,
         "//bool[@name='partialOcrHighlights']='true'",
