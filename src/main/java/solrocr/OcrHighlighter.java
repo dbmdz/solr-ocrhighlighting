@@ -43,8 +43,8 @@ import com.github.dbmdz.solrocr.model.OcrSnippet;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.reader.LegacyBaseCompositeReader;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
-import com.github.dbmdz.solrocr.util.HighlightTimeout;
 import com.github.dbmdz.solrocr.util.PageCacheWarmer;
+import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -72,6 +72,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.MultiReader;
+import org.apache.lucene.index.QueryTimeout;
 import org.apache.lucene.index.ReaderUtil;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSetIterator;
@@ -88,7 +89,7 @@ import org.apache.lucene.util.Version;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
-import org.apache.solr.search.SolrQueryTimeoutImpl;
+import org.apache.solr.request.SolrQueryRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,8 +122,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private static final Method extractAutomataLegacyMethod;
 
   static {
-    /**
-     * Copied from the upstreama {@link UnifiedHighlighter} code. <strong>Please refer to the file
+    /*
+     * Copied from the upstream {@link UnifiedHighlighter} code. <strong>Please refer to the file
      * header for licensing information</strong>
      */
     try {
@@ -233,10 +234,12 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   private final SolrParams params;
+  private final SolrQueryRequest req;
 
-  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, SolrParams params) {
+  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, SolrQueryRequest req) {
     super(indexSearcher, indexAnalyzer);
-    this.params = params;
+    this.params = req.getParams();
+    this.req = req;
   }
 
   @Override
@@ -300,10 +303,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
         query,
         docIDs,
         maxPassagesOcr);
-    Long timeAllowed = params.getLong(OcrHighlightParams.TIME_ALLOWED);
-    if (timeAllowed != null) {
-      HighlightTimeout.set(timeAllowed);
-      SolrQueryTimeoutImpl.set(timeAllowed);
+    QueryTimeout timeout = null;
+    if (TimeAllowedLimit.hasTimeLimit(req)) {
+      timeout = new TimeAllowedLimit(req);
     }
 
     // Sort docs & fields for sequential i/o
@@ -370,8 +372,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
           if (content == null) {
             continue;
           }
-          if (timeAllowed != null) {
-            content = new ExitingIterCharSeq(content, HighlightTimeout.getInstance());
+          if (timeout != null) {
+            // We only check against the timeout when reading our field content (both from disk and
+            // from memory), since this is a process that is performed at multiple points in the
+            // highlighting process and usually takes the longest time.
+            content = new ExitingIterCharSeq(content, timeout);
           }
           IndexReader indexReader =
               (fieldHighlighter.getOffsetSource() == OffsetSource.TERM_VECTORS
@@ -474,8 +479,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
     }
     assert docIdIter.docID() == DocIdSetIterator.NO_MORE_DOCS
         || docIdIter.nextDoc() == DocIdSetIterator.NO_MORE_DOCS;
-    HighlightTimeout.reset();
-    SolrQueryTimeoutImpl.reset();
 
     OcrHighlightResult[] out = new OcrHighlightResult[docIds.length];
     for (int d = 0; d < docIds.length; d++) {

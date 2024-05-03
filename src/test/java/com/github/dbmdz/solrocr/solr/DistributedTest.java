@@ -83,7 +83,7 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
             "hl.ctxTag", "ocr_line",
             "hl.ctxSize", "2",
             "hl.snippets", "10",
-            "hl.ocr.timeAllowed", "-1",
+            "hl.ocr.timeAllowed", "0",
             "fl", "id,score");
     assertEquals(1, resp.getResults().getNumFound());
     assertEquals(true, resp.getHeader().getBooleanArg("partialOcrHighlights"));
