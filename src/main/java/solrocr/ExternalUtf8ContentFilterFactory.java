@@ -63,7 +63,8 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       pointer.sources.forEach(this::validateSource);
 
       // Regions contained in source pointers are defined by byte offsets.
-      // We need to convert these to Java character offsets so they can be used by the filter.
+      // We need to convert these to Java character offsets, so they can be used by the filter.
+      // This is very expensive, but we need this since all IO from here on out is character-based.
       toCharOffsets(pointer);
 
       Reader r;

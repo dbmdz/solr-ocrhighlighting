@@ -80,7 +80,14 @@ public class OcrHighlightComponent extends SearchComponent
 
   @Override
   public void inform(SolrCore core) {
-    this.ocrHighlighter = new SolrOcrHighlighter();
+    int numHlThreads =
+        Integer.parseInt(
+            info.attributes.getOrDefault(
+                "numHighlightingThreads",
+                String.valueOf(Runtime.getRuntime().availableProcessors())));
+    int maxQueuedPerThread =
+        Integer.parseInt(info.attributes.getOrDefault("maxQueuedPerThread", "8"));
+    this.ocrHighlighter = new SolrOcrHighlighter(numHlThreads, maxQueuedPerThread);
     if ("true".equals(info.attributes.getOrDefault("enablePreload", "false"))) {
       PageCacheWarmer.enable(
           Integer.parseInt(info.attributes.getOrDefault("preloadReadSize", "32768")),
@@ -95,6 +102,7 @@ public class OcrHighlightComponent extends SearchComponent
 
           @Override
           public void postClose(SolrCore core) {
+            ocrHighlighter.shutdownThreadPool();
             PageCacheWarmer.getInstance().ifPresent(PageCacheWarmer::shutdown);
           }
         });

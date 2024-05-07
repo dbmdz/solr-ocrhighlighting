@@ -25,12 +25,16 @@
 package com.github.dbmdz.solrocr.solr;
 
 import com.github.dbmdz.solrocr.model.OcrHighlightResult;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
@@ -46,6 +50,28 @@ import solrocr.OcrHighlighter;
 
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+  private final ThreadPoolExecutor hlThreadPool;
+
+  public SolrOcrHighlighter() {
+    this(Runtime.getRuntime().availableProcessors(), 8);
+  }
+
+  public SolrOcrHighlighter(int numHlThreads, int maxQueuedPerThread) {
+    super();
+    this.hlThreadPool =
+        new ThreadPoolExecutor(
+            numHlThreads,
+            numHlThreads,
+            120L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(numHlThreads * maxQueuedPerThread),
+            new ThreadFactoryBuilder().setNameFormat("OcrHighlighter-%d").build());
+  }
+
+  public void shutdownThreadPool() {
+    hlThreadPool.shutdown();
+  }
 
   public NamedList<Object> doHighlighting(
       DocList docs, Query query, SolrQueryRequest req, Map<String, Object> respHeader)
@@ -75,7 +101,8 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
     OcrHighlighter ocrHighlighter =
         new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer(), req);
     OcrHighlightResult[] ocrSnippets =
-        ocrHighlighter.highlightOcrFields(ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader);
+        ocrHighlighter.highlightOcrFields(
+            ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader, hlThreadPool);
 
     // Assemble output data
     SimpleOrderedMap<Object> out = new SimpleOrderedMap<>();
