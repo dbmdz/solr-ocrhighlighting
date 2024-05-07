@@ -59,6 +59,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -284,7 +288,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
       Query query,
       int[] docIDs,
       int[] maxPassagesOcr,
-      Map<String, Object> respHeader)
+      Map<String, Object> respHeader,
+      ThreadPoolExecutor hlThreadPool)
       throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
@@ -358,6 +363,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
     int[][] snippetCountsByField = new int[fields.length][docIds.length];
     // Highlight in doc batches determined by loadFieldValues (consumes from docIdIter)
     DocIdSetIterator docIdIter = asDocIdSetIterator(docIds);
+
+    List<Future<?>> hlFuts = new ArrayList<>();
     docLoop:
     for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
       List<IterableCharSequence[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
@@ -394,91 +401,106 @@ public class OcrHighlighter extends UnifiedHighlighter {
           }
           int docInIndex = docInIndexes[docIdx]; // original input order
           assert resultByDocIn[docInIndex] == null;
-          OcrFormat ocrFormat = getFormat(content);
-          if (ocrFormat == null) {
-            continue;
-          }
-          String limitBlockParam = params.get(OcrHighlightParams.LIMIT_BLOCK, "block");
-          OcrBlock[] limitBlocks = null;
-          if (!limitBlockParam.equalsIgnoreCase("NONE")) {
-            limitBlocks =
-                OcrBlock.getHierarchyFrom(OcrBlock.valueOf(limitBlockParam.toUpperCase(Locale.US)))
-                    .toArray(new OcrBlock[0]);
-          }
-          OcrBlock contextBlock =
-              OcrBlock.valueOf(
-                  params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase(Locale.US));
-          BreakLocator contextLocator = ocrFormat.getBreakLocator(content, contextBlock);
-          BreakLocator limitLocator =
-              limitBlocks == null ? null : ocrFormat.getBreakLocator(content, limitBlocks);
-          BreakLocator breakLocator =
-              new ContextBreakLocator(
-                  contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
-          OcrPassageFormatter formatter =
-              ocrFormat.getPassageFormatter(
-                  OcrHighlightParams.get(params, OcrHighlightParams.TAG_PRE, "<em>"),
-                  OcrHighlightParams.get(params, OcrHighlightParams.TAG_POST, "</em>"),
-                  params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false),
-                  params.getBool(OcrHighlightParams.ALIGN_SPANS, false),
-                  params.getBool(OcrHighlightParams.TRACK_PAGES, true));
+
           int snippetLimit =
               Math.max(
                   maxPassages[fieldIdx],
                   params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
-          boolean scorePassages = params.getBool(OcrHighlightParams.SCORE_PASSAGES, true);
+
+          // Final aliases for lambda
+          final int docIdFinal = docId;
+          final int fieldIdxFinal = fieldIdx;
+          final IterableCharSequence contentFinal = content;
+          Runnable hlFn =
+              () -> {
+                try {
+                  highlightDocField(
+                      docIdFinal,
+                      docInIndex,
+                      fieldIdxFinal,
+                      contentFinal,
+                      fieldHighlighter,
+                      leafReader,
+                      snippetLimit,
+                      resultByDocIn,
+                      snippetCountsByField);
+                } catch (ExitingIterCharSeq.ExitingIterCharSeqException
+                    | ExitableDirectoryReader.ExitingReaderException e) {
+                  resultByDocIn[docInIndex] = null;
+                  throw e;
+                } catch (IOException | RuntimeException e) {
+                  // This catch-all prevents OCR highlighting from failing the complete query,
+                  // instead users get an error message in their Solr log.
+                  if (contentFinal.getPointer() != null) {
+                    log.error(
+                        "Could not highlight OCR content for document {} at '{}'",
+                        docIdFinal,
+                        contentFinal.getPointer(),
+                        e);
+                  } else {
+                    log.error(
+                        "Could not highlight OCR for document {} with OCR markup '{}...'",
+                        docIdFinal,
+                        contentFinal.subSequence(0, 256),
+                        e);
+                  }
+                } finally {
+                  if (contentFinal instanceof AutoCloseable) {
+                    try {
+                      ((AutoCloseable) contentFinal).close();
+                    } catch (Exception e) {
+                      log.warn(
+                          "Encountered error while closing content iterator for {}: {}",
+                          contentFinal.getPointer(),
+                          e.getMessage());
+                    }
+                  }
+                }
+              };
           try {
-            resultByDocIn[docInIndex] =
-                fieldHighlighter.highlightFieldForDoc(
-                    leafReader,
-                    docId,
-                    breakLocator,
-                    formatter,
-                    content,
-                    params.get(OcrHighlightParams.PAGE_ID),
-                    snippetLimit,
-                    scorePassages);
-          } catch (ExitingIterCharSeq.ExitingIterCharSeqException
-              | ExitableDirectoryReader.ExitingReaderException e) {
-            log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
-            respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
-            resultByDocIn[docInIndex] = null;
-            // Stop highlighting
-            break docLoop;
-          } catch (RuntimeException e) {
-            // This catch-all prevents OCR highlighting from failing the complete query,
-            // instead users get an error message in their Solr log.
-            if (content.getPointer() != null) {
-              log.error(
-                  "Could not highlight OCR content for document {} at '{}'",
-                  docId,
-                  content.getPointer(),
-                  e);
-            } else {
-              log.error(
-                  "Could not highlight OCR for document {} with OCR markup '{}...'",
-                  docId,
-                  content.subSequence(0, 256),
-                  e);
-            }
-          } finally {
-            if (content instanceof AutoCloseable) {
-              try {
-                ((AutoCloseable) content).close();
-              } catch (Exception e) {
-                log.warn(
-                    "Encountered error while closing content iterator for {}: {}",
-                    content.getPointer(),
-                    e.getMessage());
+            // Speed up highlighting by parallelizing the work as much as possible
+            hlFuts.add(hlThreadPool.submit(hlFn));
+          } catch (RejectedExecutionException rejected) {
+            // If the pool is full, run the task synchronously on the current thread
+            try {
+              hlFn.run();
+            } catch (ExitingIterCharSeq.ExitingIterCharSeqException
+                | ExitableDirectoryReader.ExitingReaderException e) {
+              if (respHeader.get(PARTIAL_OCR_HIGHLIGHTS) == null) {
+                respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
+                log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
               }
+              resultByDocIn[docInIndex] = null;
+              break;
             }
           }
-          snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
         }
       }
       batchDocIdx += fieldValsByDoc.size();
     }
     assert docIdIter.docID() == DocIdSetIterator.NO_MORE_DOCS
         || docIdIter.nextDoc() == DocIdSetIterator.NO_MORE_DOCS;
+
+    if (!hlFuts.isEmpty()) {
+      boolean partialOcrHighlights = false;
+      for (Future<?> fut : hlFuts) {
+        try {
+          fut.get();
+        } catch (ExecutionException e) {
+          if (e.getCause() instanceof ExitingIterCharSeq.ExitingIterCharSeqException
+              || e.getCause() instanceof ExitableDirectoryReader.ExitingReaderException) {
+            partialOcrHighlights = true;
+          } else {
+            log.error("Error while highlighting OCR content", e);
+          }
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      if (partialOcrHighlights) {
+        respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
+      }
+    }
 
     OcrHighlightResult[] out = new OcrHighlightResult[docIds.length];
     for (int d = 0; d < docIds.length; d++) {
@@ -496,6 +518,64 @@ public class OcrHighlighter extends UnifiedHighlighter {
       out[d] = hl;
     }
     return out;
+  }
+
+  private void highlightDocField(
+      int docId,
+      int docInIndex,
+      int fieldIdx,
+      IterableCharSequence content,
+      OcrFieldHighlighter fieldHighlighter,
+      LeafReader leafReader,
+      int snippetLimit,
+      OcrSnippet[][] resultByDocIn,
+      int[][] snippetCountsByField)
+      throws IOException {
+    if (content == null) {
+      return;
+    }
+    OcrFormat ocrFormat = getFormat(content);
+    if (ocrFormat == null) {
+      return;
+    }
+
+    String limitBlockParam = params.get(OcrHighlightParams.LIMIT_BLOCK, "block");
+    OcrBlock[] limitBlocks = null;
+    if (!limitBlockParam.equalsIgnoreCase("NONE")) {
+      limitBlocks =
+          OcrBlock.getHierarchyFrom(OcrBlock.valueOf(limitBlockParam.toUpperCase(Locale.US)))
+              .toArray(new OcrBlock[0]);
+    }
+    OcrBlock contextBlock =
+        OcrBlock.valueOf(
+            params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase(Locale.US));
+
+    BreakLocator contextLocator = ocrFormat.getBreakLocator(content, contextBlock);
+    BreakLocator limitLocator =
+        limitBlocks == null ? null : ocrFormat.getBreakLocator(content, limitBlocks);
+    BreakLocator breakLocator =
+        new ContextBreakLocator(
+            contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
+    OcrPassageFormatter formatter =
+        ocrFormat.getPassageFormatter(
+            OcrHighlightParams.get(params, OcrHighlightParams.TAG_PRE, "<em>"),
+            OcrHighlightParams.get(params, OcrHighlightParams.TAG_POST, "</em>"),
+            params.getBool(OcrHighlightParams.ABSOLUTE_HIGHLIGHTS, false),
+            params.getBool(OcrHighlightParams.ALIGN_SPANS, false),
+            params.getBool(OcrHighlightParams.TRACK_PAGES, true));
+    boolean scorePassages = params.getBool(OcrHighlightParams.SCORE_PASSAGES, true);
+
+    resultByDocIn[docInIndex] =
+        fieldHighlighter.highlightFieldForDoc(
+            leafReader,
+            docId,
+            breakLocator,
+            formatter,
+            content,
+            params.get(OcrHighlightParams.PAGE_ID),
+            snippetLimit,
+            scorePassages);
+    snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
   }
 
   @Override
@@ -822,6 +902,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
    * on the original code.</strong>
    */
   private static class TermVectorReusingLeafReader extends FilterLeafReader {
+
     static IndexReader wrap(IndexReader reader) throws IOException {
       LeafReader[] leafReaders =
           reader.leaves().stream()

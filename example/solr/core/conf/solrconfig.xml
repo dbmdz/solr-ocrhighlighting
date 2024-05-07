@@ -12,6 +12,7 @@
       <str>query</str>
       <str>ocrHighlight</str>
       <str>highlight</str>
+      <str>debug</str>
     </arr>
   </requestHandler>
 </config>
