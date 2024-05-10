@@ -90,7 +90,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
     while (idx < (off + numRead)) {
       // Check for invalid entities and try to fix them
       while (advancedFixing && idx < (off + numRead)) {
-        int match = multiIndexOf(cbuf, idx, '<', '&');
+        int match = multiIndexOf(cbuf, idx, (off + numRead), '<', '&');
         if (match < 0 || match > (off + numRead)) {
           // Nothing to do in this buffer
           break outer;
@@ -99,13 +99,13 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
           // Start of element, no more entities to check
           break;
         }
-        int entityEnd = multiIndexOf(cbuf, match + 1, '<', ';');
+        int entityEnd = multiIndexOf(cbuf, match + 1, (off + numRead), '<', ';');
 
         if (entityEnd < match + 1) {
           // Not enough data to determine entity end, we may have to carry over
           // FIXME: This code is largely identical to the carry-over case below, find a way to
           //        deduplicate
-          int carryOverSize = numRead - (match + 1);
+          int carryOverSize = (off + numRead) - (match + 1);
           if (carryOverSize == numRead) {
             // Can't carry-over the whole buffer, since the read would return 0
             // We bail out of validation since there's no way we can force the caller to request
@@ -205,7 +205,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
           (cbuf[startElem + 1] == '/' || cbuf[startElem + 1] == '?')
               ? startElem + 2
               : startElem + 1;
-      int endTag = multiIndexOf(cbuf, startTag, ' ', '\n', '\t');
+      int endTag = multiIndexOf(cbuf, startTag, (off + numRead), ' ', '\n', '\t');
       if (endTag > endElem || endTag < 0) {
         endTag = cbuf[endElem - 1] == '/' ? endElem - 1 : endElem;
       }
@@ -290,14 +290,14 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
    * Variant of {@link org.apache.commons.lang3.ArrayUtils#indexOf(char[], char)} that supports
    * looking for multiple values.
    */
-  private static int multiIndexOf(final char[] array, int startIndex, final char... valuesToFind) {
+  private static int multiIndexOf(final char[] array, int startIndex, int limit, final char... valuesToFind) {
     if (array == null) {
       return -1;
     }
     if (startIndex < 0) {
       startIndex = 0;
     }
-    for (int i = startIndex; i < array.length; i++) {
+    for (int i = startIndex; i < limit; i++) {
       for (char value : valuesToFind) {
         if (value == array[i]) {
           return i;
