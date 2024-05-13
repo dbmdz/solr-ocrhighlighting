@@ -290,7 +290,8 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
    * Variant of {@link org.apache.commons.lang3.ArrayUtils#indexOf(char[], char)} that supports
    * looking for multiple values.
    */
-  private static int multiIndexOf(final char[] array, int startIndex, int limit, final char... valuesToFind) {
+  private static int multiIndexOf(
+      final char[] array, int startIndex, int limit, final char... valuesToFind) {
     if (array == null) {
       return -1;
     }

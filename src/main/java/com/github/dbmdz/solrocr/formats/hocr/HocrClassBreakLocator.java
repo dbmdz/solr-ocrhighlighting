@@ -11,7 +11,6 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
   private final int overlap = 128;
   private final int blockSize;
 
-
   public HocrClassBreakLocator(IterableCharSequence text, String breakClass) {
     this(text, ImmutableList.of(breakClass), 64 * 1024);
   }
