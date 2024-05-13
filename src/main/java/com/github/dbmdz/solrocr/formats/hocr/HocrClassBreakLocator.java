@@ -9,15 +9,26 @@ import org.apache.commons.lang3.StringUtils;
 public class HocrClassBreakLocator extends BaseBreakLocator {
   private final List<String> breakClasses;
   private final int overlap = 128;
-  private final int blockSize = 64 * 1024;
+  private final int blockSize;
+
 
   public HocrClassBreakLocator(IterableCharSequence text, String breakClass) {
-    this(text, ImmutableList.of(breakClass));
+    this(text, ImmutableList.of(breakClass), 64 * 1024);
+  }
+
+  public HocrClassBreakLocator(IterableCharSequence text, String breakClass, int blockSize) {
+    this(text, ImmutableList.of(breakClass), blockSize);
   }
 
   public HocrClassBreakLocator(IterableCharSequence text, List<String> breakClasses) {
+    this(text, breakClasses, 64 * 1024);
+  }
+
+  public HocrClassBreakLocator(
+      IterableCharSequence text, List<String> breakClasses, int blockSize) {
     super(text);
     this.breakClasses = breakClasses;
+    this.blockSize = blockSize;
   }
 
   @Override

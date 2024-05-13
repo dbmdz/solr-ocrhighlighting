@@ -44,7 +44,6 @@ import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.reader.LegacyBaseCompositeReader;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
-import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -54,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -107,8 +107,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private static final CharacterRunAutomaton[] ZERO_LEN_AUTOMATA_ARRAY_LEGACY =
       new CharacterRunAutomaton[0];
   private static final IndexSearcher EMPTY_INDEXSEARCHER;
-  private static final Set<OcrFormat> FORMATS =
-      ImmutableSet.of(new HocrFormat(), new AltoFormat(), new MiniOcrFormat());
   private static final int DEFAULT_SNIPPET_LIMIT = 100;
   public static final String PARTIAL_OCR_HIGHLIGHTS = "partialOcrHighlights";
 
@@ -238,11 +236,20 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
   private final SolrParams params;
   private final SolrQueryRequest req;
+  private final Set<OcrFormat> formats;
 
-  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, SolrQueryRequest req) {
+  public OcrHighlighter(
+      IndexSearcher indexSearcher,
+      Analyzer indexAnalyzer,
+      SolrQueryRequest req,
+      Map<String, Map<OcrBlock, Integer>> formatReadSizes) {
     super(indexSearcher, indexAnalyzer);
     this.params = req.getParams();
     this.req = req;
+    this.formats = new HashSet<>();
+    this.formats.add(new HocrFormat(formatReadSizes.get("hocr")));
+    this.formats.add(new AltoFormat(formatReadSizes.get("alto")));
+    this.formats.add(new MiniOcrFormat(formatReadSizes.get("miniocr")));
   }
 
   @Override
@@ -635,7 +642,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private OcrFormat getFormat(IterableCharSequence content) {
     // Sample the first 4k characters to determine the format
     String sampleChunk = content.subSequence(0, Math.min(4096, content.length())).toString();
-    return FORMATS.stream().filter(fmt -> fmt.hasFormat(sampleChunk)).findFirst().orElse(null);
+    return formats.stream().filter(fmt -> fmt.hasFormat(sampleChunk)).findFirst().orElse(null);
   }
 
   /**
