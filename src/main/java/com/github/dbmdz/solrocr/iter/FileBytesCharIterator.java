@@ -21,7 +21,7 @@ import java.nio.file.StandardOpenOption;
  * types that don't mess with the index themselves.
  */
 public class FileBytesCharIterator implements IterableCharSequence, AutoCloseable {
-  private final byte[] copyBuf = new byte[128 * 1024];
+  private byte[] copyBuf = new byte[128 * 1024];
   private final Path filePath; // For copy-constructor
   private final FileChannel chan;
   private final MappedByteBuffer buf;
@@ -133,6 +133,9 @@ public class FileBytesCharIterator implements IterableCharSequence, AutoCloseabl
     }
     int copyLen = end - start;
     this.buf.position(start);
+    if (end - start > copyBuf.length) {
+      copyBuf = new byte[end - start];
+    }
     this.buf.get(copyBuf, 0, end - start);
 
     // Faster pure-ASCII decoding, just treat everything as ASCII, a good chunk faster than
