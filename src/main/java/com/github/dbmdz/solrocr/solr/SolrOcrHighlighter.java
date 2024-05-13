@@ -24,6 +24,7 @@
  */
 package com.github.dbmdz.solrocr.solr;
 
+import com.github.dbmdz.solrocr.model.OcrBlock;
 import com.github.dbmdz.solrocr.model.OcrHighlightResult;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
@@ -53,12 +54,16 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final Executor hlThreadPool;
+  private final Map<String, Map<OcrBlock, Integer>> formatReadSizes;
 
   public SolrOcrHighlighter() {
-    this(Runtime.getRuntime().availableProcessors(), 8);
+    this(Runtime.getRuntime().availableProcessors(), 8, null);
   }
 
-  public SolrOcrHighlighter(int numHlThreads, int maxQueuedPerThread) {
+  public SolrOcrHighlighter(
+      int numHlThreads,
+      int maxQueuedPerThread,
+      Map<String, Map<OcrBlock, Integer>> formatReadSizes) {
     super();
     if (numHlThreads > 0) {
       this.hlThreadPool =
@@ -79,6 +84,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
             }
           };
     }
+    this.formatReadSizes = formatReadSizes;
   }
 
   public void shutdownThreadPool() {
@@ -113,7 +119,8 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
     // Highlight OCR fields
     OcrHighlighter ocrHighlighter =
-        new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer(), req);
+        new OcrHighlighter(
+            req.getSearcher(), req.getSchema().getIndexAnalyzer(), req, formatReadSizes);
     OcrHighlightResult[] ocrSnippets =
         ocrHighlighter.highlightOcrFields(
             ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader, hlThreadPool);

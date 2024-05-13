@@ -10,6 +10,7 @@ import com.github.dbmdz.solrocr.model.OcrPage;
 import com.google.common.collect.ImmutableMap;
 import java.awt.Dimension;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +28,25 @@ public class MiniOcrFormat implements OcrFormat {
           OcrBlock.LINE, "l",
           OcrBlock.WORD, "w");
 
+  private final Map<OcrBlock, Integer> blockReadSizes;
+
+  public MiniOcrFormat() {
+    this(null);
+  }
+
+  public MiniOcrFormat(Map<OcrBlock, Integer> blockReadSizes) {
+    if (blockReadSizes == null) {
+      blockReadSizes = new HashMap<>();
+    }
+    blockReadSizes.putIfAbsent(OcrBlock.PAGE, 16 * 1024);
+    blockReadSizes.putIfAbsent(OcrBlock.BLOCK, 8 * 1024);
+    blockReadSizes.putIfAbsent(OcrBlock.SECTION, 8 * 1024);
+    blockReadSizes.putIfAbsent(OcrBlock.PARAGRAPH, 2 * 1024);
+    blockReadSizes.putIfAbsent(OcrBlock.LINE, 1024);
+    blockReadSizes.putIfAbsent(OcrBlock.WORD, 128);
+    this.blockReadSizes = ImmutableMap.copyOf(blockReadSizes);
+  }
+
   @Override
   public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
     // FIXME: MiniOCR currently presupposes that the desired  block type exists, i.e. if you say
@@ -34,7 +54,7 @@ public class MiniOcrFormat implements OcrFormat {
     // If they're not, there will not be a break. It would be better if we checked all of the passed
     // blocks.
     String breakTag = blockTagMapping.get(blockTypes[0]);
-    return new TagBreakLocator(text, breakTag);
+    return new TagBreakLocator(text, breakTag, blockReadSizes.get(blockTypes[0]));
   }
 
   @Override
@@ -63,6 +83,7 @@ public class MiniOcrFormat implements OcrFormat {
   @Override
   public boolean hasFormat(String ocrChunk) {
     return blockTagMapping.values().stream()
+        .filter(t -> !t.equals("p")) // leads to false positives on hOCR content
         .anyMatch(t -> ocrChunk.contains("<" + t + " ") || ocrChunk.contains("<" + t + ">"));
   }
 
