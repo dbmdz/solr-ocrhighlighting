@@ -12,7 +12,6 @@ import java.awt.Dimension;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,38 +42,13 @@ public class HocrFormat implements OcrFormat {
           .put(OcrBlock.WORD, ImmutableSet.of("ocrx_word"))
           .build();
 
-  private final Map<OcrBlock, Integer> blockReadSizes;
-
-  public HocrFormat() {
-    this(null);
-  }
-
-  public HocrFormat(Map<OcrBlock, Integer> readSizes) {
-    if (readSizes == null) {
-      readSizes = new HashMap<>();
-    }
-    // Values are roughly based on mean block sizes in example corpus
-    readSizes.putIfAbsent(OcrBlock.PAGE, 16 * 1024);
-    readSizes.putIfAbsent(OcrBlock.BLOCK, 8 * 1024);
-    readSizes.putIfAbsent(OcrBlock.SECTION, 8 * 1024);
-    readSizes.putIfAbsent(OcrBlock.PARAGRAPH, 2 * 1024);
-    readSizes.putIfAbsent(OcrBlock.LINE, 1024);
-    readSizes.putIfAbsent(OcrBlock.WORD, 128);
-    this.blockReadSizes = ImmutableMap.copyOf(readSizes);
-  }
-
   @Override
   public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
     List<String> breakClasses =
         Arrays.stream(blockTypes)
             .flatMap(b -> blockClassMapping.get(b).stream())
             .collect(Collectors.toList());
-    int readSize =
-        Arrays.stream(blockTypes)
-            .map(blockReadSizes::get)
-            .max(Integer::compareTo)
-            .orElse(64 * 1024);
-    return new HocrClassBreakLocator(text, breakClasses, readSize);
+    return new HocrClassBreakLocator(text, breakClasses);
   }
 
   @Override

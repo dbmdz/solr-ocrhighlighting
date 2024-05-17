@@ -323,7 +323,7 @@ public class AltoTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "ocr_text:\"will lie of\"", "hl.weightMatches", "true");
     assertQ(
         req,
-        "contains(((//lst[@name='47371']//arr[@name='snippets'])[1]/lst/str[@name='text'])[1]/text(), \"'<em>lie</em> past\")");
+        "contains(((//lst[@name='47371']//arr[@name='snippets'])/lst[1]/str[@name='text'])[1]/text(), \"'<em>lie</em> past\")");
   }
 
   public void testHighlightEndInTokenWithEscapes() {

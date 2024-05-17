@@ -128,7 +128,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       int snippetLimit,
       boolean scorePassages)
       throws IOException {
-    final int contentLength = breakLocator.getText().getEndIndex();
+    final int contentLength = breakLocator.getText().length();
     if (!off.nextPosition()) {
       return new Passage[0];
     }
@@ -168,7 +168,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
             "field '" + field + "' was indexed without offsets, cannot highlight");
       }
       if (pageId != null) {
-        String passagePageId = formatter.determineStartPage(start, breakLocator.getText()).id;
+        String passagePageId =
+            formatter.determineStartPage(start, breakLocator.getText().getInput()).id;
         if (!passagePageId.equals(pageId)) {
           continue;
         }

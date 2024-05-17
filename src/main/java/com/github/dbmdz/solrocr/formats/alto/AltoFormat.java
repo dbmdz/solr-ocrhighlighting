@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import java.awt.Dimension;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 import javax.xml.stream.XMLStreamException;
@@ -25,31 +24,12 @@ public class AltoFormat implements OcrFormat {
           OcrBlock.LINE, "TextLine",
           OcrBlock.WORD, "String");
 
-  private final Map<OcrBlock, Integer> blockReadSizes;
-
-  public AltoFormat() {
-    this(null);
-  }
-
-  public AltoFormat(Map<OcrBlock, Integer> blockReadSizes) {
-    if (blockReadSizes == null) {
-      blockReadSizes = new HashMap<>();
-    }
-    // Values are roughly based on mean block sizes in example corpus
-    blockReadSizes.putIfAbsent(OcrBlock.PAGE, 256 * 1024);
-    blockReadSizes.putIfAbsent(OcrBlock.BLOCK, 24 * 1024);
-    blockReadSizes.putIfAbsent(OcrBlock.LINE, 1024);
-    blockReadSizes.putIfAbsent(OcrBlock.WORD, 512);
-    this.blockReadSizes = ImmutableMap.copyOf(blockReadSizes);
-  }
-
   @Override
   public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
     // NOTE: The ALTO hierarchy we support is pretty rigid, i.e. Page > TextBlock > TextLine >
     // String is a given, hence we only grab the lowest-hierarchy block and call it a day
     String breakTag = blockTagMapping.get(blockTypes[0]);
-    int readSize = blockReadSizes.get(blockTypes[0]);
-    return new TagBreakLocator(text, breakTag, readSize);
+    return new TagBreakLocator(text, breakTag);
   }
 
   @Override

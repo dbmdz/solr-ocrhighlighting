@@ -12,9 +12,12 @@ import java.util.Map.Entry;
  */
 @SuppressWarnings("UnstableApiUsage")
 public abstract class BaseBreakLocator implements BreakLocator {
+
+  private static final String BOM_ASCII = "ï»¿";
+  private static final int SECTION_SIZE_BYTES = 8 * 1024;
   private final RangeMap<Integer, Integer> forwardCache = TreeRangeMap.create();
   private final RangeMap<Integer, Integer> backwardCache = TreeRangeMap.create();
-  protected final IterableCharSequence text;
+  protected final SectionReader text;
 
   /**
    * An "optimized" version of {@link String#lastIndexOf(String, int)}.
@@ -41,12 +44,33 @@ public abstract class BaseBreakLocator implements BreakLocator {
     return from;
   }
 
-  protected BaseBreakLocator(IterableCharSequence text) {
+  protected BaseBreakLocator(SectionReader text) {
     this.text = text;
   }
 
+  protected BaseBreakLocator(IterableCharSequence text) {
+    this(text, SECTION_SIZE_BYTES);
+  }
+
+  protected BaseBreakLocator(IterableCharSequence text, int sectionSize) {
+    this(new SectionReader(text, sectionSize));
+  }
+
+  protected static boolean isAllBlank(String s, int from, int to) {
+    if (s.startsWith(BOM_ASCII)) {
+      from += BOM_ASCII.length();
+    }
+    for (int i = from; i < to; i++) {
+      char c = s.charAt(i);
+      if (!Character.isWhitespace(c)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   @Override
-  public IterableCharSequence getText() {
+  public SectionReader getText() {
     return text;
   }
 
