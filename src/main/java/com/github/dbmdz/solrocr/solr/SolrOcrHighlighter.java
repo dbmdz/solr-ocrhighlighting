@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +52,7 @@ import solrocr.OcrHighlighter;
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private final ThreadPoolExecutor hlThreadPool;
+  private final Executor hlThreadPool;
 
   public SolrOcrHighlighter() {
     this(Runtime.getRuntime().availableProcessors(), 8);
@@ -59,18 +60,31 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
   public SolrOcrHighlighter(int numHlThreads, int maxQueuedPerThread) {
     super();
-    this.hlThreadPool =
-        new ThreadPoolExecutor(
-            numHlThreads,
-            numHlThreads,
-            120L,
-            TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(numHlThreads * maxQueuedPerThread),
-            new ThreadFactoryBuilder().setNameFormat("OcrHighlighter-%d").build());
+    if (numHlThreads > 0) {
+      this.hlThreadPool =
+          new ThreadPoolExecutor(
+              numHlThreads,
+              numHlThreads,
+              120L,
+              TimeUnit.SECONDS,
+              new LinkedBlockingQueue<>(numHlThreads * maxQueuedPerThread),
+              new ThreadFactoryBuilder().setNameFormat("OcrHighlighter-%d").build());
+    } else {
+      // Executors.newDirectExecutorService() for Java 8
+      this.hlThreadPool =
+          new Executor() {
+            @Override
+            public void execute(Runnable cmd) {
+              cmd.run();
+            }
+          };
+    }
   }
 
   public void shutdownThreadPool() {
-    hlThreadPool.shutdown();
+    if (hlThreadPool instanceof ThreadPoolExecutor) {
+      ((ThreadPoolExecutor) hlThreadPool).shutdown();
+    }
   }
 
   public NamedList<Object> doHighlighting(

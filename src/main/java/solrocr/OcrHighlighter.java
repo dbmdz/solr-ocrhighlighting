@@ -61,8 +61,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -289,7 +289,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       int[] docIDs,
       int[] maxPassagesOcr,
       Map<String, Object> respHeader,
-      ThreadPoolExecutor hlThreadPool)
+      Executor hlThreadPool)
       throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
