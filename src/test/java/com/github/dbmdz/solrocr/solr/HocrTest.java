@@ -227,8 +227,8 @@ public class HocrTest extends SolrTestCaseJ4 {
     assertQ(req, "count(//arr[@name='regions']/lst)=1");
   }
 
-  // FIXME: This test sometimes fails, with highlighting for one document missing, why?
-  @Test public void testMaskedDocumentIsIndexed() {
+  @Test
+  public void testMaskedDocumentIsIndexed() {
     SolrQueryRequest req = xmlQ("q", "Vögelchen");
     assertQ(
         req,

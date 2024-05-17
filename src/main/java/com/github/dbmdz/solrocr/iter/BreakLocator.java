@@ -7,5 +7,5 @@ public interface BreakLocator {
 
   int preceding(int offset);
 
-  IterableCharSequence getText();
+  SectionReader getText();
 }

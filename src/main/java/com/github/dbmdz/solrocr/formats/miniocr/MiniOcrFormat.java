@@ -54,7 +54,7 @@ public class MiniOcrFormat implements OcrFormat {
     // If they're not, there will not be a break. It would be better if we checked all of the passed
     // blocks.
     String breakTag = blockTagMapping.get(blockTypes[0]);
-    return new TagBreakLocator(text, breakTag, blockReadSizes.get(blockTypes[0]));
+    return new TagBreakLocator(text, breakTag);
   }
 
   @Override

@@ -2,92 +2,118 @@ package com.github.dbmdz.solrocr.formats.hocr;
 
 import com.github.dbmdz.solrocr.iter.BaseBreakLocator;
 import com.github.dbmdz.solrocr.iter.IterableCharSequence;
+import com.github.dbmdz.solrocr.iter.SectionReader.Section;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 public class HocrClassBreakLocator extends BaseBreakLocator {
-  private static final String BOM_ASCII = "ï»¿";
-  private final List<String> breakClasses;
-  private static final int overlap = 128;
 
-  private final int blockSize;
+  private final List<String> breakClasses;
 
   public HocrClassBreakLocator(IterableCharSequence text, String breakClass) {
-    this(text, ImmutableList.of(breakClass), 32 * 1024);
+    this(text, ImmutableList.of(breakClass));
   }
 
-  public HocrClassBreakLocator(IterableCharSequence text, String breakClass, int blockSize) {
-    this(text, ImmutableList.of(breakClass), blockSize);
-  }
-
-  public HocrClassBreakLocator(IterableCharSequence text, List<String> breakClasses, int blockSize) {
+  public HocrClassBreakLocator(IterableCharSequence text, List<String> breakClasses) {
     super(text);
     this.breakClasses = breakClasses;
-    this.blockSize = blockSize;
   }
 
   @Override
   protected int getFollowing(int offset) {
-    int start = Math.min(offset + 1, this.text.getEndIndex());
-    int end = Math.min(start + blockSize, this.text.getEndIndex());
-    while (start < this.text.getEndIndex()) {
-      String block = text.subSequence(start, end, true).toString();
-      // Truncate block to last '>' to avoid splitting element openings across blocks
+    int globalStart = Math.min(offset + 1, this.text.length());
+    String overlapHead = null;
+    while (globalStart < this.text.length()) {
+      Section section = this.text.getSection(globalStart);
+      String block = section.text;
+      int blockStart = globalStart - section.start;
+
+      // There was an overlap from the previous block, combine with the current block up until
+      // the first tag close and see if there's a match
+      if (overlapHead != null) {
+        int firstTagClose = block.indexOf('>');
+        int overlapStart = globalStart - overlapHead.length();
+        String overlap = overlapHead.concat(block.substring(0, firstTagClose + 1));
+        int overlapMatch = findForwardMatch(overlap, 0, overlap.length());
+        if (overlapMatch >= 0) {
+          return overlapStart + overlapMatch;
+        }
+        blockStart = firstTagClose + 1;
+        overlapHead = null;
+      }
+
+      // Truncate block to last '>' and keep the rest for the next iteration if needed
       int blockEnd = block.length();
       int lastTagClose = block.lastIndexOf('>');
-      if (lastTagClose > 0
-          && !isAllBlank(block, lastTagClose + 1, block.length())) {
+      if (lastTagClose > 0 && !isAllBlank(block, lastTagClose + 1, blockEnd)) {
+        String overlap = block.substring(lastTagClose + 1, blockEnd);
+        if (overlap.indexOf('<') >= 0) {
+          // Overlap has the start of a tag, carry over to next iteration
+          overlapHead = overlap;
+        }
         blockEnd = lastTagClose + 1;
-        end = start + lastTagClose;
       }
 
-      int match = findForwardMatch(block, 0, blockEnd);
+      int match = findForwardMatch(block, blockStart, blockEnd);
       if (match >= 0) {
-        return start + match;
+        return section.start + match;
       }
 
-      start = end;
-      if (start < this.text.getEndIndex()) {
-        start -= overlap;
-      }
-      end = Math.min(start + blockSize, this.text.getEndIndex());
+      globalStart = section.end;
     }
-    return this.text.getEndIndex();
+    return this.text.length();
   }
 
   @Override
   protected int getPreceding(int offset) {
-    if (offset <= this.text.getBeginIndex()) {
-      return this.text.getBeginIndex();
+    if (offset <= 0) {
+      return 0;
     }
 
-    int end = Math.max(0, offset - 1);
-    int start = Math.max(0, end - blockSize);
-    while (start >= this.text.getBeginIndex()) {
-      String block = text.subSequence(start, end, true).toString();
-      int firstTagOpen = block.indexOf('<');
+    String overlapTail = null;
+    int globalEnd = Math.max(0, offset - 1);
+    while (globalEnd > 0) {
+      Section section = this.text.getSection(globalEnd);
+
+      String block = section.text;
+      int blockEnd = globalEnd - section.start;
+
+      // There was an overlap from the previous block, combine with the current block up until
+      // the first tag open and see if there's a match
+      if (overlapTail != null) {
+        int lastTagOpen = block.lastIndexOf('<', blockEnd);
+        String overlapHead = block.substring(lastTagOpen);
+        int overlapStartOffset = globalEnd - overlapHead.length();
+        String overlap = overlapHead.concat(overlapTail);
+        int overlapMatch = findBackwardMatch(overlap, overlap.length(), overlap.length());
+        if (overlapMatch >= 0) {
+          return overlapStartOffset + overlapMatch;
+        }
+        blockEnd = lastTagOpen;
+        overlapTail = null;
+      }
+
       int blockStart = 0;
-      if (firstTagOpen > 0 && !isAllBlank(block, 0, firstTagOpen)) {
+      int firstTagOpen = block.indexOf('<');
+      if (firstTagOpen > 0 && firstTagOpen < blockEnd && !isAllBlank(block, 0, firstTagOpen)) {
         // Limit all following searches to the beginning of the first tag in the block
         blockStart = firstTagOpen;
-        start = start + firstTagOpen;
+        String overlap = block.substring(0, firstTagOpen);
+        if (overlap.indexOf('>') >= 0) {
+          // Overlap has the end of a tag, carry over to next iteration
+          overlapTail = overlap;
+        }
       }
 
-      int match = findBackwardMatch(block, block.length(), blockStart);
+      int match = findBackwardMatch(block, blockEnd, blockStart);
       if (match >= 0) {
-        return start - blockStart + match;
+        return section.start + match;
       }
 
-      if (start == this.text.getBeginIndex()) {
-        break;
-      } else if (start > this.text.getBeginIndex()) {
-        start += overlap;
-      }
-      end = start;
-      start = Math.max(0, start - blockSize);
+      globalEnd = section.start - 1;
     }
 
-    return this.text.getBeginIndex();
+    return 0;
   }
 
   private int findForwardMatch(String text, int fromOffset, int toOffset) {
@@ -102,7 +128,8 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
         }
         int openIdx = text.lastIndexOf('<', i);
         int closeIdx = text.indexOf('>', i);
-        assert closeIdx > openIdx : "startOffset and endOffset must be chosen to ensure a complete element";
+        assert closeIdx > openIdx
+            : "startOffset and endOffset must be chosen to ensure a complete element";
         if (openIdx < fromOffset) {
           // Incomplete element, try next position
           fromIdx = closeIdx;
@@ -134,8 +161,8 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
       return -1;
     }
 
-    assert fromOffset
-        > toOffset : "fromOffset must be greater than toOffset, we're looking backwards!";
+    assert fromOffset > toOffset
+        : "fromOffset must be greater than toOffset, we're looking backwards!";
 
     for (String breakClass : this.breakClasses) {
       // Look for the class in the block
@@ -158,18 +185,5 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
       }
     }
     return -1;
-  }
-
-  private static boolean isAllBlank(String s, int from, int to) {
-    if (s.startsWith(BOM_ASCII)) {
-      from += BOM_ASCII.length();
-    }
-    for (int i = from; i < to; i++) {
-      char c = s.charAt(i);
-      if (!Character.isWhitespace(c)) {
-        return false;
-      }
-    }
-    return true;
   }
 }

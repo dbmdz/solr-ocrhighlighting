@@ -238,18 +238,14 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private final SolrQueryRequest req;
   private final Set<OcrFormat> formats;
 
-  public OcrHighlighter(
-      IndexSearcher indexSearcher,
-      Analyzer indexAnalyzer,
-      SolrQueryRequest req,
-      Map<String, Map<OcrBlock, Integer>> formatReadSizes) {
+  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, SolrQueryRequest req) {
     super(indexSearcher, indexAnalyzer);
     this.params = req.getParams();
     this.req = req;
     this.formats = new HashSet<>();
-    this.formats.add(new HocrFormat(formatReadSizes.get("hocr")));
-    this.formats.add(new AltoFormat(formatReadSizes.get("alto")));
-    this.formats.add(new MiniOcrFormat(formatReadSizes.get("miniocr")));
+    this.formats.add(new HocrFormat());
+    this.formats.add(new AltoFormat());
+    this.formats.add(new MiniOcrFormat());
   }
 
   @Override

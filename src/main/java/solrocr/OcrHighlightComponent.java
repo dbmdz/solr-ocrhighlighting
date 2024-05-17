@@ -1,16 +1,12 @@
 package solrocr;
 
-import com.github.dbmdz.solrocr.model.OcrBlock;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.solr.SolrOcrHighlighter;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -94,29 +90,7 @@ public class OcrHighlightComponent extends SearchComponent
     int maxQueuedPerThread =
         Integer.parseInt(info.attributes.getOrDefault("maxQueuedPerThread", "8"));
 
-    Map<String, Map<OcrBlock, Integer>> formatReadSizes = new HashMap<>();
-    List<PluginInfo> readSizeCfgs = info.getChildren("breakLocatorReadSizes");
-    if (readSizeCfgs != null) {
-      for (PluginInfo readSizeCfg : readSizeCfgs) {
-        if (readSizeCfg.attributes.get("format") == null) {
-          log.warn("Ignoring breakLocatorReadSizes setting without 'format' attribute!");
-          continue;
-        }
-        Map<OcrBlock, Integer> blockReadSizes = new HashMap<>();
-        for (OcrBlock block : OcrBlock.values()) {
-          String sizeStr = readSizeCfg.attributes.get(block.name().toLowerCase(Locale.US));
-          if (sizeStr != null) {
-            blockReadSizes.put(block, Integer.parseInt(sizeStr));
-          }
-        }
-        if (!blockReadSizes.isEmpty()) {
-          formatReadSizes.put(
-              readSizeCfg.attributes.get("format").toLowerCase(Locale.US), blockReadSizes);
-        }
-      }
-    }
-
-    this.ocrHighlighter = new SolrOcrHighlighter(numHlThreads, maxQueuedPerThread, formatReadSizes);
+    this.ocrHighlighter = new SolrOcrHighlighter(numHlThreads, maxQueuedPerThread);
   }
 
   @Override

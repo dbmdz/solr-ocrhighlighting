@@ -19,7 +19,7 @@ public class ContextBreakLocator implements BreakLocator {
 
   @Override
   public int following(int offset) {
-    int limit = getText().getEndIndex();
+    int limit = getText().length();
     if (limitLocator != null) {
       limit = limitLocator.following(offset);
     }
@@ -40,7 +40,7 @@ public class ContextBreakLocator implements BreakLocator {
 
   @Override
   public int preceding(int offset) {
-    int limit = this.getText().getBeginIndex();
+    int limit = 0;
     if (limitLocator != null) {
       limit = limitLocator.preceding(offset);
     }
@@ -59,7 +59,7 @@ public class ContextBreakLocator implements BreakLocator {
   }
 
   @Override
-  public IterableCharSequence getText() {
+  public SectionReader getText() {
     return baseLocator.getText();
   }
 }
