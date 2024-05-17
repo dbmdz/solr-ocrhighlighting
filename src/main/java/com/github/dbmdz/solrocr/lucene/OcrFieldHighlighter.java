@@ -32,9 +32,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.search.uhighlight.FieldHighlighter;
 import org.apache.lucene.search.uhighlight.FieldOffsetStrategy;
@@ -45,7 +44,7 @@ import org.apache.lucene.util.BytesRef;
 
 /** A customization of {@link FieldHighlighter} to support OCR fields */
 public class OcrFieldHighlighter extends FieldHighlighter {
-  private final Map<Integer, Integer> numMatches;
+  private final ConcurrentHashMap<Integer, Integer> numMatches;
 
   public OcrFieldHighlighter(
       String field,
@@ -55,7 +54,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       int maxNoHighlightPassages) {
     super(
         field, fieldOffsetStrategy, null, passageScorer, maxPassages, maxNoHighlightPassages, null);
-    this.numMatches = new HashMap<>();
+    this.numMatches = new ConcurrentHashMap<>();
   }
 
   /**

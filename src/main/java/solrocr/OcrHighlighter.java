@@ -59,8 +59,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
@@ -364,7 +364,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     // Highlight in doc batches determined by loadFieldValues (consumes from docIdIter)
     DocIdSetIterator docIdIter = asDocIdSetIterator(docIds);
 
-    List<Future<?>> hlFuts = new ArrayList<>();
+    List<CompletableFuture<Void>> hlFuts = new ArrayList<>();
     docLoop:
     for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
       List<IterableCharSequence[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
@@ -459,7 +459,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
               };
           try {
             // Speed up highlighting by parallelizing the work as much as possible
-            hlFuts.add(hlThreadPool.submit(hlFn));
+            hlFuts.add(CompletableFuture.runAsync(hlFn, hlThreadPool));
           } catch (RejectedExecutionException rejected) {
             // If the pool is full, run the task synchronously on the current thread
             try {
@@ -482,23 +482,17 @@ public class OcrHighlighter extends UnifiedHighlighter {
         || docIdIter.nextDoc() == DocIdSetIterator.NO_MORE_DOCS;
 
     if (!hlFuts.isEmpty()) {
-      boolean partialOcrHighlights = false;
-      for (Future<?> fut : hlFuts) {
-        try {
-          fut.get();
-        } catch (ExecutionException e) {
-          if (e.getCause() instanceof ExitingIterCharSeq.ExitingIterCharSeqException
-              || e.getCause() instanceof ExitableDirectoryReader.ExitingReaderException) {
-            partialOcrHighlights = true;
-          } else {
-            log.error("Error while highlighting OCR content", e);
-          }
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
+      CompletableFuture<?>[] futArray = hlFuts.toArray(new CompletableFuture[0]);
+      CompletableFuture<Void> allFut = CompletableFuture.allOf(futArray);
+      try {
+        allFut.join();
+      } catch (CompletionException e) {
+        if (e.getCause() instanceof ExitingIterCharSeq.ExitingIterCharSeqException
+            || e.getCause() instanceof ExitableDirectoryReader.ExitingReaderException) {
+          respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
+        } else {
+          log.error("Error while highlighting OCR content", e);
         }
-      }
-      if (partialOcrHighlights) {
-        respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
       }
     }
 
