@@ -27,7 +27,6 @@ package com.github.dbmdz.solrocr.lucene;
 import com.github.dbmdz.solrocr.iter.BreakLocator;
 import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.model.OcrSnippet;
-import com.github.dbmdz.solrocr.util.PageCacheWarmer;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -78,8 +77,6 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     // note: it'd be nice to accept a CharSequence for content, but we need a CharacterIterator impl
     // for it.
 
-    // If page cache pre-warming is enabled, cancel it, since we're doing the I/O ourselves now
-    PageCacheWarmer.getInstance().ifPresent(w -> w.cancelPreload(content.getPointer()));
     if (content.length() == 0) {
       return null; // nothing to do
     }

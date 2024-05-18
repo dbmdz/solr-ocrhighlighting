@@ -2,7 +2,6 @@ package solrocr;
 
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.solr.SolrOcrHighlighter;
-import com.github.dbmdz.solrocr.util.PageCacheWarmer;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
-import org.apache.solr.core.CloseHook;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -88,24 +86,6 @@ public class OcrHighlightComponent extends SearchComponent
     int maxQueuedPerThread =
         Integer.parseInt(info.attributes.getOrDefault("maxQueuedPerThread", "8"));
     this.ocrHighlighter = new SolrOcrHighlighter(numHlThreads, maxQueuedPerThread);
-    if ("true".equals(info.attributes.getOrDefault("enablePreload", "false"))) {
-      PageCacheWarmer.enable(
-          Integer.parseInt(info.attributes.getOrDefault("preloadReadSize", "32768")),
-          Integer.parseInt(info.attributes.getOrDefault("preloadConcurrency", "8")));
-    }
-
-    // Shut down the cache warming threads after closing of the core
-    core.addCloseHook(
-        new CloseHook() {
-          @Override
-          public void preClose(SolrCore core) {}
-
-          @Override
-          public void postClose(SolrCore core) {
-            ocrHighlighter.shutdownThreadPool();
-            PageCacheWarmer.getInstance().ifPresent(PageCacheWarmer::shutdown);
-          }
-        });
   }
 
   @Override
