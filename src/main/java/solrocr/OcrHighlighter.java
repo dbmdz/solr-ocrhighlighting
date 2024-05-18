@@ -43,7 +43,6 @@ import com.github.dbmdz.solrocr.model.OcrSnippet;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.reader.LegacyBaseCompositeReader;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
-import com.github.dbmdz.solrocr.util.PageCacheWarmer;
 import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -616,9 +615,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
           ocrVals[fieldIdx] = null;
           continue;
         }
-        // If preloading is enabled, start warming the cache for the pointer
-        final SourcePointer finalPtr = sourcePointer;
-        PageCacheWarmer.getInstance().ifPresent(w -> w.preload(finalPtr));
         if (sourcePointer.sources.size() == 1) {
           ocrVals[fieldIdx] =
               new FileBytesCharIterator(
