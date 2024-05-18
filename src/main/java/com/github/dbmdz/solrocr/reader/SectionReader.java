@@ -1,5 +1,6 @@
-package com.github.dbmdz.solrocr.iter;
+package com.github.dbmdz.solrocr.reader;
 
+import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import java.util.Arrays;
 
 public class SectionReader {
@@ -20,14 +21,19 @@ public class SectionReader {
 
   private final IterableCharSequence input;
   private final int sectionSize;
-  private final int maxCacheEntries = 8;
+  private final int maxCacheEntries;
   private final Section[] cache;
   private final long[] cacheLastUsedTimestamps;
   private int cacheEntries = 0;
 
-  public SectionReader(IterableCharSequence input, int sectionSize) {
+  public SectionReader(IterableCharSequence input) {
+    this(input, 8 * 1024, 8);
+  }
+
+  public SectionReader(IterableCharSequence input, int sectionSize, int maxCacheEntries) {
     this.input = input;
     this.sectionSize = sectionSize;
+    this.maxCacheEntries = maxCacheEntries;
     int numSections = (int) Math.ceil((double) input.length() / (double) sectionSize);
     this.cache = new Section[numSections];
     this.cacheLastUsedTimestamps = new long[numSections];

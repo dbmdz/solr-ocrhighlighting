@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.github.dbmdz.solrocr.iter.FileBytesCharIterator;
 import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.iter.TagBreakLocator;
+import com.github.dbmdz.solrocr.reader.SectionReader;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.StringReader;
@@ -29,7 +30,8 @@ class TagBreakLocatorTest {
   @Test
   void firstNext() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    SectionReader reader = new SectionReader(seq);
+    TagBreakLocator it = new TagBreakLocator(reader, "w");
     int start = it.following(0);
     int end = it.following(start);
     String tag = seq.subSequence(start, end).toString();
@@ -41,7 +43,8 @@ class TagBreakLocatorTest {
   @Test
   void next() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    SectionReader reader = new SectionReader(seq);
+    TagBreakLocator it = new TagBreakLocator(reader, "w");
     int start = it.following(8267);
     int end = it.following(start);
     String tag = seq.subSequence(start, end).toString();
@@ -54,7 +57,8 @@ class TagBreakLocatorTest {
   @Test
   void lastPrevious() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    SectionReader reader = new SectionReader(seq);
+    TagBreakLocator it = new TagBreakLocator(reader, "w");
     int end = seq.length() - 1;
     int start = it.preceding(seq.length() - 1);
     String tag = seq.subSequence(start, end).toString();
@@ -67,7 +71,8 @@ class TagBreakLocatorTest {
   @Test
   void previous() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    SectionReader reader = new SectionReader(seq);
+    TagBreakLocator it = new TagBreakLocator(reader, "w");
     int end = 2872126;
     int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
@@ -80,7 +85,8 @@ class TagBreakLocatorTest {
   @Test
   void previousFirst() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakLocator it = new TagBreakLocator(seq, "w");
+    SectionReader reader = new SectionReader(seq);
+    TagBreakLocator it = new TagBreakLocator(reader, "w");
     int idx = it.preceding(293);
     idx = it.preceding(idx);
     idx = it.preceding(idx);

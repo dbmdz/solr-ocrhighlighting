@@ -8,6 +8,7 @@ import com.github.dbmdz.solrocr.iter.ContextBreakLocator;
 import com.github.dbmdz.solrocr.iter.FileBytesCharIterator;
 import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.iter.TagBreakLocator;
+import com.github.dbmdz.solrocr.reader.SectionReader;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.StringReader;
@@ -31,8 +32,9 @@ class ContextBreakLocatorTest {
   @Test
   void testContext() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    TagBreakLocator baseLocator = new TagBreakLocator(seq, "w");
-    TagBreakLocator limitLocator = new TagBreakLocator(seq, "b");
+    SectionReader reader = new SectionReader(seq);
+    TagBreakLocator baseLocator = new TagBreakLocator(reader, "w");
+    TagBreakLocator limitLocator = new TagBreakLocator(reader, "b");
     ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 5);
     int center = 16283;
     int start = it.preceding(center);
@@ -50,8 +52,9 @@ class ContextBreakLocatorTest {
     IterableCharSequence seq =
         new FileBytesCharIterator(
             Paths.get("src/test/resources/data/hocr.html"), StandardCharsets.UTF_8, null);
-    BreakLocator baseLocator = new HocrClassBreakLocator(seq, "ocr_line");
-    BreakLocator limitLocator = new HocrClassBreakLocator(seq, "ocrx_block");
+    SectionReader reader = new SectionReader(seq);
+    BreakLocator baseLocator = new HocrClassBreakLocator(reader, "ocr_line");
+    BreakLocator limitLocator = new HocrClassBreakLocator(reader, "ocrx_block");
     ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 5);
     int start = it.preceding(5352801);
     int end = it.following(5352801 + "Japan</span>".length());
@@ -74,8 +77,9 @@ class ContextBreakLocatorTest {
               Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"),
               StandardCharsets.UTF_8,
               null);
-      BreakLocator baseLocator = new TagBreakLocator(seq, "TextLine");
-      BreakLocator limitLocator = new TagBreakLocator(seq, "TextBlock");
+      SectionReader reader = new SectionReader(seq);
+      BreakLocator baseLocator = new TagBreakLocator(reader, "TextLine");
+      BreakLocator limitLocator = new TagBreakLocator(reader, "TextBlock");
       ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 2);
       int start = it.preceding(offStart);
       int end = it.following(offEnd);
@@ -96,8 +100,9 @@ class ContextBreakLocatorTest {
             Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"),
             StandardCharsets.UTF_8,
             null);
-    BreakLocator baseLocator = new TagBreakLocator(seq, "TextLine");
-    BreakLocator limitLocator = new TagBreakLocator(seq, "TextBlock");
+    SectionReader reader = new SectionReader(seq);
+    BreakLocator baseLocator = new TagBreakLocator(reader, "TextLine");
+    BreakLocator limitLocator = new TagBreakLocator(reader, "TextBlock");
     ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 2);
 
     int start = it.preceding(42736);

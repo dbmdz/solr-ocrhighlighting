@@ -2,10 +2,10 @@ package com.github.dbmdz.solrocr.formats.hocr;
 
 import com.github.dbmdz.solrocr.formats.OcrParser;
 import com.github.dbmdz.solrocr.iter.BreakLocator;
-import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.model.OcrBlock;
 import com.github.dbmdz.solrocr.model.OcrFormat;
 import com.github.dbmdz.solrocr.model.OcrPage;
+import com.github.dbmdz.solrocr.reader.SectionReader;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.awt.Dimension;
@@ -43,12 +43,12 @@ public class HocrFormat implements OcrFormat {
           .build();
 
   @Override
-  public BreakLocator getBreakLocator(IterableCharSequence text, OcrBlock... blockTypes) {
+  public BreakLocator getBreakLocator(SectionReader sectionReader, OcrBlock... blockTypes) {
     List<String> breakClasses =
         Arrays.stream(blockTypes)
             .flatMap(b -> blockClassMapping.get(b).stream())
             .collect(Collectors.toList());
-    return new HocrClassBreakLocator(text, breakClasses);
+    return new HocrClassBreakLocator(sectionReader, breakClasses);
   }
 
   @Override

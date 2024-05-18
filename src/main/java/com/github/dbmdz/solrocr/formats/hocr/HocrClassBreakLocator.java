@@ -1,8 +1,8 @@
 package com.github.dbmdz.solrocr.formats.hocr;
 
 import com.github.dbmdz.solrocr.iter.BaseBreakLocator;
-import com.github.dbmdz.solrocr.iter.IterableCharSequence;
-import com.github.dbmdz.solrocr.iter.SectionReader.Section;
+import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SectionReader.Section;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 
@@ -10,12 +10,12 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
 
   private final List<String> breakClasses;
 
-  public HocrClassBreakLocator(IterableCharSequence text, String breakClass) {
-    this(text, ImmutableList.of(breakClass));
+  public HocrClassBreakLocator(SectionReader sectionReader, String breakClass) {
+    this(sectionReader, ImmutableList.of(breakClass));
   }
 
-  public HocrClassBreakLocator(IterableCharSequence text, List<String> breakClasses) {
-    super(text);
+  public HocrClassBreakLocator(SectionReader sectionReader, List<String> breakClasses) {
+    super(sectionReader);
     this.breakClasses = breakClasses;
   }
 

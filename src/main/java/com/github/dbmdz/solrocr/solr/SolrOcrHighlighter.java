@@ -25,6 +25,7 @@
 package com.github.dbmdz.solrocr.solr;
 
 import com.github.dbmdz.solrocr.model.OcrHighlightResult;
+import com.github.dbmdz.solrocr.reader.SectionReaderFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -52,16 +53,18 @@ import solrocr.OcrHighlighter;
 public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private final Executor hlThreadPool;
+  private final Executor hlExecutor;
+  private final SectionReaderFactory readerFactory;
 
   public SolrOcrHighlighter() {
-    this(Runtime.getRuntime().availableProcessors(), 8);
+    this(Runtime.getRuntime().availableProcessors(), 8, new SectionReaderFactory(8 * 1024, 64 * 1024));
   }
 
-  public SolrOcrHighlighter(int numHlThreads, int maxQueuedPerThread) {
+  public SolrOcrHighlighter(int numHlThreads, int maxQueuedPerThread, SectionReaderFactory readerFactory) {
     super();
+    this.readerFactory = readerFactory;
     if (numHlThreads > 0) {
-      this.hlThreadPool =
+      this.hlExecutor =
           new ThreadPoolExecutor(
               numHlThreads,
               numHlThreads,
@@ -71,19 +74,13 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
               new ThreadFactoryBuilder().setNameFormat("OcrHighlighter-%d").build());
     } else {
       // Executors.newDirectExecutorService() for Java 8
-      this.hlThreadPool =
-          new Executor() {
-            @Override
-            public void execute(Runnable cmd) {
-              cmd.run();
-            }
-          };
+      this.hlExecutor = Runnable::run;
     }
   }
 
   public void shutdownThreadPool() {
-    if (hlThreadPool instanceof ThreadPoolExecutor) {
-      ((ThreadPoolExecutor) hlThreadPool).shutdown();
+    if (hlExecutor instanceof ThreadPoolExecutor) {
+      ((ThreadPoolExecutor) hlExecutor).shutdown();
     }
   }
 
@@ -116,7 +113,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
         new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer(), req);
     OcrHighlightResult[] ocrSnippets =
         ocrHighlighter.highlightOcrFields(
-            ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader, hlThreadPool);
+            ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader, hlExecutor, readerFactory);
 
     // Assemble output data
     SimpleOrderedMap<Object> out = new SimpleOrderedMap<>();

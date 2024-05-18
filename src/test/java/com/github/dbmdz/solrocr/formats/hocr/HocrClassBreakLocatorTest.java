@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.dbmdz.solrocr.iter.FileBytesCharIterator;
 import com.github.dbmdz.solrocr.iter.IterableCharSequence;
+import com.github.dbmdz.solrocr.reader.SectionReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -17,7 +18,8 @@ class HocrClassBreakLocatorTest {
   @Test
   void firstNext() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    SectionReader reader = new SectionReader(seq);
+    HocrClassBreakLocator it = new HocrClassBreakLocator(reader, "ocrx_word");
     int start = it.following(0);
     int end = it.following(start);
     String tag = seq.subSequence(start, end).toString();
@@ -28,7 +30,8 @@ class HocrClassBreakLocatorTest {
   @Test
   void next() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    SectionReader reader = new SectionReader(seq);
+    HocrClassBreakLocator it = new HocrClassBreakLocator(reader, "ocrx_word");
     int start = it.following(671024);
     int end = it.following(start);
     String tag = seq.subSequence(start, end).toString();
@@ -40,7 +43,8 @@ class HocrClassBreakLocatorTest {
   @Test
   void previous() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    SectionReader reader = new SectionReader(seq);
+    HocrClassBreakLocator it = new HocrClassBreakLocator(reader, "ocrx_word");
     int end = it.preceding(671287);
     int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
@@ -52,7 +56,8 @@ class HocrClassBreakLocatorTest {
   @Test
   void previousLast() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    SectionReader reader = new SectionReader(seq);
+    HocrClassBreakLocator it = new HocrClassBreakLocator(reader, "ocrx_word");
     int end = seq.length();
     int start = it.preceding(end);
     String tag = seq.subSequence(start, end).toString();
@@ -64,7 +69,8 @@ class HocrClassBreakLocatorTest {
   @Test
   void previousFirst() throws IOException {
     IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    HocrClassBreakLocator it = new HocrClassBreakLocator(seq, "ocrx_word");
+    SectionReader reader = new SectionReader(seq);
+    HocrClassBreakLocator it = new HocrClassBreakLocator(reader, "ocrx_word");
     seq.setIndex(1464);
     int idx = it.preceding(1464);
     int end = it.preceding(idx);

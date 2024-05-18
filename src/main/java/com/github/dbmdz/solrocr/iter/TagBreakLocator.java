@@ -1,17 +1,18 @@
 package com.github.dbmdz.solrocr.iter;
 
-import com.github.dbmdz.solrocr.iter.SectionReader.Section;
+import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SectionReader.Section;
 
 /** A {@link BreakLocator} that splits an XML-like document on a specific opening or closing tag. */
 public class TagBreakLocator extends BaseBreakLocator {
   private final String breakTag;
 
-  public TagBreakLocator(IterableCharSequence text, String tagName) {
-    this(text, tagName, false);
+  public TagBreakLocator(SectionReader reader, String tagName) {
+    this(reader, tagName, false);
   }
 
-  public TagBreakLocator(IterableCharSequence text, String tagName, boolean closing) {
-    super(text);
+  public TagBreakLocator(SectionReader reader, String tagName, boolean closing) {
+    super(reader);
     if (closing) {
       this.breakTag = ("</" + tagName + ">");
     } else {

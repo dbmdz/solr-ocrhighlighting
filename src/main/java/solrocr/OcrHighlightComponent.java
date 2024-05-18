@@ -1,5 +1,6 @@
 package solrocr;
 
+import com.github.dbmdz.solrocr.reader.SectionReaderFactory;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.solr.SolrOcrHighlighter;
 import com.google.common.base.Strings;
@@ -89,8 +90,10 @@ public class OcrHighlightComponent extends SearchComponent
                 String.valueOf(Runtime.getRuntime().availableProcessors())));
     int maxQueuedPerThread =
         Integer.parseInt(info.attributes.getOrDefault("maxQueuedPerThread", "8"));
+    int sectionReadSize = Integer.parseInt(info.attributes.getOrDefault("sectionReadSizeKiB", "8"));
+    int maxSectionCacheSize = Integer.parseInt(info.attributes.getOrDefault("maxSectionCacheSizeKiB", "64"));
 
-    this.ocrHighlighter = new SolrOcrHighlighter(numHlThreads, maxQueuedPerThread);
+    this.ocrHighlighter = new SolrOcrHighlighter(numHlThreads, maxQueuedPerThread, new SectionReaderFactory(sectionReadSize, maxSectionCacheSize));
   }
 
   @Override
