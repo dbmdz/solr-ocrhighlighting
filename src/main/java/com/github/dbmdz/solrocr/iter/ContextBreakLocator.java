@@ -1,5 +1,7 @@
 package com.github.dbmdz.solrocr.iter;
 
+import com.github.dbmdz.solrocr.reader.SectionReader;
+
 /**
  * A break locator that wraps other {@link BreakLocator}s and aggregates their breaks to form larger
  * contexts.

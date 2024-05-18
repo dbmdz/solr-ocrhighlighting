@@ -12,6 +12,7 @@ import com.github.dbmdz.solrocr.model.OcrBox;
 import com.github.dbmdz.solrocr.model.OcrFormat;
 import com.github.dbmdz.solrocr.model.OcrPage;
 import com.github.dbmdz.solrocr.model.OcrSnippet;
+import com.github.dbmdz.solrocr.reader.SectionReader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import java.io.StringReader;
@@ -93,12 +94,12 @@ public class OcrPassageFormatter extends PassageFormatter {
    * @param content of the OCR field, implemented as an {@link IterableCharSequence}
    * @return the parsed snippet representation of the passages
    */
-  public OcrSnippet[] format(Passage[] passages, IterableCharSequence content) {
+  public OcrSnippet[] format(Passage[] passages, SectionReader sectionReader) {
     OcrSnippet[] snippets = new OcrSnippet[passages.length];
     for (int i = 0; i < passages.length; i++) {
       Passage passage = passages[i];
       try {
-        snippets[i] = format(passage, content);
+        snippets[i] = format(passage, sectionReader);
       } catch (IndexOutOfBoundsException e) {
         String errorMsg =
             String.format(
@@ -107,7 +108,7 @@ public class OcrPassageFormatter extends PassageFormatter {
                     + "\nDoes the file on disk correspond to the document that was used during indexing?",
                 passage.getStartOffset(),
                 passage.getEndOffset(),
-                content.getIdentifier());
+                sectionReader.getInput().getIdentifier());
         logger.error(errorMsg, e);
       }
     }
@@ -190,11 +191,11 @@ public class OcrPassageFormatter extends PassageFormatter {
     return position;
   }
 
-  private OcrSnippet format(Passage passage, IterableCharSequence content) {
-    String xmlFragment = getHighlightedFragment(passage, content);
+  private OcrSnippet format(Passage passage, SectionReader sectionReader) {
+    String xmlFragment = getHighlightedFragment(passage, sectionReader.getInput());
     OcrPage initialPage = null;
     if (trackPages) {
-      initialPage = determineStartPage(passage.getStartOffset(), content);
+      initialPage = determineStartPage(passage.getStartOffset(), sectionReader);
     }
     OcrSnippet snip = parseFragment(xmlFragment, initialPage);
     if (snip != null) {
@@ -204,8 +205,8 @@ public class OcrPassageFormatter extends PassageFormatter {
   }
 
   /** Determine the page an OCR fragment resides on. */
-  OcrPage determineStartPage(int startOffset, IterableCharSequence content) {
-    BreakLocator pageBreakLocator = this.format.getBreakLocator(content, OcrBlock.PAGE);
+  OcrPage determineStartPage(int startOffset, SectionReader sectionReader) {
+    BreakLocator pageBreakLocator = this.format.getBreakLocator(sectionReader, OcrBlock.PAGE);
     int pageOffset = pageBreakLocator.preceding(startOffset);
     if (pageOffset == BreakLocator.DONE) {
       // This means the page is, if present, part of the passage, and will be determined during
@@ -213,7 +214,7 @@ public class OcrPassageFormatter extends PassageFormatter {
       return null;
     }
     String pageFragment =
-        content.subSequence(pageOffset, Math.min(pageOffset + 512, content.length())).toString();
+        sectionReader.getInput().subSequence(pageOffset, Math.min(pageOffset + 512, sectionReader.length())).toString();
     return this.format.parsePageFragment(pageFragment);
   }
 
@@ -455,7 +456,7 @@ public class OcrPassageFormatter extends PassageFormatter {
    */
   @Override
   public Object format(Passage[] passages, String content) {
-    OcrSnippet[] snips = this.format(passages, IterableCharSequence.fromString(content));
+    OcrSnippet[] snips = this.format(passages, new SectionReader(IterableCharSequence.fromString(content), content.length(), 8));
     return Arrays.stream(snips).map(OcrSnippet::getText).toArray(String[]::new);
   }
 

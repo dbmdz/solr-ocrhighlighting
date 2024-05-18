@@ -97,7 +97,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
 
     if (passages.length > 0) {
-      OcrSnippet[] snippets = formatter.format(passages, content);
+      OcrSnippet[] snippets = formatter.format(passages, breakLocator.getText());
       Arrays.sort(snippets, Collections.reverseOrder());
       return snippets;
     } else {
@@ -169,7 +169,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       }
       if (pageId != null) {
         String passagePageId =
-            formatter.determineStartPage(start, breakLocator.getText().getInput()).id;
+            formatter.determineStartPage(start, breakLocator.getText()).id;
         if (!passagePageId.equals(pageId)) {
           continue;
         }

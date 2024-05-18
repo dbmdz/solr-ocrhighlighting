@@ -42,6 +42,8 @@ import com.github.dbmdz.solrocr.model.OcrHighlightResult;
 import com.github.dbmdz.solrocr.model.OcrSnippet;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.reader.LegacyBaseCompositeReader;
+import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SectionReaderFactory;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
 import java.io.IOException;
@@ -291,7 +293,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
       int[] docIDs,
       int[] maxPassagesOcr,
       Map<String, Object> respHeader,
-      Executor hlThreadPool)
+      Executor hlThreadPool,
+      SectionReaderFactory readerFactory
+  )
       throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
@@ -421,6 +425,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                       docInIndex,
                       fieldIdxFinal,
                       contentFinal,
+                      readerFactory.createReader(contentFinal),
                       fieldHighlighter,
                       leafReader,
                       snippetLimit,
@@ -521,6 +526,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       int docInIndex,
       int fieldIdx,
       IterableCharSequence content,
+      SectionReader sectionReader,
       OcrFieldHighlighter fieldHighlighter,
       LeafReader leafReader,
       int snippetLimit,
@@ -546,9 +552,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
         OcrBlock.valueOf(
             params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase(Locale.US));
 
-    BreakLocator contextLocator = ocrFormat.getBreakLocator(content, contextBlock);
+    BreakLocator contextLocator = ocrFormat.getBreakLocator(sectionReader, contextBlock);
     BreakLocator limitLocator =
-        limitBlocks == null ? null : ocrFormat.getBreakLocator(content, limitBlocks);
+        limitBlocks == null ? null : ocrFormat.getBreakLocator(sectionReader, limitBlocks);
     BreakLocator breakLocator =
         new ContextBreakLocator(
             contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
