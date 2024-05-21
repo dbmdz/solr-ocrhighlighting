@@ -29,10 +29,6 @@ import com.github.dbmdz.solrocr.formats.hocr.HocrFormat;
 import com.github.dbmdz.solrocr.formats.miniocr.MiniOcrFormat;
 import com.github.dbmdz.solrocr.iter.BreakLocator;
 import com.github.dbmdz.solrocr.iter.ContextBreakLocator;
-import com.github.dbmdz.solrocr.iter.ExitingIterCharSeq;
-import com.github.dbmdz.solrocr.iter.FileBytesCharIterator;
-import com.github.dbmdz.solrocr.iter.IterableCharSequence;
-import com.github.dbmdz.solrocr.iter.MultiFileBytesCharIterator;
 import com.github.dbmdz.solrocr.lucene.OcrFieldHighlighter;
 import com.github.dbmdz.solrocr.lucene.OcrPassageFormatter;
 import com.github.dbmdz.solrocr.lucene.OcrPassageScorer;
@@ -41,16 +37,16 @@ import com.github.dbmdz.solrocr.model.OcrFormat;
 import com.github.dbmdz.solrocr.model.OcrHighlightResult;
 import com.github.dbmdz.solrocr.model.OcrSnippet;
 import com.github.dbmdz.solrocr.model.SourcePointer;
+import com.github.dbmdz.solrocr.reader.ExitingSourceReader;
 import com.github.dbmdz.solrocr.reader.LegacyBaseCompositeReader;
-import com.github.dbmdz.solrocr.reader.SectionReader;
-import com.github.dbmdz.solrocr.reader.SectionReaderFactory;
+import com.github.dbmdz.solrocr.reader.SourceReader;
+import com.github.dbmdz.solrocr.reader.StringSourceReader;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,7 +62,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.index.BaseCompositeReader;
@@ -239,11 +234,20 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private final SolrParams params;
   private final SolrQueryRequest req;
   private final Set<OcrFormat> formats;
+  private final int readerSectionSize;
+  private final int readerMaxCacheEntries;
 
-  public OcrHighlighter(IndexSearcher indexSearcher, Analyzer indexAnalyzer, SolrQueryRequest req) {
+  public OcrHighlighter(
+      IndexSearcher indexSearcher,
+      Analyzer indexAnalyzer,
+      SolrQueryRequest req,
+      int readerSectionSize,
+      int readerMaxCacheEntries) {
     super(indexSearcher, indexAnalyzer);
     this.params = req.getParams();
     this.req = req;
+    this.readerSectionSize = readerSectionSize;
+    this.readerMaxCacheEntries = readerMaxCacheEntries;
     this.formats = new HashSet<>();
     this.formats.add(new HocrFormat());
     this.formats.add(new AltoFormat());
@@ -293,9 +297,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       int[] docIDs,
       int[] maxPassagesOcr,
       Map<String, Object> respHeader,
-      Executor hlThreadPool,
-      SectionReaderFactory readerFactory
-  )
+      Executor hlThreadPool)
       throws IOException {
     if (ocrFieldNames.length < 1) {
       throw new IllegalArgumentException("ocrFieldNames must not be empty");
@@ -373,7 +375,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     List<CompletableFuture<Void>> hlFuts = new ArrayList<>();
     docLoop:
     for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
-      List<IterableCharSequence[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
+      List<SourceReader[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
 
       // Highlight in per-field order first, then by doc (better I/O pattern)
       for (int fieldIdx = 0; fieldIdx < fields.length; fieldIdx++) {
@@ -381,7 +383,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
         OcrFieldHighlighter fieldHighlighter = fieldHighlighters[fieldIdx];
         for (int docIdx = batchDocIdx; docIdx - batchDocIdx < fieldValsByDoc.size(); docIdx++) {
           int docId = docIds[docIdx]; // sorted order
-          IterableCharSequence content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
+          SourceReader content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
           if (content == null) {
             continue;
           }
@@ -389,7 +391,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
             // We only check against the timeout when reading our field content (both from disk and
             // from memory), since this is a process that is performed at multiple points in the
             // highlighting process and usually takes the longest time.
-            content = new ExitingIterCharSeq(content, timeout);
+            content = new ExitingSourceReader(content, timeout);
           }
           IndexReader indexReader =
               (fieldHighlighter.getOffsetSource() == OffsetSource.TERM_VECTORS
@@ -416,7 +418,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
           // Final aliases for lambda
           final int docIdFinal = docId;
           final int fieldIdxFinal = fieldIdx;
-          final IterableCharSequence contentFinal = content;
+          final SourceReader contentFinal = content;
           Runnable hlFn =
               () -> {
                 try {
@@ -425,13 +427,12 @@ public class OcrHighlighter extends UnifiedHighlighter {
                       docInIndex,
                       fieldIdxFinal,
                       contentFinal,
-                      readerFactory.createReader(contentFinal),
                       fieldHighlighter,
                       leafReader,
                       snippetLimit,
                       resultByDocIn,
                       snippetCountsByField);
-                } catch (ExitingIterCharSeq.ExitingIterCharSeqException
+                } catch (ExitingSourceReader.ExitingSourceReaderException
                     | ExitableDirectoryReader.ExitingReaderException e) {
                   resultByDocIn[docInIndex] = null;
                   throw e;
@@ -448,7 +449,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                     log.error(
                         "Could not highlight OCR for document {} with OCR markup '{}...'",
                         docIdFinal,
-                        contentFinal.subSequence(0, 256),
+                        contentFinal.readUtf8String(0, 256),
                         e);
                   }
                 } finally {
@@ -471,7 +472,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
             // If the pool is full, run the task synchronously on the current thread
             try {
               hlFn.run();
-            } catch (ExitingIterCharSeq.ExitingIterCharSeqException
+            } catch (ExitingSourceReader.ExitingSourceReaderException
                 | ExitableDirectoryReader.ExitingReaderException e) {
               if (respHeader.get(PARTIAL_OCR_HIGHLIGHTS) == null) {
                 respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
@@ -494,7 +495,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       try {
         allFut.join();
       } catch (CompletionException e) {
-        if (e.getCause() instanceof ExitingIterCharSeq.ExitingIterCharSeqException
+        if (e.getCause() instanceof ExitingSourceReader.ExitingSourceReaderException
             || e.getCause() instanceof ExitableDirectoryReader.ExitingReaderException) {
           respHeader.put(PARTIAL_OCR_HIGHLIGHTS, Boolean.TRUE);
         } else {
@@ -525,18 +526,17 @@ public class OcrHighlighter extends UnifiedHighlighter {
       int docId,
       int docInIndex,
       int fieldIdx,
-      IterableCharSequence content,
-      SectionReader sectionReader,
+      SourceReader reader,
       OcrFieldHighlighter fieldHighlighter,
       LeafReader leafReader,
       int snippetLimit,
       OcrSnippet[][] resultByDocIn,
       int[][] snippetCountsByField)
       throws IOException {
-    if (content == null) {
+    if (reader == null) {
       return;
     }
-    OcrFormat ocrFormat = getFormat(content);
+    OcrFormat ocrFormat = getFormat(reader);
     if (ocrFormat == null) {
       return;
     }
@@ -552,9 +552,9 @@ public class OcrHighlighter extends UnifiedHighlighter {
         OcrBlock.valueOf(
             params.get(OcrHighlightParams.CONTEXT_BLOCK, "line").toUpperCase(Locale.US));
 
-    BreakLocator contextLocator = ocrFormat.getBreakLocator(sectionReader, contextBlock);
+    BreakLocator contextLocator = ocrFormat.getBreakLocator(reader, contextBlock);
     BreakLocator limitLocator =
-        limitBlocks == null ? null : ocrFormat.getBreakLocator(sectionReader, limitBlocks);
+        limitBlocks == null ? null : ocrFormat.getBreakLocator(reader, limitBlocks);
     BreakLocator breakLocator =
         new ContextBreakLocator(
             contextLocator, limitLocator, params.getInt(OcrHighlightParams.CONTEXT_SIZE, 2));
@@ -573,32 +573,20 @@ public class OcrHighlighter extends UnifiedHighlighter {
             docId,
             breakLocator,
             formatter,
-            content,
+            reader,
             params.get(OcrHighlightParams.PAGE_ID),
             snippetLimit,
             scorePassages);
     snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
   }
 
-  @Override
-  protected List<CharSequence[]> loadFieldValues(
-      String[] fields, DocIdSetIterator docIter, int cacheCharsThreshold) throws IOException {
-    return loadOcrFieldValues(fields, docIter).stream()
-        .map(
-            seqs ->
-                Arrays.stream(seqs)
-                    .map(IterableCharSequence::toString)
-                    .toArray(CharSequence[]::new))
-        .collect(Collectors.toList());
-  }
-
-  protected List<IterableCharSequence[]> loadOcrFieldValues(
-      String[] fields, DocIdSetIterator docIter) throws IOException {
-    List<IterableCharSequence[]> fieldValues = new ArrayList<>((int) docIter.cost());
+  protected List<SourceReader[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter)
+      throws IOException {
+    List<SourceReader[]> fieldValues = new ArrayList<>((int) docIter.cost());
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
       DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor(fields);
-      IterableCharSequence[] ocrVals = new IterableCharSequence[fields.length];
+      SourceReader[] ocrVals = new SourceReader[fields.length];
       searcher.doc(docId, docIdVisitor);
       for (int fieldIdx = 0; fieldIdx < fields.length; fieldIdx++) {
         String fieldName = fields[fieldIdx];
@@ -610,7 +598,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
         }
         if (!SourcePointer.isPointer(fieldValue)) {
           // OCR content as stored text
-          ocrVals[fieldIdx] = IterableCharSequence.fromString(fieldValue);
+          ocrVals[fieldIdx] = new StringSourceReader(fieldValue);
           continue;
         }
         SourcePointer sourcePointer = null;
@@ -624,26 +612,16 @@ public class OcrHighlighter extends UnifiedHighlighter {
           ocrVals[fieldIdx] = null;
           continue;
         }
-        if (sourcePointer.sources.size() == 1) {
-          ocrVals[fieldIdx] =
-              new FileBytesCharIterator(
-                  sourcePointer.sources.get(0).path, StandardCharsets.UTF_8, sourcePointer);
-        } else {
-          ocrVals[fieldIdx] =
-              new MultiFileBytesCharIterator(
-                  sourcePointer.sources.stream().map(s -> s.path).collect(Collectors.toList()),
-                  StandardCharsets.UTF_8,
-                  sourcePointer);
-        }
+        ocrVals[fieldIdx] = sourcePointer.getReader(readerSectionSize, readerMaxCacheEntries);
       }
       fieldValues.add(ocrVals);
     }
     return fieldValues;
   }
 
-  private OcrFormat getFormat(IterableCharSequence content) {
+  private OcrFormat getFormat(SourceReader content) {
     // Sample the first 4k characters to determine the format
-    String sampleChunk = content.subSequence(0, Math.min(4096, content.length())).toString();
+    String sampleChunk = content.readAsciiString(0, Math.min(4096, content.length()));
     return formats.stream().filter(fmt -> fmt.hasFormat(sampleChunk)).findFirst().orElse(null);
   }
 

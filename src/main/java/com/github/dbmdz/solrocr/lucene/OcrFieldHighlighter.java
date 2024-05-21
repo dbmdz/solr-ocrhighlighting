@@ -25,8 +25,8 @@
 package com.github.dbmdz.solrocr.lucene;
 
 import com.github.dbmdz.solrocr.iter.BreakLocator;
-import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.model.OcrSnippet;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,16 +60,16 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    * The primary method -- highlight this doc, assuming a specific field and given this content.
    *
    * <p>Largely copied from {@link FieldHighlighter#highlightFieldForDoc(LeafReader, int, String)},
-   * modified to support an {@link IterableCharSequence} as content and dynamically setting the
-   * break iterator and the formatter. <strong>Please refer to the file header for licensing
-   * information on the original code.</strong>
+   * modified to support an {@link SourceReader} as content and dynamically setting the break
+   * iterator and the formatter. <strong>Please refer to the file header for licensing information
+   * on the original code.</strong>
    */
   public OcrSnippet[] highlightFieldForDoc(
       LeafReader reader,
       int docId,
       BreakLocator breakLocator,
       OcrPassageFormatter formatter,
-      IterableCharSequence content,
+      SourceReader content,
       String pageId,
       int snippetLimit,
       boolean scorePassages)
@@ -168,8 +168,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
             "field '" + field + "' was indexed without offsets, cannot highlight");
       }
       if (pageId != null) {
-        String passagePageId =
-            formatter.determineStartPage(start, breakLocator.getText()).id;
+        String passagePageId = formatter.determineStartPage(start, breakLocator.getText()).id;
         if (!passagePageId.equals(pageId)) {
           continue;
         }

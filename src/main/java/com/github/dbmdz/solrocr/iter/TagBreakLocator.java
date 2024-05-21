@@ -1,17 +1,17 @@
 package com.github.dbmdz.solrocr.iter;
 
-import com.github.dbmdz.solrocr.reader.SectionReader;
-import com.github.dbmdz.solrocr.reader.SectionReader.Section;
+import com.github.dbmdz.solrocr.reader.SourceReader;
+import com.github.dbmdz.solrocr.reader.SourceReader.Section;
 
 /** A {@link BreakLocator} that splits an XML-like document on a specific opening or closing tag. */
 public class TagBreakLocator extends BaseBreakLocator {
   private final String breakTag;
 
-  public TagBreakLocator(SectionReader reader, String tagName) {
+  public TagBreakLocator(SourceReader reader, String tagName) {
     this(reader, tagName, false);
   }
 
-  public TagBreakLocator(SectionReader reader, String tagName, boolean closing) {
+  public TagBreakLocator(SourceReader reader, String tagName, boolean closing) {
     super(reader);
     if (closing) {
       this.breakTag = ("</" + tagName + ">");
@@ -25,7 +25,7 @@ public class TagBreakLocator extends BaseBreakLocator {
     String overlapHead = null;
     int globalStart = Math.min(offset + 1, this.text.length());
     while (globalStart < this.text.length()) {
-      Section section = this.text.getSection(globalStart);
+      Section section = this.text.getAsciiSection(globalStart);
       String block = section.text;
       int blockStart = globalStart - section.start;
 
@@ -69,7 +69,7 @@ public class TagBreakLocator extends BaseBreakLocator {
     int globalEnd = offset;
 
     while (globalEnd > 0) {
-      Section section = this.text.getSection(globalEnd);
+      Section section = this.text.getAsciiSection(globalEnd);
       String block = section.text;
       int blockEnd = globalEnd - section.start;
 

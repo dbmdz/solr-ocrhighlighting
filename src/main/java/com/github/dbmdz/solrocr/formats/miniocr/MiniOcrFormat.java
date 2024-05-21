@@ -6,7 +6,7 @@ import com.github.dbmdz.solrocr.iter.TagBreakLocator;
 import com.github.dbmdz.solrocr.model.OcrBlock;
 import com.github.dbmdz.solrocr.model.OcrFormat;
 import com.github.dbmdz.solrocr.model.OcrPage;
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.ImmutableMap;
 import java.awt.Dimension;
 import java.io.Reader;
@@ -48,13 +48,13 @@ public class MiniOcrFormat implements OcrFormat {
   }
 
   @Override
-  public BreakLocator getBreakLocator(SectionReader sectionReader, OcrBlock... blockTypes) {
+  public BreakLocator getBreakLocator(SourceReader reader, OcrBlock... blockTypes) {
     // FIXME: MiniOCR currently presupposes that the desired  block type exists, i.e. if you say
     // "break on paragraph", we're just assuming that there are actually paragraphs in the OCR.
     // If they're not, there will not be a break. It would be better if we checked all of the passed
     // blocks.
     String breakTag = blockTagMapping.get(blockTypes[0]);
-    return new TagBreakLocator(sectionReader, breakTag);
+    return new TagBreakLocator(reader, breakTag);
   }
 
   @Override

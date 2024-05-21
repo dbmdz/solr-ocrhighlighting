@@ -1,8 +1,8 @@
 package com.github.dbmdz.solrocr.formats.hocr;
 
 import com.github.dbmdz.solrocr.iter.BaseBreakLocator;
-import com.github.dbmdz.solrocr.reader.SectionReader;
-import com.github.dbmdz.solrocr.reader.SectionReader.Section;
+import com.github.dbmdz.solrocr.reader.SourceReader;
+import com.github.dbmdz.solrocr.reader.SourceReader.Section;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 
@@ -10,12 +10,12 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
 
   private final List<String> breakClasses;
 
-  public HocrClassBreakLocator(SectionReader sectionReader, String breakClass) {
-    this(sectionReader, ImmutableList.of(breakClass));
+  public HocrClassBreakLocator(SourceReader reader, String breakClass) {
+    this(reader, ImmutableList.of(breakClass));
   }
 
-  public HocrClassBreakLocator(SectionReader sectionReader, List<String> breakClasses) {
-    super(sectionReader);
+  public HocrClassBreakLocator(SourceReader reader, List<String> breakClasses) {
+    super(reader);
     this.breakClasses = breakClasses;
   }
 
@@ -24,7 +24,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
     int globalStart = Math.min(offset + 1, this.text.length());
     String overlapHead = null;
     while (globalStart < this.text.length()) {
-      Section section = this.text.getSection(globalStart);
+      Section section = this.text.getAsciiSection(globalStart);
       String block = section.text;
       int blockStart = globalStart - section.start;
 
@@ -73,7 +73,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
     String overlapTail = null;
     int globalEnd = Math.max(0, offset - 1);
     while (globalEnd > 0) {
-      Section section = this.text.getSection(globalEnd);
+      Section section = this.text.getAsciiSection(globalEnd);
 
       String block = section.text;
       int blockEnd = globalEnd - section.start;

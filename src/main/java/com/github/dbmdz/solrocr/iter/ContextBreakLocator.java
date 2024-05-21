@@ -1,6 +1,6 @@
 package com.github.dbmdz.solrocr.iter;
 
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 
 /**
  * A break locator that wraps other {@link BreakLocator}s and aggregates their breaks to form larger
@@ -61,7 +61,7 @@ public class ContextBreakLocator implements BreakLocator {
   }
 
   @Override
-  public SectionReader getText() {
+  public SourceReader getText() {
     return baseLocator.getText();
   }
 }

@@ -2,14 +2,12 @@ package com.github.dbmdz.solrocr.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.github.dbmdz.solrocr.iter.FileBytesCharIterator;
-import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.iter.TagBreakLocator;
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.FileSourceReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.io.IOUtils;
@@ -29,12 +27,11 @@ class TagBreakLocatorTest {
 
   @Test
   void firstNext() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    SectionReader reader = new SectionReader(seq);
+    SourceReader reader = new FileSourceReader(utf8Path, null, 8 * 1024, 8);
     TagBreakLocator it = new TagBreakLocator(reader, "w");
     int start = it.following(0);
     int end = it.following(start);
-    String tag = seq.subSequence(start, end).toString();
+    String tag = reader.readUtf8String(start, end - start);
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
     assertThat(StringUtils.countMatches(tag, "</w>")).isEqualTo(1);
@@ -42,12 +39,11 @@ class TagBreakLocatorTest {
 
   @Test
   void next() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    SectionReader reader = new SectionReader(seq);
+    SourceReader reader = new FileSourceReader(utf8Path, null, 8 * 1024, 8);
     TagBreakLocator it = new TagBreakLocator(reader, "w");
     int start = it.following(8267);
     int end = it.following(start);
-    String tag = seq.subSequence(start, end).toString();
+    String tag = reader.readUtf8String(start, end - start);
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
     assertThat(StringUtils.countMatches(tag, "</w>")).isEqualTo(1);
@@ -56,12 +52,11 @@ class TagBreakLocatorTest {
 
   @Test
   void lastPrevious() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    SectionReader reader = new SectionReader(seq);
+    SourceReader reader = new FileSourceReader(utf8Path, null, 8 * 1024, 8);
     TagBreakLocator it = new TagBreakLocator(reader, "w");
-    int end = seq.length() - 1;
-    int start = it.preceding(seq.length() - 1);
-    String tag = seq.subSequence(start, end).toString();
+    int end = reader.length() - 1;
+    int start = it.preceding(reader.length() - 1);
+    String tag = reader.readUtf8String(start, end - start);
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
     assertThat(StringUtils.countMatches(tag, "</w>")).isEqualTo(1);
@@ -70,12 +65,11 @@ class TagBreakLocatorTest {
 
   @Test
   void previous() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    SectionReader reader = new SectionReader(seq);
+    SourceReader reader = new FileSourceReader(utf8Path, null, 8 * 1024, 8);
     TagBreakLocator it = new TagBreakLocator(reader, "w");
     int end = 2872126;
     int start = it.preceding(end);
-    String tag = seq.subSequence(start, end).toString();
+    String tag = reader.readUtf8String(start, end - start);
     assertThat(tag).startsWith("<w");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(1);
     assertThat(StringUtils.countMatches(tag, "</w>")).isEqualTo(1);
@@ -84,15 +78,14 @@ class TagBreakLocatorTest {
 
   @Test
   void previousFirst() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    SectionReader reader = new SectionReader(seq);
+    SourceReader reader = new FileSourceReader(utf8Path, null, 8 * 1024, 8);
     TagBreakLocator it = new TagBreakLocator(reader, "w");
     int idx = it.preceding(293);
     idx = it.preceding(idx);
     idx = it.preceding(idx);
     int end = it.preceding(idx);
     int start = it.preceding(end);
-    String tag = seq.subSequence(start, end).toString();
+    String tag = reader.readUtf8String(start, end - start);
     assertThat(tag).startsWith("<?xml");
     assertThat(StringUtils.countMatches(tag, "<w")).isEqualTo(0);
     assertThat(StringUtils.countMatches(tag, "</w>")).isEqualTo(0);
