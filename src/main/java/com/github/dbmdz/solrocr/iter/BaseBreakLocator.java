@@ -1,6 +1,6 @@
 package com.github.dbmdz.solrocr.iter;
 
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
@@ -17,7 +17,7 @@ public abstract class BaseBreakLocator implements BreakLocator {
   private static final String BOM_ASCII = "ï»¿";
   private final RangeMap<Integer, Integer> forwardCache = TreeRangeMap.create();
   private final RangeMap<Integer, Integer> backwardCache = TreeRangeMap.create();
-  protected final SectionReader text;
+  protected final SourceReader text;
 
   /**
    * An "optimized" version of {@link String#lastIndexOf(String, int)}.
@@ -44,7 +44,7 @@ public abstract class BaseBreakLocator implements BreakLocator {
     return from;
   }
 
-  protected BaseBreakLocator(SectionReader text) {
+  protected BaseBreakLocator(SourceReader text) {
     this.text = text;
   }
 
@@ -62,7 +62,7 @@ public abstract class BaseBreakLocator implements BreakLocator {
   }
 
   @Override
-  public SectionReader getText() {
+  public SourceReader getText() {
     return text;
   }
 

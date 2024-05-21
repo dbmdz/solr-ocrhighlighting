@@ -2,11 +2,10 @@ package com.github.dbmdz.solrocr.model;
 
 import com.github.dbmdz.solrocr.formats.OcrParser;
 import com.github.dbmdz.solrocr.iter.BreakLocator;
-import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.lucene.OcrPassageFormatter;
 import com.github.dbmdz.solrocr.lucene.filters.OcrCharFilter;
 import com.github.dbmdz.solrocr.reader.PeekingReader;
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import java.io.Reader;
@@ -26,7 +25,7 @@ public interface OcrFormat {
    * @param blockTypes the type(s) of {@link OcrBlock} that the input document is split on
    * @return the {@link BreakLocator} instance
    */
-  BreakLocator getBreakLocator(SectionReader reader, OcrBlock... blockTypes);
+  BreakLocator getBreakLocator(SourceReader reader, OcrBlock... blockTypes);
 
   /**
    * Get the parser for the format.

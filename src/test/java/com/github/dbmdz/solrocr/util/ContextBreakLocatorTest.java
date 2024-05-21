@@ -5,14 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.github.dbmdz.solrocr.formats.hocr.HocrClassBreakLocator;
 import com.github.dbmdz.solrocr.iter.BreakLocator;
 import com.github.dbmdz.solrocr.iter.ContextBreakLocator;
-import com.github.dbmdz.solrocr.iter.FileBytesCharIterator;
-import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.iter.TagBreakLocator;
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.FileSourceReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.io.IOUtils;
@@ -31,8 +29,7 @@ class ContextBreakLocatorTest {
 
   @Test
   void testContext() throws IOException {
-    IterableCharSequence seq = new FileBytesCharIterator(utf8Path, StandardCharsets.UTF_8, null);
-    SectionReader reader = new SectionReader(seq);
+    SourceReader reader = new FileSourceReader(utf8Path, null, 8 * 1024, 8);
     TagBreakLocator baseLocator = new TagBreakLocator(reader, "w");
     TagBreakLocator limitLocator = new TagBreakLocator(reader, "b");
     ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 5);
@@ -40,7 +37,7 @@ class ContextBreakLocatorTest {
     int start = it.preceding(center);
     int end = it.following(center);
     assertThat(start).isLessThan(end);
-    String snippet = seq.subSequence(start, end).toString();
+    String snippet = reader.readUtf8String(start, end - start);
     assertThat(StringUtils.countMatches(snippet, "<w")).isEqualTo(2 * 5 + 1);
     assertThat(StringUtils.countMatches(snippet, "</w>")).isEqualTo(2 * 5 + 1);
     assertThat(stripTags(snippet))
@@ -49,17 +46,15 @@ class ContextBreakLocatorTest {
 
   @Test
   void testContextHonorsLimits() throws IOException {
-    IterableCharSequence seq =
-        new FileBytesCharIterator(
-            Paths.get("src/test/resources/data/hocr.html"), StandardCharsets.UTF_8, null);
-    SectionReader reader = new SectionReader(seq);
+    SourceReader reader =
+        new FileSourceReader(Paths.get("src/test/resources/data/hocr.html"), null, 8 * 1024, 8);
     BreakLocator baseLocator = new HocrClassBreakLocator(reader, "ocr_line");
     BreakLocator limitLocator = new HocrClassBreakLocator(reader, "ocrx_block");
     ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 5);
     int start = it.preceding(5352801);
     int end = it.following(5352801 + "Japan</span>".length());
     assertThat(start).isLessThan(end);
-    String snippet = seq.subSequence(start, end).toString();
+    String snippet = reader.readUtf8String(start, end - start);
     assertThat(StringUtils.countMatches(snippet, "ocr_line")).isEqualTo(1 + 1 + 5);
     assertThat(snippet).doesNotContain("ocr_page");
     assertThat(snippet).containsOnlyOnce("ocrx_block");
@@ -72,18 +67,15 @@ class ContextBreakLocatorTest {
     int offStart = 42736;
     int offEnd = 42919;
     for (int i = 0; i < 3; i++) {
-      IterableCharSequence seq =
-          new FileBytesCharIterator(
-              Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"),
-              StandardCharsets.UTF_8,
-              null);
-      SectionReader reader = new SectionReader(seq);
+      SourceReader reader =
+          new FileSourceReader(
+              Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"), null, 8 * 1024, 8);
       BreakLocator baseLocator = new TagBreakLocator(reader, "TextLine");
       BreakLocator limitLocator = new TagBreakLocator(reader, "TextBlock");
       ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 2);
       int start = it.preceding(offStart);
       int end = it.following(offEnd);
-      String snippet = seq.subSequence(start, end).toString();
+      String snippet = reader.readUtf8String(start, end - start);
       if (lastResult != null) {
         assertThat(snippet).isEqualTo(lastResult);
       }
@@ -95,12 +87,9 @@ class ContextBreakLocatorTest {
 
   @Test
   void testContextWithHyphenationAndCaching() throws IOException {
-    IterableCharSequence seq =
-        new FileBytesCharIterator(
-            Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"),
-            StandardCharsets.UTF_8,
-            null);
-    SectionReader reader = new SectionReader(seq);
+    SourceReader reader =
+        new FileSourceReader(
+            Paths.get("src/test/resources/data/bnl_lunion_1865-04-15.xml"), null, 8 * 1024, 8);
     BreakLocator baseLocator = new TagBreakLocator(reader, "TextLine");
     BreakLocator limitLocator = new TagBreakLocator(reader, "TextBlock");
     ContextBreakLocator it = new ContextBreakLocator(baseLocator, limitLocator, 2);
@@ -108,7 +97,7 @@ class ContextBreakLocatorTest {
     int start = it.preceding(42736);
     int end = it.following(42919);
     assertThat(start).isLessThan(end);
-    String snippet = seq.subSequence(start, end).toString();
+    String snippet = reader.readUtf8String(start, end - start);
     // One match line, two following context lines
     assertThat(StringUtils.countMatches(snippet, "<TextLine")).isEqualTo(1 + 2);
 
@@ -116,7 +105,7 @@ class ContextBreakLocatorTest {
     end = it.following(43849);
     assertThat(start).isLessThan(end);
     // One match line, two following context lines
-    snippet = seq.subSequence(start, end).toString();
+    snippet = reader.readUtf8String(start, end - start);
     assertThat(StringUtils.countMatches(snippet, "<TextLine")).isEqualTo(1 + 2);
   }
 }

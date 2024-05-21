@@ -6,7 +6,7 @@ import com.github.dbmdz.solrocr.iter.TagBreakLocator;
 import com.github.dbmdz.solrocr.model.OcrBlock;
 import com.github.dbmdz.solrocr.model.OcrFormat;
 import com.github.dbmdz.solrocr.model.OcrPage;
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import java.awt.Dimension;
@@ -25,11 +25,11 @@ public class AltoFormat implements OcrFormat {
           OcrBlock.WORD, "String");
 
   @Override
-  public BreakLocator getBreakLocator(SectionReader sectionReader, OcrBlock... blockTypes) {
+  public BreakLocator getBreakLocator(SourceReader reader, OcrBlock... blockTypes) {
     // NOTE: The ALTO hierarchy we support is pretty rigid, i.e. Page > TextBlock > TextLine >
     // String is a given, hence we only grab the lowest-hierarchy block and call it a day
     String breakTag = blockTagMapping.get(blockTypes[0]);
-    return new TagBreakLocator(sectionReader, breakTag);
+    return new TagBreakLocator(reader, breakTag);
   }
 
   @Override

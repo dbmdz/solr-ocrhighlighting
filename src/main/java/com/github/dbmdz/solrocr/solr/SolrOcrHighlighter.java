@@ -25,7 +25,6 @@
 package com.github.dbmdz.solrocr.solr;
 
 import com.github.dbmdz.solrocr.model.OcrHighlightResult;
-import com.github.dbmdz.solrocr.reader.SectionReaderFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -54,15 +53,18 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final Executor hlExecutor;
-  private final SectionReaderFactory readerFactory;
+  private final int readerSectionSize;
+  private final int readerMaxCacheEntries;
 
   public SolrOcrHighlighter() {
-    this(Runtime.getRuntime().availableProcessors(), 8, new SectionReaderFactory(8 * 1024, 64 * 1024));
+    this(Runtime.getRuntime().availableProcessors(), 8, 8 * 1024, 64 * 1024);
   }
 
-  public SolrOcrHighlighter(int numHlThreads, int maxQueuedPerThread, SectionReaderFactory readerFactory) {
+  public SolrOcrHighlighter(
+      int numHlThreads, int maxQueuedPerThread, int readerSectionSize, int readerMaxCacheEntries) {
     super();
-    this.readerFactory = readerFactory;
+    this.readerSectionSize = readerSectionSize;
+    this.readerMaxCacheEntries = readerMaxCacheEntries;
     if (numHlThreads > 0) {
       this.hlExecutor =
           new ThreadPoolExecutor(
@@ -110,10 +112,15 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
 
     // Highlight OCR fields
     OcrHighlighter ocrHighlighter =
-        new OcrHighlighter(req.getSearcher(), req.getSchema().getIndexAnalyzer(), req);
+        new OcrHighlighter(
+            req.getSearcher(),
+            req.getSchema().getIndexAnalyzer(),
+            req,
+            readerSectionSize,
+            readerMaxCacheEntries);
     OcrHighlightResult[] ocrSnippets =
         ocrHighlighter.highlightOcrFields(
-            ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader, hlExecutor, readerFactory);
+            ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader, hlExecutor);
 
     // Assemble output data
     SimpleOrderedMap<Object> out = new SimpleOrderedMap<>();

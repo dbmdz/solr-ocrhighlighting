@@ -1,5 +1,8 @@
 package com.github.dbmdz.solrocr.model;
 
+import com.github.dbmdz.solrocr.reader.FileSourceReader;
+import com.github.dbmdz.solrocr.reader.MultiFileSourceReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.ImmutableList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -144,19 +147,20 @@ public class SourcePointer {
     this.sources = sources;
   }
 
-  /**
-   * Create meaningful human-readable representation of {@link SourcePointer} from it's attached
-   * files
-   */
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (FileSource source : this.sources) {
-      if (sb.length() > 0) {
-        sb.append("+");
-      }
-      sb.append(source.toString());
+    return sources.stream().map(FileSource::toString).collect(Collectors.joining("+"));
+  }
+
+  public SourceReader getReader(int sectionSize, int maxCacheEntries) {
+    if (this.sources.size() == 1) {
+      return new FileSourceReader(this.sources.get(0).path, this, sectionSize, maxCacheEntries);
+    } else {
+      return new MultiFileSourceReader(
+          this.sources.stream().map(s -> s.path).collect(Collectors.toList()),
+          this,
+          sectionSize,
+          maxCacheEntries);
     }
-    return sb.toString();
   }
 }

@@ -1,6 +1,6 @@
 package com.github.dbmdz.solrocr.iter;
 
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
 
 public interface BreakLocator {
   int DONE = -1;
@@ -9,5 +9,5 @@ public interface BreakLocator {
 
   int preceding(int offset);
 
-  SectionReader getText();
+  SourceReader getText();
 }

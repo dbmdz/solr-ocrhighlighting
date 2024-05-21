@@ -5,14 +5,14 @@ import static com.github.dbmdz.solrocr.formats.OcrParser.START_HL;
 
 import com.github.dbmdz.solrocr.formats.OcrParser;
 import com.github.dbmdz.solrocr.iter.BreakLocator;
-import com.github.dbmdz.solrocr.iter.IterableCharSequence;
 import com.github.dbmdz.solrocr.lucene.filters.SanitizingXmlFilter;
 import com.github.dbmdz.solrocr.model.OcrBlock;
 import com.github.dbmdz.solrocr.model.OcrBox;
 import com.github.dbmdz.solrocr.model.OcrFormat;
 import com.github.dbmdz.solrocr.model.OcrPage;
 import com.github.dbmdz.solrocr.model.OcrSnippet;
-import com.github.dbmdz.solrocr.reader.SectionReader;
+import com.github.dbmdz.solrocr.reader.SourceReader;
+import com.github.dbmdz.solrocr.reader.StringSourceReader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import java.io.StringReader;
@@ -91,15 +91,15 @@ public class OcrPassageFormatter extends PassageFormatter {
    * instances
    *
    * @param passages in the the document text that contain highlighted text
-   * @param content of the OCR field, implemented as an {@link IterableCharSequence}
+   * @param content of the OCR field, implemented as an {@link SourceReader}
    * @return the parsed snippet representation of the passages
    */
-  public OcrSnippet[] format(Passage[] passages, SectionReader sectionReader) {
+  public OcrSnippet[] format(Passage[] passages, SourceReader content) {
     OcrSnippet[] snippets = new OcrSnippet[passages.length];
     for (int i = 0; i < passages.length; i++) {
       Passage passage = passages[i];
       try {
-        snippets[i] = format(passage, sectionReader);
+        snippets[i] = format(passage, content);
       } catch (IndexOutOfBoundsException e) {
         String errorMsg =
             String.format(
@@ -108,16 +108,16 @@ public class OcrPassageFormatter extends PassageFormatter {
                     + "\nDoes the file on disk correspond to the document that was used during indexing?",
                 passage.getStartOffset(),
                 passage.getEndOffset(),
-                sectionReader.getInput().getIdentifier());
+                content.getIdentifier());
         logger.error(errorMsg, e);
       }
     }
     return snippets;
   }
 
-  protected String getHighlightedFragment(Passage passage, IterableCharSequence content) {
+  protected String getHighlightedFragment(Passage passage, SourceReader content) {
     StringBuilder sb =
-        new StringBuilder(content.subSequence(passage.getStartOffset(), passage.getEndOffset()));
+        new StringBuilder(content.readUtf8String(passage.getStartOffset(), passage.getLength()));
     int extraChars = 0;
     if (passage.getNumMatches() > 0) {
       List<PassageMatch> matches =
@@ -126,7 +126,8 @@ public class OcrPassageFormatter extends PassageFormatter {
         // Can't just do match.start - passage.getStartOffset(), since both offsets are relative to
         // **UTF-8 bytes**, but we need **UTF-16 codepoint** offsets in the code.
         String preMatchContent =
-            content.subSequence(passage.getStartOffset(), match.start).toString();
+            content.readUtf8String(
+                passage.getStartOffset(), match.start - passage.getStartOffset());
         int matchStart = preMatchContent.length();
         if (alignSpans) {
           matchStart = format.getLastContentStartIdx(preMatchContent);
@@ -137,7 +138,10 @@ public class OcrPassageFormatter extends PassageFormatter {
         extraChars += START_HL.length();
         // Again, can't just do match.end - passage.getStartOffset(), since we need char offsets
         // (see above).
-        int matchEnd = content.subSequence(passage.getStartOffset(), match.end).toString().length();
+        int matchEnd =
+            content
+                .readUtf8String(passage.getStartOffset(), match.end - passage.getStartOffset())
+                .length();
         String matchText = sb.substring(extraChars + matchStart, extraChars + matchEnd);
         if (matchText.trim().endsWith(">")) {
           // Set the end of the match to the position before the last inner closing tag inside of
@@ -191,11 +195,11 @@ public class OcrPassageFormatter extends PassageFormatter {
     return position;
   }
 
-  private OcrSnippet format(Passage passage, SectionReader sectionReader) {
-    String xmlFragment = getHighlightedFragment(passage, sectionReader.getInput());
+  private OcrSnippet format(Passage passage, SourceReader reader) {
+    String xmlFragment = getHighlightedFragment(passage, reader);
     OcrPage initialPage = null;
     if (trackPages) {
-      initialPage = determineStartPage(passage.getStartOffset(), sectionReader);
+      initialPage = determineStartPage(passage.getStartOffset(), reader);
     }
     OcrSnippet snip = parseFragment(xmlFragment, initialPage);
     if (snip != null) {
@@ -205,8 +209,8 @@ public class OcrPassageFormatter extends PassageFormatter {
   }
 
   /** Determine the page an OCR fragment resides on. */
-  OcrPage determineStartPage(int startOffset, SectionReader sectionReader) {
-    BreakLocator pageBreakLocator = this.format.getBreakLocator(sectionReader, OcrBlock.PAGE);
+  OcrPage determineStartPage(int startOffset, SourceReader reader) {
+    BreakLocator pageBreakLocator = this.format.getBreakLocator(reader, OcrBlock.PAGE);
     int pageOffset = pageBreakLocator.preceding(startOffset);
     if (pageOffset == BreakLocator.DONE) {
       // This means the page is, if present, part of the passage, and will be determined during
@@ -214,7 +218,7 @@ public class OcrPassageFormatter extends PassageFormatter {
       return null;
     }
     String pageFragment =
-        sectionReader.getInput().subSequence(pageOffset, Math.min(pageOffset + 512, sectionReader.length())).toString();
+        reader.readUtf8String(pageOffset, Math.min(512, reader.length() - pageOffset));
     return this.format.parsePageFragment(pageFragment);
   }
 
@@ -447,16 +451,16 @@ public class OcrPassageFormatter extends PassageFormatter {
   /**
    * Convenience implementation to format document text that is available as a {@link String}.
    *
-   * <p>Wraps the {@link String} in a {@link IterableCharSequence} implementation and calls {@link
-   * #format(Passage[], IterableCharSequence)}
+   * <p>Wraps the {@link String} in a {@link SourceReader} implementation and calls {@link
+   * #format(Passage[], SourceReader)}
    *
    * @param passages in the the document text that contain highlighted text
-   * @param content of the OCR field, implemented as an {@link IterableCharSequence}
+   * @param content of the OCR field
    * @return the parsed snippet representation of the passages
    */
   @Override
   public Object format(Passage[] passages, String content) {
-    OcrSnippet[] snips = this.format(passages, new SectionReader(IterableCharSequence.fromString(content), content.length(), 8));
+    OcrSnippet[] snips = this.format(passages, new StringSourceReader(content));
     return Arrays.stream(snips).map(OcrSnippet::getText).toArray(String[]::new);
   }
 
