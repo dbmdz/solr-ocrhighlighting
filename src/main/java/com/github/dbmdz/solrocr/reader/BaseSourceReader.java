@@ -8,24 +8,28 @@ public abstract class BaseSourceReader implements SourceReader {
 
   protected final SourcePointer pointer;
   protected final int sectionSize;
-  // cache slot → section
-  private final Section[] cache;
-  // cache slot → timestamp
-  private final long[] cacheLastUsedTimestamps;
-  // cache slot -> section idx
-  private final int[] cachedSections;
-  private int cacheSlotsUsed = 0;
   private final byte[] copyBuf;
+  private final int maxCacheEntries;
+
+  private CachedSection[] cache;
+  private int[] cachedSectionIdxes;
+  private int cacheSlotsUsed = 0;
+
+  private static final class CachedSection {
+    public final Section section;
+    public long lastUsedTimestamp;
+
+    private CachedSection(Section section) {
+      this.section = section;
+      this.lastUsedTimestamp = System.nanoTime();
+    }
+  }
 
   public BaseSourceReader(SourcePointer pointer, int sectionSize, int maxCacheEntries) {
     this.pointer = pointer;
     this.sectionSize = sectionSize;
-    this.cache = new Section[maxCacheEntries];
-    this.cacheLastUsedTimestamps = new long[maxCacheEntries];
-    this.cachedSections = new int[maxCacheEntries];
-    Arrays.fill(cacheLastUsedTimestamps, -1L);
-    Arrays.fill(cachedSections, -1);
     this.copyBuf = new byte[sectionSize];
+    this.maxCacheEntries = maxCacheEntries;
   }
 
   protected abstract int readBytes(byte[] dst, int dstOffset, int start, int len);
@@ -44,6 +48,19 @@ public abstract class BaseSourceReader implements SourceReader {
     return pointer;
   }
 
+  private void initializeCache() {
+    // Gotta do this outside of the constructor because we need to know the length,
+    // which is only available after the constructor has run
+    // We trade off some memory for a simpler implementation by using a fixed-size cache
+    // with `null` entries for unused slots plus a timestamp array to track LRU
+    // The memory impact is not too bad, even for small section sizes like 1KiB, the
+    // cache will only occupy around 40KiB for a 10MiB file
+    int numSections = (int) Math.ceil((double) this.length() / sectionSize);
+    this.cache = new CachedSection[numSections];
+    this.cachedSectionIdxes = new int[maxCacheEntries];
+    Arrays.fill(cachedSectionIdxes, -1);
+  }
+
   private void purgeLeastRecentlyUsed() {
     if (this.cache.length == 0 || cacheSlotsUsed < this.cache.length) {
       return;
@@ -51,24 +68,17 @@ public abstract class BaseSourceReader implements SourceReader {
 
     long oldestTimestamp = Long.MAX_VALUE;
     int oldestIndex = -1;
-    for (int i = 0; i < cacheLastUsedTimestamps.length; i++) {
-      if (cacheLastUsedTimestamps[i] < oldestTimestamp) {
-        oldestTimestamp = cacheLastUsedTimestamps[i];
-        oldestIndex = i;
+    for (int sectionIdx : cachedSectionIdxes) {
+      if (sectionIdx < 0) {
+        continue;
+      }
+      if (cache[sectionIdx].lastUsedTimestamp < oldestTimestamp) {
+        oldestTimestamp = cache[sectionIdx].lastUsedTimestamp;
+        oldestIndex = sectionIdx;
       }
     }
     cache[oldestIndex] = null;
-    cacheLastUsedTimestamps[oldestIndex] = -1L;
     cacheSlotsUsed--;
-  }
-
-  private int getCacheSlot(int sectionIndex) {
-    for (int i = 0; i < cache.length; i++) {
-      if (cachedSections[i] == sectionIndex) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   @Override
@@ -163,10 +173,12 @@ public abstract class BaseSourceReader implements SourceReader {
       throw new IllegalArgumentException("offset must be < length");
     }
     int sectionIndex = offset / sectionSize;
-    int cacheSlot = getCacheSlot(sectionIndex);
-    if (cacheSlot >= 0) {
-      cacheLastUsedTimestamps[cacheSlot] = System.nanoTime();
-      return cache[cacheSlot];
+    if (cache == null) {
+      initializeCache();
+    }
+    if (cache[sectionIndex] != null) {
+      cache[sectionIndex].lastUsedTimestamp = System.nanoTime();
+      return cache[sectionIndex].section;
     }
     int startOffset = sectionIndex * sectionSize;
     int readLen = Math.min(sectionSize, this.length() - startOffset);
@@ -177,11 +189,10 @@ public abstract class BaseSourceReader implements SourceReader {
       purgeLeastRecentlyUsed();
     }
     if (cache.length > 0) {
-      cacheSlot = getCacheSlot(-1);
-      cache[cacheSlot] = section;
-      cacheLastUsedTimestamps[cacheSlot] = System.nanoTime();
+      cache[sectionIndex] = new CachedSection(section);
       cacheSlotsUsed++;
     }
+
     return section;
   }
 }
