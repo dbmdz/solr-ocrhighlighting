@@ -8,6 +8,11 @@
 - Completely refactored, simplified and optimized I/O stack to reduce number of file system reads
   and allocations/data copies during highlighting, accounting for a significant performance improvement
   over previous versions (4-8 times faster in a synthetic benchmark that was not I/O-bound)
+- We no longer memory-map files for reading. Benchmarking revealed that it did not improve performance
+  with the new I/O stack (probably due to the reduced amount of actual reads), on the contrary,
+  performance was improved for many concurrent queries. A huge drawback of the memory-mapped approach
+  was that in the presence of I/O errors like disappearing mounts, truncated files, etc, the JVM could
+  simply crash (due to the kernel sending a `SIGBUS` signal when encountering an I/O error).
 
 
 ## 0.8.5 (2024-04-25)

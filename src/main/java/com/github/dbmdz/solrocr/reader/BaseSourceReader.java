@@ -1,6 +1,7 @@
 package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -32,13 +33,14 @@ public abstract class BaseSourceReader implements SourceReader {
     this.maxCacheEntries = maxCacheEntries;
   }
 
-  protected abstract int readBytes(byte[] dst, int dstOffset, int start, int len);
+  protected abstract int readBytes(byte[] dst, int dstOffset, int start, int len)
+      throws IOException;
 
   @Override
-  public abstract int length();
+  public abstract int length() throws IOException;
 
   @Override
-  public abstract void close();
+  public abstract void close() throws IOException;
 
   @Override
   public abstract String getIdentifier();
@@ -48,7 +50,7 @@ public abstract class BaseSourceReader implements SourceReader {
     return pointer;
   }
 
-  private void initializeCache() {
+  private void initializeCache() throws IOException {
     // Gotta do this outside of the constructor because we need to know the length,
     // which is only available after the constructor has run
     // We trade off some memory for a simpler implementation by using a fixed-size cache
@@ -82,7 +84,7 @@ public abstract class BaseSourceReader implements SourceReader {
   }
 
   @Override
-  public String readAsciiString(int start, int len) {
+  public String readAsciiString(int start, int len) throws IOException {
     if (start < 0) {
       throw new IllegalArgumentException("start must be >= 0");
     }
@@ -102,7 +104,7 @@ public abstract class BaseSourceReader implements SourceReader {
   }
 
   @Override
-  public String readUtf8String(int start, int byteLen) {
+  public String readUtf8String(int start, int byteLen) throws IOException {
     // NOTE: This is currently not on any of the hot paths, so we don't bother with caching
     if (start < 0) {
       throw new IllegalArgumentException("start must be >= 0");
@@ -165,7 +167,7 @@ public abstract class BaseSourceReader implements SourceReader {
     return offset;
   }
 
-  public Section getAsciiSection(int offset) {
+  public Section getAsciiSection(int offset) throws IOException {
     if (offset < 0) {
       throw new IllegalArgumentException("offset must be >= 0");
     }
