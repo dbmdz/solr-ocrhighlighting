@@ -1,21 +1,22 @@
 package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
+import java.io.IOException;
 
 public interface SourceReader {
-  void close();
+  void close() throws IOException;
 
   SourcePointer getPointer();
 
   String getIdentifier();
 
-  int length();
+  int length() throws IOException;
 
-  String readAsciiString(int start, int len);
+  String readAsciiString(int start, int len) throws IOException;
 
-  String readUtf8String(int start, int byteLen);
+  String readUtf8String(int start, int byteLen) throws IOException;
 
-  Section getAsciiSection(int offset);
+  Section getAsciiSection(int offset) throws IOException;
 
   enum AdjustDirection {
     LEFT,

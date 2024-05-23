@@ -20,7 +20,7 @@ class FileSourceReaderTest {
   private final int maxCacheEntries = 10;
 
   @Test
-  void shouldReadUtf8StringCorrectly() {
+  void shouldReadUtf8StringCorrectly() throws IOException {
     SourceReader reader = new FileSourceReader(filePath, pointer, 8192, maxCacheEntries);
     // No UTF8 misalignment offset
     assertThat(reader.readUtf8String(422871, 97))

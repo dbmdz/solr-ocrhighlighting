@@ -4,6 +4,7 @@ import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
+import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.Map.Entry;
 
@@ -67,7 +68,7 @@ public abstract class BaseBreakLocator implements BreakLocator {
   }
 
   @Override
-  public int following(int offset) {
+  public int following(int offset) throws IOException {
     if (offset >= this.text.length()) {
       return DONE;
     }
@@ -96,7 +97,7 @@ public abstract class BaseBreakLocator implements BreakLocator {
   }
 
   @Override
-  public int preceding(int offset) {
+  public int preceding(int offset) throws IOException {
     if (offset <= 0) {
       return DONE;
     }
@@ -121,7 +122,7 @@ public abstract class BaseBreakLocator implements BreakLocator {
     return preceding;
   }
 
-  protected abstract int getPreceding(int offset);
+  protected abstract int getPreceding(int offset) throws IOException;
 
-  protected abstract int getFollowing(int offset);
+  protected abstract int getFollowing(int offset) throws IOException;
 }

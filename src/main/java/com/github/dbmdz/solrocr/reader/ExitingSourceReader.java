@@ -1,6 +1,7 @@
 package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
+import java.io.IOException;
 import java.util.Locale;
 import org.apache.lucene.index.QueryTimeout;
 
@@ -37,7 +38,7 @@ public class ExitingSourceReader implements SourceReader {
   }
 
   @Override
-  public void close() {
+  public void close() throws IOException {
     input.close();
   }
 
@@ -52,24 +53,24 @@ public class ExitingSourceReader implements SourceReader {
   }
 
   @Override
-  public int length() {
+  public int length() throws IOException {
     return input.length();
   }
 
   @Override
-  public String readAsciiString(int start, int len) {
+  public String readAsciiString(int start, int len) throws IOException {
     checkAndThrow();
     return input.readAsciiString(start, len);
   }
 
   @Override
-  public String readUtf8String(int start, int byteLen) {
+  public String readUtf8String(int start, int byteLen) throws IOException {
     checkAndThrow();
     return input.readUtf8String(start, byteLen);
   }
 
   @Override
-  public Section getAsciiSection(int offset) {
+  public Section getAsciiSection(int offset) throws IOException {
     checkAndThrow();
     return input.getAsciiSection(offset);
   }

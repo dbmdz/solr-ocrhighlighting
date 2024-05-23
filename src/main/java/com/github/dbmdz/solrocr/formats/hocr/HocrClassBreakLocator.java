@@ -4,6 +4,7 @@ import com.github.dbmdz.solrocr.iter.BaseBreakLocator;
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.github.dbmdz.solrocr.reader.SourceReader.Section;
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.util.List;
 
 public class HocrClassBreakLocator extends BaseBreakLocator {
@@ -20,7 +21,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
   }
 
   @Override
-  protected int getFollowing(int offset) {
+  protected int getFollowing(int offset) throws IOException {
     int globalStart = Math.min(offset + 1, this.text.length());
     String overlapHead = null;
     while (globalStart < this.text.length()) {
@@ -65,7 +66,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
   }
 
   @Override
-  protected int getPreceding(int offset) {
+  protected int getPreceding(int offset) throws IOException {
     if (offset <= 0) {
       return 0;
     }
