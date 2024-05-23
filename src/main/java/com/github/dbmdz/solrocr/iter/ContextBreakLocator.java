@@ -1,6 +1,7 @@
 package com.github.dbmdz.solrocr.iter;
 
 import com.github.dbmdz.solrocr.reader.SourceReader;
+import java.io.IOException;
 
 /**
  * A break locator that wraps other {@link BreakLocator}s and aggregates their breaks to form larger
@@ -20,7 +21,7 @@ public class ContextBreakLocator implements BreakLocator {
   }
 
   @Override
-  public int following(int offset) {
+  public int following(int offset) throws IOException {
     int limit = getText().length();
     if (limitLocator != null) {
       limit = limitLocator.following(offset);
@@ -41,7 +42,7 @@ public class ContextBreakLocator implements BreakLocator {
   }
 
   @Override
-  public int preceding(int offset) {
+  public int preceding(int offset) throws IOException {
     int limit = 0;
     if (limitLocator != null) {
       limit = limitLocator.preceding(offset);

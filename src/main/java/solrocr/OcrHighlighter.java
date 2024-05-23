@@ -446,22 +446,26 @@ public class OcrHighlighter extends UnifiedHighlighter {
                         contentFinal.getPointer(),
                         e);
                   } else {
+                    String debugStr;
+                    try {
+                      debugStr = contentFinal.readUtf8String(0, 256);
+                    } catch (IOException ioexc) {
+                      debugStr = String.format("<could not read content: %s>", ioexc);
+                    }
                     log.error(
                         "Could not highlight OCR for document {} with OCR markup '{}...'",
                         docIdFinal,
-                        contentFinal.readUtf8String(0, 256),
+                        debugStr,
                         e);
                   }
                 } finally {
-                  if (contentFinal instanceof AutoCloseable) {
-                    try {
-                      ((AutoCloseable) contentFinal).close();
-                    } catch (Exception e) {
-                      log.warn(
-                          "Encountered error while closing content iterator for {}: {}",
-                          contentFinal.getPointer(),
-                          e.getMessage());
-                    }
+                  try {
+                    contentFinal.close();
+                  } catch (Exception e) {
+                    log.warn(
+                        "Encountered error while closing content iterator for {}: {}",
+                        contentFinal.getPointer(),
+                        e.getMessage());
                   }
                 }
               };
@@ -619,7 +623,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     return fieldValues;
   }
 
-  private OcrFormat getFormat(SourceReader content) {
+  private OcrFormat getFormat(SourceReader content) throws IOException {
     // Sample the first 4k characters to determine the format
     String sampleChunk = content.readAsciiString(0, Math.min(4096, content.length()));
     return formats.stream().filter(fmt -> fmt.hasFormat(sampleChunk)).findFirst().orElse(null);

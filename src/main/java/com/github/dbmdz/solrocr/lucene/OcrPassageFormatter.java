@@ -15,6 +15,7 @@ import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.github.dbmdz.solrocr.reader.StringSourceReader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -110,12 +111,23 @@ public class OcrPassageFormatter extends PassageFormatter {
                 passage.getEndOffset(),
                 content.getIdentifier());
         logger.error(errorMsg, e);
+      } catch (IOException e) {
+        String errorMsg =
+            String.format(
+                Locale.US,
+                "Could not create snippet (start=%d, end=%d) from content at '%s' due to an I/O error: %s",
+                passage.getStartOffset(),
+                passage.getEndOffset(),
+                content.getIdentifier(),
+                e);
+        logger.error(errorMsg, e);
       }
     }
     return snippets;
   }
 
-  protected String getHighlightedFragment(Passage passage, SourceReader content) {
+  protected String getHighlightedFragment(Passage passage, SourceReader content)
+      throws IOException {
     StringBuilder sb =
         new StringBuilder(content.readUtf8String(passage.getStartOffset(), passage.getLength()));
     int extraChars = 0;
@@ -195,7 +207,7 @@ public class OcrPassageFormatter extends PassageFormatter {
     return position;
   }
 
-  private OcrSnippet format(Passage passage, SourceReader reader) {
+  private OcrSnippet format(Passage passage, SourceReader reader) throws IOException {
     String xmlFragment = getHighlightedFragment(passage, reader);
     OcrPage initialPage = null;
     if (trackPages) {
@@ -209,7 +221,7 @@ public class OcrPassageFormatter extends PassageFormatter {
   }
 
   /** Determine the page an OCR fragment resides on. */
-  OcrPage determineStartPage(int startOffset, SourceReader reader) {
+  OcrPage determineStartPage(int startOffset, SourceReader reader) throws IOException {
     BreakLocator pageBreakLocator = this.format.getBreakLocator(reader, OcrBlock.PAGE);
     int pageOffset = pageBreakLocator.preceding(startOffset);
     if (pageOffset == BreakLocator.DONE) {

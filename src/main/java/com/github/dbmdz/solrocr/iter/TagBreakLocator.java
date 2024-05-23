@@ -2,6 +2,7 @@ package com.github.dbmdz.solrocr.iter;
 
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.github.dbmdz.solrocr.reader.SourceReader.Section;
+import java.io.IOException;
 
 /** A {@link BreakLocator} that splits an XML-like document on a specific opening or closing tag. */
 public class TagBreakLocator extends BaseBreakLocator {
@@ -21,7 +22,7 @@ public class TagBreakLocator extends BaseBreakLocator {
   }
 
   @Override
-  protected int getFollowing(int offset) {
+  protected int getFollowing(int offset) throws IOException {
     String overlapHead = null;
     int globalStart = Math.min(offset + 1, this.text.length());
     while (globalStart < this.text.length()) {
@@ -64,7 +65,7 @@ public class TagBreakLocator extends BaseBreakLocator {
   }
 
   @Override
-  protected int getPreceding(int offset) {
+  protected int getPreceding(int offset) throws IOException {
     String overlapTail = null;
     int globalEnd = offset;
 
