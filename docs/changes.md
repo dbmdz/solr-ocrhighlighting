@@ -5,6 +5,9 @@
   can be tweaked with the `numHighlightingThreads` and `maxQueuedPerThread` attributes on the
   `OcrHighlightComponent` in `solrconfig.xml`.
 - Removed `PageCacheWarmer`, no longer needed due to multithreading support.
+- Completely refactored, simplified and optimized I/O stack to reduce number of file system reads
+  and allocations/data copies during highlighting, accounting for a significant performance improvement
+  over previous versions (4-8 times faster in a synthetic benchmark that was not I/O-bound)
 
 
 ## 0.8.5 (2024-04-25)
