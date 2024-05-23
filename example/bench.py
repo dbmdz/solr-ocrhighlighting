@@ -22,6 +22,7 @@ If you want to profile the plugin:
 """
 
 import argparse
+import gzip
 import json
 import os
 import random
@@ -45,6 +46,7 @@ STRIP_PUNCTUATION_TBL = str.maketrans("", "", string.punctuation)
 class BenchmarkResult(NamedTuple):
     query_times_ms: list[Mapping[str, float]]
     hl_times_ms: list[Mapping[str, float]]
+    responses: Mapping[str, dict] = {}
 
     def mean_query_time(self) -> float:
         return statistics.mean(
@@ -111,6 +113,10 @@ def parse_hocr(hocr_path: Path) -> Iterable[tuple[str, ...]]:
         yield passage
 
 
+def _queryset_worker_fn(p):
+    return analyze_phrases(parse_hocr(p))
+
+
 def build_query_set(
     hocr_base_path: Path, min_count=8, max_count=256
 ) -> Iterable[tuple[str, int]]:
@@ -118,7 +124,7 @@ def build_query_set(
     phrase_counter = Counter()
     with ProcessPoolExecutor(max_workers=cpu_count()) as pool:
         futs = [
-            pool.submit(lambda p: analyze_phrases(parse_hocr(p)), hocr_path)
+            pool.submit(_queryset_worker_fn, hocr_path)
             for hocr_path in hocr_base_path.glob("**/*.hocr")
         ]
         num_completed = 0
@@ -146,7 +152,7 @@ def build_query_set(
 
 def run_query(
     query: str, solr_handler: str, num_rows: int, num_snippets: int
-) -> tuple[float, float]:
+) -> tuple[float, float, dict]:
     query_params = {
         "q": f"ocr_text:{query}",
         "hl": "on",
@@ -161,7 +167,7 @@ def run_query(
         solr_resp = json.load(http_resp)
     hl_duration = solr_resp["debug"]["timing"]["process"]["ocrHighlight"]["time"]
     query_duration = solr_resp["debug"]["timing"]["time"]
-    return query_duration, hl_duration
+    return query_duration, hl_duration, solr_resp
 
 
 def run_benchmark(
@@ -185,6 +191,7 @@ def run_benchmark(
         def _run_query(query):
             return query, run_query(query, solr_handler, num_rows, num_snippets)
 
+        responses: dict[str, dict] = {}
         for iteration_idx in range(iterations):
             iter_futs = [pool.submit(_run_query, query) for query in queries]
 
@@ -192,12 +199,13 @@ def run_benchmark(
             hl_times = {}
             for idx, fut in enumerate(as_completed(iter_futs)):
                 try:
-                    query, (query_time, hl_time) = fut.result()
+                    query, (query_time, hl_time, resp) = fut.result()
                 except Exception as e:
                     print(f"\nError: {e}", file=sys.stderr)
                     continue
                 query_times[query] = query_time
                 hl_times[query] = hl_time
+                responses[query] = resp
                 hl_factor = statistics.mean(hl_times.values()) / statistics.mean(
                     query_times.values()
                 )
@@ -212,7 +220,7 @@ def run_benchmark(
             all_query_times.append(query_times)
             all_hl_times.append(hl_times)
 
-        return BenchmarkResult(all_query_times, all_hl_times)
+        return BenchmarkResult(all_query_times, all_hl_times, responses)
 
 
 if __name__ == "__main__":
@@ -245,7 +253,14 @@ if __name__ == "__main__":
         type=str,
         default=None,
         metavar="PATH",
-        help="Path to save the results to as a JSON file (optional)",
+        help="Path to save the benchmarking results for every query to as a JSON file (optional)",
+    )
+    parser.add_argument(
+        "--save-responses",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help="Path to save the responses for every query to as a JSON file (optional)",
     )
     parser.add_argument(
         "--num-rows",
@@ -271,8 +286,6 @@ if __name__ == "__main__":
 
     if os.path.exists(args.queries_path):
         if args.queries_path.endswith(".gz"):
-            import gzip
-
             with gzip.open(args.queries_path, "rt") as f:
                 queries = set(
                     q for q in (line.strip() for line in cast(TextIO, f)) if q
@@ -284,8 +297,6 @@ if __name__ == "__main__":
         hocr_base_path = Path("./data/google1000")
         queries = set(q for q, _ in build_query_set(hocr_base_path))
         if args.queries_path.endswith(".gz"):
-            import gzip
-
             with cast(TextIO, gzip.open(args.queries_path, "wt", compresslevel=9)) as f:
                 f.write("\n".join(queries))
         else:
@@ -318,3 +329,7 @@ if __name__ == "__main__":
                 },
                 f,
             )
+
+    if args.save_responses:
+        with cast(TextIO, gzip.open(args.save_responses, "wt", compresslevel=9)) as f:
+            json.dump(results.responses, f)
