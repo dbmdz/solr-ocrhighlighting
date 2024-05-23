@@ -3,62 +3,45 @@ package com.github.dbmdz.solrocr.reader;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.util.ArrayUtils;
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
+import java.lang.invoke.MethodHandles;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MultiFileSourceReader extends BaseSourceReader {
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+  private static final class OpenFile {
+    private final FileChannel channel;
+    final int startOffset;
+    final Path path;
+
+    private OpenFile(Path p, int startOffset) throws IOException {
+      this.path = p;
+      channel = FileChannel.open(p, StandardOpenOption.READ);
+      this.startOffset = startOffset;
+    }
+
+    public int read(byte[] dst, int dstOffset, int start, int len) throws IOException {
+      return this.channel.read(ByteBuffer.wrap(dst, dstOffset, len), start);
+    }
+
+    public void close() throws IOException {
+      this.channel.close();
+    }
+  }
+
   private final Path[] paths;
   private final OpenFile[] openFiles;
   private final int[] startOffsets;
   private final int numBytes;
-
-  private static final class OpenFile {
-    private final Path path;
-    private final FileChannel channel;
-    private final MappedByteBuffer mappedByteBuffer;
-    private final int numBytes;
-    final int startOffset;
-
-    private OpenFile(Path path, int startOffset) {
-      this.path = path;
-      this.startOffset = startOffset;
-      try {
-        this.channel = (FileChannel) Files.newByteChannel(path, StandardOpenOption.READ);
-        this.numBytes = (int) channel.size();
-        this.mappedByteBuffer = channel.map(MapMode.READ_ONLY, 0, numBytes);
-      } catch (IOException e) {
-        // Should've been caught by source pointer validation
-        throw new RuntimeException(e);
-      }
-    }
-
-    int read(byte[] dst, int dstOffset, int start, int len) {
-      if (dst.length < dstOffset + len) {
-        throw new IllegalArgumentException("Destination buffer is too small");
-      }
-      int readLen = Math.min(len, numBytes - start);
-      this.mappedByteBuffer.mark();
-      this.mappedByteBuffer.position(start);
-      this.mappedByteBuffer.get(dst, dstOffset, readLen);
-      this.mappedByteBuffer.reset();
-      return readLen;
-    }
-
-    public void close() {
-      try {
-        this.channel.close();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
 
   public MultiFileSourceReader(
       List<Path> paths, SourcePointer ptr, int sectionSize, int maxCacheEntries) {
@@ -80,7 +63,7 @@ public class MultiFileSourceReader extends BaseSourceReader {
   }
 
   @Override
-  protected int readBytes(byte[] dst, int dstOffset, int start, int len) {
+  protected int readBytes(byte[] dst, int dstOffset, int start, int len) throws IOException {
     int fileIdx = ArrayUtils.binaryFloorIdxSearch(startOffsets, start);
     if (fileIdx < 0) {
       throw new RuntimeException(String.format("Offset %d is out of bounds", start));
@@ -115,12 +98,16 @@ public class MultiFileSourceReader extends BaseSourceReader {
   }
 
   @Override
-  public void close() {
+  public void close() throws IOException {
     for (OpenFile file : openFiles) {
       if (file == null) {
         continue;
       }
-      file.close();
+      try {
+        file.close();
+      } catch (IOException e) {
+        log.error(String.format("Failed to close file at %s: %s", file.path, e.getMessage()), e);
+      }
     }
   }
 

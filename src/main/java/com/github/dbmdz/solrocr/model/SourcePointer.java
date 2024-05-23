@@ -152,7 +152,7 @@ public class SourcePointer {
     return sources.stream().map(FileSource::toString).collect(Collectors.joining("+"));
   }
 
-  public SourceReader getReader(int sectionSize, int maxCacheEntries) {
+  public SourceReader getReader(int sectionSize, int maxCacheEntries) throws IOException {
     if (this.sources.size() == 1) {
       return new FileSourceReader(this.sources.get(0).path, this, sectionSize, maxCacheEntries);
     } else {

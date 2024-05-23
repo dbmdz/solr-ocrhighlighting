@@ -2,57 +2,44 @@ package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 public class FileSourceReader extends BaseSourceReader {
-  private final Path filePath;
+  private final Path path;
   private final FileChannel chan;
-  private final MappedByteBuffer buf;
-  private final int fileSizeBytes;
+  private int fileSizeBytes = -1;
 
-  public FileSourceReader(Path filePath, SourcePointer ptr, int sectionSize, int maxCacheEntries) {
+  public FileSourceReader(Path path, SourcePointer ptr, int sectionSize, int maxCacheEntries)
+      throws IOException {
     super(ptr, sectionSize, maxCacheEntries);
-    this.filePath = filePath;
-    try {
-      this.chan = (FileChannel) Files.newByteChannel(filePath, StandardOpenOption.READ);
-      this.fileSizeBytes = (int) chan.size();
-      this.buf = chan.map(FileChannel.MapMode.READ_ONLY, 0, fileSizeBytes);
-    } catch (IOException e) {
-      // Should have been caught by SourcePointer validation
-      throw new RuntimeException(e);
+    this.path = path;
+    this.chan = (FileChannel) Files.newByteChannel(path, StandardOpenOption.READ);
+  }
+
+  @Override
+  protected int readBytes(byte[] dst, int dstOffset, int start, int len) throws IOException {
+    return this.chan.read(ByteBuffer.wrap(dst, dstOffset, len), start);
+  }
+
+  @Override
+  public int length() throws IOException {
+    if (this.fileSizeBytes < 0) {
+      this.fileSizeBytes = (int) this.chan.size();
     }
-  }
-
-  @Override
-  protected int readBytes(byte[] dst, int dstOffset, int start, int len) {
-    this.buf.mark();
-    this.buf.position(start);
-    int readLen = Math.min(len, this.length() - start);
-    this.buf.get(dst, dstOffset, len);
-    this.buf.reset();
-    return readLen;
-  }
-
-  @Override
-  public int length() {
     return this.fileSizeBytes;
   }
 
   @Override
-  public void close() {
-    try {
-      this.chan.close();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  public void close() throws IOException {
+    this.chan.close();
   }
 
   @Override
   public String getIdentifier() {
-    return this.filePath.toAbsolutePath().toString();
+    return this.path.toString();
   }
 }

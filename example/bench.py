@@ -34,7 +34,7 @@ import xml.etree.ElementTree as etree
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Iterable, Mapping, NamedTuple, TextIO, cast
+from typing import Iterable, Mapping, NamedTuple, Sequence, TextIO, cast
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from collections import Counter
@@ -44,9 +44,9 @@ STRIP_PUNCTUATION_TBL = str.maketrans("", "", string.punctuation)
 
 
 class BenchmarkResult(NamedTuple):
-    query_times_ms: list[Mapping[str, float]]
-    hl_times_ms: list[Mapping[str, float]]
-    responses: Mapping[str, dict] = {}
+    query_times_ms: Sequence[Mapping[str, float]]
+    hl_times_ms: Sequence[Mapping[str, float]]
+    responses: Sequence[Mapping[str, dict]] = []
 
     def mean_query_time(self) -> float:
         return statistics.mean(
@@ -191,7 +191,7 @@ def run_benchmark(
         def _run_query(query):
             return query, run_query(query, solr_handler, num_rows, num_snippets)
 
-        responses: dict[str, dict] = {}
+        responses: list[dict[str, dict]] = []
         for iteration_idx in range(iterations):
             iter_futs = [pool.submit(_run_query, query) for query in queries]
 
@@ -205,7 +205,7 @@ def run_benchmark(
                     continue
                 query_times[query] = query_time
                 hl_times[query] = hl_time
-                responses[query] = resp
+                responses.append({query: resp})
                 hl_factor = statistics.mean(hl_times.values()) / statistics.mean(
                     query_times.values()
                 )
