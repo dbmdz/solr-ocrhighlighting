@@ -470,7 +470,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                 log.warn("OCR Highlighting timed out while handling " + content.getPointer(), e);
               }
               resultByDocIn[docInIndex] = null;
-              break;
+              break docLoop;
             }
           }
         }
