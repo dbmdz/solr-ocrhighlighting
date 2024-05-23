@@ -16,13 +16,17 @@ Before you start tuning the plugin, it is important to spend some time on analyz
 
 - Check Solr queries with `debug=timing`: How much of the response time is actually spent in the OCR highlighting
   component?
+- On newer Linux kernels, check the Pressure Stall Information (PSI) metrics with `htop` or by looking
+  at `/proc/pressure/{io,cpu}`. This can give you an indication if the system is I/O-bottlenecked or
+  CPU-bottlenecked.
 - On the operating system level (if you're on a Linux system), use [BCC Tools](https://github.com/iovisor/bcc),
   especially `{nfs/xfs/ext/...}slower` and `{nfs/xfs/ext/...}dist` to check if the performance issues are due to I/O
   latency.
 
 ## Storage Layer
-The plugin spends a lot of time on randomly reading small sections of the target files from disk. This means that
-the performance characteristics of the underlying storage system have a huge effect on the performance of the plugin.
+The plugin spends a lot of time reading small sections of the target files from disk. This means that
+the performance characteristics of the underlying storage system have a huge effect on the performance
+of the plugin.
 
 Important factors include:
 
@@ -32,6 +36,21 @@ Important factors include:
 Generally speaking, local storage is better than remote storage (like NFS or CIFS), due to the network latency, and
 flash-based storage is better than disk-based storage, due to the lower random read latency and the possibility to
 do parallel reads. A RAID1/10 setup is preferred over a RAID0/JBOD setup, due to the increased potential for parallel reads.
+
+## Concurrency
+The plugin can read multiple files in parallel and also process them concurrently. By default, it will
+use as many threads as there are available logical CPU cores on the machine, but this can be tweaked
+with the `numHighlightingThreads` and `maxQueuedPerThread` parameters on the `OcrHighlightComponent`
+in your `solrconfig.xml`. Tune these parameters to match your hardware and storage layer.
+
+- `numHighlightingThreads`: The number of threads that will be used to read and process the OCR files.
+   Defaults to the number of logical CPU cores. Set this higher if you're I/O-bottlenecked and can
+   support more parallel reads than you have logical CPU cores (very likely for modern NVMe drives).
+- `maxQueuedPerThread`: By default, we queue only a limited number of documents per thread as to not
+  stall other requests. If this number is reached, all highlighting will be done single-threaded on
+  the request thread. You usually don't have to touch this setting, but if you have large result sets
+  with many concurrent requests, this can help to reduce the number of threads that are active at
+  the same time, at least as a stopgap.
 
 ## Runtime configuration
 Another option to influence the performance of the plugin is to tune some runtime options for highlighting.

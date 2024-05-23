@@ -1,3 +1,12 @@
+## Unreleased
+
+**Changed:**
+- Add support for multithreaded highlighting. Uses all available logical CPU cores by default and
+  can be tweaked with the `numHighlightingThreads` and `maxQueuedPerThread` attributes on the
+  `OcrHighlightComponent` in `solrconfig.xml`.
+- Removed `PageCacheWarmer`, no longer needed due to multithreading support.
+
+
 ## 0.8.5 (2024-04-25)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.5)
 
