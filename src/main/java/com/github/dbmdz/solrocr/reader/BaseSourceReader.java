@@ -23,21 +23,21 @@ public abstract class BaseSourceReader implements SourceReader {
    * Array with a slot for every possible section in the source, of which only {@link
    * BaseSourceReader#maxCacheEntries} slots will ever be non-null
    */
-  private CachedSection[] cache;
+  CachedSection[] cache;
   /**
    * Array of length {@link BaseSourceReader#maxCacheEntries} with the indexes of the sections that
    * are currently cached
    */
-  private int[] cachedSectionIdxes;
+  int[] cachedSectionIdxes;
 
-  private int cacheSlotsUsed = 0;
+  int cacheSlotsUsed = 0;
 
   private enum AdjustDirection {
     LEFT,
     RIGHT
   }
 
-  private static final class CachedSection {
+  static final class CachedSection {
     public final Section section;
     public long lastUsedTimestampNs;
 
