@@ -43,6 +43,7 @@ import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.github.dbmdz.solrocr.reader.StringSourceReader;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
+import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -51,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -100,6 +100,8 @@ import org.slf4j.LoggerFactory;
 public class OcrHighlighter extends UnifiedHighlighter {
 
   private static final Logger log = LoggerFactory.getLogger(OcrHighlighter.class);
+
+  private static final Set<OcrFormat> FORMATS = ImmutableSet.of(new HocrFormat(), new AltoFormat(), new MiniOcrFormat());
 
   private static final CharacterRunAutomaton[] ZERO_LEN_AUTOMATA_ARRAY_LEGACY =
       new CharacterRunAutomaton[0];
@@ -233,7 +235,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
   private final SolrParams params;
   private final SolrQueryRequest req;
-  private final Set<OcrFormat> formats;
   private final int readerSectionSize;
   private final int readerMaxCacheEntries;
 
@@ -248,10 +249,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
     this.req = req;
     this.readerSectionSize = readerSectionSize;
     this.readerMaxCacheEntries = readerMaxCacheEntries;
-    this.formats = new HashSet<>();
-    this.formats.add(new HocrFormat());
-    this.formats.add(new AltoFormat());
-    this.formats.add(new MiniOcrFormat());
   }
 
   @Override
@@ -626,7 +623,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private OcrFormat getFormat(SourceReader content) throws IOException {
     // Sample the first 4k characters to determine the format
     String sampleChunk = content.readAsciiString(0, Math.min(4096, content.length()));
-    return formats.stream().filter(fmt -> fmt.hasFormat(sampleChunk)).findFirst().orElse(null);
+    return FORMATS.stream().filter(fmt -> fmt.hasFormat(sampleChunk)).findFirst().orElse(null);
   }
 
   /**

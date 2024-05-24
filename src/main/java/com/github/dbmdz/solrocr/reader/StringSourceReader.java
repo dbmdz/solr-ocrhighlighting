@@ -1,17 +1,14 @@
 package com.github.dbmdz.solrocr.reader;
 
-public class StringSourceReader extends BaseSourceReader {
+import com.github.dbmdz.solrocr.model.SourcePointer;
+
+/** SourceReader that reads from a String. */
+public class StringSourceReader implements SourceReader {
 
   private final String str;
 
   public StringSourceReader(String str) {
-    super(null, str.length(), 0);
     this.str = str;
-  }
-
-  @Override
-  protected int readBytes(byte[] dst, int dstOffset, int start, int len) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -39,6 +36,11 @@ public class StringSourceReader extends BaseSourceReader {
   @Override
   public void close() {
     // NOP
+  }
+
+  @Override
+  public SourcePointer getPointer() {
+    return null;
   }
 
   @Override

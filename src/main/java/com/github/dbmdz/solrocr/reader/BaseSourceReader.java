@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/** Base class that provides caching and section reading for source readers.
+ *
+ * <p>
+ * Implementers should inherit from this and simply implement the
+ * {@link BaseSourceReader#readBytes(byte[], int, int, int)} method.*/
 public abstract class BaseSourceReader implements SourceReader {
 
   protected final SourcePointer pointer;
@@ -15,6 +20,11 @@ public abstract class BaseSourceReader implements SourceReader {
   private CachedSection[] cache;
   private int[] cachedSectionIdxes;
   private int cacheSlotsUsed = 0;
+
+  private enum AdjustDirection {
+    LEFT,
+    RIGHT
+  }
 
   private static final class CachedSection {
     public final Section section;
@@ -33,6 +43,9 @@ public abstract class BaseSourceReader implements SourceReader {
     this.maxCacheEntries = maxCacheEntries;
   }
 
+  /** Read {@param len} bytes starting at {@param start} from the source into the buffer {@param dst}
+    * starting at offset {@param dstOffset}, returning the number of bytes read.
+    */
   protected abstract int readBytes(byte[] dst, int dstOffset, int start, int len)
       throws IOException;
 
@@ -50,9 +63,15 @@ public abstract class BaseSourceReader implements SourceReader {
     return pointer;
   }
 
+  /** Initialize data structures for section cache.
+   *
+   * <p>
+   *  Gotta do this outside of the constructor because we need to know the length,
+   *  which is only available after the constructor has run
+   *
+   * @throws IOException
+   */
   private void initializeCache() throws IOException {
-    // Gotta do this outside of the constructor because we need to know the length,
-    // which is only available after the constructor has run
     // We trade off some memory for a simpler implementation by using a fixed-size cache
     // with `null` entries for unused slots plus a timestamp array to track LRU
     // The memory impact is not too bad, even for small section sizes like 1KiB, the
@@ -63,6 +82,7 @@ public abstract class BaseSourceReader implements SourceReader {
     Arrays.fill(cachedSectionIdxes, -1);
   }
 
+  /** If the cache is full, remove the least recently used section */
   private void purgeLeastRecentlyUsed() {
     if (this.cache.length == 0 || cacheSlotsUsed < this.cache.length) {
       return;
@@ -185,6 +205,9 @@ public abstract class BaseSourceReader implements SourceReader {
     int startOffset = sectionIndex * sectionSize;
     int readLen = Math.min(sectionSize, this.length() - startOffset);
     this.readBytes(copyBuf, 0, startOffset, readLen);
+    // Construct a String without going through a decoder to save on CPU.
+    // Given that the method has been deprecated since Java 1.1 and was never removed, I don't think
+    // this is very risky 😅
     Section section =
         new Section(startOffset, startOffset + sectionSize, new String(copyBuf, 0, 0, readLen));
     if (cache.length > 0 && cacheSlotsUsed == cache.length) {

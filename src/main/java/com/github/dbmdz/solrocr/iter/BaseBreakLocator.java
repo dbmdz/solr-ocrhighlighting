@@ -49,7 +49,9 @@ public abstract class BaseBreakLocator implements BreakLocator {
     this.text = text;
   }
 
+  /** Check if a substring of a string is all whitespace. */
   protected static boolean isAllBlank(String s, int from, int to) {
+    // Treat Unicode BOM as whitespace
     if (s.startsWith(BOM_ASCII)) {
       from += BOM_ASCII.length();
     }
