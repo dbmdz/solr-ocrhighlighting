@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+/** Reads from a single file source using a {@link FileChannel}. */
 public class FileSourceReader extends BaseSourceReader {
   private final Path path;
   private final FileChannel chan;

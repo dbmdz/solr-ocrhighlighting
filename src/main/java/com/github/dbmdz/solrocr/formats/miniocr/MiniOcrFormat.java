@@ -10,7 +10,6 @@ import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.ImmutableMap;
 import java.awt.Dimension;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,23 +27,7 @@ public class MiniOcrFormat implements OcrFormat {
           OcrBlock.LINE, "l",
           OcrBlock.WORD, "w");
 
-  private final Map<OcrBlock, Integer> blockReadSizes;
-
   public MiniOcrFormat() {
-    this(null);
-  }
-
-  public MiniOcrFormat(Map<OcrBlock, Integer> blockReadSizes) {
-    if (blockReadSizes == null) {
-      blockReadSizes = new HashMap<>();
-    }
-    blockReadSizes.putIfAbsent(OcrBlock.PAGE, 16 * 1024);
-    blockReadSizes.putIfAbsent(OcrBlock.BLOCK, 8 * 1024);
-    blockReadSizes.putIfAbsent(OcrBlock.SECTION, 8 * 1024);
-    blockReadSizes.putIfAbsent(OcrBlock.PARAGRAPH, 2 * 1024);
-    blockReadSizes.putIfAbsent(OcrBlock.LINE, 1024);
-    blockReadSizes.putIfAbsent(OcrBlock.WORD, 128);
-    this.blockReadSizes = ImmutableMap.copyOf(blockReadSizes);
   }
 
   @Override

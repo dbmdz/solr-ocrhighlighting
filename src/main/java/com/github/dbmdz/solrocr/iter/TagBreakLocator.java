@@ -25,12 +25,16 @@ public class TagBreakLocator extends BaseBreakLocator {
   protected int getFollowing(int offset) throws IOException {
     String overlapHead = null;
     int globalStart = Math.min(offset + 1, this.text.length());
+    // Read the source section-wise  to cut down on String allocations and improve the chance of
+    // cache hits in the reader
     while (globalStart < this.text.length()) {
       Section section = this.text.getAsciiSection(globalStart);
       String block = section.text;
       int blockStart = globalStart - section.start;
 
       if (overlapHead != null) {
+        // If the previous section ended with a partial tag, we need to check if the overlapHead
+        // combined with the new section until the closing tag contains the breakTag
         int firstTagClose = block.indexOf('>');
         int overlapStart = globalStart - overlapHead.length();
         String overlap = overlapHead.concat(block.substring(0, firstTagClose + 1));
@@ -42,13 +46,13 @@ public class TagBreakLocator extends BaseBreakLocator {
         overlapHead = null;
       }
 
-      // Truncate block to last '>' and keep the rest for the next iteration if needed
+      // Truncate block to last '>'
       int blockEnd = block.length();
       int lastTagClose = block.lastIndexOf('>');
       if (lastTagClose > 0 && !isAllBlank(block, lastTagClose + 1, blockEnd)) {
         String overlap = block.substring(lastTagClose + 1, blockEnd);
         if (overlap.indexOf('<') >= 0) {
-          // Overlap has the start of a tag, carry over to next iteration
+          // Overlap has an incomplete start of a tag, carry over to next iteration
           overlapHead = overlap;
         }
         blockEnd = lastTagClose + 1;
@@ -69,12 +73,16 @@ public class TagBreakLocator extends BaseBreakLocator {
     String overlapTail = null;
     int globalEnd = offset;
 
+    // Read the source section-wise  to cut down on String allocations and improve the chance of
+    // cache hits in the reader
     while (globalEnd > 0) {
       Section section = this.text.getAsciiSection(globalEnd);
       String block = section.text;
       int blockEnd = globalEnd - section.start;
 
       if (overlapTail != null) {
+        // If the previous section started with a partial tag, we need to check if the overlapTail
+        // combined with the new section until the opening tag contains the breakTag
         int lastTagOpen = block.lastIndexOf('<');
         String overlapHead = block.substring(lastTagOpen);
         String overlap = overlapHead.concat(overlapTail);

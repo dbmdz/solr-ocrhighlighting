@@ -24,6 +24,8 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
   protected int getFollowing(int offset) throws IOException {
     int globalStart = Math.min(offset + 1, this.text.length());
     String overlapHead = null;
+    // Read the source section-wise  to cut down on String allocations and improve the chance of
+    // cache hits in the reader
     while (globalStart < this.text.length()) {
       Section section = this.text.getAsciiSection(globalStart);
       String block = section.text;
@@ -71,6 +73,8 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
       return 0;
     }
 
+    // Read the source section-wise  to cut down on String allocations and improve the chance of
+    // cache hits in the reader
     String overlapTail = null;
     int globalEnd = Math.max(0, offset - 1);
     while (globalEnd > 0) {
@@ -117,6 +121,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
     return 0;
   }
 
+  /** Find a match for one of the break classes in the given String, seeking forward. */
   private int findForwardMatch(String text, int fromOffset, int toOffset) {
     for (String breakClass : this.breakClasses) {
       // Where to start looking from for a break in the next iteration
@@ -157,6 +162,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
     return -1;
   }
 
+  /** Find a match for one of the break classes in the given String, seeking backwards. */
   private int findBackwardMatch(String text, int fromOffset, int toOffset) {
     if (fromOffset == 0 || fromOffset == toOffset) {
       return -1;
