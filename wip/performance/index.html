@@ -366,9 +366,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#plugin-configuration" class="md-nav__link">
+  <a href="#concurrency" class="md-nav__link">
     <span class="md-ellipsis">
-      Plugin configuration
+      Concurrency
     </span>
   </a>
   
@@ -476,9 +476,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#plugin-configuration" class="md-nav__link">
+  <a href="#concurrency" class="md-nav__link">
     <span class="md-ellipsis">
-      Plugin configuration
+      Concurrency
     </span>
   </a>
   
@@ -528,13 +528,17 @@ as of September 2021 is OpenJDK 17.</p>
 <ul>
 <li>Check Solr queries with <code>debug=timing</code>: How much of the response time is actually spent in the OCR highlighting
   component?</li>
+<li>On newer Linux kernels, check the Pressure Stall Information (PSI) metrics with <code>htop</code> or by looking
+  at <code>/proc/pressure/{io,cpu}</code>. This can give you an indication if the system is I/O-bottlenecked or
+  CPU-bottlenecked.</li>
 <li>On the operating system level (if you're on a Linux system), use <a href="https://github.com/iovisor/bcc">BCC Tools</a>,
   especially <code>{nfs/xfs/ext/...}slower</code> and <code>{nfs/xfs/ext/...}dist</code> to check if the performance issues are due to I/O
   latency.</li>
 </ul>
 <h2 id="storage-layer">Storage Layer</h2>
-<p>The plugin spends a lot of time on randomly reading small sections of the target files from disk. This means that
-the performance characteristics of the underlying storage system have a huge effect on the performance of the plugin.</p>
+<p>The plugin spends a lot of time reading small sections of the target files from disk. This means that
+the performance characteristics of the underlying storage system have a huge effect on the performance
+of the plugin.</p>
 <p>Important factors include:</p>
 <ul>
 <li><em>Random Read Latency</em>: What is the time required to seek to a random location and read a small chunk?</li>
@@ -543,32 +547,21 @@ the performance characteristics of the underlying storage system have a huge eff
 <p>Generally speaking, local storage is better than remote storage (like NFS or CIFS), due to the network latency, and
 flash-based storage is better than disk-based storage, due to the lower random read latency and the possibility to
 do parallel reads. A RAID1/10 setup is preferred over a RAID0/JBOD setup, due to the increased potential for parallel reads.</p>
-<h2 id="plugin-configuration">Plugin configuration</h2>
-<p>The plugin offers the possibility to perform a <strong>concurrent read-ahead of highlighting target files</strong>. This will perform
-"dummy" reads on multiple parallel threads, with the intent to fill the operating system's page cache with the contents
-of the highlighting targets, so that the actual highlighting process is performed on data read from the cache (which
-resides in main memory). This is mainly useful for storage layers that benefit from parallel reads, since the highlighting
-process is strongly sequential and performing the read-ahead concurrently can reduce latency.</p>
-<p>To enable it, add the <code>enablePreload=true</code> attribute on the OCR highlighting component in your core's <code>solrconfig.xml</code>.
-It is important to accompany this with benchmarking and monitoring, the available settings should be tuned to the
-environment:</p>
+<h2 id="concurrency">Concurrency</h2>
+<p>The plugin can read multiple files in parallel and also process them concurrently. By default, it will
+use as many threads as there are available logical CPU cores on the machine, but this can be tweaked
+with the <code>numHighlightingThreads</code> and <code>maxQueuedPerThread</code> parameters on the <code>OcrHighlightComponent</code>
+in your <code>solrconfig.xml</code>. Tune these parameters to match your hardware and storage layer.</p>
 <ul>
-<li><code>preloadReadSize</code>: Size in bytes of read-ahead block reads, should be aligned with file system block size
-  (or <code>rsize</code> for NFS file systems). Defaults to <code>32768</code>.</li>
-<li><code>preloadConcurrency</code>: Number of threads to perform read-ahead. Optimal settings have to be determined via
-  experimentation. Defaults to <code>8</code>.</li>
+<li><code>numHighlightingThreads</code>: The number of threads that will be used to read and process the OCR files.
+   Defaults to the number of logical CPU cores. Set this higher if you're I/O-bottlenecked and can
+   support more parallel reads than you have logical CPU cores (very likely for modern NVMe drives).</li>
+<li><code>maxQueuedPerThread</code>: By default, we queue only a limited number of documents per thread as to not
+  stall other requests. If this number is reached, all highlighting will be done single-threaded on
+  the request thread. You usually don't have to touch this setting, but if you have large result sets
+  with many concurrent requests, this can help to reduce the number of threads that are active at
+  the same time, at least as a stopgap.</li>
 </ul>
-<p>This approach relies on the OS-level page cache, so make sure you have enough spare RAM available on your machine to
-actually benefit from this! Use BCC's <code>*slower</code> tools to verify that it's a <code>solr-ocrhighlight</code> thread that performs
-most of the reads and not the actual query thread (<code>qtp....</code>). If you run the same query twice, you shouldn't see a lot
-of reads from either the <code>qtp...</code> or <code>solr-ocrhlighight</code> threads on  the second run.</p>
-<p>Example configuration tuned for remote NFS storage mounted with <code>rsize=65536</code>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&lt;searchComponent</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="na">class=</span><span class="s">&quot;solrocr.OcrHighlightComponent&quot;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="na">name=</span><span class="s">&quot;ocrHighlight&quot;</span><span class="w"> </span><span class="na">enablePreload=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">preloadReadSize=</span><span class="s">&quot;65536&quot;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="na">preloadConcurrency=</span><span class="s">&quot;8&quot;</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">/&gt;</span>
-</code></pre></div></p>
 <h2 id="runtime-configuration">Runtime configuration</h2>
 <p>Another option to influence the performance of the plugin is to tune some runtime options for highlighting.
 For any of these, refer to the <a href="https://dbmdz.github.io/solr-ocrhighlighting/query/">Querying section</a> for more details.</p>
