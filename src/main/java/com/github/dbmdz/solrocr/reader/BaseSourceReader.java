@@ -19,7 +19,10 @@ public abstract class BaseSourceReader implements SourceReader {
   private final byte[] copyBuf;
   private final int maxCacheEntries;
 
-  /** Array with a slot for every possible section in the source */
+  /**
+   * Array with a slot for every possible section in the source, of which only {@link
+   * BaseSourceReader#maxCacheEntries} slots will ever be non-null
+   */
   private CachedSection[] cache;
   /**
    * Array of length {@link BaseSourceReader#maxCacheEntries} with the indexes of the sections that
