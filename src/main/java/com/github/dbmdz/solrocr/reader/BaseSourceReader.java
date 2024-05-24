@@ -223,7 +223,7 @@ public abstract class BaseSourceReader implements SourceReader {
     // this is very risky 😅
     Section section =
         new Section(startOffset, startOffset + sectionSize, new String(copyBuf, 0, 0, readLen));
-    if (cache.length > 0 && cacheSlotsUsed == cache.length) {
+    if (cache.length > 0 && cacheSlotsUsed == maxCacheEntries) {
       purgeLeastRecentlyUsed();
     }
     if (cache.length > 0) {
