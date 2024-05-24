@@ -5,20 +5,28 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-/** Base class that provides caching and section reading for source readers.
+/**
+ * Base class that provides caching and section reading for source readers.
  *
- * <p>
- * Implementers should inherit from this and simply implement the
- * {@link BaseSourceReader#readBytes(byte[], int, int, int)} method.*/
+ * <p>Implementers should inherit from this and simply implement the {@link
+ * BaseSourceReader#readBytes(byte[], int, int, int)} method.
+ */
 public abstract class BaseSourceReader implements SourceReader {
+  private static final int UNUSED = -1;
 
   protected final SourcePointer pointer;
   protected final int sectionSize;
   private final byte[] copyBuf;
   private final int maxCacheEntries;
 
+  /** Array with a slot for every possible section in the source */
   private CachedSection[] cache;
+  /**
+   * Array of length {@link BaseSourceReader#maxCacheEntries} with the indexes of the sections that
+   * are currently cached
+   */
   private int[] cachedSectionIdxes;
+
   private int cacheSlotsUsed = 0;
 
   private enum AdjustDirection {
@@ -28,11 +36,11 @@ public abstract class BaseSourceReader implements SourceReader {
 
   private static final class CachedSection {
     public final Section section;
-    public long lastUsedTimestamp;
+    public long lastUsedTimestampNs;
 
     private CachedSection(Section section) {
       this.section = section;
-      this.lastUsedTimestamp = System.nanoTime();
+      this.lastUsedTimestampNs = System.nanoTime();
     }
   }
 
@@ -43,9 +51,10 @@ public abstract class BaseSourceReader implements SourceReader {
     this.maxCacheEntries = maxCacheEntries;
   }
 
-  /** Read {@param len} bytes starting at {@param start} from the source into the buffer {@param dst}
-    * starting at offset {@param dstOffset}, returning the number of bytes read.
-    */
+  /**
+   * Read {@param len} bytes starting at {@param start} from the source into the buffer {@param dst}
+   * starting at offset {@param dstOffset}, returning the number of bytes read.
+   */
   protected abstract int readBytes(byte[] dst, int dstOffset, int start, int len)
       throws IOException;
 
@@ -63,11 +72,11 @@ public abstract class BaseSourceReader implements SourceReader {
     return pointer;
   }
 
-  /** Initialize data structures for section cache.
+  /**
+   * Initialize data structures for section cache.
    *
-   * <p>
-   *  Gotta do this outside of the constructor because we need to know the length,
-   *  which is only available after the constructor has run
+   * <p>Gotta do this outside of the constructor because we need to know the length, which is only
+   * available after the constructor has run
    *
    * @throws IOException
    */
@@ -79,27 +88,31 @@ public abstract class BaseSourceReader implements SourceReader {
     int numSections = (int) Math.ceil((double) this.length() / sectionSize);
     this.cache = new CachedSection[numSections];
     this.cachedSectionIdxes = new int[maxCacheEntries];
-    Arrays.fill(cachedSectionIdxes, -1);
+    Arrays.fill(cachedSectionIdxes, UNUSED);
   }
 
   /** If the cache is full, remove the least recently used section */
   private void purgeLeastRecentlyUsed() {
-    if (this.cache.length == 0 || cacheSlotsUsed < this.cache.length) {
+    if (this.cache.length == 0 || cacheSlotsUsed < maxCacheEntries) {
       return;
     }
 
     long oldestTimestamp = Long.MAX_VALUE;
     int oldestIndex = -1;
-    for (int sectionIdx : cachedSectionIdxes) {
+    int idxOfOldestIndex = -1;
+    for (int i = 0; i < cachedSectionIdxes.length; i++) {
+      int sectionIdx = cachedSectionIdxes[i];
       if (sectionIdx < 0) {
         continue;
       }
-      if (cache[sectionIdx].lastUsedTimestamp < oldestTimestamp) {
-        oldestTimestamp = cache[sectionIdx].lastUsedTimestamp;
+      if (cache[sectionIdx].lastUsedTimestampNs < oldestTimestamp) {
+        oldestTimestamp = cache[sectionIdx].lastUsedTimestampNs;
         oldestIndex = sectionIdx;
+        idxOfOldestIndex = i;
       }
     }
     cache[oldestIndex] = null;
+    cachedSectionIdxes[idxOfOldestIndex] = UNUSED;
     cacheSlotsUsed--;
   }
 
@@ -199,7 +212,7 @@ public abstract class BaseSourceReader implements SourceReader {
       initializeCache();
     }
     if (cache[sectionIndex] != null) {
-      cache[sectionIndex].lastUsedTimestamp = System.nanoTime();
+      cache[sectionIndex].lastUsedTimestampNs = System.nanoTime();
       return cache[sectionIndex].section;
     }
     int startOffset = sectionIndex * sectionSize;
@@ -214,6 +227,12 @@ public abstract class BaseSourceReader implements SourceReader {
       purgeLeastRecentlyUsed();
     }
     if (cache.length > 0) {
+      for (int i = 0; i < cachedSectionIdxes.length; i++) {
+        if (cachedSectionIdxes[i] < 0) {
+          cachedSectionIdxes[i] = sectionIndex;
+          break;
+        }
+      }
       cache[sectionIndex] = new CachedSection(section);
       cacheSlotsUsed++;
     }

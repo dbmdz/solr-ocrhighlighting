@@ -15,8 +15,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Reads from multiple file sources, treating them as a single large chunk of data, using a
- * {@link FileChannel}. */
+/**
+ * Reads from multiple file sources, treating them as a single large chunk of data, using a {@link
+ * FileChannel}.
+ */
 public class MultiFileSourceReader extends BaseSourceReader {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
