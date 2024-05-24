@@ -101,7 +101,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
   private static final Logger log = LoggerFactory.getLogger(OcrHighlighter.class);
 
-  private static final Set<OcrFormat> FORMATS = ImmutableSet.of(new HocrFormat(), new AltoFormat(), new MiniOcrFormat());
+  private static final Set<OcrFormat> FORMATS =
+      ImmutableSet.of(new HocrFormat(), new AltoFormat(), new MiniOcrFormat());
 
   private static final CharacterRunAutomaton[] ZERO_LEN_AUTOMATA_ARRAY_LEGACY =
       new CharacterRunAutomaton[0];

@@ -17,21 +17,23 @@ public interface SourceReader {
   /** Get the number of bytes in the source. */
   int length() throws IOException;
 
-  /** Read a section from the source as an ASCII/Latin1 string.
-
-   * This method should be implemented as fast as possible, ideally without going
-   * through a decoder.
+  /**
+   * Read a section from the source as an ASCII/Latin1 string.
+   *
+   * <p>This method should be implemented as fast as possible, ideally without going through a
+   * decoder.
    */
   String readAsciiString(int start, int len) throws IOException;
 
   /** Read a section from the source as an UTF8 string. */
   String readUtf8String(int start, int byteLen) throws IOException;
 
-  /** Read a section aligned to this reader's section size.
+  /**
+   * Read a section aligned to this reader's section size.
    *
-   * <p>
-   * This method should be implemented as efficiently as possible, since it's called
-   * in the hottest loop of the highlighting logic (passage formation)*/
+   * <p>This method should be implemented as efficiently as possible, since it's called in the
+   * hottest loop of the highlighting logic (passage formation)
+   */
   Section getAsciiSection(int offset) throws IOException;
 
   class Section {

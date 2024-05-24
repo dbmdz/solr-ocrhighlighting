@@ -27,8 +27,7 @@ public class MiniOcrFormat implements OcrFormat {
           OcrBlock.LINE, "l",
           OcrBlock.WORD, "w");
 
-  public MiniOcrFormat() {
-  }
+  public MiniOcrFormat() {}
 
   @Override
   public BreakLocator getBreakLocator(SourceReader reader, OcrBlock... blockTypes) {

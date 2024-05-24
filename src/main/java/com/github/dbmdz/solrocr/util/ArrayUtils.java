@@ -1,8 +1,10 @@
 package com.github.dbmdz.solrocr.util;
 
 public class ArrayUtils {
-  /** Find the index of the largest element in {@param arr} that is smaller than or equal to
-   *  {@param x} or -1 if none was found. */
+  /**
+   * Find the index of the largest element in {@param arr} that is smaller than or equal to {@param
+   * x} or -1 if none was found.
+   */
   public static int binaryFloorIdxSearch(int[] arr, int x) {
     if (arr == null || arr.length == 0) {
       return -1;
