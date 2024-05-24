@@ -91,12 +91,23 @@ public class OcrHighlightComponent extends SearchComponent
         Integer.parseInt(info.attributes.getOrDefault("maxQueuedPerThread", "8"));
     int sectionReadSize =
         Integer.parseInt(info.attributes.getOrDefault("sectionReadSizeKiB", "8")) * 1024;
+    if (sectionReadSize <= 0) {
+      throw new SolrException(
+          SolrException.ErrorCode.SERVER_ERROR,
+          "Invalid sectionReadSizeKiB, must be > 0: " + sectionReadSize);
+    }
     int maxSectionCacheSize =
-        Integer.parseInt(info.attributes.getOrDefault("maxSectionCacheSizeKiB", "64")) * 1024;
+        Integer.parseInt(info.attributes.getOrDefault("maxSectionCacheSizeKiB", "-1"));
+    if (maxSectionCacheSize < 0) {
+      maxSectionCacheSize = sectionReadSize * 10;
+    }
 
     this.ocrHighlighter =
         new SolrOcrHighlighter(
-            numHlThreads, maxQueuedPerThread, sectionReadSize, maxSectionCacheSize);
+            numHlThreads,
+            maxQueuedPerThread,
+            sectionReadSize,
+            (int) Math.ceil((double) maxSectionCacheSize / sectionReadSize));
   }
 
   @Override

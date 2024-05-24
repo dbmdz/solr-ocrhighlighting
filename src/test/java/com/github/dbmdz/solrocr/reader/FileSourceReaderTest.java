@@ -20,6 +20,28 @@ class FileSourceReaderTest {
   private final int maxCacheEntries = 10;
 
   @Test
+  void shouldCacheSectionsProperly() throws IOException {
+    FileSourceReader reader = new FileSourceReader(filePath, pointer, 8192, 3);
+    reader.getAsciiSection(128);
+    assertThat(reader.cachedSectionIdxes).containsExactlyInAnyOrder(-1, -1, 0);
+    assertThat(reader.cache[0].section.start).isEqualTo(0);
+    assertThat(reader.cache[0].section.end).isEqualTo(8192);
+    reader.getAsciiSection(8192 + 128);
+    assertThat(reader.cachedSectionIdxes).containsExactlyInAnyOrder(-1, 1, 0);
+    assertThat(reader.cache[1]).isNotNull();
+    reader.getAsciiSection(2 * 8192 + 128);
+    assertThat(reader.cachedSectionIdxes).containsExactlyInAnyOrder(2, 1, 0);
+    assertThat(reader.cache[2]).isNotNull();
+    // Test cache eviction
+    reader.getAsciiSection(3 * 8192 + 128);
+    assertThat(reader.cachedSectionIdxes).containsExactlyInAnyOrder(2, 1, 3);
+    assertThat(reader.cache[0]).isNull();
+    reader.getAsciiSection(16 * 8192 + 128);
+    assertThat(reader.cachedSectionIdxes).containsExactlyInAnyOrder(2, 16, 3);
+    assertThat(reader.cache[1]).isNull();
+  }
+
+  @Test
   void shouldReadUtf8StringCorrectly() throws IOException {
     SourceReader reader = new FileSourceReader(filePath, pointer, 8192, maxCacheEntries);
     // No UTF8 misalignment offset
