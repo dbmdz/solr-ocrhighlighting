@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
     
     
       
@@ -547,6 +547,18 @@ of the plugin.</p>
 <p>Generally speaking, local storage is better than remote storage (like NFS or CIFS), due to the network latency, and
 flash-based storage is better than disk-based storage, due to the lower random read latency and the possibility to
 do parallel reads. A RAID1/10 setup is preferred over a RAID0/JBOD setup, due to the increased potential for parallel reads.</p>
+<p>When building passages during highlighting (i.e. determining where a snippet starts and ends), the plugin reads
+the OCR files in aligned sections and caches these to reduce the number of reads and allocations. The bigger
+the cache size, the more data is read from the disk, i.e. the chances of cache hits increase. However, this
+comes at the cost of more memory usage and more allocations in the JVM, which can have a performance impact.
+By default, the plugin uses a section size of 8KiB with a maximum number of cached sections of 10,
+which is a good trade-off for most setups and performed well in our benchmarks. If you want to tweak these
+settings, use the <code>sectionReadSizeKib</code> and <code>maxSectionCacheSizeKib</code> parameters on the <code>OcrHighlightComponent</code>
+in your <code>solrconfig.xml</code>:</p>
+<ul>
+<li><code>sectionReadSizeKib</code>: The size of the sections that are read from the OCR files. The default is 8KiB.</li>
+<li><code>maxSectionCacheSizeKib</code>: The maximum memory that is used for caching sections. The default is 10 * <code>sectionReadSizeKib</code>.</li>
+</ul>
 <h2 id="concurrency">Concurrency</h2>
 <p>The plugin can read multiple files in parallel and also process them concurrently. By default, it will
 use as many threads as there are available logical CPU cores on the machine, but this can be tweaked
