@@ -14,6 +14,10 @@
   was that in the presence of I/O errors like disappearing mounts, truncated files, etc, the JVM could
   simply crash (due to the kernel sending a `SIGBUS` signal when encountering an I/O error).
 
+**Fixed:**
+- When using source pointers with multiple files, the plugin no longer leaks file descriptors. We
+  previously didn't close the currently opened file when opening the next one.
+
 
 ## 0.8.5 (2024-04-25)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.5)

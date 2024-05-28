@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -42,13 +44,15 @@ public class MultiFileReader extends Reader {
     while (numRead < len && currentReader != null) {
       int read = this.currentReader.read(cbuf, off, len);
       if (read < len) {
+        this.currentReader.close();
         if (this.remainingSources.isEmpty()) {
           // No more readers, return what was read so far
           this.currentReader = null;
         } else {
           this.currentReader =
               new InputStreamReader(
-                  new FileInputStream(remainingSources.remove().toFile()), StandardCharsets.UTF_8);
+                  Files.newInputStream(remainingSources.remove(), StandardOpenOption.READ),
+                  StandardCharsets.UTF_8);
         }
       }
       if (read < 0) {
