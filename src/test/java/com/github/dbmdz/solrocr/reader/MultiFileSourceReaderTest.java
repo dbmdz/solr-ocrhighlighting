@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class MultiFileSurceReaderTest {
+class MultiFileSourceReaderTest {
   private final List<Path> filePaths;
   private final SourcePointer pointer;
   private final int maxCacheEntries = 10;
 
-  MultiFileSurceReaderTest() throws IOException {
+  MultiFileSourceReaderTest() throws IOException {
     Path root = Paths.get("src/test/resources/data/alto_multi");
     filePaths = new ArrayList<>();
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "1860-11-30*.xml")) {

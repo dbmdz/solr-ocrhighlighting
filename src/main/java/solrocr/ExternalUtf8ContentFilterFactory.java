@@ -7,7 +7,6 @@ import com.github.dbmdz.solrocr.util.Utf8;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -15,6 +14,7 @@ import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Locale;
@@ -81,7 +81,8 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       } else {
         r =
             new InputStreamReader(
-                new FileInputStream(pointer.sources.get(0).path.toFile()), StandardCharsets.UTF_8);
+                Files.newInputStream(pointer.sources.get(0).path, StandardOpenOption.READ),
+                StandardCharsets.UTF_8);
       }
 
       List<SourcePointer.Region> charRegions =
