@@ -771,6 +771,9 @@
   performance was improved for many concurrent queries. A huge drawback of the memory-mapped approach
   was that in the presence of I/O errors like disappearing mounts, truncated files, etc, the JVM could
   simply crash (due to the kernel sending a <code>SIGBUS</code> signal when encountering an I/O error).</p>
+<p><strong>Fixed:</strong>
+- When using source pointers with multiple files, the plugin no longer leaks file descriptors. We
+  previously didn't close the currently opened file when opening the next one.</p>
 <h2 id="085-2024-04-25">0.8.5 (2024-04-25)</h2>
 <p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.8.5">GitHub Release</a></p>
 <p><strong>Changed:</strong>
