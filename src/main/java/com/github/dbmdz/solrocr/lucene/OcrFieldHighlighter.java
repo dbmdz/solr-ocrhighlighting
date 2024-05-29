@@ -83,16 +83,11 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
 
     Passage[] passages;
-    try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, readerDocId, null)) {
+    try (OffsetsEnum offsetsEnums =
+        fieldOffsetStrategy.getOffsetsEnum(reader, readerDocId, null)) {
       passages =
           highlightOffsetsEnums(
-              offsetsEnums,
-              indexDocId,
-              breakLocator,
-              formatter,
-              pageId,
-              snippetLimit,
-              scorePassages);
+              offsetsEnums, indexDocId, breakLocator, formatter, pageId, snippetLimit, scorePassages);
     }
 
     // Format the resulting Passages.
