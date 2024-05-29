@@ -321,9 +321,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
     // Sort docs & fields for sequential i/o
     // Sort doc IDs w/ index to original order: (copy input arrays since we sort in-place)
-    int[] docIds = new int[docIDs.length];
-    int[] docInIndexes = new int[docIds.length]; // fill in ascending order; points into docIdsIn[]
-    copyAndSortDocIdsWithIndex(docIDs, docIds, docInIndexes); // latter 2 are "out" params
+    int[] sortedDocIds = new int[docIDs.length];
+    // Contains the index in `docIDs` for every position in `sortedDocIds`
+    int[] docInIndexes =
+        new int[sortedDocIds.length]; // fill in ascending order; points into docIdsIn[]
+    copyAndSortDocIdsWithIndex(docIDs, sortedDocIds, docInIndexes); // latter 2 are "out" params
 
     // Sort fields w/ maxPassages pair: (copy input arrays since we sort in-place)
     final String[] fields = new String[ocrFieldNames.length];
@@ -365,14 +367,14 @@ public class OcrHighlighter extends UnifiedHighlighter {
         (numTermVectors >= 2) ? TermVectorReusingLeafReader.wrap(searcher.getIndexReader()) : null;
 
     // [fieldIdx][docIdInIndex] of highlightDoc result
-    OcrSnippet[][][] highlightDocsInByField = new OcrSnippet[fields.length][docIds.length][];
-    int[][] snippetCountsByField = new int[fields.length][docIds.length];
+    OcrSnippet[][][] highlightDocsInByField = new OcrSnippet[fields.length][sortedDocIds.length][];
+    int[][] snippetCountsByField = new int[fields.length][sortedDocIds.length];
     // Highlight in doc batches determined by loadFieldValues (consumes from docIdIter)
-    DocIdSetIterator docIdIter = asDocIdSetIterator(docIds);
+    DocIdSetIterator docIdIter = asDocIdSetIterator(sortedDocIds);
 
     List<CompletableFuture<Void>> hlFuts = new ArrayList<>();
     docLoop:
-    for (int batchDocIdx = 0; batchDocIdx < docIds.length; ) {
+    for (int batchDocIdx = 0; batchDocIdx < sortedDocIds.length; ) {
       List<SourceReader[]> fieldValsByDoc = loadOcrFieldValues(fields, docIdIter);
 
       // Highlight in per-field order first, then by doc (better I/O pattern)
@@ -380,7 +382,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
         OcrSnippet[][] resultByDocIn = highlightDocsInByField[fieldIdx]; // parallel to docIdsIn
         OcrFieldHighlighter fieldHighlighter = fieldHighlighters[fieldIdx];
         for (int docIdx = batchDocIdx; docIdx - batchDocIdx < fieldValsByDoc.size(); docIdx++) {
-          int docId = docIds[docIdx]; // sorted order
+          // This docId is potentially going to be made relative to the corresponding leaf reader
+          // later on, i.e. it's not always going to be the index-wide docId, hence we store the
+          // absolute value in another variable.
+          int readerDocId = sortedDocIds[docIdx]; // sorted order
+          int indexDocId = sortedDocIds[docIdx];
           SourceReader content = fieldValsByDoc.get(docIdx - batchDocIdx)[fieldIdx];
           if (content == null) {
             continue;
@@ -401,9 +407,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
             leafReader = (LeafReader) indexReader;
           } else {
             List<LeafReaderContext> leaves = indexReader.leaves();
-            LeafReaderContext leafReaderContext = leaves.get(ReaderUtil.subIndex(docId, leaves));
+            LeafReaderContext leafReaderContext =
+                leaves.get(ReaderUtil.subIndex(readerDocId, leaves));
             leafReader = leafReaderContext.reader();
-            docId -= leafReaderContext.docBase; // adjust 'doc' to be within this leaf reader
+            readerDocId -= leafReaderContext.docBase; // adjust 'doc' to be within this leaf reader
           }
           int docInIndex = docInIndexes[docIdx]; // original input order
           assert resultByDocIn[docInIndex] == null;
@@ -414,14 +421,15 @@ public class OcrHighlighter extends UnifiedHighlighter {
                   params.getInt(OcrHighlightParams.MAX_OCR_PASSAGES, DEFAULT_SNIPPET_LIMIT));
 
           // Final aliases for lambda
-          final int docIdFinal = docId;
+          final int readerDocIdFinal = readerDocId;
           final int fieldIdxFinal = fieldIdx;
           final SourceReader contentFinal = content;
           Runnable hlFn =
               () -> {
                 try {
                   highlightDocField(
-                      docIdFinal,
+                      indexDocId,
+                      readerDocIdFinal,
                       docInIndex,
                       fieldIdxFinal,
                       contentFinal,
@@ -440,7 +448,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                   if (contentFinal.getPointer() != null) {
                     log.error(
                         "Could not highlight OCR content for document {} at '{}'",
-                        docIdFinal,
+                        indexDocId,
                         contentFinal.getPointer(),
                         e);
                   } else {
@@ -452,7 +460,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                     }
                     log.error(
                         "Could not highlight OCR for document {} with OCR markup '{}...'",
-                        docIdFinal,
+                        indexDocId,
                         debugStr,
                         e);
                   }
@@ -506,8 +514,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
       }
     }
 
-    OcrHighlightResult[] out = new OcrHighlightResult[docIds.length];
-    for (int d = 0; d < docIds.length; d++) {
+    OcrHighlightResult[] out = new OcrHighlightResult[sortedDocIds.length];
+    for (int d = 0; d < sortedDocIds.length; d++) {
       OcrHighlightResult hl = new OcrHighlightResult();
       for (int f = 0; f < fields.length; f++) {
         if (snippetCountsByField[f][d] <= 0) {
@@ -525,7 +533,8 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   private void highlightDocField(
-      int docId,
+      int indexDocId, // index-wide docId
+      int readerDocId, // docId relative to the leaf reader
       int docInIndex,
       int fieldIdx,
       SourceReader reader,
@@ -572,14 +581,15 @@ public class OcrHighlighter extends UnifiedHighlighter {
     resultByDocIn[docInIndex] =
         fieldHighlighter.highlightFieldForDoc(
             leafReader,
-            docId,
+            indexDocId,
+            readerDocId,
             breakLocator,
             formatter,
             reader,
             params.get(OcrHighlightParams.PAGE_ID),
             snippetLimit,
             scorePassages);
-    snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(docId);
+    snippetCountsByField[fieldIdx][docInIndex] = fieldHighlighter.getNumMatches(indexDocId);
   }
 
   protected List<SourceReader[]> loadOcrFieldValues(String[] fields, DocIdSetIterator docIter)
