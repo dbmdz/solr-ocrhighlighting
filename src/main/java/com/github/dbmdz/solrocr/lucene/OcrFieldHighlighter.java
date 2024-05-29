@@ -66,7 +66,8 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    */
   public OcrSnippet[] highlightFieldForDoc(
       LeafReader reader,
-      int docId,
+      int indexDocId, // relative to the whole index
+      int readerDocId, // relative to the current leafReader
       BreakLocator breakLocator,
       OcrPassageFormatter formatter,
       SourceReader content,
@@ -82,10 +83,16 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
 
     Passage[] passages;
-    try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, docId, null)) {
+    try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, readerDocId, null)) {
       passages =
           highlightOffsetsEnums(
-              offsetsEnums, docId, breakLocator, formatter, pageId, snippetLimit, scorePassages);
+              offsetsEnums,
+              indexDocId,
+              breakLocator,
+              formatter,
+              pageId,
+              snippetLimit,
+              scorePassages);
     }
 
     // Format the resulting Passages.
@@ -121,7 +128,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
    */
   protected Passage[] highlightOffsetsEnums(
       OffsetsEnum off,
-      int docId,
+      int indexDocId,
       BreakLocator breakLocator,
       OcrPassageFormatter formatter,
       String pageId,
@@ -178,7 +185,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
         continue;
       }
       // Since building passages is expensive when using external files, we forego it past a certain
-      // limit (which can be set by the user) and just update the total count, counting each matc
+      // limit (which can be set by the user) and just update the total count, counting each match
       // as a single passage.
       if (limitReached || numTotal > snippetLimit) {
         numTotal++;
@@ -213,7 +220,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
     maybeAddPassage(passageQueue, passageScorer, passage, contentLength, scorePassages);
 
-    this.numMatches.put(docId, numTotal);
+    this.numMatches.put(indexDocId, numTotal);
     Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
     // sort in ascending order
     Arrays.sort(passages, Comparator.comparingInt(Passage::getStartOffset));

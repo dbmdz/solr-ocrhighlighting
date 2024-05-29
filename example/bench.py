@@ -155,6 +155,7 @@ def run_query(
 ) -> tuple[float, float, dict]:
     query_params = {
         "q": f"ocr_text:{query}",
+        "echoParams": "explicit",
         "hl": "on",
         "hl.ocr.fl": "ocr_text",
         "hl.snippets": num_snippets,
@@ -260,7 +261,7 @@ if __name__ == "__main__":
         type=str,
         default=None,
         metavar="PATH",
-        help="Path to save the responses for every query to as a JSON file (optional)",
+        help="Path to save the responses for every query to as a JSONL file (optional)",
     )
     parser.add_argument(
         "--num-rows",
@@ -332,4 +333,5 @@ if __name__ == "__main__":
 
     if args.save_responses:
         with cast(TextIO, gzip.open(args.save_responses, "wt", compresslevel=9)) as f:
-            json.dump(results.responses, f)
+            for response in results.responses:
+                f.write(json.dumps(response) + "\n")
