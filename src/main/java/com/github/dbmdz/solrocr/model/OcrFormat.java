@@ -1,7 +1,7 @@
 package com.github.dbmdz.solrocr.model;
 
+import com.github.dbmdz.solrocr.breaklocator.BreakLocator;
 import com.github.dbmdz.solrocr.formats.OcrParser;
-import com.github.dbmdz.solrocr.iter.BreakLocator;
 import com.github.dbmdz.solrocr.lucene.OcrPassageFormatter;
 import com.github.dbmdz.solrocr.lucene.filters.OcrCharFilter;
 import com.github.dbmdz.solrocr.reader.PeekingReader;

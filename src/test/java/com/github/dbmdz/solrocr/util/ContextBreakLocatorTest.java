@@ -2,10 +2,10 @@ package com.github.dbmdz.solrocr.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.dbmdz.solrocr.breaklocator.BreakLocator;
+import com.github.dbmdz.solrocr.breaklocator.ContextBreakLocator;
+import com.github.dbmdz.solrocr.breaklocator.TagBreakLocator;
 import com.github.dbmdz.solrocr.formats.hocr.HocrClassBreakLocator;
-import com.github.dbmdz.solrocr.iter.BreakLocator;
-import com.github.dbmdz.solrocr.iter.ContextBreakLocator;
-import com.github.dbmdz.solrocr.iter.TagBreakLocator;
 import com.github.dbmdz.solrocr.reader.FileSourceReader;
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.google.common.collect.ImmutableSet;
