@@ -24,7 +24,7 @@
  */
 package com.github.dbmdz.solrocr.lucene;
 
-import com.github.dbmdz.solrocr.iter.BreakLocator;
+import com.github.dbmdz.solrocr.breaklocator.BreakLocator;
 import com.github.dbmdz.solrocr.model.OcrSnippet;
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import java.io.IOException;
@@ -83,11 +83,16 @@ public class OcrFieldHighlighter extends FieldHighlighter {
     }
 
     Passage[] passages;
-    try (OffsetsEnum offsetsEnums =
-        fieldOffsetStrategy.getOffsetsEnum(reader, readerDocId, null)) {
+    try (OffsetsEnum offsetsEnums = fieldOffsetStrategy.getOffsetsEnum(reader, readerDocId, null)) {
       passages =
           highlightOffsetsEnums(
-              offsetsEnums, indexDocId, breakLocator, formatter, pageId, snippetLimit, scorePassages);
+              offsetsEnums,
+              indexDocId,
+              breakLocator,
+              formatter,
+              pageId,
+              snippetLimit,
+              scorePassages);
     }
 
     // Format the resulting Passages.

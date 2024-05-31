@@ -1,6 +1,6 @@
 package com.github.dbmdz.solrocr.formats.hocr;
 
-import com.github.dbmdz.solrocr.iter.BaseBreakLocator;
+import com.github.dbmdz.solrocr.breaklocator.BaseBreakLocator;
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.github.dbmdz.solrocr.reader.SourceReader.Section;
 import com.google.common.collect.ImmutableList;
@@ -47,14 +47,20 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
 
       // Truncate block to last '>' and keep the rest for the next iteration if needed
       int blockEnd = block.length();
+      int lastTagOpen = block.lastIndexOf('<');
+      if (lastTagOpen < blockStart) {
+        lastTagOpen = -1;
+      }
       int lastTagClose = block.lastIndexOf('>');
-      if (lastTagClose > 0 && !isAllBlank(block, lastTagClose + 1, blockEnd)) {
-        String overlap = block.substring(lastTagClose + 1, blockEnd);
-        if (overlap.indexOf('<') >= 0) {
-          // Overlap has the start of a tag, carry over to next iteration
-          overlapHead = overlap;
-        }
-        blockEnd = lastTagClose + 1;
+      if (lastTagClose < blockStart) {
+        lastTagClose = -1;
+      }
+      boolean partialTag =
+          (lastTagOpen >= 0 && lastTagClose < 0)
+              || (lastTagClose >= 0 && lastTagClose < lastTagOpen);
+      if (partialTag) {
+        overlapHead = block.substring(lastTagOpen, blockEnd);
+        blockEnd = lastTagOpen + 1;
       }
 
       int match = findForwardMatch(block, blockStart, blockEnd);
@@ -88,9 +94,9 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
       if (overlapTail != null) {
         int lastTagOpen = block.lastIndexOf('<', blockEnd);
         String overlapHead = block.substring(lastTagOpen);
-        int overlapStartOffset = globalEnd - overlapHead.length();
+        int overlapStartOffset = globalEnd - overlapHead.length() + 1;
         String overlap = overlapHead.concat(overlapTail);
-        int overlapMatch = findBackwardMatch(overlap, overlap.length(), overlap.length());
+        int overlapMatch = findBackwardMatch(overlap, overlap.length(), 0);
         if (overlapMatch >= 0) {
           return overlapStartOffset + overlapMatch;
         }
@@ -100,14 +106,20 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
 
       int blockStart = 0;
       int firstTagOpen = block.indexOf('<');
-      if (firstTagOpen > 0 && firstTagOpen < blockEnd && !isAllBlank(block, 0, firstTagOpen)) {
-        // Limit all following searches to the beginning of the first tag in the block
-        blockStart = firstTagOpen;
-        String overlap = block.substring(0, firstTagOpen);
-        if (overlap.indexOf('>') >= 0) {
-          // Overlap has the end of a tag, carry over to next iteration
-          overlapTail = overlap;
-        }
+      if (firstTagOpen > blockEnd) {
+        firstTagOpen = -1;
+      }
+      int firstTagClose = block.indexOf('>');
+      if (firstTagClose > blockEnd) {
+        firstTagClose = -1;
+      }
+      boolean partialTag =
+          (firstTagOpen < 0 && firstTagClose >= 0)
+              || (firstTagClose >= 0 && firstTagClose < firstTagOpen);
+      if (partialTag) {
+        // Section starts on a partial tag, store it for the next iteration
+        blockStart = firstTagClose + 1;
+        overlapTail = block.substring(0, firstTagClose + 1);
       }
 
       int match = findBackwardMatch(block, blockEnd, blockStart);
@@ -134,8 +146,10 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
         }
         int openIdx = text.lastIndexOf('<', i);
         int closeIdx = text.indexOf('>', i);
-        assert closeIdx > openIdx
-            : "startOffset and endOffset must be chosen to ensure a complete element";
+        if (openIdx < fromIdx && closeIdx < 0) {
+          // No match
+          break;
+        }
         if (openIdx < fromOffset) {
           // Incomplete element, try next position
           fromIdx = closeIdx;

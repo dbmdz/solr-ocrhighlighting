@@ -3,8 +3,8 @@ package com.github.dbmdz.solrocr.lucene;
 import static com.github.dbmdz.solrocr.formats.OcrParser.END_HL;
 import static com.github.dbmdz.solrocr.formats.OcrParser.START_HL;
 
+import com.github.dbmdz.solrocr.breaklocator.BreakLocator;
 import com.github.dbmdz.solrocr.formats.OcrParser;
-import com.github.dbmdz.solrocr.iter.BreakLocator;
 import com.github.dbmdz.solrocr.lucene.filters.SanitizingXmlFilter;
 import com.github.dbmdz.solrocr.model.OcrBlock;
 import com.github.dbmdz.solrocr.model.OcrBox;

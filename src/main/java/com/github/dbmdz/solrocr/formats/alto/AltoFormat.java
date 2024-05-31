@@ -1,8 +1,8 @@
 package com.github.dbmdz.solrocr.formats.alto;
 
+import com.github.dbmdz.solrocr.breaklocator.BreakLocator;
+import com.github.dbmdz.solrocr.breaklocator.TagBreakLocator;
 import com.github.dbmdz.solrocr.formats.OcrParser;
-import com.github.dbmdz.solrocr.iter.BreakLocator;
-import com.github.dbmdz.solrocr.iter.TagBreakLocator;
 import com.github.dbmdz.solrocr.model.OcrBlock;
 import com.github.dbmdz.solrocr.model.OcrFormat;
 import com.github.dbmdz.solrocr.model.OcrPage;

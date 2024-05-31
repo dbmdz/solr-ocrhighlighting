@@ -1,4 +1,4 @@
-package com.github.dbmdz.solrocr.iter;
+package com.github.dbmdz.solrocr.breaklocator;
 
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.github.dbmdz.solrocr.reader.SourceReader.Section;
@@ -45,17 +45,22 @@ public class TagBreakLocator extends BaseBreakLocator {
         blockStart = firstTagClose + 1;
         overlapHead = null;
       }
-
-      // Truncate block to last '>'
+      // Truncate block to last '>' and keep the rest for the next iteration if needed
       int blockEnd = block.length();
+      int lastTagOpen = block.lastIndexOf('<');
+      if (lastTagOpen < blockStart) {
+        lastTagOpen = -1;
+      }
       int lastTagClose = block.lastIndexOf('>');
-      if (lastTagClose > 0 && !isAllBlank(block, lastTagClose + 1, blockEnd)) {
-        String overlap = block.substring(lastTagClose + 1, blockEnd);
-        if (overlap.indexOf('<') >= 0) {
-          // Overlap has an incomplete start of a tag, carry over to next iteration
-          overlapHead = overlap;
-        }
-        blockEnd = lastTagClose + 1;
+      if (lastTagClose < blockStart) {
+        lastTagClose = -1;
+      }
+      boolean partialTag =
+          (lastTagOpen >= 0 && lastTagClose < 0)
+              || (lastTagClose >= 0 && lastTagClose < lastTagOpen);
+      if (partialTag) {
+        overlapHead = block.substring(lastTagOpen, blockEnd);
+        blockEnd = lastTagOpen + 1;
       }
 
       int idx = block.indexOf(breakTag, blockStart);
@@ -96,12 +101,20 @@ public class TagBreakLocator extends BaseBreakLocator {
 
       int blockStart = 0;
       int firstTagOpen = block.indexOf('<');
-      if (firstTagOpen > 0 && firstTagOpen < blockEnd && !isAllBlank(block, 0, firstTagOpen)) {
-        String overlap = block.substring(blockStart, firstTagOpen);
-        if (overlap.indexOf('>') >= 0) {
-          overlapTail = overlap;
-        }
-        blockStart = firstTagOpen;
+      if (firstTagOpen > blockEnd) {
+        firstTagOpen = -1;
+      }
+      int firstTagClose = block.indexOf('>');
+      if (firstTagClose > blockEnd) {
+        firstTagClose = -1;
+      }
+      boolean partialTag =
+          (firstTagOpen < 0 && firstTagClose >= 0)
+              || (firstTagClose >= 0 && firstTagClose < firstTagOpen);
+      if (partialTag) {
+        // Section starts on a partial tag, store it for the next iteration
+        blockStart = firstTagClose + 1;
+        overlapTail = block.substring(0, firstTagClose + 1);
       }
 
       int match = optimizedLastIndexOf(block, breakTag, blockEnd);

@@ -1,4 +1,4 @@
-package com.github.dbmdz.solrocr.iter;
+package com.github.dbmdz.solrocr.breaklocator;
 
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import java.io.IOException;

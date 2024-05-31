@@ -24,11 +24,11 @@
  */
 package solrocr;
 
+import com.github.dbmdz.solrocr.breaklocator.BreakLocator;
+import com.github.dbmdz.solrocr.breaklocator.ContextBreakLocator;
 import com.github.dbmdz.solrocr.formats.alto.AltoFormat;
 import com.github.dbmdz.solrocr.formats.hocr.HocrFormat;
 import com.github.dbmdz.solrocr.formats.miniocr.MiniOcrFormat;
-import com.github.dbmdz.solrocr.iter.BreakLocator;
-import com.github.dbmdz.solrocr.iter.ContextBreakLocator;
 import com.github.dbmdz.solrocr.lucene.OcrFieldHighlighter;
 import com.github.dbmdz.solrocr.lucene.OcrPassageFormatter;
 import com.github.dbmdz.solrocr.lucene.OcrPassageScorer;
