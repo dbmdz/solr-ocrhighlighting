@@ -72,7 +72,7 @@ The objects contained under the `snippets` key are structured like this:
 - `pages` contains a list of pages the snippet appears on along with their pixel dimensions. This can be useful
   for rendering highlights, e.g. if the highlighting target image is scaled down from the source image.
 - `regions` contains a list of regions that the snippet is located on. Usually this will contain only one item,
-  but in cases where a phrase spans multiple pages, it will contain a region for every page involved in the match.
+  but in cases where a phrase spans multiple pages or columns, it will contain a region for every page and column involved in the match.
   The object includes coordinates for all four corners it is defined by, as well as the identifier of the `page` the
   region is located on.
 - `highlights` contains a list of regions that contain the actual matches for the query as well as the `text` that

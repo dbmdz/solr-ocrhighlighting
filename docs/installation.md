@@ -19,7 +19,7 @@ your Solrcloud cluster. All paths are relative to the Solr installation director
   `$ ./bin/solr package add-repo dbmdz.github.io https://dbmdz.github.io/solr`
 - **Install package** in the latest version:<br>
   `$ ./bin/solr package install ocrhighlighting` if you're on Solr 9, otherwise:
-  `$ ./bin/solr package install ocrhighlighting:0.8.1-solr78`
+  `$ ./bin/solr package install ocrhighlighting:0.9.0-solr78`
 
 !!! caution "Be sure to use the `ocrhighlighting:` prefix when specifying classes in your configuration."
     When using the Package Manager, classes from plugins have to be prefixed (separated by a colon) by

@@ -30,7 +30,7 @@ the (again, potentially very large) contents themselves in the index.
     how fast the underlying storage is able to perform random I/O. This is why **we highly recommend
     using flash storage for the documents**.
     
-    Another option to increase highlighting performance is
+    Another option to increase indexing performance is
     to **switch from UTF8 to ASCII** (with XML-escaped Unicode codepoints) for the encoding of the OCR
     files. This requires less CPU during decoding, since we don't have to take multi-byte sequences into
     account. To signal to the plugin that a given source path is encoded in ASCII, include the `{ascii}`
@@ -143,9 +143,9 @@ The format of the regions is inspired by [Python's slicing syntax](https://docs.
 
 
 !!! note "Example Implementation"
-    The [example setup on GitHub](https://github.com/dbmdz/solr-ocrhighlighting/tree/master/example)
-    uses a [Python script](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py)
+    The [example setup on GitHub](https://github.com/dbmdz/solr-ocrhighlighting/tree/main/example)
+    uses a [Python script](https://github.com/dbmdz/solr-ocrhighlighting/blob/main/example/ingest.py)
     to index articles from multi-page newspaper scans into Solr. It works by [first extracting the OCR
-    block ids for each article from a METS file](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py#L141-L147)
-    and then [finds the byte regions these OCR blocks are located in](https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py#L108-L123)
+    block ids for each article from a METS file](https://github.com/dbmdz/solr-ocrhighlighting/blob/main/example/ingest.py#L141-L148)
+    and then [finds the byte regions these OCR blocks are located in](https://github.com/dbmdz/solr-ocrhighlighting/blob/main/example/ingest.py#L103-L124)
     to build the source pointer for each article.

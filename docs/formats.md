@@ -81,7 +81,7 @@ encode a word with the default form `clistrias` and two alternatives `christmas`
 
 | Block     | MiniOCR tag  | notes                            |
 | --------- | ------------ | -------------------------------- |
-| Word      | `<w/>`       | needs to have `box` attribute with `{x} {y} {width} {height}`. <br>Values can be integers or floats between 0 and 1, **with the leading `0.` omitted** |
+| Word      | `<w/>`       | needs to have `box` attribute with `{x} {y} {width} {height}`. <br>Values can be integers or floats between 0 and 1, **with the leading `0` omitted** |
 | Line      | `<l/>`       |                                  |
 | Block     | `<b/>`       |                                  |
 | Page      | `<p/>`       | needs to have an `xml:id` attribute with a page identifier. Optionally can have a `wh` attribute with the `{width} {height}` values for the page |

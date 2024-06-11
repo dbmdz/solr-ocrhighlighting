@@ -6,9 +6,9 @@ readings for a given sequence of characters, or they could come from an manual o
 OCR correction system.
 
 !!! note Expressing alternatives in OCR files
-    - For **hOCR**, use `<span class="alternatives"><ins class="alt">...</ins><del class="alt">...</del></span>` (see [hOCR specification](http://kba.cloud/hocr-spec/1.2/#segmentation))
+    - For **hOCR**, use `<span class="alternatives"><ins class="alt">...</ins><del class="alt">...</del></span>` (see [hOCR specification](http://kba.github.io/hocr-spec/1.2/#segmentation))
     - For **ALTO**, use `<String …><ALTERNATIVE>...</ALTERNATIVE></String>` (see `AlternativeType` in the [ALTO schema](https://www.loc.gov/standards/alto/v4/alto-4-2.xsd))
-    - For **MiniOCR**, delimit alternative forms with `⇿` (U+21FF) (see [MiniOCR documentation](../formats#miniocr))
+    - For **MiniOCR**, delimit alternative forms with `⇿` (U+21FF) (see [MiniOCR documentation](./formats.md#miniocr))
 
 In any case, these alternative readings can improve your user's search experience, by allowing us to
 index *multiple forms for a given text position*. This enables users to find more matching passages
