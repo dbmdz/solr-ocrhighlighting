@@ -58,10 +58,12 @@ in your `solrconfig.xml`. Tune these parameters to match your hardware and stora
 - `numHighlightingThreads`: The number of threads that will be used to read and process the OCR files.
    Defaults to the number of logical CPU cores. Set this higher if you're I/O-bottlenecked and can
    support more parallel reads than you have logical CPU cores (very likely for modern NVMe drives).
-- `maxQueuedPerThread`: By default, we queue only a limited number of documents per thread as to not
-  stall other requests. If this number is reached, all highlighting will be done single-threaded on
-  the request thread. You usually don't have to touch this setting, but if you have large result sets
-  with many concurrent requests, this can help to reduce the number of threads that are active at
+- `maxQueuedPerThread`: The thread pool used to highlight documents is shared across all requests.
+  By default, we queue only a limited number of documents per thread as to not
+  stall other requests. If this number is reached, all remaining highlighting
+  will be done single-threaded on the request thread. You usually don't have to
+  touch this setting, but if you have large result sets with many concurrent
+  requests, this can help to reduce the number of threads that are active at
   the same time, at least as a stopgap.
 
 ## Runtime configuration

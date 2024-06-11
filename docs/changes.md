@@ -1,4 +1,7 @@
-## Unreleased
+## 0.9.0 (2024-06-12)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.0)
+
+Major performance and stability improvements in this release, upgrading is highly recommended.
 
 **Changed:**
 - Add support for multithreaded highlighting. Uses all available logical CPU cores by default and
@@ -228,7 +231,7 @@ significantly.
   shipping with Solr). For example, if you OCR file has the alternatives `christmas` and `christrias` for the token
   `clistrias` in the span `presents on clistrias eve`, users would be able to search for `"presents christmas"` and
   `"presents clistrias"` and would get the correct match in both cases, both with full highlighting.
-  Refer to the corresponding [section in the documentation](../alternatives) for instructions on setting it up.
+  Refer to the corresponding [section in the documentation](./alternatives.md) for instructions on setting it up.
 - **On-the-fly repair of 'broken' markup.**
   `OcrCharFilterFactory` has a new option `fixMarkup` that enables on-the-fly repair of invalid XML in OCR input documents,
   namely problems that can arise when the markup contains unescaped instances of `<`, `>` and `&`.
@@ -255,7 +258,7 @@ significantly.
   identify the page, improving highlighting performance due to the need for less backwards-seeking in the
   input files.
 - **Add new `expandAlternatives` attribute to `OcrCharFilterFactory`.** This enables the parsing of
-   alternative readings from input files (see above and the [corresponding section in the documentation](../alternatives))
+   alternative readings from input files (see above and the [corresponding section in the documentation](./alternatives.md))
   - **Add new `hl.ocr.scorePassages` parameter to disable sorting of passages by their score.**
     See the above section unter *New Features* for an explanation of this flag.
 
