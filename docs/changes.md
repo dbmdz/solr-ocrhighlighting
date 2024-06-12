@@ -16,6 +16,11 @@ Major performance and stability improvements in this release, upgrading is highl
   performance was improved for many concurrent queries. A huge drawback of the memory-mapped approach
   was that in the presence of I/O errors like disappearing mounts, truncated files, etc, the JVM could
   simply crash (due to the kernel sending a `SIGBUS` signal when encountering an I/O error).
+- When locating breaks in the forward direction, we used to put the break point at the *end* of the
+  limiting element opening tag. With the new implementation, the break point is now at the *start* of
+  the limiting tag open element, i.e. no part of the limiting element is contained in the created section.
+  This leads to a small change in the scores assigned to passages (since BM25 uses the length of the scored
+  content in its calculations).
 
 **Fixed:**
 - When using source pointers with multiple files, the plugin no longer leaks file descriptors. We
