@@ -2,6 +2,7 @@ package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import java.io.IOException;
+import java.io.Reader;
 
 /** API for reading data from a source. */
 public interface SourceReader {
@@ -35,6 +36,8 @@ public interface SourceReader {
    * hottest loop of the highlighting logic (passage formation)
    */
   Section getAsciiSection(int offset) throws IOException;
+
+  Reader getReader() throws IOException;
 
   class Section {
     public final int start;

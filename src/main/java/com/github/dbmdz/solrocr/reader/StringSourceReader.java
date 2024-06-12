@@ -1,6 +1,9 @@
 package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 
 /** SourceReader that reads from a String. */
 public class StringSourceReader implements SourceReader {
@@ -26,6 +29,11 @@ public class StringSourceReader implements SourceReader {
   @Override
   public Section getAsciiSection(int offset) {
     return new Section(0, str.length(), str);
+  }
+
+  @Override
+  public Reader getReader() throws IOException {
+    return new StringReader(str);
   }
 
   @Override
