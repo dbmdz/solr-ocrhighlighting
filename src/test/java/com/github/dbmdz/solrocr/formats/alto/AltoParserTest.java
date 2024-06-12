@@ -128,6 +128,7 @@ public class AltoParserTest {
             .filter(p -> p.getFileName().toString().startsWith("1860-"))
             .map(Path::toAbsolutePath)
             .map(Path::toString)
+            .sorted()
             .collect(Collectors.joining("+"));
     List<OcrBox> boxes =
         new AltoParser(filterFac.create(new StringReader(ptr)))
