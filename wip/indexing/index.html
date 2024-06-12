@@ -522,7 +522,7 @@ the (again, potentially very large) contents themselves in the index.</p>
 <p>When using external files for highlighting, the performance depends to a large degree on
 how fast the underlying storage is able to perform random I/O. This is why <strong>we highly recommend
 using flash storage for the documents</strong>.</p>
-<p>Another option to increase highlighting performance is
+<p>Another option to increase indexing performance is
 to <strong>switch from UTF8 to ASCII</strong> (with XML-escaped Unicode codepoints) for the encoding of the OCR
 files. This requires less CPU during decoding, since we don't have to take multi-byte sequences into
 account. To signal to the plugin that a given source path is encoded in ASCII, include the <code>{ascii}</code>
@@ -619,11 +619,11 @@ text files is difficult in some programming languages (most notoriously Java, us
 </div>
 <div class="admonition note">
 <p class="admonition-title">Example Implementation</p>
-<p>The <a href="https://github.com/dbmdz/solr-ocrhighlighting/tree/master/example">example setup on GitHub</a>
-uses a <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py">Python script</a>
-to index articles from multi-page newspaper scans into Solr. It works by <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py#L141-L147">first extracting the OCR
+<p>The <a href="https://github.com/dbmdz/solr-ocrhighlighting/tree/main/example">example setup on GitHub</a>
+uses a <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/main/example/ingest.py">Python script</a>
+to index articles from multi-page newspaper scans into Solr. It works by <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/main/example/ingest.py#L141-L148">first extracting the OCR
 block ids for each article from a METS file</a>
-and then <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/master/example/ingest.py#L108-L123">finds the byte regions these OCR blocks are located in</a>
+and then <a href="https://github.com/dbmdz/solr-ocrhighlighting/blob/main/example/ingest.py#L103-L124">finds the byte regions these OCR blocks are located in</a>
 to build the source pointer for each article.</p>
 </div>
 

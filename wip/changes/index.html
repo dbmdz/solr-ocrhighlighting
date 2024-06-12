@@ -60,7 +60,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#unreleased" class="md-skip">
+        <a href="#090-2024-06-12" class="md-skip">
           Skip to content
         </a>
       
@@ -382,9 +382,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#090-2024-06-12" class="md-nav__link">
     <span class="md-ellipsis">
-      Unreleased
+      0.9.0 (2024-06-12)
     </span>
   </a>
   
@@ -576,9 +576,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#090-2024-06-12" class="md-nav__link">
     <span class="md-ellipsis">
-      Unreleased
+      0.9.0 (2024-06-12)
     </span>
   </a>
   
@@ -757,7 +757,9 @@
 
   <h1>Change Log</h1>
 
-<h2 id="unreleased">Unreleased</h2>
+<h2 id="090-2024-06-12">0.9.0 (2024-06-12)</h2>
+<p><a href="https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.0">GitHub Release</a></p>
+<p>Major performance and stability improvements in this release, upgrading is highly recommended.</p>
 <p><strong>Changed:</strong>
 - Add support for multithreaded highlighting. Uses all available logical CPU cores by default and
   can be tweaked with the <code>numHighlightingThreads</code> and <code>maxQueuedPerThread</code> attributes on the
@@ -770,7 +772,12 @@
   with the new I/O stack (probably due to the reduced amount of actual reads), on the contrary,
   performance was improved for many concurrent queries. A huge drawback of the memory-mapped approach
   was that in the presence of I/O errors like disappearing mounts, truncated files, etc, the JVM could
-  simply crash (due to the kernel sending a <code>SIGBUS</code> signal when encountering an I/O error).</p>
+  simply crash (due to the kernel sending a <code>SIGBUS</code> signal when encountering an I/O error).
+- When locating breaks in the forward direction, we used to put the break point at the <em>end</em> of the
+  limiting element opening tag. With the new implementation, the break point is now at the <em>start</em> of
+  the limiting tag open element, i.e. no part of the limiting element is contained in the created section.
+  This leads to a small change in the scores assigned to passages (since BM25 uses the length of the scored
+  content in its calculations).</p>
 <p><strong>Fixed:</strong>
 - When using source pointers with multiple files, the plugin no longer leaks file descriptors. We
   previously didn't close the currently opened file when opening the next one.</p>
@@ -958,7 +965,7 @@ significantly.</p>
   shipping with Solr). For example, if you OCR file has the alternatives <code>christmas</code> and <code>christrias</code> for the token
   <code>clistrias</code> in the span <code>presents on clistrias eve</code>, users would be able to search for <code>"presents christmas"</code> and
   <code>"presents clistrias"</code> and would get the correct match in both cases, both with full highlighting.
-  Refer to the corresponding <a href="../alternatives">section in the documentation</a> for instructions on setting it up.</li>
+  Refer to the corresponding <a href="../alternatives/">section in the documentation</a> for instructions on setting it up.</li>
 <li><strong>On-the-fly repair of 'broken' markup.</strong>
   <code>OcrCharFilterFactory</code> has a new option <code>fixMarkup</code> that enables on-the-fly repair of invalid XML in OCR input documents,
   namely problems that can arise when the markup contains unescaped instances of <code>&lt;</code>, <code>&gt;</code> and <code>&amp;</code>.
@@ -984,7 +991,7 @@ significantly.</p>
   identify the page, improving highlighting performance due to the need for less backwards-seeking in the
   input files.</li>
 <li><strong>Add new <code>expandAlternatives</code> attribute to <code>OcrCharFilterFactory</code>.</strong> This enables the parsing of
-   alternative readings from input files (see above and the <a href="../alternatives">corresponding section in the documentation</a>)</li>
+   alternative readings from input files (see above and the <a href="../alternatives/">corresponding section in the documentation</a>)</li>
 <li><strong>Add new <code>hl.ocr.scorePassages</code> parameter to disable sorting of passages by their score.</strong>
     See the above section unter <em>New Features</em> for an explanation of this flag.</li>
 </ul>
