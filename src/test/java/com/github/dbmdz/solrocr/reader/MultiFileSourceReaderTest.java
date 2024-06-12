@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
@@ -31,6 +32,7 @@ class MultiFileSourceReaderTest {
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "1860-11-30*.xml")) {
       stream.forEach(filePaths::add);
     }
+    filePaths.sort(Comparator.comparing(Path::toString));
     pointer =
         SourcePointer.parse(
             filePaths.stream()
