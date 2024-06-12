@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.dbmdz.solrocr.lucene.filters.ExternalUtf8ContentFilter;
 import com.github.dbmdz.solrocr.model.SourcePointer.Region;
-import com.github.dbmdz.solrocr.reader.MultiFileReader;
 import com.github.dbmdz.solrocr.util.Utf8;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
@@ -147,19 +146,6 @@ public class ExternalUtf8ContentFilterTest {
       String filtered = IOUtils.toString(filter);
       assertThat(filtered.length()).isEqualTo(fullText.length());
       assertThat(filtered).isEqualTo(fullText);
-    }
-  }
-
-  @Test
-  public void testMultiFileReader() throws IOException {
-    Path aPath = Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00001.xml");
-    Path bPath = Paths.get("src/test/resources/data/alto_multi/1865-05-24_01-00002.xml");
-    try (MultiFileReader r = new MultiFileReader(ImmutableList.of(aPath, bPath))) {
-      String fromReader = IOUtils.toString(r);
-      String aText = new String(Files.readAllBytes(aPath), StandardCharsets.UTF_8);
-      String bText = new String(Files.readAllBytes(bPath), StandardCharsets.UTF_8);
-      String fromFiles = aText + bText;
-      assertThat(fromReader).isEqualTo(fromFiles);
     }
   }
 }

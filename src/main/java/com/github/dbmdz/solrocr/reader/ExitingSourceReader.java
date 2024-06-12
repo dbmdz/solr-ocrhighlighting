@@ -2,6 +2,7 @@ package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Locale;
 import org.apache.lucene.index.QueryTimeout;
 
@@ -73,5 +74,10 @@ public class ExitingSourceReader implements SourceReader {
   public Section getAsciiSection(int offset) throws IOException {
     checkAndThrow();
     return input.getAsciiSection(offset);
+  }
+
+  @Override
+  public Reader getReader() throws IOException {
+    return input.getReader();
   }
 }

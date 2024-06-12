@@ -2,19 +2,15 @@ package solrocr;
 
 import com.github.dbmdz.solrocr.lucene.filters.ExternalUtf8ContentFilter;
 import com.github.dbmdz.solrocr.model.SourcePointer;
-import com.github.dbmdz.solrocr.reader.MultiFileReader;
 import com.github.dbmdz.solrocr.util.Utf8;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Locale;
@@ -67,24 +63,16 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       // This is very expensive, but we need this since all IO from here on out is character-based.
       toCharOffsets(pointer);
 
-      Reader r;
       if (pointer.sources.isEmpty()) {
         throw new RuntimeException(
             "No source files could be determined from pointer. "
                 + "Is it pointing to files that exist and are readable? "
                 + "Pointer was: "
                 + ptrStr);
-      } else if (pointer.sources.size() > 1) {
-        r =
-            new MultiFileReader(
-                pointer.sources.stream().map(s -> s.path).collect(Collectors.toList()));
-      } else {
-        r =
-            new InputStreamReader(
-                Files.newInputStream(pointer.sources.get(0).path, StandardOpenOption.READ),
-                StandardCharsets.UTF_8);
       }
-
+      // NOTE: Section size doesn't matter much, since we only use the APIs for unaligned
+      // reads through the Reader implementations.
+      Reader r = pointer.getReader(512 * 1024, 0).getReader();
       List<SourcePointer.Region> charRegions =
           pointer.sources.stream().flatMap(s -> s.regions.stream()).collect(Collectors.toList());
       return new ExternalUtf8ContentFilter(new BufferedReader(r), charRegions, ptrStr);

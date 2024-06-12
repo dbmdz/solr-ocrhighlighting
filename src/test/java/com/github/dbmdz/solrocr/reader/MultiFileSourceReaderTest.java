@@ -7,6 +7,7 @@ import com.github.dbmdz.solrocr.reader.SourceReader.Section;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +15,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -115,5 +118,24 @@ class MultiFileSourceReaderTest {
     assertThat(section.start).isEqualTo(sectionStart);
     assertThat(section.end).isEqualTo(sectionStart + sectionSize);
     assertThat(section.text).isEqualTo(expectedStr);
+  }
+
+  @Test
+  public void shouldReturnValidReader() throws IOException {
+    SourceReader reader =
+        new MultiFileSourceReader(filePaths, pointer, 512 * 1024, maxCacheEntries);
+    String fromReader = IOUtils.toString(reader.getReader());
+    String fromFiles =
+        filePaths.stream()
+            .map(
+                fp -> {
+                  try {
+                    return new String(Files.readAllBytes(fp), StandardCharsets.UTF_8);
+                  } catch (IOException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .collect(Collectors.joining(""));
+    assertThat(fromReader).isEqualTo(fromFiles);
   }
 }
