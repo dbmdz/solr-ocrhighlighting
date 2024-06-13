@@ -2,7 +2,8 @@ package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import java.io.IOException;
-import java.io.Reader;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 
 /** API for reading data from a source. */
 public interface SourceReader {
@@ -37,7 +38,72 @@ public interface SourceReader {
    */
   Section getAsciiSection(int offset) throws IOException;
 
-  Reader getReader() throws IOException;
+  /**
+   * Read into {@param dst} starting at {@param start} from the source. , returning the number of
+   * bytes read.
+   */
+  int readBytes(ByteBuffer dst, int start) throws IOException;
+
+  default int readBytes(byte[] dst, int dstOffset, int start, int len) throws IOException {
+    return readBytes(ByteBuffer.wrap(dst, dstOffset, len), start);
+  }
+
+  /**
+   * Get a {@link java.nio.channels.SeekableByteChannel} for this SourceReader.
+   *
+   * <p>This is a generic implementation that should be overriden with a more efficient
+   * source-specific implementation, if available.
+   */
+  default SeekableByteChannel getByteChannel() throws IOException {
+    return new SeekableByteChannel() {
+      int position = 0;
+      boolean closed = false;
+
+      @Override
+      public int read(ByteBuffer byteBuffer) throws IOException {
+        int numRead = SourceReader.this.readBytes(byteBuffer, position);
+        this.position += numRead;
+        return numRead;
+      }
+
+      @Override
+      public int write(ByteBuffer byteBuffer) throws IOException {
+        throw new UnsupportedOperationException("Channel is read-only");
+      }
+
+      @Override
+      public long position() throws IOException {
+        return position;
+      }
+
+      @Override
+      public SeekableByteChannel position(long newPosition) throws IOException {
+        this.position = (int) newPosition;
+        return this;
+      }
+
+      @Override
+      public long size() throws IOException {
+        return SourceReader.this.length();
+      }
+
+      @Override
+      public SeekableByteChannel truncate(long l) throws IOException {
+        throw new UnsupportedOperationException("Channel is read-only");
+      }
+
+      @Override
+      public boolean isOpen() {
+        return !this.closed;
+      }
+
+      @Override
+      public void close() throws IOException {
+        SourceReader.this.close();
+        this.closed = true;
+      }
+    };
+  }
 
   class Section {
     public final int start;

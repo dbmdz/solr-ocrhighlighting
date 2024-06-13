@@ -6,6 +6,7 @@ import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.reader.SourceReader.Section;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
@@ -126,7 +127,9 @@ class MultiFileSourceReaderTest {
   public void shouldReturnValidReader() throws IOException {
     SourceReader reader =
         new MultiFileSourceReader(filePaths, pointer, 512 * 1024, maxCacheEntries);
-    String fromReader = IOUtils.toString(reader.getReader());
+    String fromReader =
+        IOUtils.toString(
+            Channels.newReader(reader.getByteChannel(), StandardCharsets.UTF_8.name()));
     String fromFiles =
         filePaths.stream()
             .map(

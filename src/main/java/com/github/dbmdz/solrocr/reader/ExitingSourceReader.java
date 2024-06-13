@@ -2,7 +2,8 @@ package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import java.io.IOException;
-import java.io.Reader;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Locale;
 import org.apache.lucene.index.QueryTimeout;
 
@@ -77,7 +78,15 @@ public class ExitingSourceReader implements SourceReader {
   }
 
   @Override
-  public Reader getReader() throws IOException {
-    return input.getReader();
+  public int readBytes(ByteBuffer dst, int start) throws IOException {
+    checkAndThrow();
+    return input.readBytes(dst, start);
+  }
+
+  @Override
+  public SeekableByteChannel getByteChannel() throws IOException {
+    // Just provided for completeness, this type is not used during indexing where this method
+    // matters.
+    return input.getByteChannel();
   }
 }

@@ -2,11 +2,9 @@ package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -25,8 +23,8 @@ public class FileSourceReader extends BaseSourceReader {
   }
 
   @Override
-  protected int readBytes(byte[] dst, int dstOffset, int start, int len) throws IOException {
-    return this.chan.read(ByteBuffer.wrap(dst, dstOffset, len), start);
+  public int readBytes(ByteBuffer dst, int start) throws IOException {
+    return this.chan.read(dst, start);
   }
 
   @Override
@@ -48,7 +46,7 @@ public class FileSourceReader extends BaseSourceReader {
   }
 
   @Override
-  public Reader getReader() {
-    return Channels.newReader(this.chan, StandardCharsets.UTF_8.newDecoder(), -1);
+  public SeekableByteChannel getByteChannel() throws IOException {
+    return this.chan;
   }
 }

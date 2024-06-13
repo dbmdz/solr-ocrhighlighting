@@ -3,14 +3,9 @@ package com.github.dbmdz.solrocr.reader;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.util.ArrayUtils;
 import java.io.IOException;
-import java.io.Reader;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -39,8 +34,8 @@ public class MultiFileSourceReader extends BaseSourceReader {
       this.startOffset = startOffset;
     }
 
-    public int read(byte[] dst, int dstOffset, int start, int len) throws IOException {
-      return this.channel.read(ByteBuffer.wrap(dst, dstOffset, len), start);
+    public int read(ByteBuffer dst, int start) throws IOException {
+      return this.channel.read(dst, start);
     }
 
     public void close() throws IOException {
@@ -73,7 +68,7 @@ public class MultiFileSourceReader extends BaseSourceReader {
   }
 
   @Override
-  protected int readBytes(byte[] dst, int dstOffset, int start, int len) throws IOException {
+  public int readBytes(ByteBuffer dst, int start) throws IOException {
     int fileIdx = ArrayUtils.binaryFloorIdxSearch(startOffsets, start);
     if (fileIdx < 0) {
       throw new RuntimeException(String.format("Offset %d is out of bounds", start));
@@ -84,9 +79,10 @@ public class MultiFileSourceReader extends BaseSourceReader {
     }
     OpenFile file = openFiles[fileIdx];
 
+    int len = dst.remaining();
     int numRead = 0;
     while (numRead < len) {
-      numRead += file.read(dst, dstOffset + numRead, (start + numRead) - fileOffset, len - numRead);
+      numRead += file.read(dst, (start + numRead) - fileOffset);
       if (numRead < len) {
         fileIdx++;
         if (fileIdx >= paths.length) {
@@ -128,44 +124,5 @@ public class MultiFileSourceReader extends BaseSourceReader {
         Arrays.stream(paths)
             .map(p -> p.toAbsolutePath().toString())
             .collect(Collectors.joining(", ")));
-  }
-
-  @Override
-  public Reader getReader() {
-    CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
-    ReadableByteChannel multiFileChannel =
-        new ReadableByteChannel() {
-          private boolean closed = false;
-          private int position = 0;
-
-          @Override
-          public boolean isOpen() {
-            return !closed;
-          }
-
-          @Override
-          public void close() throws IOException {
-            MultiFileSourceReader.this.close();
-            this.closed = true;
-          }
-
-          @Override
-          public int read(ByteBuffer byteBuffer) throws IOException {
-            if (!byteBuffer.hasArray()) {
-              throw new UnsupportedOperationException(
-                  "Currently only ByteBuffers backed by an array are supported.");
-            }
-            int numRead =
-                MultiFileSourceReader.this.readBytes(
-                    byteBuffer.array(), byteBuffer.arrayOffset(), position, byteBuffer.remaining());
-            if (numRead > 0) {
-              byteBuffer.position(byteBuffer.position() + numRead);
-              this.position += numRead;
-            }
-            return numRead;
-          }
-        };
-
-    return Channels.newReader(multiFileChannel, decoder, -1);
   }
 }
