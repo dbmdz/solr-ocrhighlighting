@@ -1,9 +1,8 @@
 package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /** SourceReader that reads from a String. */
 public class StringSourceReader implements SourceReader {
@@ -32,8 +31,11 @@ public class StringSourceReader implements SourceReader {
   }
 
   @Override
-  public Reader getReader() throws IOException {
-    return new StringReader(str);
+  public int readBytes(ByteBuffer dst, int start) {
+    byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+    int limit = Math.min(dst.remaining(), bytes.length);
+    dst.put(bytes, 0, limit);
+    return limit;
   }
 
   @Override

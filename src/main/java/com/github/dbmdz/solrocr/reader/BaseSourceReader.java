@@ -2,9 +2,6 @@ package com.github.dbmdz.solrocr.reader;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -56,13 +53,6 @@ public abstract class BaseSourceReader implements SourceReader {
     this.copyBuf = new byte[sectionSize];
     this.maxCacheEntries = maxCacheEntries;
   }
-
-  /**
-   * Read {@param len} bytes starting at {@param start} from the source into the buffer {@param dst}
-   * starting at offset {@param dstOffset}, returning the number of bytes read.
-   */
-  protected abstract int readBytes(byte[] dst, int dstOffset, int start, int len)
-      throws IOException;
 
   @Override
   public abstract int length() throws IOException;
@@ -244,55 +234,5 @@ public abstract class BaseSourceReader implements SourceReader {
     }
 
     return section;
-  }
-
-  /**
-   * Get a {@link java.io.Reader} instance for this SourceReader.
-   *
-   * <p>This is a generic implementation that should be overriden with a more efficient
-   * source-specific implementation, if available.
-   */
-  public Reader getReader() {
-    return new InputStreamReader(
-        new InputStream() {
-          int position = 0;
-          final byte[] buf = new byte[sectionSize];
-          int currentSectionStart = -1;
-          int currentSectionEnd = -1;
-
-          @Override
-          public int read() throws IOException {
-            if (position >= length()) {
-              return -1;
-            }
-            if (position > currentSectionEnd) {
-              currentSectionEnd =
-                  position + BaseSourceReader.this.readBytes(buf, 0, position, sectionSize);
-              currentSectionStart = position;
-            }
-            int out = buf[position - currentSectionStart] & 0xFF;
-            position++;
-            return out;
-          }
-
-          @Override
-          public int read(byte[] b, int off, int len) throws IOException {
-            int numRead = BaseSourceReader.this.readBytes(buf, off, position, len);
-            this.position += numRead;
-            return numRead;
-          }
-
-          @Override
-          public long skip(long n) throws IOException {
-            int toSkip = Math.min(length() - position, (int) n);
-            this.position += toSkip;
-            return toSkip;
-          }
-
-          @Override
-          public void close() throws IOException {
-            BaseSourceReader.this.close();
-          }
-        });
   }
 }

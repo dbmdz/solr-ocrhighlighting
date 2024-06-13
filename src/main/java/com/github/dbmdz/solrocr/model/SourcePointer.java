@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -22,31 +23,58 @@ import org.slf4j.LoggerFactory;
 public class SourcePointer {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  public static class FileSource {
+  public enum SourceType {
+    FILESYSTEM,
+  };
 
-    public final Path path;
+  public static class Source {
+
+    public final SourceType type;
+    public final String target;
     public List<Region> regions;
     public boolean isAscii;
 
-    public FileSource(Path path, List<Region> regions, boolean isAscii) throws IOException {
-      this.path = path;
-      if (!path.toFile().exists()) {
-        throw new FileNotFoundException(
-            String.format(Locale.US, "File at %s does not exist.", path));
-      }
-      if (path.toFile().length() == 0) {
-        throw new IOException(String.format(Locale.US, "File at %s is empty.", path));
-      }
+    public Source(String target, List<Region> regions, boolean isAscii) throws IOException {
+      this.type = determineType(target);
+      Source.validateTarget(target, this.type);
+      this.target = target;
       this.regions = regions;
       this.isAscii = isAscii;
     }
 
-    static FileSource parse(String pointer) {
+    static SourceType determineType(String target) throws IOException {
+      if (target.startsWith("/")) {
+        return SourceType.FILESYSTEM;
+      } else if (Files.exists(Paths.get(target))) {
+        return SourceType.FILESYSTEM;
+      } else {
+        throw new IOException(
+            String.format(Locale.US, "Target %s is currently not supported.", target));
+      }
+    }
+
+    static void validateTarget(String target, SourceType type) throws IOException {
+      if (type == SourceType.FILESYSTEM) {
+        Path path = Paths.get(target);
+        if (!Files.exists(path)) {
+          throw new FileNotFoundException(
+              String.format(Locale.US, "File at %s does not exist.", target));
+        }
+        if (Files.size(path) == 0) {
+          throw new IOException(String.format(Locale.US, "File at %s is empty.", target));
+        }
+      } else {
+        throw new IOException(
+            String.format(Locale.US, "Target %s is currently not supported.", target));
+      }
+    }
+
+    static Source parse(String pointer) {
       Matcher m = POINTER_PAT.matcher(pointer);
       if (!m.find()) {
         throw new RuntimeException("Could not parse source pointer from '" + pointer + ".");
       }
-      Path sourcePath = Paths.get(m.group("path"));
+      String target = m.group("target");
       List<Region> regions = ImmutableList.of();
       if (m.group("regions") != null) {
         regions =
@@ -56,16 +84,25 @@ public class SourcePointer {
                 .collect(Collectors.toList());
       }
       try {
-        return new FileSource(sourcePath, regions, m.group("isAscii") != null);
+        return new Source(target, regions, m.group("isAscii") != null);
       } catch (FileNotFoundException e) {
-        throw new RuntimeException("Could not locate file at '" + sourcePath + ".");
+        throw new RuntimeException("Could not locate file at '" + target + ".");
       } catch (IOException e) {
-        throw new RuntimeException("Could not read file at '" + sourcePath + ".");
+        throw new RuntimeException("Could not read target at '" + target + ".");
+      }
+    }
+
+    public SourceReader getReader(int sectionSize, int maxCacheEntries) throws IOException {
+      if (this.type == SourceType.FILESYSTEM) {
+        return new FileSourceReader(
+            Paths.get(this.target), SourcePointer.parse(this.target), sectionSize, maxCacheEntries);
+      } else {
+        throw new UnsupportedOperationException("Unsupported source type '" + this.type + "'.");
       }
     }
 
     public String toString() {
-      StringBuilder sb = new StringBuilder(path.toString());
+      StringBuilder sb = new StringBuilder(target);
       if (isAscii) {
         sb.append("{ascii}");
       }
@@ -117,9 +154,9 @@ public class SourcePointer {
   }
 
   static final Pattern POINTER_PAT =
-      Pattern.compile("^(?<path>.+?)(?<isAscii>\\{ascii})?(?:\\[(?<regions>[0-9:,]+)])?$");
+      Pattern.compile("^(?<target>.+?)(?<isAscii>\\{ascii})?(?:\\[(?<regions>[0-9:,]+)])?$");
 
-  public final List<FileSource> sources;
+  public final List<Source> sources;
 
   public static boolean isPointer(String pointer) {
     if (pointer.startsWith("<")) {
@@ -134,34 +171,43 @@ public class SourcePointer {
       throw new RuntimeException("Could not parse pointer: " + pointer);
     }
     String[] sourceTokens = pointer.split("\\+");
-    List<FileSource> fileSources =
-        Arrays.stream(sourceTokens).map(FileSource::parse).collect(Collectors.toList());
-    if (fileSources.isEmpty()) {
+    List<Source> sources =
+        Arrays.stream(sourceTokens).map(Source::parse).collect(Collectors.toList());
+    if (sources.isEmpty()) {
       return null;
     } else {
-      return new SourcePointer(fileSources);
+      return new SourcePointer(sources);
     }
   }
 
-  public SourcePointer(List<FileSource> sources) {
+  public SourcePointer(List<Source> sources) {
     this.sources = sources;
   }
 
   @Override
   public String toString() {
-    return sources.stream().map(FileSource::toString).collect(Collectors.joining("+"));
+    return sources.stream().map(Source::toString).collect(Collectors.joining("+"));
   }
 
   /** Create a reader for the data pointed at by this source pointer. */
   public SourceReader getReader(int sectionSize, int maxCacheEntries) throws IOException {
-    if (this.sources.size() == 1) {
-      return new FileSourceReader(this.sources.get(0).path, this, sectionSize, maxCacheEntries);
+    if (this.sources.stream().allMatch(s -> s.type == SourceType.FILESYSTEM)) {
+      if (this.sources.size() == 1) {
+        return new FileSourceReader(
+            Paths.get(this.sources.get(0).target), this, sectionSize, maxCacheEntries);
+      } else {
+        return new MultiFileSourceReader(
+            this.sources.stream().map(s -> Paths.get(s.target)).collect(Collectors.toList()),
+            this,
+            sectionSize,
+            maxCacheEntries);
+      }
     } else {
-      return new MultiFileSourceReader(
-          this.sources.stream().map(s -> s.path).collect(Collectors.toList()),
-          this,
-          sectionSize,
-          maxCacheEntries);
+      throw new IOException(
+          String.format(
+              Locale.US,
+              "Pointer %s contains unsupported target types or a mix of target types.",
+              this));
     }
   }
 }
