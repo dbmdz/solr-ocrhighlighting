@@ -142,7 +142,10 @@ public abstract class BaseSourceReader implements SourceReader {
       byteLen = this.length() - start;
     }
     byte[] data = new byte[byteLen];
-    this.readBytes(data, 0, start, byteLen);
+    int numRead = 0;
+    while (numRead < byteLen) {
+      numRead += this.readBytes(data, numRead, start + numRead, byteLen - numRead);
+    }
     int dataStart = adjustOffset(0, data, AdjustDirection.RIGHT);
     int dataEnd = adjustOffset(data.length - 1, data, AdjustDirection.LEFT);
     return new String(data, dataStart, dataEnd - dataStart + 1, StandardCharsets.UTF_8);
@@ -213,7 +216,10 @@ public abstract class BaseSourceReader implements SourceReader {
     }
     int startOffset = sectionIndex * sectionSize;
     int readLen = Math.min(sectionSize, this.length() - startOffset);
-    this.readBytes(copyBuf, 0, startOffset, readLen);
+    int numRead = 0;
+    while(numRead < readLen) {
+      numRead += this.readBytes(copyBuf, 0, startOffset, readLen);
+    }
     // Construct a String without going through a decoder to save on CPU.
     // Given that the method has been deprecated since Java 1.1 and was never removed, I don't think
     // this is very risky 😅
