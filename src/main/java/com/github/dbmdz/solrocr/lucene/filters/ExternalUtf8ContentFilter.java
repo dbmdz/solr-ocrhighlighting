@@ -1,10 +1,13 @@
 package com.github.dbmdz.solrocr.lucene.filters;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
+import com.github.dbmdz.solrocr.model.SourcePointer.Region;
 import com.github.dbmdz.solrocr.util.SourceAwareReader;
 import com.github.dbmdz.solrocr.util.Utf8;
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
-import java.io.Reader;
+import java.nio.CharBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -17,98 +20,132 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
    * The cumulative offset difference between the input (bytes) and the output (chars) at the
    * current position.
    *
+   * <p>Used to calculate the <strong>byte</strong> offset in the input, given a
+   * <strong>char</strong> offset from the output of this filter.
+   *
    * <pre>
-   * current actual byte offset in input = currentOutOffset + cumulative
+   * currentInputByteOffset = currentOutCharOffset + cumulativeOffsetDifference
    * </pre>
    */
-  private int cumulative;
+  private int cumulativeOffsetDifference;
 
-  /** The current <strong>char</strong> offset in the full file; */
-  private int currentInOffset;
+  /**
+   * The current <strong>byte</strong> offset in the <strong>full</strong> input, i.e. the
+   * concatenated content of all files in the source pointer.
+   */
+  private int currentInByteOffset;
 
-  /** The current <strong>char</strong> offset in the output. */
-  private int currentOutOffset;
+  /**
+   * The current <strong>char</strong> offset in the output, i.e. the concatenated and decoded
+   * content of all regions in the source pointer.
+   */
+  private int currentOutCharOffset;
 
   /** Source pointer of this reader, used for debugging and error reporting. */
   private final String pointer;
 
-  private boolean nextIsOffset = false;
+  /** Whether the last seen character had more than 1 byte for a char */
+  private boolean lastCharHadMultipleBytes = false;
+
   private final Queue<SourcePointer.Region> remainingRegions;
   private SourcePointer.Region currentRegion;
 
-  public ExternalUtf8ContentFilter(Reader input, List<SourcePointer.Region> regions, String pointer)
+  public ExternalUtf8ContentFilter(
+      SeekableByteChannel channel, List<SourcePointer.Region> regions, String pointer)
       throws IOException {
-    super(input);
+    // We need to be able to reposition the underlying reader, so we use our own implementation
+    // based on a SeekableByteChannel.
+    super(new ByteSeekableReader(channel));
+    if (regions == null || regions.isEmpty()) {
+      regions = ImmutableList.of(new Region(0, (int) channel.size()));
+    }
     this.pointer = pointer;
-    this.currentOutOffset = 0;
-    this.currentInOffset = 0;
-    this.cumulative = 0;
+    this.currentOutCharOffset = 0;
+    this.currentInByteOffset = 0;
+    this.cumulativeOffsetDifference = 0;
     this.remainingRegions = new LinkedList<>(regions);
     currentRegion = remainingRegions.remove();
     if (currentRegion.start > 0) {
-      this.addOffCorrectMap(currentOutOffset, currentRegion.startOffset);
-      this.cumulative += currentRegion.startOffset;
-      this.currentInOffset = (int) this.input.skip(currentRegion.start);
+      this.addOffCorrectMap(currentOutCharOffset, currentRegion.start);
+      this.cumulativeOffsetDifference += currentRegion.start;
+      this.currentInByteOffset = currentRegion.start;
+      ((ByteSeekableReader) this.input).position(currentInByteOffset);
     }
   }
 
   /**
-   * Read <tt>len</tt> <tt>char</tt>s into <tt>cbuf</tt>, starting from character index <tt>off</tt>
-   * relative to the beginning of <tt>cbuf</tt> and return the number of <tt>char</tt>s read.
+   * Read <tt>requestedCharLen</tt> <tt>char</tt>s into <tt>outputBuffer</tt>, starting from
+   * character index <tt>outputCharOffset</tt> relative to the beginning of <tt>outputBuffer</tt>
+   * and return the number of <tt>char</tt>s read.
+   *
+   * <p>Keeps track of the current byte offset in the input and the current char offset in the
+   * output.
    */
   @Override
-  public int read(char[] cbuf, int off, int len) throws IOException {
-    if (currentInOffset == currentRegion.end) {
+  public int read(char[] outputBuffer, int outputCharOffset, int requestedCharLen)
+      throws IOException {
+    if (currentInByteOffset == currentRegion.end) {
       return -1;
     }
 
     int numCharsRead = 0;
-    while (len - numCharsRead > 0) {
-      int charsRemainingInRegion = currentRegion.end - currentInOffset;
-      int charsToRead = len - numCharsRead;
-      if (charsToRead > charsRemainingInRegion) {
-        charsToRead = charsRemainingInRegion;
+    while (requestedCharLen - numCharsRead > 0) {
+      int bytesRemainingInRegion = currentRegion.end - currentInByteOffset;
+      int charsToRead = requestedCharLen - numCharsRead;
+      if (charsToRead > bytesRemainingInRegion) {
+        charsToRead = bytesRemainingInRegion;
       }
 
-      int read = this.input.read(cbuf, off, charsToRead);
-      if (read < 0) {
+      int charsRead = this.input.read(outputBuffer, outputCharOffset, charsToRead);
+      if (charsRead < 0) {
         break;
       }
-      correctOffsets(cbuf, off, read);
-      numCharsRead += read;
-      off += read;
+      while (Utf8.encodedLength(CharBuffer.wrap(outputBuffer, outputCharOffset, charsRead))
+          > bytesRemainingInRegion) {
+        charsRead--;
+      }
+      correctOffsets(outputBuffer, outputCharOffset, charsRead);
+      numCharsRead += charsRead;
+      outputCharOffset += charsRead;
 
-      if (currentInOffset == currentRegion.end) {
+      if (currentInByteOffset == currentRegion.end) {
         if (remainingRegions.isEmpty()) {
           break;
         }
         currentRegion = remainingRegions.remove();
 
-        cumulative = currentRegion.startOffset - currentOutOffset;
-        this.addOffCorrectMap(currentOutOffset, cumulative);
-        int toSkip = this.currentRegion.start - this.currentInOffset;
-        if (toSkip > 0) {
-          this.input.skip(this.currentRegion.start - this.currentInOffset);
+        cumulativeOffsetDifference = currentRegion.start - currentOutCharOffset;
+        this.addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
+        if (this.currentRegion.start > this.currentInByteOffset) {
+          this.currentInByteOffset = currentRegion.start;
         }
-        this.currentInOffset = currentRegion.start;
+        ((ByteSeekableReader) this.input).position(this.currentInByteOffset);
       }
     }
     return numCharsRead > 0 ? numCharsRead : -1;
   }
 
-  private void correctOffsets(char[] cbuf, int off, int len) {
-    for (int i = off; i < off + len; i++) {
-      if (nextIsOffset) {
-        this.addOffCorrectMap(currentOutOffset, cumulative);
-        nextIsOffset = false;
+  /**
+   * Updates the current input and output offsets based on the characters read from the input.
+   *
+   * @param decodedChars Buffer of characters that were read from the input
+   * @param bufOffset Offset in decodedChars, where the stored characters start
+   * @param numChars Number of characters stored in decodedChars
+   */
+  private void correctOffsets(char[] decodedChars, int bufOffset, int numChars) {
+    for (int i = bufOffset; i < bufOffset + numChars; ) {
+      if (lastCharHadMultipleBytes) {
+        this.addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
+        lastCharHadMultipleBytes = false;
       }
-      currentInOffset += 1;
-      currentOutOffset += 1;
-      int cp = Character.codePointAt(cbuf, i);
-      int increment = Utf8.encodedLength(cp) - 1;
-      if (increment > 0) {
-        cumulative += increment;
-        nextIsOffset = true;
+      currentOutCharOffset += 1;
+      int cp = Character.codePointAt(decodedChars, i);
+      i += Character.charCount(cp);
+      int encodedLen = Utf8.encodedLength(cp);
+      currentInByteOffset += encodedLen;
+      if (encodedLen > 1) {
+        cumulativeOffsetDifference += (encodedLen - 1);
+        lastCharHadMultipleBytes = true;
       }
     }
   }

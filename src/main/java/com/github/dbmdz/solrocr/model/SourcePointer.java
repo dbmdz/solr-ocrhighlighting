@@ -3,13 +3,13 @@ package com.github.dbmdz.solrocr.model;
 import com.github.dbmdz.solrocr.reader.FileSourceReader;
 import com.github.dbmdz.solrocr.reader.MultiFileSourceReader;
 import com.github.dbmdz.solrocr.reader.SourceReader;
-import com.google.common.collect.ImmutableList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -75,7 +75,7 @@ public class SourcePointer {
         throw new RuntimeException("Could not parse source pointer from '" + pointer + ".");
       }
       String target = m.group("target");
-      List<Region> regions = ImmutableList.of();
+      List<Region> regions = new ArrayList<>();
       if (m.group("regions") != null) {
         regions =
             Arrays.stream(m.group("regions").split(","))
@@ -124,7 +124,6 @@ public class SourcePointer {
 
     public int start;
     public int end;
-    public int startOffset = 0;
 
     public static Region parse(String r) {
       if (r.startsWith(":")) {
@@ -140,11 +139,6 @@ public class SourcePointer {
     public Region(int start, int end) {
       this.start = start;
       this.end = end;
-    }
-
-    public Region(int start, int end, int startOffset) {
-      this(start, end);
-      this.startOffset = startOffset;
     }
 
     @Override
