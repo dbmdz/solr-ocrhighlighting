@@ -135,6 +135,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
 
   /** Find a match for one of the break classes in the given String, seeking forward. */
   private int findForwardMatch(String text, int fromOffset, int toOffset) {
+    int match = Integer.MAX_VALUE;
     for (String breakClass : this.breakClasses) {
       // Where to start looking from for a break in the next iteration
       int fromIdx = fromOffset;
@@ -169,11 +170,17 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
           fromIdx = closeIdx;
           continue;
         }
-        // Found a match
-        return openIdx;
+        // Found a match, try next class to see whether there is a match closer to the offset
+        if (openIdx < match) {
+          match = openIdx;
+        }
+        break;
       }
     }
-    return -1;
+    if (match == Integer.MAX_VALUE) {
+      return -1;
+    }
+    return match;
   }
 
   /** Find a match for one of the break classes in the given String, seeking backwards. */
@@ -185,6 +192,7 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
     assert fromOffset > toOffset
         : "fromOffset must be greater than toOffset, we're looking backwards!";
 
+    int match = -1;
     for (String breakClass : this.breakClasses) {
       // Look for the class in the block
       while (fromOffset > toOffset) {
@@ -202,9 +210,13 @@ public class HocrClassBreakLocator extends BaseBreakLocator {
           fromOffset = Math.max(previousClose, elemOpen);
           continue;
         }
-        return elemOpen;
+        // Found match, try next class to see whether there is a match closer to the offset
+        if (elemOpen > match) {
+          match = elemOpen;
+        }
+        break;
       }
     }
-    return -1;
+    return match;
   }
 }
