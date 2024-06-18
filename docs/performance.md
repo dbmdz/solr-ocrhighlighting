@@ -43,11 +43,11 @@ the cache size, the more data is read from the disk, i.e. the chances of cache h
 comes at the cost of more memory usage and more allocations in the JVM, which can have a performance impact.
 By default, the plugin uses a section size of 8KiB with a maximum number of cached sections of 10,
 which is a good trade-off for most setups and performed well in our benchmarks. If you want to tweak these
-settings, use the `sectionReadSizeKib` and `maxSectionCacheSizeKib` parameters on the `OcrHighlightComponent`
+settings, use the `sectionReadSizeKiB` and `maxSectionCacheSizeKiB` parameters on the `OcrHighlightComponent`
 in your `solrconfig.xml`:
 
-- `sectionReadSizeKib`: The size of the sections that are read from the OCR files. The default is 8KiB.
-- `maxSectionCacheSizeKib`: The maximum memory that is used for caching sections. The default is 10 * `sectionReadSizeKib`.
+- `sectionReadSizeKiB`: The size of the sections that are read from the OCR files. The default is 8KiB.
+- `maxSectionCacheSizeKiB`: The maximum memory that is used for caching sections. The default is 10 * `sectionReadSizeKiB`.
 
 ## Concurrency
 The plugin can read multiple files in parallel and also process them concurrently. By default, it will
