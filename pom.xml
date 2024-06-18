@@ -83,16 +83,19 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <version>${version.solr}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-highlighter</artifactId>
       <version>${version.lucene}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-analysis-common</artifactId>
       <version>${version.lucene}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.woodstox</groupId>
@@ -103,6 +106,16 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>33.2.0-jre</version>
+    </dependency>
+    <dependency>
+      <groupId>io.minio</groupId>
+      <artifactId>minio</artifactId>
+      <version>8.5.10</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
+      <version>2.15.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -164,6 +177,18 @@
       <version>${version.byteseek}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>minio</artifactId>
+      <version>1.19.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>1.19.8</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -204,15 +229,6 @@
               </excludes>
             </filter>
           </filters>
-          <artifactSet>
-            <includes>
-              <include>de.digitalcollections:solr-ocrhighlighting</include>
-              <include>org.apache.commons:commons-text</include>
-              <include>commons-io:commons-io</include>
-              <include>com.fasterxml.woodstox:woodstox-core</include>
-              <include>com.google.guava:guava</include>
-            </includes>
-          </artifactSet>
         </configuration>
         <executions>
           <execution>

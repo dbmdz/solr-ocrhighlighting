@@ -1,13 +1,11 @@
 package com.github.dbmdz.solrocr.model;
 
-import com.github.dbmdz.solrocr.reader.FileSourceReader;
-import com.github.dbmdz.solrocr.reader.MultiFileSourceReader;
-import com.github.dbmdz.solrocr.reader.SourceReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import com.github.dbmdz.solrocr.reader.*;
+import io.minio.MinioClient;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
+import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +23,8 @@ public class SourcePointer {
 
   public enum SourceType {
     FILESYSTEM,
-  };
+    S3
+  }
 
   public static class Source {
 
@@ -36,7 +35,6 @@ public class SourcePointer {
 
     public Source(String target, List<Region> regions, boolean isAscii) throws IOException {
       this.type = determineType(target);
-      Source.validateTarget(target, this.type);
       this.target = target;
       this.regions = regions;
       this.isAscii = isAscii;
@@ -47,22 +45,8 @@ public class SourcePointer {
         return SourceType.FILESYSTEM;
       } else if (Files.exists(Paths.get(target))) {
         return SourceType.FILESYSTEM;
-      } else {
-        throw new IOException(
-            String.format(Locale.US, "Target %s is currently not supported.", target));
-      }
-    }
-
-    static void validateTarget(String target, SourceType type) throws IOException {
-      if (type == SourceType.FILESYSTEM) {
-        Path path = Paths.get(target);
-        if (!Files.exists(path)) {
-          throw new FileNotFoundException(
-              String.format(Locale.US, "File at %s does not exist.", target));
-        }
-        if (Files.size(path) == 0) {
-          throw new IOException(String.format(Locale.US, "File at %s is empty.", target));
-        }
+      } else if (target.startsWith("s3://")) {
+        return SourceType.S3;
       } else {
         throw new IOException(
             String.format(Locale.US, "Target %s is currently not supported.", target));
@@ -74,6 +58,7 @@ public class SourcePointer {
       if (!m.find()) {
         throw new RuntimeException("Could not parse source pointer from '" + pointer + ".");
       }
+
       String target = m.group("target");
       List<Region> regions = new ArrayList<>();
       if (m.group("regions") != null) {
@@ -89,15 +74,6 @@ public class SourcePointer {
         throw new RuntimeException("Could not locate file at '" + target + ".");
       } catch (IOException e) {
         throw new RuntimeException("Could not read target at '" + target + ".");
-      }
-    }
-
-    public SourceReader getReader(int sectionSize, int maxCacheEntries) throws IOException {
-      if (this.type == SourceType.FILESYSTEM) {
-        return new FileSourceReader(
-            Paths.get(this.target), SourcePointer.parse(this.target), sectionSize, maxCacheEntries);
-      } else {
-        throw new UnsupportedOperationException("Unsupported source type '" + this.type + "'.");
       }
     }
 
@@ -117,6 +93,23 @@ public class SourcePointer {
         sb.append("]");
       }
       return sb.toString();
+    }
+
+    public SourceReader getReader(int sectionSize, int maxCacheEntries, MinioClient s3Client)
+        throws IOException {
+      if (this.type == SourceType.FILESYSTEM) {
+        return new FileSourceReader(
+            Paths.get(this.target), SourcePointer.parse(this.target), sectionSize, maxCacheEntries);
+      } else if (this.type == SourceType.S3) {
+        return new S3ObjectSourceReader(
+            s3Client,
+            URI.create(this.target),
+            SourcePointer.parse(this.target),
+            sectionSize,
+            maxCacheEntries);
+      } else {
+        throw new UnsupportedOperationException("Unsupported source type '" + this.type + "'.");
+      }
     }
   }
 
@@ -184,24 +177,21 @@ public class SourcePointer {
   }
 
   /** Create a reader for the data pointed at by this source pointer. */
-  public SourceReader getReader(int sectionSize, int maxCacheEntries) throws IOException {
-    if (this.sources.stream().allMatch(s -> s.type == SourceType.FILESYSTEM)) {
-      if (this.sources.size() == 1) {
+  public SourceReader getReader(int sectionSize, int maxCacheEntries, MinioClient s3client)
+      throws IOException {
+    if (this.sources.size() == 1) {
+      if (this.sources.get(0).type == SourceType.FILESYSTEM) {
         return new FileSourceReader(
             Paths.get(this.sources.get(0).target), this, sectionSize, maxCacheEntries);
+      } else if (this.sources.get(0).type == SourceType.S3) {
+        return new S3ObjectSourceReader(
+            s3client, URI.create(this.sources.get(0).target), this, sectionSize, maxCacheEntries);
       } else {
-        return new MultiFileSourceReader(
-            this.sources.stream().map(s -> Paths.get(s.target)).collect(Collectors.toList()),
-            this,
-            sectionSize,
-            maxCacheEntries);
+        throw new IOException(
+            String.format(Locale.US, "Pointer %s contains an unsupported target type.", this));
       }
     } else {
-      throw new IOException(
-          String.format(
-              Locale.US,
-              "Pointer %s contains unsupported target types or a mix of target types.",
-              this));
+      return new MultiSourceReader(this, sectionSize, maxCacheEntries, s3client);
     }
   }
 }
