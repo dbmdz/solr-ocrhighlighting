@@ -6,8 +6,6 @@ import com.github.dbmdz.solrocr.lucene.filters.ExternalUtf8ContentFilter;
 import com.github.dbmdz.solrocr.model.SourcePointer.Region;
 import com.github.dbmdz.solrocr.util.Utf8;
 import com.google.common.collect.ImmutableList;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
@@ -57,7 +55,7 @@ public class ExternalUtf8ContentFilterTest {
     Path p = Paths.get("src/test/resources/data/hocr.html");
     CharFilter filter =
         new ExternalUtf8ContentFilter(
-            new BufferedReader(new FileReader(p.toFile())),
+            Files.newByteChannel(p),
             ImmutableList.of(new Region(0, (int) p.toFile().length())),
             p.toString());
     String full = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);

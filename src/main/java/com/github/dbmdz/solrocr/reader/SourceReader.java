@@ -6,8 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 
 /** API for reading data from a source. */
-public interface SourceReader {
+public interface SourceReader extends AutoCloseable {
   /** Close the resources associated with this reader. */
+  @Override
   void close() throws IOException;
 
   /** Get the pointer this reader is reading from. */
