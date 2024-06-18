@@ -218,7 +218,7 @@ public abstract class BaseSourceReader implements SourceReader {
     int readLen = Math.min(sectionSize, this.length() - startOffset);
     int numRead = 0;
     while(numRead < readLen) {
-      numRead += this.readBytes(copyBuf, 0, startOffset, readLen);
+      numRead += this.readBytes(copyBuf, numRead, startOffset + numRead, readLen - numRead);
     }
     // Construct a String without going through a decoder to save on CPU.
     // Given that the method has been deprecated since Java 1.1 and was never removed, I don't think
