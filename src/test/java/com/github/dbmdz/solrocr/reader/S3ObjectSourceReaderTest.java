@@ -4,28 +4,60 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.github.dbmdz.solrocr.model.SourcePointer;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
+import io.minio.UploadObjectArgs;
+import io.minio.errors.*;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.testcontainers.containers.MinIOContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-class FileSourceReaderTest {
+@Testcontainers
+public class S3ObjectSourceReaderTest {
+  @Container static final MinIOContainer container = new MinIOContainer("minio/minio");
+  static MinioClient s3Client;
+  int maxCacheEntries = 10;
+  static final String s3Source = "s3://my-test-bucket/hocr.html";
+  static final Path filePath = Paths.get("src/test/resources/data/hocr.html");
 
-  private final Path filePath = Paths.get("src/test/resources/data/hocr.html");
-  private final SourcePointer pointer = SourcePointer.parse(filePath.toString());
-  private final int maxCacheEntries = 10;
+  @BeforeAll
+  public static void setUp()
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
+          NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+          XmlParserException, InternalException {
+    s3Client =
+        MinioClient.builder()
+            .endpoint(container.getS3URL())
+            .credentials(container.getUserName(), container.getPassword())
+            .build();
+
+    s3Client.makeBucket(MakeBucketArgs.builder().bucket("my-test-bucket").build());
+    s3Client.uploadObject(
+        UploadObjectArgs.builder()
+            .bucket("my-test-bucket")
+            .object("hocr.html")
+            .filename(filePath.toString())
+            .build());
+  }
 
   @Test
   void shouldCacheSectionsProperly() throws IOException {
-    FileSourceReader reader = new FileSourceReader(filePath, pointer, 8192, 3);
+    S3ObjectSourceReader reader =
+        new S3ObjectSourceReader(
+            s3Client, URI.create(s3Source), SourcePointer.parse(s3Source), 8192, 3);
     reader.getAsciiSection(128);
     assertThat(reader.cachedSectionIdxes).containsExactlyInAnyOrder(-1, -1, 0);
     assertThat(reader.cache[0].section.start).isEqualTo(0);
@@ -47,7 +79,9 @@ class FileSourceReaderTest {
 
   @Test
   void shouldReadUtf8StringCorrectly() throws IOException {
-    SourceReader reader = new FileSourceReader(filePath, pointer, 8192, maxCacheEntries);
+    SourceReader reader =
+        new S3ObjectSourceReader(
+            s3Client, URI.create(s3Source), SourcePointer.parse(s3Source), 1024, maxCacheEntries);
     // No UTF8 misalignment offset
     assertThat(reader.readUtf8String(422871, 97))
         .isEqualTo(
@@ -65,7 +99,9 @@ class FileSourceReaderTest {
       ints = {64, 128, 256, 512, 1024, 2048, 4096, 8192, 16_384, 32_768, 65_536, 131_072, 262_144})
   void shouldReadAsciiStringCorrectlyWithDifferentSectionSizes(int sectionSize) throws IOException {
     // Reduce number of cache entries to force some cache evictions
-    SourceReader reader = new FileSourceReader(filePath, pointer, sectionSize, 3);
+    SourceReader reader =
+        new S3ObjectSourceReader(
+            s3Client, URI.create(s3Source), SourcePointer.parse(s3Source), sectionSize, 3);
     // Choose offsets to force reading across multiple sections
     int startOffset = 2_715_113 - (maxCacheEntries / 2 * sectionSize) - (sectionSize / 2);
     int endOffset = startOffset + (maxCacheEntries / 2 * sectionSize);
@@ -82,7 +118,13 @@ class FileSourceReaderTest {
   @ValueSource(
       ints = {64, 128, 256, 512, 1024, 2048, 4096, 8192, 16_384, 32_768, 65_536, 131_072, 262_144})
   public void shouldReadCorrectlyAlignedSections(int sectionSize) throws IOException {
-    SourceReader reader = new FileSourceReader(filePath, pointer, sectionSize, maxCacheEntries);
+    SourceReader reader =
+        new S3ObjectSourceReader(
+            s3Client,
+            URI.create(s3Source),
+            SourcePointer.parse(s3Source),
+            sectionSize,
+            maxCacheEntries);
     int offset = (sectionSize * 4) + (sectionSize / 2);
     SourceReader.Section section = reader.getAsciiSection(offset);
     byte[] expectedData = new byte[sectionSize];
@@ -95,48 +137,18 @@ class FileSourceReaderTest {
     assertThat(section.text).isEqualTo(expectedStr);
   }
 
-  /** Providing empty pointer String yields Exception */
   @Test
-  public void testEmptyToStringThrowsException() {
-    String pointerStr = "";
+  public void testMissingS3ClientThrowsException() {
     assertThrows(
         RuntimeException.class,
         () ->
-            new FileSourceReader(
-                Paths.get(pointerStr), SourcePointer.parse(pointerStr), 1024, maxCacheEntries));
+            new S3ObjectSourceReader(
+                null, URI.create(s3Source), SourcePointer.parse(s3Source), 1024, maxCacheEntries));
   }
 
-  /** Provided meaningful source information but no files actually present */
   @Test
-  public void testMeaningfulStringToStringButFilesMissing() throws Exception {
-    Path p = Paths.get("src/test/resources/data/b0361249-3be2-4cf7-b90c-5eb888fbeb2b.ocr_text");
-    String pointerStr = new String(Files.readAllBytes(p), StandardCharsets.UTF_8);
-    assertThrows(
-        RuntimeException.class,
-        () ->
-            new FileSourceReader(
-                Paths.get(pointerStr), SourcePointer.parse(pointerStr), 1024, maxCacheEntries));
-  }
-
-  /** One invalid local path results in an exception for the bunch */
-  @Test
-  public void testInvalidFileSources(@TempDir Path tempDir) throws Exception {
-    // arrange
-    Path someAlto =
-        Paths.get("src/test/resources/data/alto_semantics_urn+nbn+de+gbv+3+5-83179_00000007.xml");
-    Path dirOne = tempDir.resolve("assetstoreOcr/16/96/46");
-    Files.createDirectories(dirOne);
-    Path fileOne = dirOne.resolve("169646058196561338046488667538472128959");
-    Files.createFile(fileOne);
-    Files.copy(someAlto, fileOne, StandardCopyOption.REPLACE_EXISTING);
-    Path dirTwo = tempDir.resolve("assetstoreOcr/70/24/82");
-    Files.createDirectories(dirTwo);
-    Path fileTwo = dirTwo.resolve("70248214232052142117595264918632243561");
-    Files.copy(someAlto, fileTwo, StandardCopyOption.REPLACE_EXISTING);
-    Path fileMissing = dirTwo.resolve("invalid_path");
-    String pointerStr = String.format("%s+%s+%s", fileOne, fileTwo, fileMissing);
-
-    // act + assert
+  public void testMissingBucketThrowsException() {
+    String pointerStr = "s3://unknown-bucket/hocr.html";
     assertThrows(
         RuntimeException.class,
         () ->

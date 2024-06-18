@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class MultiFileSourceReaderTest {
+class MultiSourceReaderTest {
   private final List<Path> filePaths;
   private final SourcePointer pointer;
   private final int maxCacheEntries = 10;
 
-  MultiFileSourceReaderTest() throws IOException {
+  MultiSourceReaderTest() throws IOException {
     Path root = Paths.get("src/test/resources/data/alto_multi");
     filePaths = new ArrayList<>();
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(root, "1860-11-30*.xml")) {
@@ -93,7 +93,7 @@ class MultiFileSourceReaderTest {
       ints = {64, 128, 256, 512, 1024, 2048, 4096, 8192, 16_384, 32_768, 65_536, 131_072, 262_144})
   void shouldReadAsciiStringCorrectlyWithDifferentSectionSizes(int sectionSize) throws IOException {
     // Reduce number of cache entries to force some cache evictions
-    SourceReader reader = new MultiFileSourceReader(filePaths, pointer, sectionSize, 3);
+    SourceReader reader = new MultiSourceReader(pointer, sectionSize, 3, null);
     // Choose offsets to force reading across multiple sections
     int startOffset =
         Math.max(
@@ -110,8 +110,7 @@ class MultiFileSourceReaderTest {
   @ValueSource(
       ints = {64, 128, 256, 512, 1024, 2048, 4096, 8192, 16_384, 32_768, 65_536, 131_072, 262_144})
   public void shouldReadCorrectlyAlignedSections(int sectionSize) throws IOException {
-    SourceReader reader =
-        new MultiFileSourceReader(filePaths, pointer, sectionSize, maxCacheEntries);
+    SourceReader reader = new MultiSourceReader(pointer, sectionSize, maxCacheEntries, null);
     // FIXME: Pick offset that falls on a file boundary!
     int offset = (int) (Files.size(filePaths.get(2)) - 32);
     Section section = reader.getAsciiSection(offset);
@@ -125,8 +124,7 @@ class MultiFileSourceReaderTest {
 
   @Test
   public void shouldReturnValidReader() throws IOException {
-    SourceReader reader =
-        new MultiFileSourceReader(filePaths, pointer, 512 * 1024, maxCacheEntries);
+    SourceReader reader = new MultiSourceReader(pointer, 512 * 1024, maxCacheEntries, null);
     String fromReader =
         IOUtils.toString(
             Channels.newReader(reader.getByteChannel(), StandardCharsets.UTF_8.name()));
