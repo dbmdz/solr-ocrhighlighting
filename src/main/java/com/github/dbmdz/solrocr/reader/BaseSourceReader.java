@@ -217,7 +217,7 @@ public abstract class BaseSourceReader implements SourceReader {
     int startOffset = sectionIndex * sectionSize;
     int readLen = Math.min(sectionSize, this.length() - startOffset);
     int numRead = 0;
-    while(numRead < readLen) {
+    while (numRead < readLen) {
       numRead += this.readBytes(copyBuf, numRead, startOffset + numRead, readLen - numRead);
     }
     // Construct a String without going through a decoder to save on CPU.
