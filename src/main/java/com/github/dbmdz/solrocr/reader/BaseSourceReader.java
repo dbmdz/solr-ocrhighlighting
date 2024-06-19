@@ -17,7 +17,7 @@ public abstract class BaseSourceReader implements SourceReader {
   protected final SourcePointer pointer;
   protected final int sectionSize;
   private final byte[] copyBuf;
-  private final int maxCacheEntries;
+  protected final int maxCacheEntries;
 
   /**
    * Array with a slot for every possible section in the source, of which only {@link
@@ -224,7 +224,7 @@ public abstract class BaseSourceReader implements SourceReader {
     // Given that the method has been deprecated since Java 1.1 and was never removed, I don't think
     // this is very risky 😅
     Section section =
-        new Section(startOffset, startOffset + sectionSize, new String(copyBuf, 0, 0, readLen));
+        new Section(startOffset, startOffset + readLen, new String(copyBuf, 0, 0, readLen));
     if (cache.length > 0 && cacheSlotsUsed == maxCacheEntries) {
       purgeLeastRecentlyUsed();
     }
