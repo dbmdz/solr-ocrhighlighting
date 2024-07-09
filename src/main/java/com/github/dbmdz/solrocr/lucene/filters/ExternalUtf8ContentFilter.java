@@ -138,10 +138,11 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
         this.addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
         lastCharHadMultipleBytes = false;
       }
-      currentOutCharOffset += 1;
       int cp = Character.codePointAt(decodedChars, i);
-      i += Character.charCount(cp);
       int encodedLen = Utf8.encodedLength(cp);
+      int charLen = Character.charCount(cp);
+      i += charLen;
+      currentOutCharOffset += charLen;
       currentInByteOffset += encodedLen;
       if (encodedLen > 1) {
         cumulativeOffsetDifference += (encodedLen - 1);

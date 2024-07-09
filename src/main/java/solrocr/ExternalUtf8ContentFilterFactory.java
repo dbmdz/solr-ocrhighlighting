@@ -68,7 +68,7 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
                 + ptrStr);
       }
       adjustRegions(pointer);
-      // Section size and cache size dont't matter, since we don't use sectioned reads during
+      // Section size and cache size don't matter, since we don't use sectioned reads during
       // indexing.
       SourceReader r = pointer.getReader(512 * 1024, 0);
       List<SourcePointer.Region> regions =
