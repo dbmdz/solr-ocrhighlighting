@@ -1,15 +1,20 @@
 package solrocr;
 
 import com.github.dbmdz.solrocr.lucene.filters.ExternalUtf8ContentFilter;
+import com.github.dbmdz.solrocr.model.S3Config;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.model.SourcePointer.Region;
 import com.github.dbmdz.solrocr.model.SourcePointer.Source;
 import com.github.dbmdz.solrocr.model.SourcePointer.SourceType;
+import com.github.dbmdz.solrocr.reader.FileSourceReader;
+import com.github.dbmdz.solrocr.reader.S3ObjectSourceReader;
 import com.github.dbmdz.solrocr.reader.SourceReader;
-import java.io.File;
+import io.minio.MinioClient;
+import io.minio.errors.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Paths;
@@ -20,8 +25,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.lucene.analysis.CharFilterFactory;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.SolrException.ErrorCode;
 
 /**
  * A CharFilter implementation that loads the field value from an external UTF8-encoded source and
@@ -30,11 +33,26 @@ import org.apache.solr.common.SolrException.ErrorCode;
  * <p>For more information on these source pointers, refer to {@link SourcePointer}.
  */
 public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
+  private MinioClient s3Client = null;
+
   public ExternalUtf8ContentFilterFactory(Map<String, String> args) {
     super(args);
     // TODO: Read allowed base directories from config
     // TODO: Read allowed filename patterns from config
     // TODO: Warn of security implications if neither is defined
+    if (args.containsKey("s3Config")) {
+      try {
+        S3Config s3Config = S3Config.parse(args.get("s3Config"));
+        s3Client =
+            MinioClient.builder()
+                .endpoint(s3Config.endpoint)
+                .credentials(s3Config.accessKey, s3Config.secretKey)
+                .build();
+      } catch (IOException e) {
+        throw new RuntimeException(
+            "Could not configure S3Client based on " + args.get("s3Config"), e);
+      }
+    }
   }
 
   @Override
@@ -58,7 +76,6 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
                 "Could not parse source pointer from field, check the format (value was: '%s')!",
                 ptrStr));
       }
-      pointer.sources.forEach(this::validateSource);
 
       if (pointer.sources.isEmpty()) {
         throw new RuntimeException(
@@ -70,7 +87,7 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       adjustRegions(pointer);
       // Section size and cache size don't matter, since we don't use sectioned reads during
       // indexing.
-      SourceReader r = pointer.getReader(512 * 1024, 0);
+      SourceReader r = pointer.getReader(512 * 1024, 0, s3Client);
       List<SourcePointer.Region> regions =
           pointer.sources.stream().flatMap(s -> s.regions.stream()).collect(Collectors.toList());
       return new ExternalUtf8ContentFilter(r.getByteChannel(), regions, ptrStr);
@@ -82,21 +99,23 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     }
   }
 
-  private void validateSource(Source src) {
-    // TODO: Check if sourcePath is located under one of the allowed base directories, else abort
-    // TODO: Check if sourcePath's filename matches one of the allowed filename patterns, else abort
-    if (src.type == SourceType.FILESYSTEM) {
-      File f = Paths.get(src.target).toFile();
-      if (!f.exists() || !f.canRead()) {
-        throw new SolrException(
-            ErrorCode.BAD_REQUEST,
-            String.format(
-                Locale.US, "File at %s either does not exist or cannot be read.", src.target));
-      }
+  public SourceReader getReader(Source source, int sectionSize, int maxCacheEntries)
+      throws IOException {
+    if (source.type == SourceType.FILESYSTEM) {
+      return new FileSourceReader(
+          Paths.get(source.target),
+          SourcePointer.parse(source.target),
+          sectionSize,
+          maxCacheEntries);
+    } else if (source.type == SourceType.S3) {
+      return new S3ObjectSourceReader(
+          s3Client,
+          URI.create(source.target),
+          SourcePointer.parse(source.target),
+          sectionSize,
+          maxCacheEntries);
     } else {
-      throw new SolrException(
-          ErrorCode.BAD_REQUEST,
-          String.format(Locale.US, "Pointer has target with unsupported type: %s", src.target));
+      throw new UnsupportedOperationException("Unsupported source type '" + source.type + "'.");
     }
   }
 
@@ -115,7 +134,7 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     for (SourcePointer.Source src : ptr.sources) {
       // Again, section size and cache size don't matter, since we don't use sectioned reads during
       // indexing.
-      try (SourceReader reader = src.getReader(512, 0)) {
+      try (SourceReader reader = src.getReader(512, 0, s3Client)) {
         int inputLen = reader.length();
 
         if (src.regions.isEmpty()) {

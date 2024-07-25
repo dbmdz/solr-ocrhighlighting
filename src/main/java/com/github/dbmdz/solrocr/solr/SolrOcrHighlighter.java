@@ -26,6 +26,7 @@ package com.github.dbmdz.solrocr.solr;
 
 import com.github.dbmdz.solrocr.model.OcrHighlightResult;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.minio.MinioClient;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
@@ -55,13 +56,18 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
   private final Executor hlExecutor;
   private final int readerSectionSize;
   private final int readerMaxCacheEntries;
+  private final MinioClient s3Client;
 
   public SolrOcrHighlighter() {
-    this(Runtime.getRuntime().availableProcessors(), 8, 8 * 1024, 64 * 1024);
+    this(Runtime.getRuntime().availableProcessors(), 8, 8 * 1024, 64 * 1024, null);
   }
 
   public SolrOcrHighlighter(
-      int numHlThreads, int maxQueuedPerThread, int readerSectionSize, int readerMaxCacheEntries) {
+      int numHlThreads,
+      int maxQueuedPerThread,
+      int readerSectionSize,
+      int readerMaxCacheEntries,
+      MinioClient s3Client) {
     super();
     this.readerSectionSize = readerSectionSize;
     this.readerMaxCacheEntries = readerMaxCacheEntries;
@@ -78,6 +84,7 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
       // Executors.newDirectExecutorService() for Java 8
       this.hlExecutor = Runnable::run;
     }
+    this.s3Client = s3Client;
   }
 
   public void shutdownThreadPool() {
@@ -117,7 +124,8 @@ public class SolrOcrHighlighter extends UnifiedSolrHighlighter {
             req.getSchema().getIndexAnalyzer(),
             req,
             readerSectionSize,
-            readerMaxCacheEntries);
+            readerMaxCacheEntries,
+            s3Client);
     OcrHighlightResult[] ocrSnippets =
         ocrHighlighter.highlightOcrFields(
             ocrFieldNames, query, docIDs, maxPassagesOcr, respHeader, hlExecutor);

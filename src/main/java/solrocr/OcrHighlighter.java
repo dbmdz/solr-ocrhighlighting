@@ -44,6 +44,7 @@ import com.github.dbmdz.solrocr.reader.StringSourceReader;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
 import com.google.common.collect.ImmutableSet;
+import io.minio.MinioClient;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -87,6 +88,7 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.InPlaceMergeSorter;
 import org.apache.lucene.util.Version;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.request.SolrQueryRequest;
@@ -238,18 +240,21 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private final SolrQueryRequest req;
   private final int readerSectionSize;
   private final int readerMaxCacheEntries;
+  private final MinioClient s3Client;
 
   public OcrHighlighter(
       IndexSearcher indexSearcher,
       Analyzer indexAnalyzer,
       SolrQueryRequest req,
       int readerSectionSize,
-      int readerMaxCacheEntries) {
+      int readerMaxCacheEntries,
+      MinioClient s3Client) {
     super(indexSearcher, indexAnalyzer);
     this.params = req.getParams();
     this.req = req;
     this.readerSectionSize = readerSectionSize;
     this.readerMaxCacheEntries = readerMaxCacheEntries;
+    this.s3Client = s3Client;
   }
 
   @Override
@@ -369,7 +374,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     // [fieldIdx][docIdInIndex] of highlightDoc result
     OcrSnippet[][][] highlightDocsInByField = new OcrSnippet[fields.length][sortedDocIds.length][];
     int[][] snippetCountsByField = new int[fields.length][sortedDocIds.length];
-    // Highlight in doc batches determined by loadFieldValues (consumes from docIdIter)
+    // Highlight in doc batches determined by loadOcrFieldValues (consumes from docIdIter)
     DocIdSetIterator docIdIter = asDocIdSetIterator(sortedDocIds);
 
     List<CompletableFuture<Void>> hlFuts = new ArrayList<>();
@@ -613,18 +618,13 @@ public class OcrHighlighter extends UnifiedHighlighter {
           ocrVals[fieldIdx] = new StringSourceReader(fieldValue);
           continue;
         }
-        SourcePointer sourcePointer = null;
         try {
-          sourcePointer = SourcePointer.parse(fieldValue);
-        } catch (RuntimeException e) {
-          log.error("Could not parse OCR pointer for document {}: {}", docId, fieldValue, e);
+          SourcePointer sourcePointer = SourcePointer.parse(fieldValue);
+          ocrVals[fieldIdx] =
+              sourcePointer.getReader(readerSectionSize, readerMaxCacheEntries, s3Client);
+        } catch (IOException | SolrException e) {
+          log.error("Could not load OCR pointer for document {}: {}", docId, fieldValue, e);
         }
-        if (sourcePointer == null) {
-          // None of the files in the pointer exist or were readable, log should have warnings
-          ocrVals[fieldIdx] = null;
-          continue;
-        }
-        ocrVals[fieldIdx] = sourcePointer.getReader(readerSectionSize, readerMaxCacheEntries);
       }
       fieldValues.add(ocrVals);
     }
