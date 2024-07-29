@@ -64,7 +64,7 @@
     <version.maven-javadoc-plugin>3.8.0</version.maven-javadoc-plugin>
     <version.maven-shade-plugin>3.5.1</version.maven-shade-plugin>
     <version.maven-source-plugin>3.3.0</version.maven-source-plugin>
-    <version.surefire>3.2.5</version.surefire>
+    <version.surefire>3.3.1</version.surefire>
     <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
   </properties>
 
