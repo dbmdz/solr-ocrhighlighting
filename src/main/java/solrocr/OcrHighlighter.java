@@ -42,6 +42,7 @@ import com.github.dbmdz.solrocr.reader.LegacyBaseCompositeReader;
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.github.dbmdz.solrocr.reader.StringSourceReader;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
+import com.github.dbmdz.solrocr.util.LuceneVersionInfo;
 import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -85,7 +86,6 @@ import org.apache.lucene.search.uhighlight.UHComponents;
 import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.InPlaceMergeSorter;
-import org.apache.lucene.util.Version;
 import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
@@ -110,14 +110,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private static final int DEFAULT_SNIPPET_LIMIT = 100;
   public static final String PARTIAL_OCR_HIGHLIGHTS = "partialOcrHighlights";
 
-  private static final boolean VERSION_IS_PRE81 =
-      Version.LATEST.major < 8 || (Version.LATEST.major == 8 && Version.LATEST.minor < 1);
-  private static final boolean VERSION_IS_PRE82 =
-      VERSION_IS_PRE81 || (Version.LATEST.major == 8 && Version.LATEST.minor < 2);
-  private static final boolean VERSION_IS_PRE84 =
-      VERSION_IS_PRE82 || (Version.LATEST.major == 8 && Version.LATEST.minor < 4);
-  private static final boolean VERSION_IS_PRE89 =
-      VERSION_IS_PRE82 || (Version.LATEST.major == 8 && Version.LATEST.minor < 9);
   private static final Constructor<UHComponents> hlComponentsConstructorLegacy;
   private static final Method offsetSourceGetterLegacy;
   private static final Method extractAutomataLegacyMethod;
@@ -169,7 +161,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
             }
           };
 
-      if (VERSION_IS_PRE81) {
+      if (LuceneVersionInfo.versionIsBefore(8, 1)) {
         @SuppressWarnings("rawtypes")
         Class multiTermHl =
             Class.forName("org.apache.lucene.search.uhighlight.MultiTermHighlighting");
@@ -180,7 +172,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
           throw new RuntimeException(
               "Could not make `extractAutomata` accessible, are you running a SecurityManager?");
         }
-      } else if (VERSION_IS_PRE84) {
+      } else if (LuceneVersionInfo.versionIsBefore(8, 4)) {
         @SuppressWarnings("rawtypes")
         Class multiTermHl =
             Class.forName("org.apache.lucene.search.uhighlight.MultiTermHighlighting");
@@ -194,7 +186,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       } else {
         extractAutomataLegacyMethod = null;
       }
-      if (VERSION_IS_PRE82) {
+      if (LuceneVersionInfo.versionIsBefore(8, 2)) {
         //noinspection JavaReflectionMemberAccess
         hlComponentsConstructorLegacy =
             UHComponents.class.getDeclaredConstructor(
@@ -212,7 +204,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
                 BytesRef[].class,
                 PhraseHelper.class,
                 CharacterRunAutomaton[].class);
-      } else if (VERSION_IS_PRE84) {
+      } else if (LuceneVersionInfo.versionIsBefore(8, 4)) {
         //noinspection JavaReflectionMemberAccess
         hlComponentsConstructorLegacy =
             UHComponents.class.getDeclaredConstructor(
@@ -649,7 +641,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       String field, Query query, Set<Term> allTerms, int maxPassages) {
     // This method and some associated types changed in v8.2 and v8.4, so we have to delegate to an
     // adapter method for these versions
-    if (VERSION_IS_PRE84) {
+    if (LuceneVersionInfo.versionIsBefore(8, 4)) {
       return getOcrFieldHighlighterLegacy(field, query, allTerms, maxPassages);
     }
 
@@ -690,7 +682,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
     // older versions
     OffsetSource offsetSource;
     UHComponents components;
-    if (VERSION_IS_PRE82) {
+    if (LuceneVersionInfo.versionIsBefore(8, 2)) {
       offsetSource = this.getOffsetSourcePre82(field, terms, phraseHelper, automata);
       components =
           this.getUHComponentsPre82(
@@ -728,7 +720,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
       Query query, Predicate<String> fieldMatcher, boolean lookInSpan) {
     Function<Query, Collection<Query>> nopWriteFn = q -> null;
     try {
-      if (VERSION_IS_PRE81) {
+      if (LuceneVersionInfo.versionIsBefore(8, 1)) {
         return (CharacterRunAutomaton[])
             extractAutomataLegacyMethod.invoke(null, query, fieldMatcher, lookInSpan, nopWriteFn);
       } else {
@@ -898,7 +890,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
               .map(LeafReaderContext::reader)
               .map(TermVectorReusingLeafReader::new)
               .toArray(LeafReader[]::new);
-      if (VERSION_IS_PRE89) {
+      if (LuceneVersionInfo.versionIsBefore(8, 9)) {
         return new LegacyBaseCompositeReader<IndexReader>(leafReaders) {
           @Override
           protected void doClose() throws IOException {
