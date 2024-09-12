@@ -1,0 +1,105 @@
+/** This is a small adapter class that allows inheriting from
+  * FieldHighlighter from Lucene versions older than 9.11 and
+  * newer. There was a breaking change in Lucene 9.11 that added
+  * an 8th parameter to the constructor, breaking backwards
+  * compatibility.
+  *
+  * This cannot be worked around at the Java source level, due to
+  * strict requirements surrounding the `super()` call in a
+  * subclass constructor.
+  *
+  * However, using JVM bytecode, we can easily work around that
+  * and implement a class that can dynamically select the superclass
+  * constructor based on the Lucene version.
+  */
+public class com/github/dbmdz/solrocr/lucene/FieldHighlighterAdapter
+extends org/apache/lucene/search/uhighlight/FieldHighlighter {
+
+  /** This constructor is a simple adapter that forwards the
+    * parameters to the correct superclass constructor based on
+    * the Lucene version.
+    *
+    * The bytecode corresponds to the following (illegal) Java code:
+    *
+    * ```java
+    * public FieldHighlighterAdapter(
+    *     String fieldName,
+    *     FieldOffsetStrategy fieldOffsetStrategy,
+    *     PassageScorer passageScorer,
+    *     int maxPassages,
+    *     int maxNoHighlightPassages
+    * ) {
+    *   if (LuceneVersionInfo.versionIsBefore(9, 11)) {
+    *     super(fieldName, fieldOffsetStrategy, null, passageScorer, maxPassages, maxNoHighlightPassages, null);
+    *   } else {
+    *     super(fieldName, fieldOffsetStrategy, null, passageScorer, maxPassages, maxNoHighlightPassages, null, null);
+    *   }
+    * }
+    * ```
+    *
+    * @param fieldName The name of the field to highlight
+    * @param fieldOffsetStrategy The strategy to use for field
+    *   offsets
+    * @param passageScorer The scorer to use for passages
+    * @param maxPassages The maximum number of passages to return
+    * @param maxNoHighlightPassages The maximum number of passages
+    *   to return if no highlighting is possible
+    */
+  public <init>(
+      java/lang/String,
+      org/apache/lucene/search/uhighlight/FieldOffsetStrategy,
+      org/apache/lucene/search/uhighlight/PassageScorer,
+      int,
+      int
+      ) void {
+
+    // Load common constructor parameters from method params onto the stack
+    aload 0       // `this`, i.e. object reference
+    aload 1       // String fieldName
+    aload 2       // FieldOffsetStrategy
+    aconst_null   // BreakIterator
+    aload 3       // PassageScorer
+    iload 4       // int maxPassages
+    iload 5       // int maxNoHighlightPassages
+    aconst_null   // PassageFormatter
+
+    // Check if Lucene version is lower than 9.11
+    bipush 9  // major version
+    bipush 11  // minor version
+    invokestatic com/github/dbmdz/solrocr/util/LuceneVersionInfo.versionIsBefore(int, int) boolean
+
+    // go to new constructor if return value was false
+    ifeq NEW_CONSTRUCTOR
+
+    // Version check indicated a version <9.11, so we call the old
+    // constructor signature with 7 parameters
+    invokespecial org/apache/lucene/search/uhighlight/FieldHighlighter.<init>(
+      java/lang/String,
+      org/apache/lucene/search/uhighlight/FieldOffsetStrategy,
+      java/text/BreakIterator,
+      org/apache/lucene/search/uhighlight/PassageScorer,
+      int,
+      int,
+      org/apache/lucene/search/uhighlight/PassageFormatter
+    ) void
+    goto BEACH
+
+NEW_CONSTRUCTOR:
+    // Versions >= 9.11 need a Comparator as the 8th parameter for the
+    // new constructor signature
+    aconst_null   // Comparator
+    invokespecial org/apache/lucene/search/uhighlight/FieldHighlighter.<init>(
+      java/lang/String,
+      org/apache/lucene/search/uhighlight/FieldOffsetStrategy,
+      java/text/BreakIterator,
+      org/apache/lucene/search/uhighlight/PassageScorer,
+      int,
+      int,
+      org/apache/lucene/search/uhighlight/PassageFormatter,
+      java/util/Comparator
+    ) void
+
+BEACH:
+    return
+  }
+}

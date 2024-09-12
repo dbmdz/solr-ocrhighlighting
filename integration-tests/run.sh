@@ -4,8 +4,7 @@ SOLR_HOST="${SOLR_HOST:-localhost}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SOLR7_VERSIONS="7.7 7.6 7.5"
 SOLR8_VERSIONS="8.11 8.10 8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0"
-SOLR9_VERSIONS="9.6 9.5 9.4 9.3 9.2 9.1 9.0"
-SOLR78_PLUGIN_PATH=/tmp/solrocr-solr78
+SOLR9_VERSIONS="9.7 9.6 9.5 9.4 9.3 9.2 9.1 9.0"
 
 wait_for_solr() {
     status="404"

@@ -42,7 +42,7 @@ import org.apache.lucene.search.uhighlight.PassageScorer;
 import org.apache.lucene.util.BytesRef;
 
 /** A customization of {@link FieldHighlighter} to support OCR fields */
-public class OcrFieldHighlighter extends FieldHighlighter {
+public class OcrFieldHighlighter extends FieldHighlighterAdapter {
   private final ConcurrentHashMap<Integer, Integer> numMatches;
 
   public OcrFieldHighlighter(
@@ -51,8 +51,7 @@ public class OcrFieldHighlighter extends FieldHighlighter {
       PassageScorer passageScorer,
       int maxPassages,
       int maxNoHighlightPassages) {
-    super(
-        field, fieldOffsetStrategy, null, passageScorer, maxPassages, maxNoHighlightPassages, null);
+    super(field, fieldOffsetStrategy, passageScorer, maxPassages, maxNoHighlightPassages);
     this.numMatches = new ConcurrentHashMap<>();
   }
 
