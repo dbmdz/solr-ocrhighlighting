@@ -1,3 +1,8 @@
+## Unreleased
+
+**Fixed**
+- Compatibility with Solr 9.7
+
 ## 0.9.0 (2024-06-12)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.0)
 
