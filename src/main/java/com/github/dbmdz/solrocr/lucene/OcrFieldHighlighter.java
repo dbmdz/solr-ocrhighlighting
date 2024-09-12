@@ -38,12 +38,20 @@ import org.apache.lucene.search.uhighlight.FieldHighlighter;
 import org.apache.lucene.search.uhighlight.FieldOffsetStrategy;
 import org.apache.lucene.search.uhighlight.OffsetsEnum;
 import org.apache.lucene.search.uhighlight.Passage;
+import org.apache.lucene.search.uhighlight.PassageFormatter;
 import org.apache.lucene.search.uhighlight.PassageScorer;
+import org.apache.lucene.search.uhighlight.UnifiedHighlighter;
 import org.apache.lucene.util.BytesRef;
 
 /** A customization of {@link FieldHighlighter} to support OCR fields */
-public class OcrFieldHighlighter extends FieldHighlighterAdapter {
+public class OcrFieldHighlighter {
   private final ConcurrentHashMap<Integer, Integer> numMatches;
+
+  private final String field;
+  private final FieldOffsetStrategy fieldOffsetStrategy;
+  private final PassageScorer passageScorer;
+  private final int maxPassages;
+  private final int maxNoHighlightPassages;
 
   public OcrFieldHighlighter(
       String field,
@@ -51,8 +59,12 @@ public class OcrFieldHighlighter extends FieldHighlighterAdapter {
       PassageScorer passageScorer,
       int maxPassages,
       int maxNoHighlightPassages) {
-    super(field, fieldOffsetStrategy, passageScorer, maxPassages, maxNoHighlightPassages);
     this.numMatches = new ConcurrentHashMap<>();
+    this.field = field;
+    this.fieldOffsetStrategy = fieldOffsetStrategy;
+    this.passageScorer = passageScorer;
+    this.maxPassages = maxPassages;
+    this.maxNoHighlightPassages = maxNoHighlightPassages;
   }
 
   /**
@@ -111,7 +123,6 @@ public class OcrFieldHighlighter extends FieldHighlighterAdapter {
     }
   }
 
-  @Override
   protected Passage[] highlightOffsetsEnums(OffsetsEnum off) {
     throw new UnsupportedOperationException();
   }
@@ -265,9 +276,12 @@ public class OcrFieldHighlighter extends FieldHighlighterAdapter {
   }
 
   /** We don't provide summaries if there is no highlighting, i.e. no matches in the OCR text */
-  @Override
   protected Passage[] getSummaryPassagesNoHighlight(int maxPassages) {
     return new Passage[] {};
+  }
+
+  public UnifiedHighlighter.OffsetSource getOffsetSource() {
+    return this.fieldOffsetStrategy.getOffsetSource();
   }
 
   public int getNumMatches(int docId) {
