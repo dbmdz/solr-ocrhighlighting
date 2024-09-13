@@ -40,8 +40,8 @@ public interface SourceReader extends AutoCloseable {
   Section getAsciiSection(int offset) throws IOException;
 
   /**
-   * Read into {@param dst} starting at {@param start} from the source. , returning the number of
-   * bytes read.
+   * Read into {@param dst} starting at {@param start} from the source, returning the number of
+   * bytes read or -1 if there are no more bytes to read.
    */
   int readBytes(ByteBuffer dst, int start) throws IOException;
 
@@ -63,7 +63,9 @@ public interface SourceReader extends AutoCloseable {
       @Override
       public int read(ByteBuffer byteBuffer) throws IOException {
         int numRead = SourceReader.this.readBytes(byteBuffer, position);
-        this.position += numRead;
+        if (numRead != -1) {
+          this.position += numRead;
+        }
         return numRead;
       }
 

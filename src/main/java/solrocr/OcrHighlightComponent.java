@@ -1,8 +1,10 @@
 package solrocr;
 
+import com.github.dbmdz.solrocr.model.S3Config;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.solr.SolrOcrHighlighter;
 import com.google.common.base.Strings;
+import io.minio.MinioClient;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -102,12 +104,28 @@ public class OcrHighlightComponent extends SearchComponent
       maxSectionCacheSize = sectionReadSize * 10;
     }
 
+    MinioClient s3Client = null;
+    if (info.attributes.containsKey("s3Config")) {
+      try {
+        S3Config s3Config = S3Config.parse(info.attributes.get("s3Config"));
+        s3Client =
+            MinioClient.builder()
+                .endpoint(s3Config.endpoint)
+                .credentials(s3Config.accessKey, s3Config.secretKey)
+                .build();
+      } catch (IOException e) {
+        throw new RuntimeException(
+            "Could not configure S3Client based on " + info.attributes.get("s3Config"), e);
+      }
+    }
+
     this.ocrHighlighter =
         new SolrOcrHighlighter(
             numHlThreads,
             maxQueuedPerThread,
             sectionReadSize,
-            (int) Math.ceil((double) maxSectionCacheSize / sectionReadSize));
+            (int) Math.ceil((double) maxSectionCacheSize / sectionReadSize),
+            s3Client);
   }
 
   @Override
