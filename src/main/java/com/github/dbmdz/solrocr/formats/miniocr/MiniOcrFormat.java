@@ -16,9 +16,10 @@ import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 
 public class MiniOcrFormat implements OcrFormat {
-  private static final Pattern pagePat =
-      Pattern.compile(
-          "<p (?:xml)?:id=(\"|')(?<pageId>.+?)(\"|') ?(?:wh=(\"|')(?<width>\\d+) (?<height>\\d+)(\"|'))?>");
+  private static final Pattern pageIdPat =
+      Pattern.compile("(?:xml)?:id=[\"'](?<pageId>.+?)[\"']");
+  private static final Pattern pageDimPat =
+      Pattern.compile("wh=[\"'](?<width>\\d+) (?<height>\\d+)[\"']");
   private static final Map<OcrBlock, String> blockTagMapping =
       ImmutableMap.of(
           OcrBlock.PAGE, "p",
@@ -50,15 +51,16 @@ public class MiniOcrFormat implements OcrFormat {
 
   @Override
   public OcrPage parsePageFragment(String pageFragment) {
-    Matcher m = pagePat.matcher(pageFragment);
-    if (!m.find()) {
-      return null;
-    }
+    String pageId = null;
     Dimension dims = null;
-    if (m.group("width") != null && m.group("height") != null) {
+    Matcher m = pageIdPat.matcher(pageFragment);
+    if (m.find()) {
+      pageId = m.group("pageId");
+    }
+    m = pageDimPat.matcher(pageFragment);
+    if (m.find()) {
       dims = new Dimension(Integer.parseInt(m.group("width")), Integer.parseInt(m.group("height")));
     }
-    String pageId = m.group("pageId");
     return new OcrPage(pageId, dims);
   }
 
