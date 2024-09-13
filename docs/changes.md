@@ -1,6 +1,14 @@
-## Unreleased
+## 0.9.1 (2024-09-13)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.1)
+
+**Changed**
+- During indexing, we now only need a single pass through the input files, instead of
+  two, this is in preparation for the S3 storage backend, where we don't have the luxury
+  of relying on a page cache to paper over our inefficencies.
 
 **Fixed**
+- Fix bug that resulted in missed matches during highlighting (#442, thanks @schmika!)
+- Fix bug that resulted in incomplete reads from the input file under some circumstances (#441, thanks @schmika!)
 - Compatibility with Solr 9.7
 
 ## 0.9.0 (2024-06-12)
