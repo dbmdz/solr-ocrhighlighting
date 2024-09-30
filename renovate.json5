@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "ignorePaths": ["example/frontend/**", "example/iiif-prezi/**"],
+  "groupName": "all dependencies",
+  "groupSlug": "all",
+  "lockFileMaintenance": {
+    "enabled": false
+  },
+  "packageRules": [
+    {
+      "groupName": "all dependencies",
+      "groupSlug": "all",
+      "matchPackageNames": [
+        "*"
+      ]
+    },
+    {
+      // Solr is checked for daily, we want to track upstream versions very closely
+      "matchPackagePrefixes": ["org.apache.solr"],
+      "extends": ["schedule:daily"]
+    },
+    {
+      // Our Lucene version should track the one used by the currently used solr-core
+      // version. Unfortunately this can't be done automatically by renovate, so we
+      // have to exclude these dependencies from the renovate process and maintain them
+      // manually to be in sync with Solr
+      "matchPackagePrefixes": ["org.apache.lucene"],
+      "enabled": false
+    },
+    {
+      // Same thing as for Lucene, woodstox version should track the one used by solr
+      // and needs to be manually kept in sync
+      "matchPackagePrefixes": ["com.fasterxml.woodstox"],
+      "enabled": false
+    }
+  ],
+  "schedule": [
+    "every weekend"
+  ],
+  "separateMajorMinor": false
+}

@@ -58,7 +58,6 @@
     <version.slf4j>2.0.12</version.slf4j>
     <version.solr>9.7.0</version.solr>
     <version.lucene>9.11.1</version.lucene>
-    <!-- DO NOT UPDATE THIS, this is the latest version that works with Java 8 -->
     <version.fmt-maven-plugin>2.9.1</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>3.2.0</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.8.0</version.maven-javadoc-plugin>
@@ -97,7 +96,7 @@
     <dependency>
       <groupId>com.fasterxml.woodstox</groupId>
       <artifactId>woodstox-core</artifactId>
-      <version>6.6.0</version>
+      <version>6.7.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -209,7 +208,6 @@
               <include>de.digitalcollections:solr-ocrhighlighting</include>
               <include>org.apache.commons:commons-text</include>
               <include>commons-io:commons-io</include>
-              <include>com.fasterxml.woodstox:woodstox-core</include>
               <include>com.google.guava:guava</include>
             </includes>
           </artifactSet>
