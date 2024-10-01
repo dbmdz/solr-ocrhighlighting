@@ -77,6 +77,9 @@ encode a word with the default form `clistrias` and two alternatives `christmas`
 <w x="50 50 100 100">clistrias⇿christmas⇿christrias</w>
 ```
 
+A command-line tool to convert from ALTO and hOCR to MiniOCR is provided in
+[`util/miniocr.py`](https://github.com/dbmdz/solr-ocrhighlighting/blob/main/util/miniocr.py).
+
 **Block type mapping:**
 
 | Block     | MiniOCR tag  | notes                            |
