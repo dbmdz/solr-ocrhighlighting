@@ -122,16 +122,24 @@ def convert_entity(entity: str) -> str:
 
 
 def parse_hocr(hocr: bytes) -> Iterable[ParseEvent]:
-    cur_word: ParseEvent | None = None
-    in_word_alternatives = False
+    # hOCR can used named entities, which Python's stdlib parser can't handle, so we
+    # have to convert them to numeric entities
     fixed_hocr = ENTITIES_PAT.sub(
         lambda match: convert_entity(match.group(1)),
         hocr.decode("utf-8"),
     )
+
+    # Track the currently parsed word across parse iterations to be able to
+    # add alternatives to the word text
+    cur_word: ParseEvent | None = None
+    # Track if we're currently parsing alternatives for a word
+    in_word_alternatives = False
+
     for evt in ET.iterparse(io.StringIO(fixed_hocr), events=("start", "end")):
         event, elem = evt
         kind = EventKind.START if event == "start" else EventKind.END
         box_type = BoxType.from_hocr_class(elem.attrib.get("class"))
+        # Strip namespace from tag
         tag = elem.tag.split("}")[-1]
 
         if (
@@ -158,11 +166,15 @@ def parse_hocr(hocr: bytes) -> Iterable[ParseEvent]:
 
         if evt.kind == EventKind.END:
             if evt.box_type == BoxType.WORD and cur_word is not None:
+                # Emit the word event if the word has ended and we have picked up all
+                # potential alternative readings within it
                 yield cur_word
                 cur_word = None
                 in_word_alternatives = False
             yield evt
             if evt.box_type == BoxType.WORD and elem.tail:
+                # hOCR has support for coordinate-less text nodes between words, emit these
+                # as text events
                 yield ParseEvent(kind=EventKind.TEXT, box_type=None, text=elem.tail)
             elem.clear()
             continue
@@ -183,19 +195,28 @@ def parse_hocr(hocr: bytes) -> Iterable[ParseEvent]:
             evt.width, evt.height = lrx - ulx, lry - uly
 
         if evt.box_type == BoxType.WORD:
+            # Don't emit word events immediately, since we might have alternatives
             evt.text = elem.text
             cur_word = evt
-        else:
-            yield evt
+            continue
+
+        yield evt
 
 
 def parse_alto(alto: bytes) -> Iterable[ParseEvent]:
+    # ALTO documents can have coordinates expressed as 1/1200th of an inch or as millimeters,
+    # in these cases we can only use relative coordinates in the MiniOCR output format, since
+    # we don't know the DPI of the original document.
     use_relative = False
     relative_reference: tuple[int, int] | None = None
+
+    # We track the currently parsed word across parse iterations to be able to
+    # add alternatives to the word text
     cur_word: ParseEvent | None = None
     for evt in ET.iterparse(io.BytesIO(alto), events=("start", "end")):
         event, elem = evt
         kind = EventKind.START if event == "start" else EventKind.END
+        # Strip namespace from tag
         tag = elem.tag.split("}")[-1]
 
         if kind == EventKind.START:
@@ -215,6 +236,8 @@ def parse_alto(alto: bytes) -> Iterable[ParseEvent]:
         evt = ParseEvent(kind=kind, box_type=box_type)
 
         if evt.kind == EventKind.END:
+            # We only emit the word event if the word has ended, since there might
+            # have been alternatives within the word element in the ALTO
             if evt.box_type == BoxType.WORD and cur_word is not None:
                 yield cur_word
                 cur_word = None
@@ -237,6 +260,7 @@ def parse_alto(alto: bytes) -> Iterable[ParseEvent]:
             evt.width = float(elem.attrib["WIDTH"])
             evt.height = float(elem.attrib["HEIGHT"])
             if use_relative and relative_reference:
+                # Non-pixel coordinates are emitted as relative coordinates
                 evt.x = evt.x / relative_reference[0]
                 evt.y = evt.y / relative_reference[1]
                 evt.width = evt.width / relative_reference[0]
@@ -263,9 +287,13 @@ def parse_alto(alto: bytes) -> Iterable[ParseEvent]:
 
 def generate_miniocr(evts: Iterable[ParseEvent]) -> Iterable[str]:
     yield "<ocr>"
+
+    # Used to determine if there should be inter-line whitespace
     last_txt_was_hyphen = False
+
     for evt in evts:
         if evt.kind == EventKind.TEXT and evt.text:
+            # Ignore whitespace-only text if the last text ended on a hyphen
             if last_txt_was_hyphen and not evt.text.strip():
                 continue
             yield evt.text
@@ -286,6 +314,7 @@ def generate_miniocr(evts: Iterable[ParseEvent]) -> Iterable[str]:
                     and evt.height
                     and all(isinstance(x, int) for x in (evt.width, evt.height))
                 ):
+                    # Only add page dimensions if we have integers, i.e. pixel dimensions
                     attribs.append(f'wh="{evt.width} {evt.height}"')
             elif evt.box_type == BoxType.WORD:
                 if all(x is not None for x in (evt.x, evt.y, evt.width, evt.height)):
@@ -293,6 +322,8 @@ def generate_miniocr(evts: Iterable[ParseEvent]) -> Iterable[str]:
                         isinstance(x, float)
                         for x in (evt.x, evt.y, evt.width, evt.height)
                     ):
+                        # Relative coordinates are always floats, encoded without the leading zero
+                        # and with four decimal places
                         attribs.append(
                             "x="
                             + " ".join(
@@ -310,6 +341,7 @@ def generate_miniocr(evts: Iterable[ParseEvent]) -> Iterable[str]:
         elif evt.kind == EventKind.END:
             yield f"</{BoxType.to_miniocr_tag(evt.box_type)}>"
             if evt.box_type == BoxType.LINE and not last_txt_was_hyphen:
+                # Add inter-line whitespace if the line did not end on a hyphenation
                 yield " "
     yield "</ocr>"
 
@@ -351,6 +383,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.input is None:
+        # Help users who accidentally launched it without arguments from a
+        # terminal by telling them that we're waiting for input on stdin
         if sys.stdin.isatty():
             while True:
                 rlist, _, _ = select.select([sys.stdin], [], [], 3)
