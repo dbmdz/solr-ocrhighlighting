@@ -49,21 +49,21 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.assertj>3.25.3</version.assertj>
+    <version.assertj>3.26.3</version.assertj>
     <version.assertj-json>1.2.0</version.assertj-json>
     <version.byteseek>2.0.3</version.byteseek>
     <version.commons-text>1.12.0</version.commons-text>
-    <version.junit>5.10.2</version.junit>
-    <version.mockito>5.10.0</version.mockito>
-    <version.slf4j>2.0.12</version.slf4j>
+    <version.junit>5.11.1</version.junit>
+    <version.mockito>5.14.1</version.mockito>
+    <version.slf4j>2.0.16</version.slf4j>
     <version.solr>9.7.0</version.solr>
     <version.lucene>9.11.1</version.lucene>
-    <version.fmt-maven-plugin>2.9.1</version.fmt-maven-plugin>
-    <version.maven-gpg-plugin>3.2.0</version.maven-gpg-plugin>
-    <version.maven-javadoc-plugin>3.8.0</version.maven-javadoc-plugin>
-    <version.maven-shade-plugin>3.5.1</version.maven-shade-plugin>
-    <version.maven-source-plugin>3.3.0</version.maven-source-plugin>
-    <version.surefire>3.4.0</version.surefire>
+    <version.fmt-maven-plugin>2.13</version.fmt-maven-plugin>
+    <version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
+    <version.maven-javadoc-plugin>3.10.1</version.maven-javadoc-plugin>
+    <version.maven-shade-plugin>3.6.0</version.maven-shade-plugin>
+    <version.maven-source-plugin>3.3.1</version.maven-source-plugin>
+    <version.surefire>3.5.0</version.surefire>
     <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
   </properties>
 
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.14.0</version>
+      <version>2.17.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -101,7 +101,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>33.2.0-jre</version>
+      <version>33.3.1-jre</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
