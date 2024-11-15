@@ -41,6 +41,7 @@ public class SanitizingXmlFilter extends BaseCharFilter implements SourceAwareRe
    * stored in the instance state.
    */
   private char[] closingTagsTrailer = null;
+
   /** Tracks how much of the trailer has already been written during previous `read` calls. */
   private int closingTagsTrailerIdx = -1;
 

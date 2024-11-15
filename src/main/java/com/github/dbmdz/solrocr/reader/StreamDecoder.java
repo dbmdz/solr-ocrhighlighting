@@ -130,7 +130,7 @@ public class StreamDecoder extends Reader {
       case 2:
         leftoverChar = cb[1];
         haveLeftoverChar = true;
-        // FALL THROUGH
+      // FALL THROUGH
       case 1:
         return cb[0];
       default:

@@ -58,7 +58,7 @@
     <version.slf4j>2.0.16</version.slf4j>
     <version.solr>9.7.0</version.solr>
     <version.lucene>9.11.1</version.lucene>
-    <version.fmt-maven-plugin>2.13</version.fmt-maven-plugin>
+    <version.fmt-maven-plugin>2.25</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.11.1</version.maven-javadoc-plugin>
     <version.maven-shade-plugin>3.6.0</version.maven-shade-plugin>
@@ -168,7 +168,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.coveo</groupId>
+        <groupId>com.spotify.fmt</groupId>
         <artifactId>fmt-maven-plugin</artifactId>
         <version>${version.fmt-maven-plugin}</version>
         <executions>
