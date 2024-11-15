@@ -16,8 +16,7 @@ import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 
 public class MiniOcrFormat implements OcrFormat {
-  private static final Pattern pageIdPat =
-      Pattern.compile("(?:xml)?:id=[\"'](?<pageId>.+?)[\"']");
+  private static final Pattern pageIdPat = Pattern.compile("(?:xml)?:id=[\"'](?<pageId>.+?)[\"']");
   private static final Pattern pageDimPat =
       Pattern.compile("wh=[\"'](?<width>\\d+) (?<height>\\d+)[\"']");
   private static final Map<OcrBlock, String> blockTagMapping =

@@ -24,6 +24,7 @@ public abstract class BaseSourceReader implements SourceReader {
    * BaseSourceReader#maxCacheEntries} slots will ever be non-null
    */
   CachedSection[] cache;
+
   /**
    * Array of length {@link BaseSourceReader#maxCacheEntries} with the indexes of the sections that
    * are currently cached
