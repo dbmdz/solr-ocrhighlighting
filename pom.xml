@@ -60,7 +60,7 @@
     <version.lucene>9.11.1</version.lucene>
     <version.fmt-maven-plugin>2.25</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
-    <version.maven-javadoc-plugin>3.11.1</version.maven-javadoc-plugin>
+    <version.maven-javadoc-plugin>3.11.2</version.maven-javadoc-plugin>
     <version.maven-shade-plugin>3.6.0</version.maven-shade-plugin>
     <version.maven-source-plugin>3.3.1</version.maven-source-plugin>
     <version.surefire>3.5.2</version.surefire>
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.17.0</version>
+      <version>2.18.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
