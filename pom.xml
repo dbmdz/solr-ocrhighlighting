@@ -49,12 +49,12 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.assertj>3.26.3</version.assertj>
+    <version.assertj>3.27.2</version.assertj>
     <version.assertj-json>1.2.0</version.assertj-json>
     <version.byteseek>2.0.3</version.byteseek>
-    <version.commons-text>1.12.0</version.commons-text>
-    <version.junit>5.11.3</version.junit>
-    <version.mockito>5.14.2</version.mockito>
+    <version.commons-text>1.13.0</version.commons-text>
+    <version.junit>5.11.4</version.junit>
+    <version.mockito>5.15.2</version.mockito>
     <version.slf4j>2.0.16</version.slf4j>
     <version.solr>9.7.0</version.solr>
     <version.lucene>9.11.1</version.lucene>
@@ -101,7 +101,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>33.3.1-jre</version>
+      <version>33.4.0-jre</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
