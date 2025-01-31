@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,6 +65,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.index.BaseCompositeReader;
 import org.apache.lucene.index.ExitableDirectoryReader;
@@ -76,6 +78,7 @@ import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.QueryTimeout;
 import org.apache.lucene.index.ReaderUtil;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermVectors;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -113,6 +116,17 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private static final Constructor<UHComponents> hlComponentsConstructorLegacy;
   private static final Method offsetSourceGetterLegacy;
   private static final Method extractAutomataLegacyMethod;
+
+  private static Document getDocWithFieldValues(
+      IndexSearcher searcher, int docId, String[] fieldNames) throws IOException {
+    if (LuceneVersionInfo.versionIsBefore(9, 5)) {
+      DocumentStoredFieldVisitor visitor = new DocumentStoredFieldVisitor(fieldNames);
+      searcher.doc(docId, visitor);
+      return visitor.getDocument();
+    } else {
+      return searcher.storedFields().document(docId, new HashSet<>(Arrays.asList(fieldNames)));
+    }
+  }
 
   static {
     /*
@@ -589,12 +603,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
     List<SourceReader[]> fieldValues = new ArrayList<>((int) docIter.cost());
     int docId;
     while ((docId = docIter.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
-      DocumentStoredFieldVisitor docIdVisitor = new DocumentStoredFieldVisitor(fields);
       SourceReader[] ocrVals = new SourceReader[fields.length];
-      searcher.doc(docId, docIdVisitor);
+      Document doc = getDocWithFieldValues(searcher, docId, fields);
       for (int fieldIdx = 0; fieldIdx < fields.length; fieldIdx++) {
         String fieldName = fields[fieldIdx];
-        String fieldValue = docIdVisitor.getDocument().get(fieldName);
+        String fieldValue = doc.get(fieldName);
         if (fieldValue == null) {
           // No OCR content at all
           ocrVals[fieldIdx] = null;
@@ -874,11 +887,11 @@ public class OcrHighlighter extends UnifiedHighlighter {
   }
 
   /**
-   * Wraps an IndexReader that remembers/caches the last call to {@link
-   * LeafReader#getTermVectors(int)} so that if the next call has the same ID, then it is reused. If
-   * TV's were column-stride (like doc-values), there would be no need for this.
+   * Wraps an IndexReader that remembers/caches the last call to {@link TermVectors#get(int)} so
+   * that if the next call has the same ID, then it is reused. If TV's were column-stride (like
+   * doc-values), there would be no need for this.
    *
-   * <p>This is copied straight from {@link UnifiedHighlighter#asDocIdSetIterator(int[])} )} because
+   * <p>This is copied straight from {@link UnifiedHighlighter.TermVectorReusingLeafReader} because
    * it has private access there. <strong>Please refer to the file header for licensing information
    * on the original code.</strong>
    */
@@ -922,15 +935,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
 
     TermVectorReusingLeafReader(LeafReader in) {
       super(in);
-    }
-
-    @Override
-    public Fields getTermVectors(int docID) throws IOException {
-      if (docID != lastDocId) {
-        lastDocId = docID;
-        tvFields = in.getTermVectors(docID);
-      }
-      return tvFields;
     }
 
     @Override
