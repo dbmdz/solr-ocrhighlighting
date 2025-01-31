@@ -58,6 +58,9 @@ In your core's `solrconfig.xml`, you need to:
     This assumes a directory structure where the cores are in
     `$SOLR_HOME/server/solr/$CORE` and the plugin JAR was installed in
     `$SOLR_HOME/contrib/ocrhighlighting/lib`. Adjust the path if you setup differs.
+
+    NOTE: When using Solr >=9.8, you need to start it with `-Dsolr.config.lib.enabled=true`
+          for this to work
   -->
   <lib dir="../../../contrib/ocrhighlighting/lib" regex=".*\.jar" />
 
