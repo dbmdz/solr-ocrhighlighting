@@ -1,3 +1,16 @@
+## 0.9.2 (2025-02-26)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.2)
+**Breaking Changes**
+- When using Solr >= 9.8 and the the plugin is included via the `<lib>` directive, 
+  the Solr JVM needs to be launched with `-Dsolr.config.lib.enabled=true` for
+  the plugin to work
+
+**Changed**
+- MiniOCR page fragment parsing is now more robust regarding the order of attributes and additional whitespace
+- Added a small command-line tool to convert ALTO and hOCR to MiniOCR in `util/miniocr.py`
+- Removed usage of deprecated API for retrieving stored field values for Solr versions
+  that support it
+
 ## 0.9.1 (2024-09-13)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.1)
 
