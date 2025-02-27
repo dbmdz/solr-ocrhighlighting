@@ -22,7 +22,11 @@ public class TimeAllowedLimit implements QueryTimeout {
   }
 
   public static boolean hasTimeLimit(SolrQueryRequest req) {
-    return req.getParams().getLong(OcrHighlightParams.TIME_ALLOWED, -1L) >= 0L;
+    return getTimeAllowed(req) >= 0L;
+  }
+
+  public static long getTimeAllowed(SolrQueryRequest req) {
+    return req.getParams().getLong(OcrHighlightParams.TIME_ALLOWED, -1L);
   }
 
   public boolean shouldExit() {
