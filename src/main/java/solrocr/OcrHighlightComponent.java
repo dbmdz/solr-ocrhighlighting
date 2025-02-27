@@ -211,8 +211,10 @@ public class OcrHighlightComponent extends SearchComponent
             rb.rsp.getResponseHeader().add(OcrHighlighter.PARTIAL_OCR_HIGHLIGHTS, true);
           }
           Object hl = srsp.getSolrResponse().getResponse().get(HL_RESPONSE_FIELD);
-          SolrPluginUtils.copyNamedListIntoArrayByDocPosInResponse(
-              (NamedList) hl, rb.resultIds, (Map.Entry<String, Object>[]) objArr);
+          if (hl != null) {
+            SolrPluginUtils.copyNamedListIntoArrayByDocPosInResponse(
+                (NamedList) hl, rb.resultIds, (Map.Entry<String, Object>[]) objArr);
+          }
         }
       }
       rb.rsp.add(
