@@ -3,7 +3,7 @@ package com.github.dbmdz.solrocr.util;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.api.util.SolrVersion;
 
-public class SolrVersionInfo {
+public class VersionUtils {
   private static final int PRE_SOLR94_LUCENE_MINOR_VERSION_DIFF = 2;
 
   public static boolean luceneVersionIsBefore(int major, int minor) {
