@@ -1,3 +1,15 @@
+## 0.9.3 (2025-03-10)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.3)
+**Changed**
+- Respect global request limits (time, memory, cpu) from the [`*allowed` Solr
+  query parameters][1] in addition to our own OCR-specific limit
+
+**Fixed**
+- Highlighting responses that are partial by the time they hit the highlighting stage
+  during distributed request processing resulted in errors, this has been fixed.
+
+[1] https://solr.apache.org/guide/solr/latest/query-guide/common-query-parameters.html#timeallowed-parameter
+
 ## 0.9.2 (2025-02-26)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.2)
 **Breaking Changes**

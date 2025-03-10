@@ -89,6 +89,28 @@ Found a bug? Want a new feature? Make a fork, create a pull request.
 For larger changes/features, it's usually wise to open an issue before starting
 the work, so we can discuss if it's a fit.
 
+## Release Process
+1. Create a PR for the release:
+    - Update version in `pom.xml`
+    - Update `docs/changes.md` with the release information
+2. Wait for PR to be approved and merge
+3. Tag release commit (`<major>.<minor>.<patch>`) and push the tag to GitHub
+4. Make a Release Build:
+    - `mvn clean package` to build the JAR for Solr >=8.x
+    - `./util/patch_solr78_bytecode.py` to create the JAR for Solr 7.x
+5. [Publish a new GitHub release](https://github.com/dbmdz/solr-ocrhighlighting/releases/new)
+   based on the tag just pushed. Add the two JARs from the build process as binaries
+   to the release
+6. Publish the releases to the plugin repository:
+   ```
+   # Token to publish to this repository on the `gh-pages` branch
+   $ export GH_DEPLOY_TOKEN=THE_TOKEN
+   # RSA Certificate Key for signing the release binaries
+   $ export CERTIFICATE=THE_RSA_PRIVATE_KEY
+   $ ./util/update_repo.py
+   ```
+7. Bump version in `pom.xml` to next minor version snapshot and push to GitHub
+
 ## Support us!
 
 We always appreciate if users let us know how they're using our software and
