@@ -81,6 +81,10 @@ POST http://solrhost:8983/solr/corename/update
 For indexing and highlighting, Solr will load the contents of the `ocrdoc-1_1.xml`, `ocrdoc-1_2.xml` and 
 `ocrdoc-1_2.xml` as a single continuous text.
 
+!!! caution "Page Identifiers"
+    For this use case, you have to **make absolutely sure that the page identifiers  are unique within the
+    document**.  If this requirement is not met, you will get unexpected results during highlighting.
+
 ## Advanced: One or more *partial* files per Solr document
 
 A more complicated situation arises if the Solr documents need to refer to *parts* of one or more files on
@@ -132,6 +136,7 @@ The format of the regions is inspired by [Python's slicing syntax](https://docs.
       that spans from the bottom of one page to the top of the next, you will have to include a region
       for the opening element of the first page so we can determine the page for the first part of the
       article during highlighting
+    - The page identifiers for every page in the document must be unique within it.
 
 
 !!! caution "Byte Offsets"

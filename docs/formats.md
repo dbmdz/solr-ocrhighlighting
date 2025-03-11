@@ -18,16 +18,23 @@ query parameters](query.md#available-highlighting-parameters) to control how the
 
 **Block type mapping:**
 
-| Block     | hOCR class                  | notes                            |
-| --------- | --------------------------- | -------------------------------- |
-| Word      | `ocrx_word`                 | needs to have a `bbox` attribute with the coordinates on the page |
-| Page      | `ocr_page`                  | needs to have a page identifier, either in `id` attribute or in the `ppageno` or `x_source` entry in the `title` attribute |
-| Block     | `ocr_carea`/`ocrx_block`    |                                  |
-| Section   | `ocr_chapter`/`ocr_section`/<br>`ocr_subsection`/`ocr_subsubsection` | |
-| Paragraph | `ocr_par`                   |                                  |
-| Line      | `ocr_line` or `ocrx_line`   |                                  |
+| Block     | hOCR class                  | notes                                                                                                                                                                                  |
+| --------- | --------------------------- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Word      | `ocrx_word`                 | needs to have a `bbox` attribute with the coordinates on the page                                                                                                                      |
+| Page      | `ocr_page`                  | needs to have a page identifier, either in `id` attribute or in the `ppageno` or `x_source` entry in the `title` attribute, **must be unique within a document!** |
+| Block     | `ocr_carea`/`ocrx_block`    |                                                                                                                                                                                        |
+| Section   | `ocr_chapter`/`ocr_section`/<br>`ocr_subsection`/`ocr_subsubsection` |                                                                                                                                                                                        |
+| Paragraph | `ocr_par`                   |                                                                                                                                                                                        |
+| Line      | `ocr_line` or `ocrx_line`   |                                                                                                                                                                                        |
 
 ## ALTO
+
+For ALTO OCR, there are some **requirements** for the XML structure:
+- Must have ALTO as the default namespace and no namespace prefixes for the tags.
+- If using multiple ALTO files per document, the `ID` attribute of the `<Page>` tag must be unique within the document.
+
+If those requirements are not met, you will encounter severe bugs and misbehavior in the
+highlighting phase, please make sure your inputs meet these requirements before you start indexing.
 
 !!! caution
     The coordinates returned by the plugin are **not always pixel values**, since ALTO supports a variety
@@ -37,14 +44,14 @@ query parameters](query.md#available-highlighting-parameters) to control how the
 
 **Block type mapping:**
 
-| Block     | ALTO tag                    | notes                            |
-| --------- | --------------------------- | -------------------------------- |
-| Word      | `<String />`                | needs to have `CONTENT`, `HPOS`, `VPOS`, `WIDTH` and `HEIGHT` attributes |
-| Line      | `<TextLine />`              |                                  |
-| Block     | `<TextBlock />`             |                                  |
-| Page      | `<Page />`                  | needs to have an `ID` attribute with a page identifier |
-| Section   | *not mapped*                |                                  |
-| Paragraph | *not mapped*                |                                  |
+| Block     | ALTO tag                    | notes                                                                                        |
+| --------- | --------------------------- |----------------------------------------------------------------------------------------------|
+| Word      | `<String />`                | needs to have `CONTENT`, `HPOS`, `VPOS`, `WIDTH` and `HEIGHT` attributes                     |
+| Line      | `<TextLine />`              |                                                                                              |
+| Block     | `<TextBlock />`             |                                                                                              |
+| Page      | `<Page />`                  | needs to have an `ID` attribute with a page identifier, **must be unique within a document** |
+| Section   | *not mapped*                |                                                                                              |
+| Paragraph | *not mapped*                |                                                                                              |
 
 
 ## MiniOCR
