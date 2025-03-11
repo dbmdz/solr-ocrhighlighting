@@ -572,6 +572,11 @@ instruct the plugin to load the OCR content from multiple files.</p>
 </code></pre></div>
 <p>For indexing and highlighting, Solr will load the contents of the <code>ocrdoc-1_1.xml</code>, <code>ocrdoc-1_2.xml</code> and 
 <code>ocrdoc-1_2.xml</code> as a single continuous text.</p>
+<div class="admonition caution">
+<p class="admonition-title">Page Identifiers</p>
+<p>For this use case, you have to <strong>make absolutely sure that the page identifiers  are unique within the
+document</strong>.  If this requirement is not met, you will get unexpected results during highlighting.</p>
+</div>
 <h2 id="advanced-one-or-more-partial-files-per-solr-document">Advanced: One or more <em>partial</em> files per Solr document</h2>
 <p>A more complicated situation arises if the Solr documents need to refer to <em>parts</em> of one or more files on
 disk. This happens for example when you have scans of bound newspaper volumes, which frequently consist
@@ -618,6 +623,7 @@ listed as <strong>comma-separated byte-regions</strong> inside of square bracket
   that spans from the bottom of one page to the top of the next, you will have to include a region
   for the opening element of the first page so we can determine the page for the first part of the
   article during highlighting</li>
+<li>The page identifiers for every page in the document must be unique within it.</li>
 </ul>
 </div>
 <div class="admonition caution">

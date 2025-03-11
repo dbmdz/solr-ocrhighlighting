@@ -534,7 +534,7 @@ query parameters</a> to control how the plugin generates snippets.</p>
 <tr>
 <td>Page</td>
 <td><code>ocr_page</code></td>
-<td>needs to have a page identifier, either in <code>id</code> attribute or in the <code>ppageno</code> or <code>x_source</code> entry in the <code>title</code> attribute</td>
+<td>needs to have a page identifier, either in <code>id</code> attribute or in the <code>ppageno</code> or <code>x_source</code> entry in the <code>title</code> attribute, <strong>must be unique within a document!</strong></td>
 </tr>
 <tr>
 <td>Block</td>
@@ -559,6 +559,11 @@ query parameters</a> to control how the plugin generates snippets.</p>
 </tbody>
 </table>
 <h2 id="alto">ALTO</h2>
+<p>For ALTO OCR, there are some <strong>requirements</strong> for the XML structure:
+- Must have ALTO as the default namespace and no namespace prefixes for the tags.
+- If using multiple ALTO files per document, the <code>ID</code> attribute of the <code>&lt;Page&gt;</code> tag must be unique within the document.</p>
+<p>If those requirements are not met, you will encounter severe bugs and misbehavior in the
+highlighting phase, please make sure your inputs meet these requirements before you start indexing.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>The coordinates returned by the plugin are <strong>not always pixel values</strong>, since ALTO supports a variety
@@ -594,7 +599,7 @@ on the client side to convert to pixel coordinates.</p>
 <tr>
 <td>Page</td>
 <td><code>&lt;Page /&gt;</code></td>
-<td>needs to have an <code>ID</code> attribute with a page identifier</td>
+<td>needs to have an <code>ID</code> attribute with a page identifier, <strong>must be unique within a document</strong></td>
 </tr>
 <tr>
 <td>Section</td>
