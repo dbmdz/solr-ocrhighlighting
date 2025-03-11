@@ -20,7 +20,18 @@ from pathlib import Path
 from typing import Any, Iterable, List, Tuple, TypedDict
 from urllib import request
 
+# Standard SemVer with an optional patch component
 VERSION_PAT = re.compile(r"^\d+\.\d+(?:\.\d+)?$")
+
+# These constraints define the minimum and maximum version of Solr
+# that is compatible with a certain plugin version.
+# Due to our use of internal Solr and Lucene APIs, every plugin version
+# is backwards-compatible as much as possible, but not forward-compatible
+# to new Solr releases.
+# Each constraint is a tuple of
+# (<plugin-version>, (<min-solr-version>, <max-solr-version>))
+# Min/Max are both inclusive, so ("9.0", "9.6") is compatible with all
+# Solr versions >= 9.0 && <= 9.6.
 VERSION_CONSTRAINTS_78 = [
     ((0, 1, 0), ("7.5", "8.0")),
     ((0, 3, 1), ("7.5", "8.2")),
@@ -33,7 +44,14 @@ VERSION_CONSTRAINTS_9 = [
     ((0, 8, 5), ("9.0", "9.6")),
     ((0, 9, 1), ("9.0", "9.8")),
 ]
+
+# The release from which our two release trains diverge
+# Solr 9.0 introduced changes that make the bytecode between our
+# Solr 9.x and < 9.x releases incompatible, which is why we have
+# a split release train from 0.8.0 on, the plugin release that
+# introduced Solr 9.0 compatibility.
 SPLIT_START_VERSION = (0, 8, 0)
+
 REPOSITORY_NAME = "ocrhighlighting"
 REPOSITORY_DESCRIPTION = "Highlight various OCR formats directly in Solr."
 REPOSITORY_GIT_REPO = "github.com/dbmdz/dbmdz.github.io.git"
@@ -42,32 +60,51 @@ RELEASE_DOWNLOAD_URL = "https://github.com/dbmdz/solr-ocrhighlighting/releases/d
 
 
 class Artifact(TypedDict):
+    #: Where the release artifact is hosted
     url: str
+    #: Signature for the release artifact
     sig: str
 
 
-Manifest = TypedDict("Manifest", {"version-constraint": str})
+
+Manifest = TypedDict('Manifest', {
+    #: A SemVer version constraint, see this for examples of valid syntax:
+    #: https://github.com/semver4j/semver4j/blob/1bfc2b975/src/test/java/org/semver4j/SemverTest.java#L904-L1174
+    'version-constraint': str
+})
 
 
 class Version(TypedDict):
+    """
+    Specific release version for a Solr plugin package
+    """
+    #: SemVer version
     version: str
+    #: Release date in YYYY-MM-dd format
     date: str
     artifacts: List[Artifact]
     manifest: Manifest
 
 
 class Plugin(TypedDict):
+    """
+    Solr plugin package
+    """
     name: str
     description: str
     versions: List[Version]
 
 
 class Asset(TypedDict):
+    """
+    GitHub Release asset
+    """
     browser_download_url: str
     name: str
 
 
 def fetch_releases() -> List[Any]:
+    """ Fetch releases from GitHub """
     req = request.Request(RELEASES_URL)
     req.add_header("Accept", "application/vnd.github.v3+json")
     with request.urlopen(req) as resp:
@@ -75,6 +112,13 @@ def fetch_releases() -> List[Any]:
 
 
 def build_repository(build_v78: bool = False) -> List[Plugin]:
+    """
+    Build the repository data structure based on the available
+    GitHub releases.
+
+    :param build_v78: Whether to build a repository for the Solr 7.x/8.x
+                      release train
+    """
     all_releases = fetch_releases()
     return [
         {
@@ -98,6 +142,14 @@ def build_repository(build_v78: bool = False) -> List[Plugin]:
 def build_versions(
     tag_name: str, publish_date: datetime, assets: List[Asset], build_v78: bool = False
 ) -> Iterable[Version]:
+    """ Build the Version data structures for a specific release.
+
+    :param tag_name:        GitHub release tag
+    :param publish_date:    Date the release was published
+    :param assets:          Assets associated with the release
+    :param build_v78:       Whether the release is for the 7.x/8.x release
+                            train
+    """
     relevant_assets = [
         a
         for a in assets
@@ -144,6 +196,7 @@ def build_versions(
 
 
 def sign_artifact(artifact_url: str) -> str:
+    """ Calculate the signature for a given release artifact. """
     with request.urlopen(artifact_url) as resp:
         artifact_data = resp.read()
     with tempfile.NamedTemporaryFile("wt") as key_path:
@@ -157,14 +210,19 @@ def sign_artifact(artifact_url: str) -> str:
 
 
 def add_solr_repository(solr_repo_path: Path, repository: List[Plugin]) -> None:
+    """ Dump a repository to a JSON file in a specific directory. """
     solr_repo_path.mkdir(parents=True, exist_ok=True)
     with (solr_repo_path / "repository.json").open("wt") as fp:
         json.dump(repository, fp, indent=2)
 
 def git(cmd, *args, cwd: Path):
+    """ Wrapper around the git CLI. """
     return subprocess.check_call(("git", cmd) + args, cwd=cwd)
 
 def publish_repository(dry_run=False) -> None:
+    """ Build 7.x/8.x and 9.x repositories and publish them to GitHub pages. 
+    :param dry_run: Do not publish to GitHub, only print repository JSON to stdout
+    """
     repository = build_repository()
     repository_v78 = build_repository(build_v78=True)
 
