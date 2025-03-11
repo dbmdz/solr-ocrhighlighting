@@ -93,6 +93,8 @@ the work, so we can discuss if it's a fit.
 1. Create a PR for the release:
     - Update version in `pom.xml`
     - Update `docs/changes.md` with the release information
+    - If the compatibility with Solr has changed, update the version constraints
+      in `util/update_repo.py`
 2. Wait for PR to be approved and merge
 3. Tag release commit (`<major>.<minor>.<patch>`) and push the tag to GitHub
 4. Make a Release Build:
