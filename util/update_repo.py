@@ -27,7 +27,12 @@ VERSION_CONSTRAINTS_78 = [
     ((0, 4, 0), ("7.5", "8.8")),
     ((0, 7, 0), ("7.5", "8.11")),
 ]
-VERSION_CONSTRAINTS_9 = [((0, 8, 0), ("9.0",))]
+VERSION_CONSTRAINTS_9 = [
+    ((0, 8, 0), ("9.0", "9.3")),
+    ((0, 8, 4), ("9.0", "9.4")),
+    ((0, 8, 5), ("9.0", "9.6")),
+    ((0, 9, 1), ("9.0", "9.8")),
+]
 SPLIT_START_VERSION = (0, 8, 0)
 REPOSITORY_NAME = "ocrhighlighting"
 REPOSITORY_DESCRIPTION = "Highlight various OCR formats directly in Solr."
