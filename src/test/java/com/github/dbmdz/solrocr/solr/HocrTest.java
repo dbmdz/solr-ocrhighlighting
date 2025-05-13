@@ -521,7 +521,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     Path ocrPath = Paths.get("src/test/resources/data/issue_288.hocr");
     assertU(
         adoc(
-            "ocr_text_stored",
+            "ocr_text",
             new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
             "id",
             "87371"));
@@ -535,9 +535,9 @@ public class HocrTest extends SolrTestCaseJ4 {
             "hl.weightMatches",
             "true",
             "df",
-            "ocr_text_stored",
+            "ocr_text",
             "hl.ocr.fl",
-            "ocr_text_stored");
+            "ocr_text");
     assertQ(req, "count(.//lst[@name=\"87371\"]//arr[@name='snippets']/lst)=19");
   }
 
@@ -545,7 +545,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     Path ocrPath = Paths.get("src/test/resources/data/hocr_broken_entities.html");
     assertU(
         adoc(
-            "ocr_text_stored",
+            "ocr_text",
             new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
             "id",
             "87372"));
@@ -561,9 +561,9 @@ public class HocrTest extends SolrTestCaseJ4 {
             "hl.ocr.contextSize",
             "4",
             "df",
-            "ocr_text_stored",
+            "ocr_text",
             "hl.ocr.fl",
-            "ocr_text_stored");
+            "ocr_text");
     assertQ(
         req,
         "contains(.//lst[@name='87372']//arr[@name='snippets']/lst/str[@name='text']/text(), 'dt_HiFi-i?cBßflpedx1ttonI-iii;_;ikW')");
@@ -573,7 +573,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     Path ocrPath = Paths.get("src/test/resources/data/hocr_broken_pis.html");
     assertU(
         adoc(
-            "ocr_text_stored",
+            "ocr_text",
             new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
             "id",
             "87373"));
@@ -589,9 +589,9 @@ public class HocrTest extends SolrTestCaseJ4 {
             "hl.ocr.contextSize",
             "4",
             "df",
-            "ocr_text_stored",
+            "ocr_text",
             "hl.ocr.fl",
-            "ocr_text_stored");
+            "ocr_text");
     assertQ(
         req,
         "contains(.//lst[@name='87373']//arr[@name='snippets']/lst/str[@name='text']/text(), '_?«»«?_i_5t»_?».')");
@@ -601,7 +601,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     Path ocrPath = Paths.get("src/test/resources/data/hocr_broken_comment.html");
     assertU(
         adoc(
-            "ocr_text_stored",
+            "ocr_text",
             new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
             "id",
             "87374"));
@@ -617,9 +617,9 @@ public class HocrTest extends SolrTestCaseJ4 {
             "hl.ocr.contextSize",
             "4",
             "df",
-            "ocr_text_stored",
+            "ocr_text",
             "hl.ocr.fl",
-            "ocr_text_stored");
+            "ocr_text");
     assertQ(
         req,
         "contains(.//lst[@name='87374']//arr[@name='snippets']/lst/str[@name='text']/text(), \"!'_!--,,,_\")");
@@ -641,7 +641,7 @@ public class HocrTest extends SolrTestCaseJ4 {
             "q",
             "ocr_text:\"nathanael brush\"",
             "df",
-            "ocr_text_stored", // should break hl.q if hl.qparser is not working properly
+            "ocr_text", // should break hl.q if hl.qparser is not working properly
             "hl.ocr.qparser",
             "edismax",
             "hl.ocr.q",

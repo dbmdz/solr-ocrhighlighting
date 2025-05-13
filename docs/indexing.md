@@ -5,8 +5,9 @@
     [MiniOCR format](./formats.md#miniocr) if you decide to go this way.
 
 Indexing OCR documents without storing the actual content in the index is relatively simple:
-When building the index document, instead of putting  the actual OCR content into the field, you use
-a **source pointer**. This pointer will tell the plugin from which location to load the OCR content
+In your schema, make sure you have `<charFilter class="solrocr.ExternalUtf8ContentFilterFactory" />` as the first step in the index analysis chain of your OCR schema field.
+When building the index document, you now have to option to use
+a **source pointer** instead of putting  the actual OCR content into the field (which is still possible!). This pointer will tell the plugin from which location to load the OCR content
 during indexing and highlighting.
 
 !!! caution "When running under Solr >= 9 make sure to disable the security manager!"

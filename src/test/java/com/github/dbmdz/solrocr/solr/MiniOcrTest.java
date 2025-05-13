@@ -48,7 +48,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "31337"));
     assertU(
         adoc(
-            "ocr_text_stored",
+            "ocr_text",
             new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
             "id",
             "41337"));
@@ -123,7 +123,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
         "//arr[@name='regions'][1]/lst/float[@name='uly']/text()='0.0071'",
         "//arr[@name='regions'][1]/lst/float[@name='lrx']/text()='0.571'",
         "//arr[@name='regions'][1]/lst/float[@name='lry']/text()='0.028499998'",
-        "count(//arr[@name='highlights'])=3",
+        "count(//arr[@name='highlights'])=6",
         "//arr[@name='highlights'][1]/arr/lst/float[@name='ulx']/text()='0.2339'",
         "//arr[@name='highlights'][1]/arr/lst/float[@name='uly']/text()='0.7149'",
         "//arr[@name='highlights'][1]/arr/lst/float[@name='lrx']/text()='0.7805'",
@@ -132,11 +132,10 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
 
   @Test
   public void testStoredHighlighting() {
-    SolrQueryRequest req =
-        xmlQ("q", "München", "hl.ocr.fl", "ocr_text_stored", "df", "ocr_text_stored");
+    SolrQueryRequest req = xmlQ("q", "München", "hl.ocr.fl", "ocr_text", "df", "ocr_text");
     assertQ(
         req,
-        "count(//lst[@name='ocrHighlighting']/lst[@name='41337']/lst[@name='ocr_text_stored']/arr/lst)=3");
+        "count(//lst[@name='ocrHighlighting']/lst[@name='41337']/lst[@name='ocr_text']/arr/lst)=3");
   }
 
   @Test
@@ -319,7 +318,7 @@ public class MiniOcrTest extends SolrTestCaseJ4 {
     assertQ(
         req,
         "//str[@name='text'][1]/text()='5proc. Metall. 69, 00. 1854er Looſe –. Bankactien 797, 00. Nordbahn –. National-Anlehen 74, 10. Credit-Actien 177, 80. St. Eiſenb.-Actien-Cert. 182, 10. Galizier 197, 00. <em>London 108, 90. ien-Nachrichten</em>. i er in ſº. . . 1 eyhfü „Fºº Är º Heinr P? P. ſ º. - Empfehlen º Meyen ( - Leutloff mit -meraüren beenre-e-mehr-die-ergeben Ä-mein Gehrer u. Studirende!'",
-        "count(//arr[@name='pages']/lst)='2'",
+        "count(//arr[@name='pages']/lst)='4'",
         "(//arr[@name='pages']/lst/str[@name='id'])[1]='9'",
         "(//arr[@name='pages']/lst/int[@name='width'])[1]='2000'",
         "(//arr[@name='pages']/lst/str[@name='id'])[2]='10'",
