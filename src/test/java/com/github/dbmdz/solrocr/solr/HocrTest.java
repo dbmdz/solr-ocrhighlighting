@@ -504,11 +504,11 @@ public class HocrTest extends SolrTestCaseJ4 {
     SolrQueryRequest req = xmlQ("q", "fenitſchka", "hl.ocr.scorePassages", "off");
     assertQ(
         req,
-        "((//lst[@name='42']//arr[@name='pages'])[1]/lst/str[@name='id'])[1]/text()='page_88'",
-        "((//lst[@name='42']//arr[@name='pages'])[2]/lst/str[@name='id'])[1]/text()='page_89'",
-        "((//lst[@name='42']//arr[@name='pages'])[3]/lst/str[@name='id'])[1]/text()='page_92'",
-        "((//lst[@name='42']//arr[@name='pages'])[4]/lst/str[@name='id'])[1]/text()='page_92'",
-        "((//lst[@name='42']//arr[@name='pages'])[5]/lst/str[@name='id'])[1]/text()='page_97'");
+        "((//lst[@name='42']//arr[@name='pages'])[1]/lst/str[@name='id'])[1]/text()='page_7'",
+        "((//lst[@name='42']//arr[@name='pages'])[2]/lst/str[@name='id'])[1]/text()='page_9'",
+        "((//lst[@name='42']//arr[@name='pages'])[3]/lst/str[@name='id'])[1]/text()='page_12'",
+        "((//lst[@name='42']//arr[@name='pages'])[4]/lst/str[@name='id'])[1]/text()='page_21'",
+        "((//lst[@name='42']//arr[@name='pages'])[5]/lst/str[@name='id'])[1]/text()='page_62'");
   }
 
   public void testEmptyDoc() {

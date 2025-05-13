@@ -127,13 +127,30 @@ public class OcrFieldHighlighter {
   }
 
   /**
-   * Score snippets as mini-documents, either based on TF-IDF/BM25 or simply their position.
+   * Aggregate matches into passages, optionally scoring them.
    *
    * <p>Largely based on {@link FieldHighlighter#highlightOffsetsEnums(OffsetsEnum)} with
-   * modifications to add support for the {@link BreakLocator} interrface, the option to disable
+   * modifications to add support for the {@link BreakLocator} interface, the option to disable
    * scoring, the option to limit the number of snippets to consider for scoring as well as
    * restricting the returned snippets to those from OCR pages with a given identifier. <strong>
    * Please refer to the file header for licensing information on the original code.</strong>
+   *
+   * @param off the {@link OffsetsEnum} to retrieve matches with their offsets from
+   * @param indexDocId the document ID in the index
+   * @param breakLocator the {@link BreakLocator} to use for determining the passage boundaries,
+   *     also used for obtaining the text, which is bound to it
+   * @param formatter the {@link OcrPassageFormatter} to use for determining the page identifier in
+   *     case we are only intersted in a single page (i.e. if {@code pageId}) is non-null
+   * @param pageId the page identifier to restrict the results to, or null if all pages should be
+   *     considered
+   * @param snippetLimit the maximum number of snippets to consider for scoring, after this number
+   *     has been reached, no more snippets will be considered for the output (the total count is
+   *     still being incremented, though).
+   * @param scorePassages Flag to indicate whether to score the passages or not. If false, the
+   *     passages will be returned in the order they were found, without any scoring, otherwise they
+   *     will be scored with BM25 and returned in descending order of their score.
+   * @return the passages that were found in the given content, ordered by score (if {@code
+   *     scorePassages}) or by their order of appearance (if {@code !scorePassages})
    */
   protected Passage[] highlightOffsetsEnums(
       OffsetsEnum off,
@@ -174,10 +191,13 @@ public class OcrFieldHighlighter {
     Passage passage =
         new Passage(); // the current passage in-progress.  Will either get reset or added to queue.
 
-    // If we've reached the limit, no longer calculate passages, only count matches as passages
+    // Since building passages is expensive when using external files, we forego it past a certain
+    // limit (which can be set by the user) and just update the total count, counting each match
+    // as a single passage.
     boolean limitReached = false;
     int numTotal = 0;
     do {
+      limitReached = limitReached || numTotal >= snippetLimit;
       int start = off.startOffset();
       if (start == -1) {
         throw new IllegalArgumentException(
@@ -193,12 +213,9 @@ public class OcrFieldHighlighter {
       if (start < contentLength && end > contentLength) {
         continue;
       }
-      // Since building passages is expensive when using external files, we forego it past a certain
-      // limit (which can be set by the user) and just update the total count, counting each match
-      // as a single passage.
-      if (limitReached || numTotal > snippetLimit) {
+      if (limitReached) {
+        // Only count the match, but don't build a passage
         numTotal++;
-        limitReached = true;
         continue;
       }
       // advance breakIterator
@@ -212,7 +229,7 @@ public class OcrFieldHighlighter {
         }
         passage =
             maybeAddPassage(passageQueue, passageScorer, passage, contentLength, scorePassages);
-        // if we exceed limit, we are done
+        // if we exceed the content size, we are done
         if (start >= contentLength) {
           break;
         }
@@ -231,8 +248,14 @@ public class OcrFieldHighlighter {
 
     this.numMatches.put(indexDocId, numTotal);
     Passage[] passages = passageQueue.toArray(new Passage[passageQueue.size()]);
-    // sort in ascending order
-    Arrays.sort(passages, Comparator.comparingInt(Passage::getStartOffset));
+    // Array has unspecified order, sort again
+    if (scorePassages) {
+      // We want the highest scoring passage first
+      Arrays.sort(passages, Collections.reverseOrder(cmp));
+    } else {
+      // We want the snippets in their order of appearance
+      Arrays.sort(passages, cmp);
+    }
     return passages;
   }
 
@@ -257,19 +280,33 @@ public class OcrFieldHighlighter {
     if (score) {
       passage.setScore(scorer.score(passage, contentLength));
     }
-    // new sentence: first add 'passage' to queue
-    if (score
-        && passageQueue.size() == maxPassages
-        && passage.getScore() < passageQueue.peek().getScore()) {
-      passage.reset(); // can't compete, just reset it
-    } else {
-      passageQueue.offer(passage);
-      if (passageQueue.size() > maxPassages) {
+    boolean queueIsFull = passageQueue.size() == maxPassages;
+    if (score) {
+      if (queueIsFull && passage.getScore() < passageQueue.peek().getScore()) {
+        // If the queue is full, and the score of the passage is below the lowest scoring passage,
+        // we just reset the passage and return it.
+        passage.reset();
+        return passage;
+      }
+      // Otherwise, add it to the queue and remove and re-use the lowest-scoring passage, if the
+      // queue is full.
+      passageQueue.add(passage);
+      queueIsFull = passageQueue.size() > maxPassages;
+      if (queueIsFull) {
         passage = passageQueue.poll();
         passage.reset();
       } else {
         passage = new Passage();
       }
+    } else {
+      if (queueIsFull) {
+        // If the queue is full, and we don't score, we just reset the passage and return it.
+        passage.reset();
+        return passage;
+      }
+      // Otherwise, add it to the queue
+      passageQueue.add(passage);
+      passage = new Passage();
     }
     return passage;
   }
