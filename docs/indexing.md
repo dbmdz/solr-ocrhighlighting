@@ -6,7 +6,7 @@
 
 Indexing OCR documents without storing the actual content in the index is relatively simple:
 In your schema, make sure you have `<charFilter class="solrocr.ExternalUtf8ContentFilterFactory" />` as the first step in the index analysis chain of your OCR schema field.
-When building the index document, you now have to option to use
+When building the index document, you now have the option to use
 a **source pointer** instead of putting  the actual OCR content into the field (which is still possible!). This pointer will tell the plugin from which location to load the OCR content
 during indexing and highlighting.
 
