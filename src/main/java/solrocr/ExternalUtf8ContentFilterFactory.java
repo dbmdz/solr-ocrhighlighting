@@ -49,6 +49,11 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
     if (ptrStr.isEmpty()) {
       return new StringReader("");
     }
+    // If the field value is not a source pointer, forward it to the next component
+    // in the chain in case it contains OCR markup.
+    if (!SourcePointer.isPointer(ptrStr)) {
+      return new StringReader(ptrStr);
+    }
     try {
       SourcePointer pointer = SourcePointer.parse(ptrStr);
       if (pointer == null) {

@@ -10,21 +10,6 @@
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
     </fieldType>
-    <fieldtype name="text_ocr_stored" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
-      <analyzer type="index">
-        <charFilter class="solrocr.OcrCharFilterFactory" fixMarkup="true" />
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.StopFilterFactory"/>
-        <filter class="solr.PorterStemFilterFactory"/>
-      </analyzer>
-      <analyzer type="query">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.StopFilterFactory"/>
-        <filter class="solr.PorterStemFilterFactory"/>
-      </analyzer>
-    </fieldtype>
     <fieldtype name="text_ocr" class="solr.TextField" storeOffsetsWithPositions="true" termVectors="true">
       <analyzer type="index">
         <charFilter class="solrocr.ExternalUtf8ContentFilterFactory"/>
@@ -52,7 +37,6 @@
     <field name="id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
     <field name="some_text" type="text" indexed="true" stored="true" />
     <field name="ocr_text" type="text_ocr" indexed="true" stored="true" />
-    <field name="ocr_text_stored" type="text_ocr_stored" indexed="true" stored="true" />
     <dynamicField name="*_ocr" type="text_ocr" indexed="true" stored="false" />
   </fields>
   <uniqueKey>id</uniqueKey>
