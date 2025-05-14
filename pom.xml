@@ -52,18 +52,18 @@
     <version.assertj>3.27.3</version.assertj>
     <version.assertj-json>1.2.0</version.assertj-json>
     <version.byteseek>2.0.3</version.byteseek>
-    <version.commons-text>1.13.0</version.commons-text>
-    <version.junit>5.12.1</version.junit>
-    <version.mockito>5.16.1</version.mockito>
+    <version.commons-text>1.13.1</version.commons-text>
+    <version.junit>5.12.2</version.junit>
+    <version.mockito>5.17.0</version.mockito>
     <version.slf4j>2.0.17</version.slf4j>
     <version.solr>9.8.1</version.solr>
     <version.lucene>9.11.1</version.lucene>
-    <version.fmt-maven-plugin>2.25</version.fmt-maven-plugin>
+    <version.fmt-maven-plugin>2.27</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.11.2</version.maven-javadoc-plugin>
     <version.maven-shade-plugin>3.6.0</version.maven-shade-plugin>
     <version.maven-source-plugin>3.3.1</version.maven-source-plugin>
-    <version.surefire>3.5.2</version.surefire>
+    <version.surefire>3.5.3</version.surefire>
     <version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
   </properties>
 
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.18.0</version>
+      <version>2.19.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -101,7 +101,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>33.4.5-jre</version>
+      <version>33.4.8-jre</version>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
