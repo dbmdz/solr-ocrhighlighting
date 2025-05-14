@@ -165,8 +165,15 @@ public class OcrFieldHighlighter {
     if (!off.nextPosition()) {
       return new Passage[0];
     }
-    // If we're filtering by a page identifier, we want *all* hits on that page
-    int queueSize = pageId != null ? 4096 : maxPassages;
+    int queueSize = maxPassages;
+    if (!scorePassages) {
+      // If we're not scoring, we are only interested in the first matches until we reach the
+      // snippetLimit
+      queueSize = snippetLimit;
+    } else if (pageId != null) {
+      // If we're filtering by a page identifier, we want to take *all* hits on that page into account
+      queueSize = 4096;
+    }
     if (queueSize <= 0) {
       queueSize = 512;
     }
