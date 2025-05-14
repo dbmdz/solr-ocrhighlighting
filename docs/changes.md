@@ -1,3 +1,19 @@
+## 0.9.4 (2025-05-14)
+[GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.4)
+
+**Changed**
+- It is now possible to use `ExternalUtf8Filter` in a OCR field definition and still
+  use inline OCR, mixed with external OCR.
+- Improve performance when highlighting with `hl.ocr.scorePassages=false`, we now only
+  analyze as many passages as the number of snippets that were requested
+
+**Fixed**
+- Version constraints in the Solr plugin repository have been corrected, these were
+  previously pinned to Solr 9.0, which was wrong.
+- When highlighting with `hl.ocr.scorePassages=false`, the snippets returned would
+  be the last snippets in the document, not the first, as intended. This has now
+  been fixed and we only return the first snippets in the document.
+
 ## 0.9.3 (2025-03-10)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.3)
 **Changed**
