@@ -288,25 +288,27 @@ public class OcrFieldHighlighter {
         passage.reset();
         return passage;
       }
-      // Otherwise, add it to the queue and remove and re-use the lowest-scoring passage, if the
-      // queue is full.
+      // Queue not full, or the passage is better than the worst passage in the queue
       passageQueue.add(passage);
-      queueIsFull = passageQueue.size() > maxPassages;
-      if (queueIsFull) {
+      boolean queueExceedsMax = passageQueue.size() > maxPassages;
+      if (queueExceedsMax) {
+        // If the queue exceeds the max size, we remove the lowest scoring passage and re-use
+        // it, to avoid a heap allocation
         passage = passageQueue.poll();
         passage.reset();
       } else {
         passage = new Passage();
       }
     } else {
-      if (queueIsFull) {
-        // If the queue is full, and we don't score, we just reset the passage and return it.
+      // With scoring disabled, we're only interested in the earliest matches in the doc and ignore
+      // the rest.
+      if (!queueIsFull) {
+        passageQueue.add(passage);
+        passage = new Passage();
+      } else {
         passage.reset();
         return passage;
       }
-      // Otherwise, add it to the queue
-      passageQueue.add(passage);
-      passage = new Passage();
     }
     return passage;
   }
