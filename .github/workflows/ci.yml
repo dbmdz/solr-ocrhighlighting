@@ -13,7 +13,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: corretto
-          java-version: 11
+          java-version: 17
           cache: maven
       - name: Build with Maven and run unit tests
         run: mvn -B package
