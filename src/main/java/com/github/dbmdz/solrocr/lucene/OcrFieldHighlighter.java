@@ -171,7 +171,8 @@ public class OcrFieldHighlighter {
       // snippetLimit
       queueSize = snippetLimit;
     } else if (pageId != null) {
-      // If we're filtering by a page identifier, we want to take *all* hits on that page into account
+      // If we're filtering by a page identifier, we want to take *all* hits on that page into
+      // account
       queueSize = 4096;
     }
     if (queueSize <= 0) {
