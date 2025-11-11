@@ -1,7 +1,7 @@
 ## Unreleased
 
 **Dependencies**
-- Updated Solr to 9.9.0 and Lucene to 9.12.2
+- Updated Solr to 9.10.0 and Lucene to 9.12.3
 
 ## 0.9.4 (2025-05-14)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.4)
