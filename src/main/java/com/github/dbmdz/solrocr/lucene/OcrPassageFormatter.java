@@ -436,7 +436,9 @@ public class OcrPassageFormatter extends PassageFormatter {
       float lineHeight = curBox.getLry() - curBox.getUly();
       // Highlight coordinates are relative to their region, so we need to add the region's vertical
       // position to get the absolute vertical position on the page
-      float yDiff = Math.abs((nextRegion.getUly() + nextBox.getUly()) - (curRegion.getUly() + curBox.getUly()));
+      float yDiff =
+          Math.abs(
+              (nextRegion.getUly() + nextBox.getUly()) - (curRegion.getUly() + curBox.getUly()));
       boolean newLine = yDiff > (0.75 * lineHeight);
       boolean newPage = !Objects.equals(nextBox.getPage(), curBox.getPage());
       if (newLine || newPage) {
