@@ -414,31 +414,36 @@ public class OcrPassageFormatter extends PassageFormatter {
               // Remove the highlighting tags from the text
               box.setText(box.getText().replace(START_HL, "").replace(END_HL, ""));
             });
-    hlSpans.forEach(span -> snippet.addHighlightSpan(this.mergeBoxes(span)));
+    hlSpans.forEach(span -> snippet.addHighlightSpan(this.mergeBoxes(span, snippet)));
   }
 
   /** Merge adjacent OCR boxes into a single one, taking line breaks into account * */
-  protected List<OcrBox> mergeBoxes(List<OcrBox> boxes) {
+  protected List<OcrBox> mergeBoxes(List<OcrBox> boxes, OcrSnippet snippet) {
     if (boxes.size() < 2) {
       return boxes;
     }
     List<OcrBox> out = new ArrayList<>();
     Iterator<OcrBox> it = boxes.iterator();
     OcrBox curBox = it.next();
+    OcrBox curRegion = snippet.getSnippetRegions().get(curBox.getParentRegionIdx());
     StringBuilder curText = new StringBuilder(curBox.getText());
     // Combine word boxes into a single new OCR box until we hit a linebreak
     while (it.hasNext()) {
       OcrBox nextBox = it.next();
+      OcrBox nextRegion = snippet.getSnippetRegions().get(nextBox.getParentRegionIdx());
       // We consider a box on a new line if its vertical distance from the current box is close to
       // the line height
       float lineHeight = curBox.getLry() - curBox.getUly();
-      float yDiff = Math.abs(nextBox.getUly() - curBox.getUly());
+      // Highlight coordinates are relative to their region, so we need to add the region's vertical
+      // position to get the absolute vertical position on the page
+      float yDiff = Math.abs((nextRegion.getUly() + nextBox.getUly()) - (curRegion.getUly() + curBox.getUly()));
       boolean newLine = yDiff > (0.75 * lineHeight);
       boolean newPage = !Objects.equals(nextBox.getPage(), curBox.getPage());
       if (newLine || newPage) {
         curBox.setText(curText.toString());
         out.add(curBox);
         curBox = nextBox;
+        curRegion = nextRegion;
         curText = new StringBuilder(curBox.getText());
         continue;
       }

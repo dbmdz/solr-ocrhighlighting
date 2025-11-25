@@ -3,6 +3,10 @@
 **Dependencies**
 - Updated Solr to 9.10.0 and Lucene to 9.12.3
 
+**Fixed**
+- Highlighting when a highlighted span was crossing muliple vertical columns on
+  the page
+
 ## 0.9.4 (2025-05-14)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.4)
 
