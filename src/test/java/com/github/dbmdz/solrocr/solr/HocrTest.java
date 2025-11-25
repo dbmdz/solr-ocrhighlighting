@@ -680,4 +680,32 @@ public class HocrTest extends SolrTestCaseJ4 {
       assertU(commit());
     }
   }
+
+  public void testCrossLineSpanWithoutContext() throws IOException {
+    Path ocrPath = Paths.get("src/test/resources/data/newspaper-limit-bug.hocr");
+    assertU(
+            adoc(
+                    "ocr_text",
+                    new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
+                    "id",
+                    "87377"));
+    assertU(commit());
+    SolrQueryRequest req =
+            xmlQ(
+                    "q",
+                    "\"aerzten aufgegeben die bestrahlte milch\"~3",
+                    "hl.snippets",
+                    "8192",
+                    "hl.weightMatches",
+                    "true",
+                    "hl.ocr.contextSize",
+                    "0",
+                    "df",
+                    "ocr_text",
+                    "hl.ocr.fl",
+                    "ocr_text");
+    assertQ(
+            req,
+            "count(.//lst[@name='87377']//arr[@name='highlights']/arr/lst)=2");
+  }
 }
