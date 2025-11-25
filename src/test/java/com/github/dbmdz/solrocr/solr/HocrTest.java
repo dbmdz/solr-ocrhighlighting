@@ -681,7 +681,7 @@ public class HocrTest extends SolrTestCaseJ4 {
     }
   }
 
-  public void testCrossLineSpanWithoutContext() throws IOException {
+  public void testCrossColumnHighlighting() throws IOException {
     Path ocrPath = Paths.get("src/test/resources/data/newspaper-limit-bug.hocr");
     assertU(
             adoc(

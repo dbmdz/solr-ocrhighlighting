@@ -4,7 +4,7 @@
 - Updated Solr to 9.10.0 and Lucene to 9.12.3
 
 **Fixed**
-- Highlighting when a highlighted span was crossing muliple vertical columns on
+- Highlighting when a highlighted span was crossing multiple vertical columns on
   the page
 
 ## 0.9.4 (2025-05-14)
