@@ -2,10 +2,14 @@
 
 **Dependencies**
 - Updated Solr to 9.10.0 and Lucene to 9.12.3
+- Updated other dependencies to their latest versions
 
 **Fixed**
 - Highlighting when a highlighted span was crossing multiple vertical columns on
   the page
+
+**Chores**
+- Use JSONC for Renovate config instead of JSON5
 
 ## 0.9.4 (2025-05-14)
 [GitHub Release](https://github.com/dbmdz/solr-ocrhighlighting/releases/tag/0.9.4)
