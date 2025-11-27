@@ -1,4 +1,4 @@
-## Unreleased
+## 0.9.5 (2025-11-27)
 
 **Dependencies**
 - Updated Solr to 9.10.0 and Lucene to 9.12.3
