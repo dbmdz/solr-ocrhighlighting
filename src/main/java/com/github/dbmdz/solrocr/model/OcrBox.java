@@ -296,6 +296,13 @@ public class OcrBox implements Comparable<OcrBox> {
         && other.lry <= this.lry;
   }
 
+  public boolean isHyphenEndOf(OcrBox other) {
+    return this.isHyphenated()
+           && !this.isHyphenStart()
+           && Objects.equals(this.dehyphenatedForm, other.dehyphenatedForm)
+           && (Objects.equals(this.highlightSpan, other.highlightSpan));
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

@@ -133,11 +133,8 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
 
   private OcrBox prepareNext() {
     try {
-      while (xmlReader.hasNext()) {
-        OcrBox box = this.readNext(this.xmlReader, this.features);
-        if (box == null) {
-          continue;
-        }
+      OcrBox box;
+      while ((box = this.readNext(this.xmlReader, this.features)) != null) {
         // Boxes without text or coordinates (if either is requested with a feature flag) are
         // ignored since they break things downstream. Skip the current box and continue with next
         // one.
@@ -216,6 +213,14 @@ public abstract class OcrParser implements Iterator<OcrBox>, Iterable<OcrBox> {
    *
    * <p>Implementers should take care to enable/disable various parsing steps depending on the set
    * of features passed in.
+   *
+   * @param xmlReader the XML stream reader to read from, positioned at the current location in the
+   *     input stream. Implementers should advance the reader to the next position after reading the
+   *     box.
+   * @param features the set of features to enable/disable during parsing, as passed in the
+   *     constructor
+   * @return the next OCR box, or null if there are no more boxes to read
+   * @throws XMLStreamException if an error occurs while reading the input stream
    */
   protected abstract OcrBox readNext(XMLStreamReader2 xmlReader, Set<ParsingFeature> features)
       throws XMLStreamException;
