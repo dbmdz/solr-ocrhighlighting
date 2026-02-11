@@ -213,11 +213,72 @@ public class OcrPassageFormatter extends PassageFormatter {
     if (trackPages) {
       initialPage = determineStartPage(passage.getStartOffset(), reader);
     }
-    OcrSnippet snip = parseFragment(xmlFragment, initialPage);
+
+    List<OcrBox> parsed = this.parseWords(xmlFragment, initialPage);
+    if (parsed.isEmpty()) {
+      return null;
+    }
+
+    OcrBox finalBox = parsed.get(parsed.size() - 1);
+    if (finalBox.isInHighlight() && finalBox.isHyphenStart()) {
+      // Edge Case: Since our limit break locator does not truly parse the OCR,
+      // we can run into situations where the last word of a passage is a
+      // highlighted hyphenated word, but the following part of the word is not
+      // included in the passage since it is after a break. In this case, we want
+      // to expand the passage to include the line with the second part of the
+      // hyphenated word, since otherwise we would end up with a snippet that only
+      // contains half of a match.
+      // We do the expansion here at formatting time instead of passage-building time
+      // since we can only know about hyphenation after parsing the passage, which
+      // we don't do at passage-building time for performance reasons (passage-building
+      // is one of the hottest paths in the codebase)
+      parsed = this.expandPassageForHyphenation(passage, reader, initialPage, finalBox);
+    }
+
+    OcrSnippet snip = buildFragment(parsed, initialPage);
     if (snip != null) {
       snip.setScore(passage.getScore());
     }
     return snip;
+  }
+
+  private List<OcrBox> expandPassageForHyphenation(
+      Passage passage, SourceReader reader, OcrPage initialPage, OcrBox finalBox)
+      throws IOException {
+    int passageEnd = passage.getStartOffset() + passage.getLength();
+    BreakLocator lineBreakLocator = this.format.getBreakLocator(reader, OcrBlock.LINE);
+    int lineEndOffset = lineBreakLocator.following(passageEnd);
+    if (lineEndOffset == BreakLocator.DONE) {
+      // This means that the last part of the hyphenation does not exist in the
+      // input, which is weird (and likely due to an error during indexing), but we can't do
+      // anything about it, so we just return the original passage
+      lineEndOffset = passageEnd;
+    }
+    passage.setEndOffset(lineEndOffset);
+    String expandedFragment = getHighlightedFragment(passage, reader);
+    List<OcrBox> parsed = this.parseWords(expandedFragment, initialPage);
+    OcrBox hyphenStart =
+        parsed.stream()
+            .filter(
+                b ->
+                    b.getUlx() == finalBox.getUlx()
+                        && b.getUly() == finalBox.getUly()
+                        && b.isHyphenStart())
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new RuntimeException(
+                        "Could not find the original final box in the expanded passage, this should not happen"));
+    int hyphenStartIdx = parsed.indexOf(hyphenStart);
+    if (hyphenStartIdx + 1 < parsed.size()) {
+      OcrBox hyphenEnd = parsed.get(hyphenStartIdx + 1);
+      if (hyphenEnd.isHyphenEndOf(hyphenStart)) {
+        parsed
+            .get(parsed.indexOf(hyphenStart) + 1)
+            .setHighlightSpan(hyphenStart.getHighlightSpan());
+      }
+    }
+    return parsed;
   }
 
   /** Determine the page an OCR fragment resides on. */
@@ -234,9 +295,17 @@ public class OcrPassageFormatter extends PassageFormatter {
     return this.format.parsePageFragment(pageFragment);
   }
 
-  /** Parse an {@link OcrSnippet} from an OCR fragment. */
-  protected OcrSnippet parseFragment(String ocrFragment, OcrPage page) {
-    List<OcrBox> allBoxes = this.parseWords(ocrFragment, page);
+  /**
+   * Build an {@link OcrSnippet} from a parsed OCR fragment.
+   *
+   * @param allBoxes the parsed OCR boxes from the fragment, including highlighted and
+   *     non-highlighted ones that are needed to determine the snippet regions and the highlighted
+   *     spans and their coordinates
+   * @param page the page that the fragment starts on, can be null if page tracking is not enabled
+   *     or the page could not be determined
+   * @return the built snippet, or null if the fragment did not contain any text
+   */
+  protected OcrSnippet buildFragment(List<OcrBox> allBoxes, OcrPage page) {
     if (allBoxes.isEmpty()) {
       return null;
     }

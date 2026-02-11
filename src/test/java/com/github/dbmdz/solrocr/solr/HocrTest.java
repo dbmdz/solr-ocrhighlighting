@@ -228,6 +228,32 @@ public class HocrTest extends SolrTestCaseJ4 {
   }
 
   @Test
+  public void testMatchOnHyphenEndExpandsPassage() throws IOException {
+    Path ocrPath = Paths.get("src/test/resources/data/hocr_hyphen.html");
+    String docId = "578aa43b-5b3c-4595-bedc-f115300464a9";
+    assertU(
+        adoc(
+            "ocr_text",
+            new String(Files.readAllBytes(ocrPath), StandardCharsets.UTF_8),
+            "id",
+            docId));
+    assertU(commit());
+    try {
+      SolrQueryRequest req =
+          xmlQ("q", "schweizerdeutsch", "hl.ocr.limitBlock", "line", "hl.ocr.contextSize", "0");
+      assertQ(
+          req,
+          "//str[@name='text'][1]/text()='Subjekts im Wechsel der Sprachen. Englisch steht neben Deutsch und <em>Schweizerdeutsch</em>:'",
+          "(//arr[@name='regions']/lst)[1]/str[@name='text']/text()='Subjekts im Wechsel der Sprachen. Englisch steht neben Deutsch und <em>Schweizerdeutsch</em>:'",
+          "//arr[@name='highlights']/arr/lst[1]/str[@name='text']/text()='Schweizer'",
+          "//arr[@name='highlights']/arr/lst[2]/str[@name='text']/text()='deutsch:'");
+    } finally {
+      assertU(delI(docId));
+      assertU(commit());
+    }
+  }
+
+  @Test
   public void testMaskedDocumentIsIndexed() {
     SolrQueryRequest req = xmlQ("q", "Vögelchen");
     assertQ(
