@@ -20,7 +20,7 @@ jobs:
       - name: Create Solr 7/8 JAR
         run: ./util/patch_solr78_bytecode.py
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: build-artifacts
           path: target/*.jar
@@ -30,7 +30,7 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: build-artifacts
           path: ./target
@@ -91,7 +91,7 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: build-artifacts
       - uses: ncipollo/release-action@v1
