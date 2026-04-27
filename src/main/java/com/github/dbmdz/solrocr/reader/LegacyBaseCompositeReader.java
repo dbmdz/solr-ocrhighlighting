@@ -16,6 +16,7 @@
  */
 package com.github.dbmdz.solrocr.reader;
 
+import com.github.dbmdz.solrocr.util.LuceneSolrCompat;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -92,26 +93,26 @@ public abstract class LegacyBaseCompositeReader<R extends IndexReader> extends C
     starts[subReaders.length] = this.maxDoc;
   }
 
-  @Override
   public final Fields getTermVectors(int docID) throws IOException {
     ensureOpen();
     final int i = readerIndex(docID); // find subreader num
-    return subReaders[i].getTermVectors(docID - starts[i]); // dispatch to subreader
+    return LuceneSolrCompat.getTermVectors(
+        subReaders[i], docID - starts[i]); // dispatch to subreader
   }
 
   @Override
   public final TermVectors termVectors() throws IOException {
     ensureOpen();
-    TermVectors[] subVectors = new TermVectors[subReaders.length];
+    Object[] subVectors = new Object[subReaders.length];
     return new TermVectors() {
       @Override
       public Fields get(int docID) throws IOException {
         final int i = readerIndex(docID); // find subreader num
         // dispatch to subreader, reusing if possible
         if (subVectors[i] == null) {
-          subVectors[i] = subReaders[i].termVectors();
+          subVectors[i] = LuceneSolrCompat.openTermVectors(subReaders[i]);
         }
-        return subVectors[i].get(docID - starts[i]);
+        return LuceneSolrCompat.getTermVectors(subVectors[i], docID - starts[i]);
       }
     };
   }
@@ -119,16 +120,16 @@ public abstract class LegacyBaseCompositeReader<R extends IndexReader> extends C
   @Override
   public final StoredFields storedFields() throws IOException {
     ensureOpen();
-    StoredFields[] subFields = new StoredFields[subReaders.length];
+    Object[] subFields = new Object[subReaders.length];
     return new StoredFields() {
       @Override
       public void document(int docID, StoredFieldVisitor visitor) throws IOException {
         final int i = readerIndex(docID); // find subreader num
         // dispatch to subreader, reusing if possible
         if (subFields[i] == null) {
-          subFields[i] = subReaders[i].storedFields();
+          subFields[i] = LuceneSolrCompat.openStoredFields(subReaders[i]);
         }
-        subFields[i].document(docID - starts[i], visitor);
+        LuceneSolrCompat.visitStoredFields(subFields[i], docID - starts[i], visitor);
       }
     };
   }
@@ -161,11 +162,11 @@ public abstract class LegacyBaseCompositeReader<R extends IndexReader> extends C
     return maxDoc;
   }
 
-  @Override
   public final void document(int docID, StoredFieldVisitor visitor) throws IOException {
     ensureOpen();
     final int i = readerIndex(docID); // find subreader num
-    subReaders[i].document(docID - starts[i], visitor); // dispatch to subreader
+    LuceneSolrCompat.visitStoredFields(
+        subReaders[i], docID - starts[i], visitor); // dispatch to subreader
   }
 
   @Override

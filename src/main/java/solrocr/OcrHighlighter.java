@@ -38,10 +38,10 @@ import com.github.dbmdz.solrocr.model.OcrHighlightResult;
 import com.github.dbmdz.solrocr.model.OcrSnippet;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.reader.ExitingSourceReader;
-import com.github.dbmdz.solrocr.reader.LegacyBaseCompositeReader;
 import com.github.dbmdz.solrocr.reader.SourceReader;
 import com.github.dbmdz.solrocr.reader.StringSourceReader;
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
+import com.github.dbmdz.solrocr.util.LuceneSolrCompat;
 import com.github.dbmdz.solrocr.util.TimeAllowedLimit;
 import com.github.dbmdz.solrocr.util.VersionUtils;
 import com.google.common.collect.ImmutableSet;
@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -66,8 +65,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DocumentStoredFieldVisitor;
-import org.apache.lucene.index.BaseCompositeReader;
 import org.apache.lucene.index.ExitableDirectoryReader;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.FilterLeafReader;
@@ -93,7 +90,6 @@ import org.apache.lucene.util.automaton.CharacterRunAutomaton;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.search.QueryLimits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,17 +113,10 @@ public class OcrHighlighter extends UnifiedHighlighter {
   private static final Constructor<UHComponents> hlComponentsConstructorLegacy;
   private static final Method offsetSourceGetterLegacy;
   private static final Method extractAutomataLegacyMethod;
-  private static final Method queryTimeoutGetterLegacy;
 
   private static Document getDocWithFieldValues(
       IndexSearcher searcher, int docId, String[] fieldNames) throws IOException {
-    if (VersionUtils.luceneVersionIsBefore(9, 5)) {
-      DocumentStoredFieldVisitor visitor = new DocumentStoredFieldVisitor(fieldNames);
-      searcher.doc(docId, visitor);
-      return visitor.getDocument();
-    } else {
-      return searcher.storedFields().document(docId, new HashSet<>(Arrays.asList(fieldNames)));
-    }
+    return LuceneSolrCompat.getDocument(searcher, docId, fieldNames);
   }
 
   static {
@@ -237,14 +226,6 @@ public class OcrHighlighter extends UnifiedHighlighter {
         hlComponentsConstructorLegacy = null;
         offsetSourceGetterLegacy = null;
       }
-
-      if (VersionUtils.solrVersionIsBefore(9, 6)) {
-        Class<?> solrQueryTimeoutImplCls =
-            Class.forName("org.apache.solr.search.SolrQueryTimeoutImpl");
-        queryTimeoutGetterLegacy = solrQueryTimeoutImplCls.getDeclaredMethod("getInstance");
-      } else {
-        queryTimeoutGetterLegacy = null;
-      }
     } catch (NoSuchMethodException | ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
@@ -278,21 +259,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
    * @return the limiter for the current request, or null if no limits were configured
    */
   private static QueryTimeout getQueryLimits(SolrQueryRequest req) {
-    final QueryTimeout globalTimeout;
-    if (queryTimeoutGetterLegacy != null) {
-      try {
-        globalTimeout = (QueryTimeout) queryTimeoutGetterLegacy.invoke(null);
-      } catch (ReflectiveOperationException e) {
-        throw new RuntimeException(e);
-      }
-    } else {
-      QueryLimits limits = QueryLimits.getCurrentLimits();
-      if (limits.isLimitsEnabled()) {
-        globalTimeout = limits;
-      } else {
-        globalTimeout = null;
-      }
-    }
+    final QueryTimeout globalTimeout = LuceneSolrCompat.getQueryTimeout(req);
     if (TimeAllowedLimit.hasTimeLimit(req)) {
       if (globalTimeout == null) {
         return new TimeAllowedLimit(req);
@@ -944,31 +911,7 @@ public class OcrHighlighter extends UnifiedHighlighter {
               .map(LeafReaderContext::reader)
               .map(TermVectorReusingLeafReader::new)
               .toArray(LeafReader[]::new);
-      if (VersionUtils.luceneVersionIsBefore(8, 9)) {
-        return new LegacyBaseCompositeReader<IndexReader>(leafReaders) {
-          @Override
-          protected void doClose() throws IOException {
-            reader.close();
-          }
-
-          @Override
-          public CacheHelper getReaderCacheHelper() {
-            return null;
-          }
-        };
-      } else {
-        return new BaseCompositeReader<IndexReader>(leafReaders, null) {
-          @Override
-          protected void doClose() throws IOException {
-            reader.close();
-          }
-
-          @Override
-          public CacheHelper getReaderCacheHelper() {
-            return null;
-          }
-        };
-      }
+      return LuceneSolrCompat.createCompositeReader(leafReaders, reader);
     }
 
     private int lastDocId = -1;

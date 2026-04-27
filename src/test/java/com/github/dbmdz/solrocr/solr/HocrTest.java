@@ -32,7 +32,7 @@ public class HocrTest extends SolrTestCaseJ4 {
   public static void beforeClass() throws Exception {
     // Needed since https://github.com/apache/solr/commit/16657ccab092
     System.setProperty("solr.install.dir", "./");
-    initCore("solrconfig.xml", "schema.xml", "src/test/resources/solr", "general");
+    initCore("solrconfig.xml", "schema.xml", Paths.get("src/test/resources/solr"), "general");
 
     assertU(
         adoc(
