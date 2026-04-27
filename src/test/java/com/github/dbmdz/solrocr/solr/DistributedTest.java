@@ -1,6 +1,7 @@
 package com.github.dbmdz.solrocr.solr;
 
 import com.carrotsearch.randomizedtesting.annotations.ThreadLeakFilters;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -9,6 +10,8 @@ import org.apache.solr.BaseDistributedSearchTestCase;
 import org.apache.solr.SolrIgnoredThreadsFilter;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
+import org.apache.solr.core.CoreContainer;
+import org.apache.solr.embedded.JettySolrRunner;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,8 +26,8 @@ import org.junit.Test;
 public class DistributedTest extends BaseDistributedSearchTestCase {
 
   @Override
-  public String getSolrHome() {
-    return getFile("solr/distributed").getAbsolutePath();
+  public Path getSolrHome() {
+    return getFile("solr/distributed");
   }
 
   @Override
@@ -32,14 +35,36 @@ public class DistributedTest extends BaseDistributedSearchTestCase {
     return "solr.xml";
   }
 
+  @Override
+  protected JettySolrRunner createControlJetty() throws Exception {
+    Path jettyHome = testDir.resolve("control");
+    seedSolrHome(jettyHome);
+    // Our custom distributed test home ships the collection config under `cores/collection1/conf`,
+    // so we still need to materialize the matching core.properties file for the control node.
+    Path coreDir = jettyHome.resolve("cores").resolve(DEFAULT_TEST_CORENAME);
+    if (Files.notExists(coreDir.resolve(CORE_PROPERTIES_FILENAME))) {
+      writeCoreProperties(coreDir, DEFAULT_TEST_CORENAME);
+    }
+    JettySolrRunner jetty =
+        createJetty(jettyHome, null, null, getSolrConfigFile(), getSchemaFile());
+    try {
+      jetty.start();
+      return jetty;
+    } catch (Exception e) {
+      CoreContainer container = jetty.getCoreContainer();
+      if (container != null && !container.getCoreInitFailures().isEmpty()) {
+        throw new IllegalStateException(
+            "The CoreContainer is unavailable: " + container.getCoreInitFailures(), e);
+      }
+      throw e;
+    }
+  }
+
   @BeforeClass
   public static void beforeClass() {
     System.setProperty("validateAfterInactivity", "200");
     System.setProperty("solr.httpclient.retries", "0");
     System.setProperty("distribUpdateSoTimeout", "5000");
-    System.setProperty("solr.log.dir", "/tmp/debug-log-solr");
-    // Needed since https://github.com/apache/solr/commit/16657ccab092
-    System.setProperty("solr.install.dir", "./");
   }
 
   @Before

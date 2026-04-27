@@ -2,6 +2,7 @@ package solrocr;
 
 import com.github.dbmdz.solrocr.solr.OcrHighlightParams;
 import com.github.dbmdz.solrocr.solr.SolrOcrHighlighter;
+import com.github.dbmdz.solrocr.util.LuceneSolrCompat;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -193,7 +194,7 @@ public class OcrHighlightComponent extends SearchComponent
   public void finishStage(ResponseBuilder rb) {
     boolean setOcrHighlights =
         !Strings.isNullOrEmpty(rb.req.getParams().get(OcrHighlightParams.OCR_FIELDS, ""))
-            && rb.stage == ResponseBuilder.STAGE_GET_FIELDS;
+            && LuceneSolrCompat.getStage(rb) == ResponseBuilder.STAGE_GET_FIELDS;
     if (setOcrHighlights) {
       final Object[] objArr = new NamedList.NamedListEntry[rb.resultIds.size()];
       for (ShardRequest sreq : rb.finished) {

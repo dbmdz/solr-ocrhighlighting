@@ -56,8 +56,8 @@
     <version.junit>6.0.1</version.junit>
     <version.mockito>5.20.0</version.mockito>
     <version.slf4j>2.0.17</version.slf4j>
-    <version.solr>9.10.0</version.solr>
-    <version.lucene>9.12.3</version.lucene>
+    <version.solr>10.0.0</version.solr>
+    <version.lucene>10.3.2</version.lucene>
     <version.fmt-maven-plugin>2.29</version.fmt-maven-plugin>
     <version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
@@ -113,6 +113,102 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-analysis-extras</artifactId>
       <version>${version.solr}</version>
+      <scope>test</scope>
+    </dependency>
+    <!--
+      FIXME: Remove these direct workaround dependencies once the published Solr 10 `solr-core` POM is fixed.
+	     Maven 3 treats that POM as invalid because several Jackson runtime dependencies are missing versions,
+	     so it drops `solr-core` transitive dependencies entirely. We therefore have to declare the minimal
+      	     direct set we actually need.
+             See those links for more details:
+             - https://issues.apache.org/jira/browse/SOLR-18003
+             - https://lists.apache.org/thread/w0tqdcjyo0wlbf7xjtc0ll9tjhwor8n2
+    -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${version.slf4j}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj</artifactId>
+      <version>${version.solr}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-api</artifactId>
+      <version>${version.solr}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj-streaming</artifactId>
+      <version>${version.solr}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj-zookeeper</artifactId>
+      <version>${version.solr}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+      <artifactId>caffeine</artifactId>
+      <version>3.2.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>3.1.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-json-jackson</artifactId>
+      <version>3.1.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <version>3.1.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-cbor</artifactId>
+      <version>2.20.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-smile</artifactId>
+      <version>2.20.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-join</artifactId>
+      <version>${version.lucene}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-queryparser</artifactId>
+      <version>${version.lucene}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.carrotsearch</groupId>
+      <artifactId>hppc</artifactId>
+      <version>0.10.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
+      <version>1.5.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -185,6 +281,10 @@
         <version>${version.surefire}</version>
         <configuration>
           <argLine>-Djava.security.egd=file:/dev/./urandom</argLine>
+          <systemPropertyVariables>
+            <solr.configset.default.confdir>${project.basedir}/src/test/resources/solr/general</solr.configset.default.confdir>
+            <solr.install.dir>${project.basedir}</solr.install.dir>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
       <plugin>
