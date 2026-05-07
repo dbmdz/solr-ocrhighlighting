@@ -18,7 +18,7 @@ works transparently with non-OCR fields and just lets the default
 implementation handle those.
 
 In addition to improved highlighting for OCR, the plugin is able to [index
-alternative readings](https://dbmdz.github.io/solr-ocrhighlighting/latest/alternatives/)
+alternative readings](https://dbmdz.github.io/solr-ocrhighlighting/alternatives/)
 listed in the markup. For example, if you OCR file
 has the alternatives `christmas` and `christrias` for the token
 `clistrias` in the span `presents on clistrias eve`, users would be able
@@ -28,7 +28,7 @@ get the correct match in both cases, both with full highlighting.
 The plugin **works with all Solr versions >= 7.5**.
 
 ## Features
-- Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/latest/formats/#miniocr) directly without preprocessing
+- Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/formats/#miniocr) directly without preprocessing
 - Retrieve all the information needed to render a highlighted snippet view directly from Solr, without postprocessing
 - Keeps your index size manageable by not storing the OCR in the index
 
@@ -72,7 +72,7 @@ To run:
 3. `./ingest.py`
 4. Access `http://localhost:8181` in your browser
 
-For more information about the example setup, refer to the [documentation](https://dbmdz.github.io/solr-ocrhighlighting/latest/example/).
+For more information about the example setup, refer to the [documentation](https://dbmdz.github.io/solr-ocrhighlighting/example/).
 
 
 ## Limitations
@@ -94,24 +94,17 @@ the work, so we can discuss if it's a fit.
     - Update version in `pom.xml`
     - Update `docs/changes.md` with the release information
     - If the compatibility with Solr has changed, update the version constraints
-      in `util/update_repo.py`
+      in `util/release.py update-repo`
 2. Wait for PR to be approved and merge
 3. Tag release commit (`<major>.<minor>.<patch>`) and push the tag to GitHub
-4. Make a Release Build:
-    - `mvn clean package` to build the JAR for Solr >=8.x
-    - `./util/patch_solr78_bytecode.py` to create the JAR for Solr 7.x
-5. [Publish a new GitHub release](https://github.com/dbmdz/solr-ocrhighlighting/releases/new)
-   based on the tag just pushed. Add the two JARs from the build process as binaries
-   to the release
-6. Publish the releases to the plugin repository:
-   ```
-   # Token to publish to this repository on the `gh-pages` branch
-   $ export GH_DEPLOY_TOKEN=THE_TOKEN
-   # RSA Certificate Key for signing the release binaries
-   $ export CERTIFICATE=THE_RSA_PRIVATE_KEY
-   $ ./util/update_repo.py
-   ```
-7. Bump version in `pom.xml` to next minor version snapshot and push to GitHub
+    - The tagged commit must have a non-`SNAPSHOT` version in `pom.xml`
+    - `docs/changes.md` must contain a matching entry for the tag
+4. Wait for the GitHub Actions release workflow to finish. It will:
+    - build the regular JAR for Solr >=9.x
+    - build the patched `-solr78` JAR for Solr 7.x and 8.x
+    - publish a GitHub release for the tag using the corresponding entry from `docs/changes.md`
+    - publish the documentation for the tagged release and update the `latest` alias
+    - update the Solr plugin repository metadata
 
 ## Support us!
 
