@@ -1,10 +1,21 @@
 on:
   push:
     branches: [ main ]
+    tags: [ "*" ]
   pull_request:
     branches: [ main ]
 
 jobs:
+  validate_release:
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+      - name: Validate tagged release
+        run: python3 ./util/release.py validate-release "${{ github.ref_name }}"
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -39,13 +50,17 @@ jobs:
       - name: Run integration tests
         run: ./integration-tests/run.sh
 
-  publish_mkdocs_latest:
+  publish_docs:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - validate_release
+      - release
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.10
+      - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
@@ -53,74 +68,90 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install mkdocs singledispatch mkdocs-material mike==1.1.2
-      - name: Deploy documentation with mike
+          pip install mkdocs mkdocs-material mike==2.2.0
+      - name: Deploy versioned documentation
         run: |
           git config user.name mkdocs-mike
           git config user.email mkdocs-mike@nowhere.tld
           git fetch origin gh-pages
-          mike deploy -p --rebase ${{github.ref_name}} latest
+          mike deploy --push --update-aliases ${{ github.ref_name }} latest
+          mike set-default --push latest
 
-
-  publish_mkdocs_wip:
-    if: github.event_name == 'push' && contains(github.ref, 'main')
+  release:
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - validate_release
+      - integration_tests
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v6
         with:
-          python-version: "3.14"
-          cache: 'pip'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install mkdocs singledispatch mkdocs-material mike==1.1.2
-      - name: Deploy documentation with mike
-        run: |
-          git config user.name mkdocs-mike
-          git config user.email mkdocs-mike@nowhere.tld
-          git fetch origin gh-pages
-          mike deploy -p --rebase wip
-
-  pre-release:
-    name: "Pre Release"
-    if: github.event_name == 'push' && contains(github.ref, 'main')
-    runs-on: "ubuntu-latest"
-    needs: build
-    steps:
-      - uses: actions/checkout@v6
+          ref: ${{ github.ref }}
       - uses: actions/download-artifact@v8
         with:
           name: build-artifacts
+          path: ./target
+      - name: Generate release notes
+        run: python3 ./util/release.py extract-changelog "${{ github.ref_name }}" > ./release-notes.md
       - uses: ncipollo/release-action@v1
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
-          tag: "wip"
-          prerelease: true
-          name: "WIP build (use at own risk)"
-          artifacts: solr-ocrhighlighting-*.jar
+          tag: "${{ github.ref_name }}"
+          name: "${{ github.ref_name }}"
+          bodyFile: ./release-notes.md
+          artifacts: target/solr-ocrhighlighting-${{ github.ref_name }}.jar,target/solr-ocrhighlighting-${{ github.ref_name }}-solr78.jar
+          artifactErrorsFailBuild: true
           allowUpdates: true
 
-  update_wip_repository:
-    if: github.event_name == 'push' && contains(github.ref, 'main')
+  update_plugin_repository:
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - validate_release
+      - publish_docs
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.10
+        with:
+          ref: ${{ github.ref }}
+      - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
       - name: Install dependencies
-        run: |
-          sudo apt-get install -y openssl git
+        run: sudo apt-get install -y openssl git
       - name: Update repository
         run: |
           git config --global user.name gh-actions
           git config --global user.email ocrhl-gh-actions@nowhere.tld
-          ./util/update_repo.py
+          python3 ./util/release.py update-repo
         env:
           CERTIFICATE: ${{ secrets.CERTIFICATE }}
           GH_DEPLOY_TOKEN: ${{ secrets.GH_DEPLOY_TOKEN }}
+
+  bump_next_snapshot:
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    needs:
+      - validate_release
+      - update_plugin_repository
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Bump version to next snapshot
+        run: python3 ./util/release.py bump-snapshot "${{ github.ref_name }}"
+      - name: Commit version bump
+        run: |
+          if git diff --quiet -- pom.xml; then
+            echo "No version bump needed."
+            exit 0
+          fi
+          git config user.name github-actions
+          git config user.email github-actions@nowhere.tld
+          git add pom.xml
+          git commit -m "chore: bump version to next snapshot"
+          git push origin HEAD:main
