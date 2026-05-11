@@ -1,3 +1,28 @@
+## 0.10.0 (2026-05-11)
+
+**Changed**
+- Added compatibility with Solr 10
+- Automated tagged releases: CI now validates release metadata, publishes
+  GitHub releases from the changelog, deploys versioned documentation and
+  updates the Solr plugin repository metadata
+
+**Dependencies**
+- Updated Solr to 10.0.0 and Lucene to 10.3.2
+- Updated Commons Text to 1.15.0, Commons IO to 2.22.0 and Guava to
+  33.6.0-jre
+
+**Deprecated**
+- WIP/pre-release builds from `main` are no longer published to GitHub
+  Releases, the documentation site or the Solr plugin repository; use tagged
+  releases instead
+
+**Fixed**
+- Highlighting of hyphenated words when context was set to 0 lines, in this
+  case we now include the line with the second part of the hyphenation on the
+  next line.
+- Sometimes the second part of a hyphenated word in a fragment would get
+  skipped
+
 ## 0.9.5 (2025-11-27)
 
 **Dependencies**
