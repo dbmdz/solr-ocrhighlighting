@@ -144,14 +144,14 @@ jobs:
           ref: main
       - name: Bump version to next snapshot
         run: python3 ./util/release.py bump-snapshot "${{ github.ref_name }}"
-      - name: Commit version bump
-        run: |
-          if git diff --quiet -- pom.xml; then
-            echo "No version bump needed."
-            exit 0
-          fi
-          git config user.name github-actions
-          git config user.email github-actions@nowhere.tld
-          git add pom.xml
-          git commit -m "chore: bump version to next snapshot"
-          git push origin HEAD:main
+      - name: Open version bump pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}
+          base: main
+          branch: automation/bump-${{ github.ref_name }}-snapshot
+          delete-branch: true
+          add-paths: pom.xml
+          commit-message: "chore: bump version to next snapshot"
+          title: "chore: bump version to next snapshot"
+          body: "Automated snapshot version bump after release ${{ github.ref_name }}."
