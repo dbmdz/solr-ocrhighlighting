@@ -398,4 +398,17 @@ public class AltoTest extends SolrTestCaseJ4 {
     assertU(adoc("ocr_text", ocrPath.toString(), "id", "47379"));
     assertU(commit());
   }
+
+  // ALTO v4 from Transkribus with muti-line String elements
+  @Test
+  public void testAltoV4Transkribus() {
+    Path ocrPath = Paths.get("src/test/resources/data/alto_v4_transkribus.xml");
+    assertU(adoc("ocr_text", ocrPath.toString(), "id", "47390"));
+    assertU(commit());
+    SolrQueryRequest req = xmlQ("q", "ocr_text:Ausnahme");
+    assertQ(
+        req,
+        "count(//lst[@name='47390']//arr[@name='snippets']/lst)>=1",
+        "contains((//lst[@name='47390']//arr[@name='snippets']/lst/str[@name='text'])[1]/text(), '<em>Ausnahme</em>')");
+  }
 }
