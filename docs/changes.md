@@ -1,5 +1,8 @@
 ## Unreleased
 
+
+## 0.10.1 (2026-08-12)
+
 **Fixed**
 - ALTO indexing is now more tolerant of whitespace inside of element
   declarations, fixing e.g. parsing of the Transkribus default ALTO formatting
