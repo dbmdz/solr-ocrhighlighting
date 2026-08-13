@@ -330,7 +330,7 @@ def publish_repository(dry_run: bool = False, rebuild_all: bool = False) -> None
 
     git_repo_path = Path(tempfile.mkdtemp())
     github_token = os.environ["GH_DEPLOY_TOKEN"]
-    repo_url = f"https://{github_token}@{REPOSITORY_GIT_REPO}"
+    repo_url = f"https://x-access-token:{github_token}@{REPOSITORY_GIT_REPO}"
     subprocess.check_call(("git", "clone", "-q", repo_url, git_repo_path))
 
     existing_repository = None if rebuild_all else load_solr_repository(git_repo_path / "solr")
