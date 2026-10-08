@@ -3,13 +3,12 @@ package com.github.dbmdz.solrocr.lucene.filters;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.model.SourcePointer.Region;
 import com.github.dbmdz.solrocr.util.SourceAwareReader;
-import com.github.dbmdz.solrocr.util.Utf8;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
-import java.nio.CharBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Queue;
 import org.apache.lucene.analysis.charfilter.BaseCharFilter;
@@ -44,9 +43,6 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
   /** Source pointer of this reader, used for debugging and error reporting. */
   private final String pointer;
 
-  /** Whether the last seen character had more than 1 byte for a char */
-  private boolean lastCharHadMultipleBytes = false;
-
   private final Queue<SourcePointer.Region> remainingRegions;
   private SourcePointer.Region currentRegion;
 
@@ -59,6 +55,7 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
     if (regions == null || regions.isEmpty()) {
       regions = ImmutableList.of(new Region(0, (int) channel.size()));
     }
+    validateRegions(regions, pointer);
     this.pointer = pointer;
     this.currentOutCharOffset = 0;
     this.currentInByteOffset = 0;
@@ -69,7 +66,33 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
       this.addOffCorrectMap(currentOutCharOffset, currentRegion.start);
       this.cumulativeOffsetDifference += currentRegion.start;
       this.currentInByteOffset = currentRegion.start;
-      ((ByteSeekableReader) this.input).position(currentInByteOffset);
+    }
+    ((ByteSeekableReader) this.input).position(currentInByteOffset, currentRegion.end);
+  }
+
+  /**
+   * Reject regions that cannot describe a byte range.
+   *
+   * <p>Open-ended regions ({@code start:}) reach this class as {@code end == -1} and must be
+   * resolved to the file length by the caller, which {@code ExternalUtf8ContentFilterFactory} does
+   * before constructing the filter. Accepting them silently would decode nothing at all, since a
+   * negative byte count reads as an exhausted region.
+   */
+  private static void validateRegions(List<Region> regions, String pointer) {
+    for (Region region : regions) {
+      if (region.start < 0 || region.end < 0) {
+        throw new IllegalArgumentException(
+            String.format(
+                Locale.US,
+                "Region %s in %s has a negative offset; open ends must be resolved to the file length"
+                    + " before constructing the filter",
+                region,
+                pointer));
+      }
+      if (region.end < region.start) {
+        throw new IllegalArgumentException(
+            String.format(Locale.US, "Region %s in %s ends before it starts", region, pointer));
+      }
     }
   }
 
@@ -84,71 +107,103 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
   @Override
   public int read(char[] outputBuffer, int outputCharOffset, int requestedCharLen)
       throws IOException {
-    if (currentInByteOffset == currentRegion.end) {
-      return -1;
+    if (outputCharOffset < 0
+        || requestedCharLen < 0
+        || outputCharOffset > outputBuffer.length - requestedCharLen) {
+      throw new IndexOutOfBoundsException();
     }
-
+    if (requestedCharLen == 0) {
+      return 0;
+    }
     int numCharsRead = 0;
-    while (requestedCharLen - numCharsRead > 0) {
-      int bytesRemainingInRegion = currentRegion.end - currentInByteOffset;
-      int charsToRead = requestedCharLen - numCharsRead;
-      if (charsToRead > bytesRemainingInRegion) {
-        charsToRead = bytesRemainingInRegion;
-      }
-
-      int charsRead = this.input.read(outputBuffer, outputCharOffset, charsToRead);
-      if (charsRead < 0) {
-        break;
-      }
-      while (Utf8.encodedLength(CharBuffer.wrap(outputBuffer, outputCharOffset, charsRead))
-          > bytesRemainingInRegion) {
-        charsRead--;
-      }
-      correctOffsets(outputBuffer, outputCharOffset, charsRead);
-      numCharsRead += charsRead;
-      outputCharOffset += charsRead;
-
-      if (currentInByteOffset == currentRegion.end) {
-        if (remainingRegions.isEmpty()) {
-          break;
+    ByteSeekableReader reader = (ByteSeekableReader) this.input;
+    while (numCharsRead < requestedCharLen) {
+      try {
+        int charsRead =
+            reader.read(outputBuffer, outputCharOffset, requestedCharLen - numCharsRead);
+        if (charsRead < 0) {
+          if (remainingRegions.isEmpty()) {
+            break;
+          }
+          currentRegion = remainingRegions.remove();
+          currentInByteOffset = Math.max(currentInByteOffset, currentRegion.start);
+          cumulativeOffsetDifference = currentInByteOffset - currentOutCharOffset;
+          addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
+          reader.position(currentInByteOffset, currentRegion.end);
+          continue;
         }
-        currentRegion = remainingRegions.remove();
-
-        cumulativeOffsetDifference = currentRegion.start - currentOutCharOffset;
-        this.addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
-        if (this.currentRegion.start > this.currentInByteOffset) {
-          this.currentInByteOffset = currentRegion.start;
+        if (reader.asciiOnly()) {
+          currentInByteOffset += charsRead;
+          currentOutCharOffset += charsRead;
+        } else {
+          correctOffsets(
+              outputBuffer, outputCharOffset, charsRead, reader.replacementSourceByteLength());
         }
-        ((ByteSeekableReader) this.input).position(this.currentInByteOffset);
+        numCharsRead += charsRead;
+        outputCharOffset += charsRead;
+      } catch (IOException e) {
+        throw new IOException(
+            String.format(
+                Locale.ROOT,
+                "Failed to read region %s from '%s' near byte offset %d",
+                currentRegion,
+                pointer,
+                currentInByteOffset),
+            e);
       }
     }
     return numCharsRead > 0 ? numCharsRead : -1;
   }
 
-  /**
-   * Updates the current input and output offsets based on the characters read from the input.
-   *
-   * @param decodedChars Buffer of characters that were read from the input
-   * @param bufOffset Offset in decodedChars, where the stored characters start
-   * @param numChars Number of characters stored in decodedChars
-   */
-  private void correctOffsets(char[] decodedChars, int bufOffset, int numChars) {
-    for (int i = bufOffset; i < bufOffset + numChars; ) {
-      if (lastCharHadMultipleBytes) {
-        this.addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
-        lastCharHadMultipleBytes = false;
+  /** Update corrections, skipping ASCII runs whose byte and character lengths are equal. */
+  private void correctOffsets(char[] chars, int offset, int length, int boundaryReplacementWidth) {
+    assert boundaryReplacementWidth >= 0 && boundaryReplacementWidth <= 3
+        : boundaryReplacementWidth;
+    int byteOffset = currentInByteOffset;
+    int charOffset = currentOutCharOffset;
+    int end = offset + length;
+    for (int i = offset; i < end; ) {
+      int asciiStart = i;
+      while (i < end && chars[i] < 0x80) {
+        i++;
       }
-      int cp = Character.codePointAt(decodedChars, i);
-      int encodedLen = Utf8.encodedLength(cp);
-      int charLen = Character.charCount(cp);
-      i += charLen;
-      currentOutCharOffset += charLen;
-      currentInByteOffset += encodedLen;
-      if (encodedLen > 1) {
-        cumulativeOffsetDifference += (encodedLen - 1);
-        lastCharHadMultipleBytes = true;
+      byteOffset += i - asciiStart;
+      charOffset += i - asciiStart;
+      if (i == end) {
+        break;
       }
+      char c = chars[i++];
+      int width = sourceWidth(c);
+      if (i == end && boundaryReplacementWidth > 0) {
+        // A boundary replacement always ends a read: a truncated tail means the region ended, so
+        // nothing can follow it. Its width is the truncating prefix's length, not U+FFFD's three.
+        assert c == '\uFFFD' : c;
+        width = boundaryReplacementWidth;
+      }
+      byteOffset += width;
+      charOffset++;
+      cumulativeOffsetDifference = byteOffset - charOffset;
+      addOffCorrectMap(charOffset, cumulativeOffsetDifference);
     }
+    currentInByteOffset = byteOffset;
+    currentOutCharOffset = charOffset;
+  }
+
+  /**
+   * Source byte width of one decoded character, from the decoded value alone.
+   *
+   * <p>A surrogate pair is billed together on its low surrogate: across small caller reads the high
+   * surrogate can arrive alone, and the pair's four source bytes belong to the code point, not to
+   * either half of it.
+   */
+  private static int sourceWidth(char c) {
+    if (Character.isHighSurrogate(c)) {
+      return 0;
+    }
+    if (Character.isLowSurrogate(c)) {
+      return 4;
+    }
+    return c < 0x800 ? 2 : 3;
   }
 
   @Override
