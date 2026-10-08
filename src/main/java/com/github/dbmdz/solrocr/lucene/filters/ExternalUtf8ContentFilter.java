@@ -3,10 +3,8 @@ package com.github.dbmdz.solrocr.lucene.filters;
 import com.github.dbmdz.solrocr.model.SourcePointer;
 import com.github.dbmdz.solrocr.model.SourcePointer.Region;
 import com.github.dbmdz.solrocr.util.SourceAwareReader;
-import com.github.dbmdz.solrocr.util.Utf8;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
-import java.nio.CharBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,9 +42,6 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
   /** Source pointer of this reader, used for debugging and error reporting. */
   private final String pointer;
 
-  /** Whether the last seen character had more than 1 byte for a char */
-  private boolean lastCharHadMultipleBytes = false;
-
   private final Queue<SourcePointer.Region> remainingRegions;
   private SourcePointer.Region currentRegion;
 
@@ -69,8 +64,8 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
       this.addOffCorrectMap(currentOutCharOffset, currentRegion.start);
       this.cumulativeOffsetDifference += currentRegion.start;
       this.currentInByteOffset = currentRegion.start;
-      ((ByteSeekableReader) this.input).position(currentInByteOffset);
     }
+    ((ByteSeekableReader) this.input).position(currentInByteOffset, currentRegion.end);
   }
 
   /**
@@ -84,71 +79,71 @@ public class ExternalUtf8ContentFilter extends BaseCharFilter implements SourceA
   @Override
   public int read(char[] outputBuffer, int outputCharOffset, int requestedCharLen)
       throws IOException {
-    if (currentInByteOffset == currentRegion.end) {
-      return -1;
+    if (outputCharOffset < 0
+        || requestedCharLen < 0
+        || outputCharOffset > outputBuffer.length - requestedCharLen) {
+      throw new IndexOutOfBoundsException();
     }
-
+    if (requestedCharLen == 0) {
+      return 0;
+    }
     int numCharsRead = 0;
-    while (requestedCharLen - numCharsRead > 0) {
-      int bytesRemainingInRegion = currentRegion.end - currentInByteOffset;
-      int charsToRead = requestedCharLen - numCharsRead;
-      if (charsToRead > bytesRemainingInRegion) {
-        charsToRead = bytesRemainingInRegion;
-      }
-
-      int charsRead = this.input.read(outputBuffer, outputCharOffset, charsToRead);
+    ByteSeekableReader reader = (ByteSeekableReader) this.input;
+    while (numCharsRead < requestedCharLen) {
+      int charsRead = reader.read(outputBuffer, outputCharOffset, requestedCharLen - numCharsRead);
       if (charsRead < 0) {
-        break;
-      }
-      while (Utf8.encodedLength(CharBuffer.wrap(outputBuffer, outputCharOffset, charsRead))
-          > bytesRemainingInRegion) {
-        charsRead--;
-      }
-      correctOffsets(outputBuffer, outputCharOffset, charsRead);
-      numCharsRead += charsRead;
-      outputCharOffset += charsRead;
-
-      if (currentInByteOffset == currentRegion.end) {
         if (remainingRegions.isEmpty()) {
           break;
         }
         currentRegion = remainingRegions.remove();
-
-        cumulativeOffsetDifference = currentRegion.start - currentOutCharOffset;
-        this.addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
-        if (this.currentRegion.start > this.currentInByteOffset) {
-          this.currentInByteOffset = currentRegion.start;
-        }
-        ((ByteSeekableReader) this.input).position(this.currentInByteOffset);
+        currentInByteOffset = Math.max(currentInByteOffset, currentRegion.start);
+        cumulativeOffsetDifference = currentInByteOffset - currentOutCharOffset;
+        addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
+        reader.position(currentInByteOffset, currentRegion.end);
+        continue;
       }
+      if (reader.asciiOnly()) {
+        currentInByteOffset += charsRead;
+        currentOutCharOffset += charsRead;
+      } else {
+        correctOffsets(outputBuffer, outputCharOffset, charsRead, reader.replacementBytes());
+      }
+      numCharsRead += charsRead;
+      outputCharOffset += charsRead;
     }
     return numCharsRead > 0 ? numCharsRead : -1;
   }
 
-  /**
-   * Updates the current input and output offsets based on the characters read from the input.
-   *
-   * @param decodedChars Buffer of characters that were read from the input
-   * @param bufOffset Offset in decodedChars, where the stored characters start
-   * @param numChars Number of characters stored in decodedChars
-   */
-  private void correctOffsets(char[] decodedChars, int bufOffset, int numChars) {
-    for (int i = bufOffset; i < bufOffset + numChars; ) {
-      if (lastCharHadMultipleBytes) {
-        this.addOffCorrectMap(currentOutCharOffset, cumulativeOffsetDifference);
-        lastCharHadMultipleBytes = false;
+  /** Update corrections, skipping ASCII runs whose byte and character lengths are equal. */
+  private void correctOffsets(char[] chars, int offset, int length, int replacementBytes) {
+    int byteOffset = currentInByteOffset;
+    int charOffset = currentOutCharOffset;
+    int end = offset + length;
+    for (int i = offset; i < end; ) {
+      int asciiStart = i;
+      while (i < end && chars[i] < 0x80) {
+        i++;
       }
-      int cp = Character.codePointAt(decodedChars, i);
-      int encodedLen = Utf8.encodedLength(cp);
-      int charLen = Character.charCount(cp);
-      i += charLen;
-      currentOutCharOffset += charLen;
-      currentInByteOffset += encodedLen;
-      if (encodedLen > 1) {
-        cumulativeOffsetDifference += (encodedLen - 1);
-        lastCharHadMultipleBytes = true;
+      byteOffset += i - asciiStart;
+      charOffset += i - asciiStart;
+      if (i == end) {
+        break;
       }
+      char c = chars[i++];
+      // The decoder validates UTF-8 and emits complete pairs. Across small caller reads,
+      // bill the pair's four source bytes only when its low surrogate is returned.
+      int width =
+          Character.isHighSurrogate(c) ? 0 : Character.isLowSurrogate(c) ? 4 : c < 0x800 ? 2 : 3;
+      if (i == end && replacementBytes > 0) {
+        width = replacementBytes;
+      }
+      byteOffset += width;
+      charOffset++;
+      cumulativeOffsetDifference = byteOffset - charOffset;
+      addOffCorrectMap(charOffset, cumulativeOffsetDifference);
     }
+    currentInByteOffset = byteOffset;
+    currentOutCharOffset = charOffset;
   }
 
   @Override
