@@ -141,8 +141,12 @@ The format of the regions is inspired by [Python's slicing syntax](https://docs.
 
 
 !!! caution "Byte Offsets"
-    The region offsets are expected as **byte offsets**. Take care that the start and end of each region
-    fall on the start of a valid unicode byte sequence, and not in the middle of a multi-byte sequence.
+    The region offsets are expected as **byte offsets**, not character offsets. A region whose
+    **start** lands inside a multi-byte sequence is an error and fails indexing, since only a
+    malformed pointer produces one. A region **end** inside a multi-byte sequence is tolerated: the
+    truncated character is indexed as `U+FFFD` (`�`), so at most one character is lost per region and
+    no following offsets shift. Invalid UTF-8 in the file itself is always an error.
+
     Care needs to be taken when determining the offsets, since obtaining byte offsets for UTF8-encoded
     text files is difficult in some programming languages (most notoriously Java, use the
     [`net.byteseek:byteseek`](https://github.com/nishihatapalmer/byteseek) package)

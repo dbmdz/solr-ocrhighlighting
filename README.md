@@ -25,7 +25,7 @@ has the alternatives `christmas` and `christrias` for the token
 to search for `"presents christmas"` and `"presents clistrias"` and would
 get the correct match in both cases, both with full highlighting.
 
-The plugin **works with all Solr versions >= 7.5**.
+The plugin **works with all Solr versions >= 7.5 running on Java >= 11**.
 
 ## Features
 - Index hOCR, ALTO or [MiniOCR](https://dbmdz.github.io/solr-ocrhighlighting/formats/#miniocr) directly without preprocessing

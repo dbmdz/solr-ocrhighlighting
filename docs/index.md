@@ -41,7 +41,7 @@ does not interfere with Solr's standard highlighting component, i.e. it works
 transparently with non-OCR fields and just lets the default implementation handle
 those.
 
-The plugin **works with all Solr versions >= 7.x up to 9.0**.
+The plugin **works with all Solr versions >= 7.x up to and including 10.0 running on Java >= 11**.
 
 ## Features
 - Index various [OCR formats](formats.md) directly without any pre-processing

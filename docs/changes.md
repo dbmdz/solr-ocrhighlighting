@@ -1,5 +1,16 @@
 ## Unreleased
 
+**Fixed**
+- Byte offsets of external OCR files are now correct across source-pointer region
+  boundaries. A region that ends inside a multi-byte character used to lose or
+  duplicate text and shift every following offset; the truncated character is now
+  indexed as `U+FFFD`. Offsets after supplementary characters no longer drift, and
+  a small read that splits a surrogate pair no longer fails indexing.
+  **Reindex fields that use `ExternalUtf8ContentFilter`** for the corrected
+  offsets to take effect, existing indexes keep the offsets they were built with.
+  As a nice side effect, this brings a 4-10% performance boost for indexing,
+  depending on the OCR.
+
 
 ## 0.10.1 (2026-08-12)
 

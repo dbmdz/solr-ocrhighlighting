@@ -75,10 +75,20 @@ public class ExternalUtf8ContentFilterFactory extends CharFilterFactory {
       adjustRegions(pointer);
       // Section size and cache size don't matter, since we don't use sectioned reads during
       // indexing.
-      SourceReader r = pointer.getReader(512 * 1024, 0);
-      List<SourcePointer.Region> regions =
-          pointer.sources.stream().flatMap(s -> s.regions.stream()).collect(Collectors.toList());
-      return new ExternalUtf8ContentFilter(r.getByteChannel(), regions, ptrStr);
+      SourceReader source = pointer.getReader(512 * 1024, 0);
+      try {
+        List<SourcePointer.Region> regions =
+            pointer.sources.stream().flatMap(s -> s.regions.stream()).collect(Collectors.toList());
+        return new ExternalUtf8ContentFilter(source.getByteChannel(), regions, ptrStr);
+      } catch (IOException | RuntimeException | Error failure) {
+        // Only a successfully constructed filter takes ownership of the source channel.
+        try {
+          source.close();
+        } catch (IOException | RuntimeException | Error closeFailure) {
+          failure.addSuppressed(closeFailure);
+        }
+        throw failure;
+      }
     } catch (IOException e) {
       throw new RuntimeException(
           String.format(
