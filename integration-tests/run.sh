@@ -5,7 +5,25 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SOLR7_VERSIONS="7.7 7.6 7.5"
 SOLR8_VERSIONS="8.11 8.10 8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0"
 SOLR9_VERSIONS="9.9 9.8 9.7 9.6 9.5 9.4 9.3 9.2 9.1 9.0"
-SOLR10_VERSIONS="10.0"
+SOLR10_VERSIONS="10.1.0 10.0"
+
+# With no arguments, run the full matrix. Pass versions to run only those images,
+# e.g. ./integration-tests/run.sh 10.1.0
+if [[ "$#" -gt 0 ]]; then
+    SOLR7_VERSIONS=""
+    SOLR8_VERSIONS=""
+    SOLR9_VERSIONS=""
+    SOLR10_VERSIONS=""
+    for version in "$@"; do
+        case "$version" in
+            7.*) SOLR7_VERSIONS+=" $version" ;;
+            8.*) SOLR8_VERSIONS+=" $version" ;;
+            9.*) SOLR9_VERSIONS+=" $version" ;;
+            10.*) SOLR10_VERSIONS+=" $version" ;;
+            *) echo "Unsupported Solr version: $version" >&2; exit 1 ;;
+        esac
+    done
+fi
 
 # Prefer Docker when available, but allow Podman so the same test script works in both setups.
 if command -v docker >/dev/null 2>&1; then
@@ -95,10 +113,13 @@ if [ ! -d "../target" ]; then
 fi
 
 solr910_jar="$(ls ../target/*.jar |egrep -v '(javadoc|original|source|solr78)')"
-solr78_jar="$(ls ../target/*.jar |egrep 'solr78.jar')"
-if [ -z "$solr78_jar" ]; then
-    echo "No solr78 jar found in ../target, please run 'util/patch_solr78_bytecode.py' in the parent directory first!"
-    exit 1
+solr78_jar=""
+if [[ -n "$SOLR7_VERSIONS$SOLR8_VERSIONS" ]]; then
+    solr78_jar="$(ls ../target/*-solr78.jar 2>/dev/null || true)"
+    if [ -z "$solr78_jar" ]; then
+        echo "No solr78 jar found in ../target, please run 'util/patch_solr78_bytecode.py' in the parent directory first!"
+        exit 1
+    fi
 fi
 
 failed_versions=0
@@ -191,7 +212,9 @@ done
 rm -rf "$plugin_dir"/*.jar
 
 # Swap in the Solr 7/8-compatible artifact before continuing with the older image matrix.
-cp $solr78_jar "$plugin_dir"
+if [[ -n "$solr78_jar" ]]; then
+    cp $solr78_jar "$plugin_dir"
+fi
 # Solr 8 versions, use a different plugin JAR
 for version in $SOLR8_VERSIONS; do
     printf "Testing $version: "

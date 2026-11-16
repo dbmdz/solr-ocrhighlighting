@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.BaseCompositeReader;
 import org.apache.lucene.index.Fields;
@@ -15,6 +16,7 @@ import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.QueryTimeout;
 import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.solr.common.util.NamedList;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.QueryLimits;
@@ -33,6 +35,8 @@ public class LuceneSolrCompat {
       getMethodOrNull(IndexReader.class, "document", int.class, StoredFieldVisitor.class);
   private static final Method INDEX_READER_STORED_FIELDS =
       getMethodOrNull(IndexReader.class, "storedFields");
+  private static final Method NAMED_LIST_AS_SHALLOW_MAP =
+      getMethodOrNull(NamedList.class, "asShallowMap");
   private static final Method RESPONSE_BUILDER_GET_STAGE =
       getMethodOrNull(ResponseBuilder.class, "getStage");
   private static final Field RESPONSE_BUILDER_STAGE =
@@ -100,6 +104,21 @@ public class LuceneSolrCompat {
   public static void visitStoredFields(Object storedFields, int docId, StoredFieldVisitor visitor)
       throws IOException {
     invoke(storedFields, STORED_FIELDS_VISIT, docId, visitor);
+  }
+
+  /** Return a writable view of a Solr response header, not a detached copy. */
+  @SuppressWarnings("unchecked")
+  public static Map<String, Object> responseHeaderAsMap(NamedList<Object> header) {
+    // Recent SimpleOrderedMap implementations implement Map directly. Older Solr versions
+    // expose the same live view through NamedList.asShallowMap(), removed in Solr 10.1.
+    if (header instanceof Map) {
+      return (Map<String, Object>) header;
+    }
+    try {
+      return (Map<String, Object>) invokeUnchecked(header, NAMED_LIST_AS_SHALLOW_MAP);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public static int getStage(ResponseBuilder rb) {
