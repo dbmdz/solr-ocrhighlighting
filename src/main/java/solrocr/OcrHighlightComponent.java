@@ -136,7 +136,7 @@ public class OcrHighlightComponent extends SearchComponent
                 rb.getResults().docList,
                 highlightQuery,
                 req,
-                rb.rsp.getResponseHeader().asShallowMap());
+                LuceneSolrCompat.responseHeaderAsMap(rb.rsp.getResponseHeader()));
         if (ocrHighlights != null) {
           rb.rsp.add(HL_RESPONSE_FIELD, ocrHighlights);
         }
@@ -196,7 +196,7 @@ public class OcrHighlightComponent extends SearchComponent
         !Strings.isNullOrEmpty(rb.req.getParams().get(OcrHighlightParams.OCR_FIELDS, ""))
             && LuceneSolrCompat.getStage(rb) == ResponseBuilder.STAGE_GET_FIELDS;
     if (setOcrHighlights) {
-      final Object[] objArr = new NamedList.NamedListEntry[rb.resultIds.size()];
+      final Map.Entry<String, Object>[] objArr = new Map.Entry[rb.resultIds.size()];
       for (ShardRequest sreq : rb.finished) {
         if ((sreq.purpose & ShardRequest.PURPOSE_GET_HIGHLIGHTS) == 0) continue;
         for (ShardResponse srsp : sreq.responses) {
@@ -214,14 +214,11 @@ public class OcrHighlightComponent extends SearchComponent
           Object hl = srsp.getSolrResponse().getResponse().get(HL_RESPONSE_FIELD);
           if (hl != null) {
             SolrPluginUtils.copyNamedListIntoArrayByDocPosInResponse(
-                (NamedList) hl, rb.resultIds, (Map.Entry<String, Object>[]) objArr);
+                (NamedList) hl, rb.resultIds, objArr);
           }
         }
       }
-      rb.rsp.add(
-          HL_RESPONSE_FIELD,
-          SolrPluginUtils.removeNulls(
-              (Map.Entry<String, Object>[]) objArr, new SimpleOrderedMap<>()));
+      rb.rsp.add(HL_RESPONSE_FIELD, SolrPluginUtils.removeNulls(objArr, new SimpleOrderedMap<>()));
       fixRegularHighlighting(rb);
     }
   }
