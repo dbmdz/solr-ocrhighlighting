@@ -1,4 +1,4 @@
-## Unreleased
+## 0.11.0 (2026-11-16)
 
 **Changed**
 - Added compatibility with Solr 10.1
