@@ -36,6 +36,8 @@ VERSION_CONSTRAINTS_9 = [
     ((0, 8, 4), ("9.0", "9.4")),
     ((0, 8, 5), ("9.0", "9.6")),
     ((0, 9, 1), ("9.0", "9.8")),
+    ((0, 10, 0), ("9.0", "10.0")),
+    ((0, 11, 0), ("9.0", "10.1")),
 ]
 
 REPOSITORY_NAME = "ocrhighlighting"
@@ -189,8 +191,8 @@ def build_repository(
 ) -> List[Plugin]:
     """Build Solr plugin repository metadata from published GitHub releases.
 
-    When ``existing_repository`` is given, matching versions are reused as-is so
-    unchanged historical entries are not re-signed.
+    When ``existing_repository`` is given, matching artifacts are reused without
+    re-signing, but their compatibility constraints are refreshed.
     """
     all_releases = fetch_releases()
     existing_versions = version_map(existing_repository)
@@ -253,10 +255,12 @@ def build_versions(
         if is_v78:
             version_str = f"{version_str}-solr78"
             all_constraints = VERSION_CONSTRAINTS_78
-        if existing_versions is not None and version_str in existing_versions:
-            yield existing_versions[version_str]
-            continue
         constraint = next(c for min_vers, c in reversed(all_constraints) if version >= min_vers)
+        manifest = {"version-constraint": " - ".join(constraint)}
+        if existing_versions is not None and version_str in existing_versions:
+            existing = existing_versions[version_str]
+            yield {**existing, "manifest": {**existing["manifest"], **manifest}}
+            continue
 
         asset_url = asset["browser_download_url"]
         try:
@@ -267,7 +271,7 @@ def build_versions(
                 "version": version_str,
                 "date": publish_date.strftime("%Y-%m-%d"),
                 "artifacts": [artifact],
-                "manifest": {"version-constraint": " - ".join(constraint)},
+                "manifest": manifest,
             }
         except Exception as exc:
             print(
