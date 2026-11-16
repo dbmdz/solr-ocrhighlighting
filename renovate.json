@@ -21,6 +21,7 @@
       ]
     },
     {
+      // Solr is checked for daily, we want to track upstream versions very closely
       "extends": [
         "schedule:daily"
       ],
@@ -29,12 +30,18 @@
       ]
     },
     {
+      // Our Lucene version should track the one used by the currently used solr-core
+      // version. Unfortunately this can't be done automatically by renovate, so we
+      // have to exclude these dependencies from the renovate process and maintain them
+      // manually to be in sync with Solr
       "enabled": false,
       "matchPackageNames": [
         "org.apache.lucene{/,}**"
       ]
     },
     {
+      // Same thing as for Lucene, woodstox version should track the one used by solr
+      // and needs to be manually kept in sync
       "enabled": false,
       "matchPackageNames": [
         "com.fasterxml.woodstox{/,}**"
